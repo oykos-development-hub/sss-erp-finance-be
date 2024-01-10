@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/go-chi/chi/v5 v5.0.8
-	github.com/oykos-development-hub/celeritas v1.2.5
+	github.com/oykos-development-hub/celeritas v1.2.8
 	github.com/upper/db/v4 v4.6.0
 )
 

@@ -50,7 +50,7 @@ push_to_github:
       mkdir ../tmp;
       cd ../tmp;
       fi
-    - rm -rf ./sss-erp-inventory-be
+    - rm -rf ./sss-erp-finance-be
     - git clone git@github.com:oykos-development-hub/sss-erp-finance-be.git
     - cd sss-erp-finance-be
     - git checkout development
