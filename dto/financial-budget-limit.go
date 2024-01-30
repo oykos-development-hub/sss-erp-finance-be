@@ -7,14 +7,14 @@ import (
 )
 
 type FinancialBudgetLimitDTO struct {
-	BudgetID           int `json:"budget_id" validate:"required"`
+	FinancialBudgetID  int `json:"financial_budget_id" validate:"required"`
 	OrganizationUnitID int `json:"organization_unit_id" validate:"required"`
 	Limit              int `json:"limit" validate:"required"`
 }
 
 type FinancialBudgetLimitResponseDTO struct {
 	ID                 int       `json:"id"`
-	BudgetID           int       `json:"budget_id"`
+	FinancialBudgetID  int       `json:"financial_budget_id"`
 	OrganizationUnitID int       `json:"organization_unit_id"`
 	Limit              int       `json:"limit"`
 	CreatedAt          time.Time `json:"created_at"`
@@ -29,7 +29,7 @@ type FinancialBudgetLimitFilterDTO struct {
 
 func (dto FinancialBudgetLimitDTO) ToFinancialBudgetLimit() *data.FinancialBudgetLimit {
 	return &data.FinancialBudgetLimit{
-		BudgetID:           dto.BudgetID,
+		FinancialBudgetID:  dto.FinancialBudgetID,
 		OrganizationUnitID: dto.OrganizationUnitID,
 		Limit:              dto.Limit,
 	}
@@ -38,7 +38,7 @@ func (dto FinancialBudgetLimitDTO) ToFinancialBudgetLimit() *data.FinancialBudge
 func ToFinancialBudgetLimitResponseDTO(data data.FinancialBudgetLimit) FinancialBudgetLimitResponseDTO {
 	return FinancialBudgetLimitResponseDTO{
 		ID:                 data.ID,
-		BudgetID:           data.BudgetID,
+		FinancialBudgetID:  data.FinancialBudgetID,
 		OrganizationUnitID: data.OrganizationUnitID,
 		Limit:              data.Limit,
 		CreatedAt:          data.CreatedAt,

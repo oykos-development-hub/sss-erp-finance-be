@@ -9,7 +9,7 @@ import (
 // FinancialBudgetLimit struct
 type FinancialBudgetLimit struct {
 	ID                 int       `db:"id,omitempty"`
-	BudgetID           int       `db:"budget_id"`
+	FinancialBudgetID  int       `db:"financial_budget_id"`
 	OrganizationUnitID int       `db:"organization_unit_id"`
 	Limit              int       `db:"limit_value"`
 	CreatedAt          time.Time `db:"created_at,omitempty"`
