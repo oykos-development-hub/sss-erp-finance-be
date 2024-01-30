@@ -7,7 +7,8 @@ import (
 type Handlers struct {
 	BudgetHandler          BudgetHandler
 	FinancialBudgetHandler FinancialBudgetHandler
-}
+	FinancialBudgetLimitHandler FinancialBudgetLimitHandler
+	}
 
 type BudgetHandler interface {
 	CreateBudget(w http.ResponseWriter, r *http.Request)
@@ -24,4 +25,12 @@ type FinancialBudgetHandler interface {
 	GetFinancialBudgetById(w http.ResponseWriter, r *http.Request)
 	GetFinancialBudgetByBudgetID(w http.ResponseWriter, r *http.Request)
 	GetFinancialBudgetList(w http.ResponseWriter, r *http.Request)
+}
+
+type FinancialBudgetLimitHandler interface {
+	CreateFinancialBudgetLimit(w http.ResponseWriter, r *http.Request)
+	UpdateFinancialBudgetLimit(w http.ResponseWriter, r *http.Request)
+	DeleteFinancialBudgetLimit(w http.ResponseWriter, r *http.Request)
+	GetFinancialBudgetLimitById(w http.ResponseWriter, r *http.Request)
+	GetFinancialBudgetLimitList(w http.ResponseWriter, r *http.Request)
 }
