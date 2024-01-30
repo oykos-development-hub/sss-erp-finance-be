@@ -2,3 +2,4 @@ db-data
 .idea
 tmp
 vendor
+__debug*

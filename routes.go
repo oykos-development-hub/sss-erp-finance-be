@@ -14,6 +14,18 @@ func routes(app *celeritas.Celeritas, middleware *middleware.Middleware, handler
 	//api
 	app.Routes.Route("/api", func(rt chi.Router) {
 
+		rt.Post("/budgets", handlers.BudgetHandler.CreateBudget)
+		rt.Get("/budgets/{id}", handlers.BudgetHandler.GetBudgetById)
+		rt.Get("/budgets", handlers.BudgetHandler.GetBudgetList)
+		rt.Get("/budgets/{id}/financial", handlers.FinancialBudgetHandler.GetFinancialBudgetByBudgetID)
+		rt.Put("/budgets/{id}", handlers.BudgetHandler.UpdateBudget)
+		rt.Delete("/budgets/{id}", handlers.BudgetHandler.DeleteBudget)
+
+		rt.Post("/financial-budgets", handlers.FinancialBudgetHandler.CreateFinancialBudget)
+		rt.Get("/financial-budgets/{id}", handlers.FinancialBudgetHandler.GetFinancialBudgetById)
+		rt.Get("/financial-budgets", handlers.FinancialBudgetHandler.GetFinancialBudgetList)
+		rt.Put("/financial-budgets/{id}", handlers.FinancialBudgetHandler.UpdateFinancialBudget)
+		rt.Delete("/financial-budgets/{id}", handlers.FinancialBudgetHandler.DeleteFinancialBudget)
 	})
 
 	return app.Routes
