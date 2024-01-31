@@ -10,7 +10,7 @@ type ProgramDTO struct {
 	Title       string `json:"title" validate:"required"`
 	Code        string `json:"code"`
 	Description string `json:"description"`
-	ParentID    int    `json:"parent_id"`
+	ParentID    *int   `json:"parent_id"`
 }
 
 type ProgramResponseDTO struct {
@@ -18,7 +18,7 @@ type ProgramResponseDTO struct {
 	Title       string    `json:"title"`
 	Code        string    `json:"code"`
 	Description string    `json:"description"`
-	ParentID    int       `json:"parent_id"`
+	ParentID    *int      `json:"parent_id"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 }

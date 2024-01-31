@@ -12,7 +12,7 @@ type Program struct {
 	Title       string    `db:"title"`
 	Code        string    `db:"code"`
 	Description string    `db:"description"`
-	ParentID    int       `db:"parent_id"`
+	ParentID    *int      `db:"parent_id"`
 	CreatedAt   time.Time `db:"created_at,omitempty"`
 	UpdatedAt   time.Time `db:"updated_at"`
 }
