@@ -87,9 +87,9 @@ func (h *ProgramServiceImpl) GetProgramList(filter dto.ProgramFilterDTO) ([]dto.
 
 	if filter.IsProgram != nil {
 		if *filter.IsProgram {
-			conditionAndExp = up.And(conditionAndExp, &up.Cond{"parent_id IS NULL": nil})
+			conditionAndExp = up.And(conditionAndExp, &up.Cond{"parent_id IS": nil})
 		} else {
-			conditionAndExp = up.And(conditionAndExp, &up.Cond{"parent_id IS NOT NULL": nil})
+			conditionAndExp = up.And(conditionAndExp, &up.Cond{"parent_id IS NOT": nil})
 		}
 	}
 
