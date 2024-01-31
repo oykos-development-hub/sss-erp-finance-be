@@ -42,3 +42,27 @@ type NonFinancialBudgetService interface {
 	GetNonFinancialBudget(id int) (*dto.NonFinancialBudgetResponseDTO, error)
 	GetNonFinancialBudgetList(filter dto.NonFinancialBudgetFilterDTO) ([]dto.NonFinancialBudgetResponseDTO, *uint64, error)
 }
+
+type NonFinancialBudgetGoalService interface {
+	CreateNonFinancialBudgetGoal(input dto.NonFinancialBudgetGoalDTO) (*dto.NonFinancialBudgetGoalResponseDTO, error)
+	UpdateNonFinancialBudgetGoal(id int, input dto.NonFinancialBudgetGoalDTO) (*dto.NonFinancialBudgetGoalResponseDTO, error)
+	DeleteNonFinancialBudgetGoal(id int) error
+	GetNonFinancialBudgetGoal(id int) (*dto.NonFinancialBudgetGoalResponseDTO, error)
+	GetNonFinancialBudgetGoalList(filter dto.NonFinancialBudgetGoalFilterDTO) ([]dto.NonFinancialBudgetGoalResponseDTO, *uint64, error)
+}
+
+type ProgramService interface {
+	CreateProgram(input dto.ProgramDTO) (*dto.ProgramResponseDTO, error)
+	UpdateProgram(id int, input dto.ProgramDTO) (*dto.ProgramResponseDTO, error)
+	DeleteProgram(id int) error
+	GetProgram(id int) (*dto.ProgramResponseDTO, error)
+	GetProgramList(filter dto.ProgramFilterDTO) ([]dto.ProgramResponseDTO, *uint64, error)
+}
+
+type ActivityService interface {
+	CreateActivity(input dto.ActivityDTO) (*dto.ActivityResponseDTO, error)
+	UpdateActivity(id int, input dto.ActivityDTO) (*dto.ActivityResponseDTO, error)
+	DeleteActivity(id int) error
+	GetActivity(id int) (*dto.ActivityResponseDTO, error)
+	GetActivityList(filter dto.ActivityFilterDTO) ([]dto.ActivityResponseDTO, *uint64, error)
+}

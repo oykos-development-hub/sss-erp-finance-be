@@ -41,11 +41,23 @@ func initApplication() *celeritas.Celeritas {
 	NonFinancialBudgetService := services.NewNonFinancialBudgetServiceImpl(cel, models.NonFinancialBudget)
 	NonFinancialBudgetHandler := handlers.NewNonFinancialBudgetHandler(cel, NonFinancialBudgetService)
 
+	NonFinancialBudgetGoalService := services.NewNonFinancialBudgetGoalServiceImpl(cel, models.NonFinancialBudgetGoal)
+	NonFinancialBudgetGoalHandler := handlers.NewNonFinancialBudgetGoalHandler(cel, NonFinancialBudgetGoalService)
+
+	ProgramService := services.NewProgramServiceImpl(cel, models.Program)
+	ProgramHandler := handlers.NewProgramHandler(cel, ProgramService)
+
+	ActivityService := services.NewActivityServiceImpl(cel, models.Activity)
+	ActivityHandler := handlers.NewActivityHandler(cel, ActivityService)
+
 	myHandlers := &handlers.Handlers{
-		BudgetHandler:               BudgetHandler,
-		FinancialBudgetHandler:      FinancialBudgetHandler,
-		FinancialBudgetLimitHandler: FinancialBudgetLimitHandler,
-		NonFinancialBudgetHandler:   NonFinancialBudgetHandler,
+		BudgetHandler:                 BudgetHandler,
+		FinancialBudgetHandler:        FinancialBudgetHandler,
+		FinancialBudgetLimitHandler:   FinancialBudgetLimitHandler,
+		NonFinancialBudgetHandler:     NonFinancialBudgetHandler,
+		NonFinancialBudgetGoalHandler: NonFinancialBudgetGoalHandler,
+		ProgramHandler:                ProgramHandler,
+		ActivityHandler:               ActivityHandler,
 	}
 
 	myMiddleware := &middleware.Middleware{

@@ -38,6 +38,24 @@ func routes(app *celeritas.Celeritas, middleware *middleware.Middleware, handler
 		rt.Get("/non-financial-budgets", handlers.NonFinancialBudgetHandler.GetNonFinancialBudgetList)
 		rt.Put("/non-financial-budgets/{id}", handlers.NonFinancialBudgetHandler.UpdateNonFinancialBudget)
 		rt.Delete("/non-financial-budgets/{id}", handlers.NonFinancialBudgetHandler.DeleteNonFinancialBudget)
+
+		rt.Post("/non-financial-budget-goals", handlers.NonFinancialBudgetGoalHandler.CreateNonFinancialBudgetGoal)
+		rt.Get("/non-financial-budget-goals/{id}", handlers.NonFinancialBudgetGoalHandler.GetNonFinancialBudgetGoalById)
+		rt.Get("/non-financial-budget-goals", handlers.NonFinancialBudgetGoalHandler.GetNonFinancialBudgetGoalList)
+		rt.Put("/non-financial-budget-goals/{id}", handlers.NonFinancialBudgetGoalHandler.UpdateNonFinancialBudgetGoal)
+		rt.Delete("/non-financial-budget-goals/{id}", handlers.NonFinancialBudgetGoalHandler.DeleteNonFinancialBudgetGoal)
+
+		rt.Post("/programs", handlers.ProgramHandler.CreateProgram)
+		rt.Get("/programs/{id}", handlers.ProgramHandler.GetProgramById)
+		rt.Get("/programs", handlers.ProgramHandler.GetProgramList)
+		rt.Put("/programs/{id}", handlers.ProgramHandler.UpdateProgram)
+		rt.Delete("/programs/{id}", handlers.ProgramHandler.DeleteProgram)
+
+		rt.Post("/activities", handlers.ActivityHandler.CreateActivity)
+		rt.Get("/activities/{id}", handlers.ActivityHandler.GetActivityById)
+		rt.Get("/activities", handlers.ActivityHandler.GetActivityList)
+		rt.Put("/activities/{id}", handlers.ActivityHandler.UpdateActivity)
+		rt.Delete("/activities/{id}", handlers.ActivityHandler.DeleteActivity)
 	})
 
 	return app.Routes

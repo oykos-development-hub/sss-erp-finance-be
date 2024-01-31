@@ -5,11 +5,14 @@ import (
 )
 
 type Handlers struct {
-	BudgetHandler          BudgetHandler
-	FinancialBudgetHandler FinancialBudgetHandler
-	FinancialBudgetLimitHandler FinancialBudgetLimitHandler
-		NonFinancialBudgetHandler NonFinancialBudgetHandler
-	}
+	BudgetHandler                 BudgetHandler
+	FinancialBudgetHandler        FinancialBudgetHandler
+	FinancialBudgetLimitHandler   FinancialBudgetLimitHandler
+	NonFinancialBudgetHandler     NonFinancialBudgetHandler
+	NonFinancialBudgetGoalHandler NonFinancialBudgetGoalHandler
+	ProgramHandler                ProgramHandler
+	ActivityHandler               ActivityHandler
+}
 
 type BudgetHandler interface {
 	CreateBudget(w http.ResponseWriter, r *http.Request)
@@ -42,4 +45,28 @@ type NonFinancialBudgetHandler interface {
 	DeleteNonFinancialBudget(w http.ResponseWriter, r *http.Request)
 	GetNonFinancialBudgetById(w http.ResponseWriter, r *http.Request)
 	GetNonFinancialBudgetList(w http.ResponseWriter, r *http.Request)
+}
+
+type NonFinancialBudgetGoalHandler interface {
+	CreateNonFinancialBudgetGoal(w http.ResponseWriter, r *http.Request)
+	UpdateNonFinancialBudgetGoal(w http.ResponseWriter, r *http.Request)
+	DeleteNonFinancialBudgetGoal(w http.ResponseWriter, r *http.Request)
+	GetNonFinancialBudgetGoalById(w http.ResponseWriter, r *http.Request)
+	GetNonFinancialBudgetGoalList(w http.ResponseWriter, r *http.Request)
+}
+
+type ProgramHandler interface {
+	CreateProgram(w http.ResponseWriter, r *http.Request)
+	UpdateProgram(w http.ResponseWriter, r *http.Request)
+	DeleteProgram(w http.ResponseWriter, r *http.Request)
+	GetProgramById(w http.ResponseWriter, r *http.Request)
+	GetProgramList(w http.ResponseWriter, r *http.Request)
+}
+
+type ActivityHandler interface {
+	CreateActivity(w http.ResponseWriter, r *http.Request)
+	UpdateActivity(w http.ResponseWriter, r *http.Request)
+	DeleteActivity(w http.ResponseWriter, r *http.Request)
+	GetActivityById(w http.ResponseWriter, r *http.Request)
+	GetActivityList(w http.ResponseWriter, r *http.Request)
 }
