@@ -26,6 +26,8 @@ type ProgramResponseDTO struct {
 type ProgramFilterDTO struct {
 	Page        *int    `json:"page"`
 	Size        *int    `json:"size"`
+	Search      *string `json:"search"`
+	IsProgram   *bool   `json:"is_program"`
 	SortByTitle *string `json:"sort_by_title"`
 }
 

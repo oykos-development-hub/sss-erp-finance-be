@@ -1,6 +1,8 @@
 package services
 
 import (
+	"fmt"
+
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
 	"gitlab.sudovi.me/erp/finance-api/errors"
@@ -83,10 +85,23 @@ func (h *ProgramServiceImpl) GetProgramList(filter dto.ProgramFilterDTO) ([]dto.
 	conditionAndExp := &up.AndExpr{}
 	var orders []interface{}
 
-	// example of making conditions
-	// if filter.Year != nil {
-	// 	conditionAndExp = up.And(conditionAndExp, &up.Cond{"year": *filter.Year})
-	// }
+	if filter.IsProgram != nil {
+		if *filter.IsProgram {
+			conditionAndExp = up.And(conditionAndExp, &up.Cond{"parent_id": "IS NULL"})
+		} else {
+			conditionAndExp = up.And(conditionAndExp, &up.Cond{"parent_id": "IS NOT NULL"})
+		}
+	}
+
+	if filter.Search != nil && *filter.Search != "" {
+		likeCondition := fmt.Sprintf("%%%s%%", *filter.Search)
+		searchCond := up.Or(
+			up.Cond{"title ILIKE": likeCondition},
+			up.Cond{"code ILIKE": likeCondition},
+			up.Cond{"description ILIKE": likeCondition},
+		)
+		conditionAndExp = up.And(conditionAndExp, searchCond)
+	}
 
 	if filter.SortByTitle != nil {
 		if *filter.SortByTitle == "asc" {
@@ -97,7 +112,6 @@ func (h *ProgramServiceImpl) GetProgramList(filter dto.ProgramFilterDTO) ([]dto.
 	}
 
 	orders = append(orders, "-created_at")
-	
 
 	data, total, err := h.repo.GetAll(filter.Page, filter.Size, conditionAndExp, orders)
 	if err != nil {
