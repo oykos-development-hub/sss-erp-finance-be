@@ -83,10 +83,9 @@ func (h *NonFinancialBudgetServiceImpl) GetNonFinancialBudgetList(filter dto.Non
 	conditionAndExp := &up.AndExpr{}
 	var orders []interface{}
 
-	// example of making conditions
-	// if filter.Year != nil {
-	// 	conditionAndExp = up.And(conditionAndExp, &up.Cond{"year": *filter.Year})
-	// }
+	if filter.BudgetID != nil {
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"budget_id": *filter.BudgetID})
+	}
 
 	if filter.SortByTitle != nil {
 		if *filter.SortByTitle == "asc" {
@@ -97,7 +96,6 @@ func (h *NonFinancialBudgetServiceImpl) GetNonFinancialBudgetList(filter dto.Non
 	}
 
 	orders = append(orders, "-created_at")
-	
 
 	data, total, err := h.repo.GetAll(filter.Page, filter.Size, conditionAndExp, orders)
 	if err != nil {
