@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS non_financial_budgets (
     impl_contact_fullname TEXT NOT NULL,
     impl_contact_working_place TEXT NOT NULL,
     impl_contact_phone TEXT NOT NULL,
+    impl_contact_email TEXT NOT NULL,
     contact_fullname TEXT NOT NULL,
     contact_working_place TEXT NOT NULL,
     contact_phone TEXT NOT NULL,
