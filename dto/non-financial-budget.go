@@ -8,7 +8,7 @@ import (
 
 type NonFinancialBudgetDTO struct {
 	BudetID            int `json:"budget_id" validate:"required"`
-	OrganizationUnitID int `json:"title" validate:"required"`
+	OrganizationUnitID int `json:"organization_unit_id" validate:"required"`
 
 	ImplContactFullName     string `json:"impl_contact_fullname" validate:"required"`
 	ImplContactWorkingPlace string `json:"impl_contact_working_place" validate:"required"`
@@ -24,7 +24,7 @@ type NonFinancialBudgetDTO struct {
 type NonFinancialBudgetResponseDTO struct {
 	ID                 int `json:"id"`
 	BudetID            int `json:"budget_id"`
-	OrganizationUnitID int `json:"title"`
+	OrganizationUnitID int `json:"organization_unit_id"`
 
 	ImplContactFullName     string `json:"impl_contact_fullname"`
 	ImplContactWorkingPlace string `json:"impl_contact_working_place"`
