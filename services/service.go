@@ -66,3 +66,11 @@ type ActivityService interface {
 	GetActivity(id int) (*dto.ActivityResponseDTO, error)
 	GetActivityList(filter dto.ActivityFilterDTO) ([]dto.ActivityResponseDTO, *uint64, error)
 }
+
+type GoalIndicatorService interface {
+	CreateGoalIndicator(input dto.GoalIndicatorDTO) (*dto.GoalIndicatorResponseDTO, error)
+	UpdateGoalIndicator(id int, input dto.GoalIndicatorDTO) (*dto.GoalIndicatorResponseDTO, error)
+	DeleteGoalIndicator(id int) error
+	GetGoalIndicator(id int) (*dto.GoalIndicatorResponseDTO, error)
+	GetGoalIndicatorList(filter dto.GoalIndicatorFilterDTO) ([]dto.GoalIndicatorResponseDTO, *uint64, error)
+}

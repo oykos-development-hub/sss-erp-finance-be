@@ -12,7 +12,8 @@ type Handlers struct {
 	NonFinancialBudgetGoalHandler NonFinancialBudgetGoalHandler
 	ProgramHandler                ProgramHandler
 	ActivityHandler               ActivityHandler
-}
+	GoalIndicatorHandler GoalIndicatorHandler
+	}
 
 type BudgetHandler interface {
 	CreateBudget(w http.ResponseWriter, r *http.Request)
@@ -69,4 +70,12 @@ type ActivityHandler interface {
 	DeleteActivity(w http.ResponseWriter, r *http.Request)
 	GetActivityById(w http.ResponseWriter, r *http.Request)
 	GetActivityList(w http.ResponseWriter, r *http.Request)
+}
+
+type GoalIndicatorHandler interface {
+	CreateGoalIndicator(w http.ResponseWriter, r *http.Request)
+	UpdateGoalIndicator(w http.ResponseWriter, r *http.Request)
+	DeleteGoalIndicator(w http.ResponseWriter, r *http.Request)
+	GetGoalIndicatorById(w http.ResponseWriter, r *http.Request)
+	GetGoalIndicatorList(w http.ResponseWriter, r *http.Request)
 }

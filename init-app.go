@@ -50,6 +50,9 @@ func initApplication() *celeritas.Celeritas {
 	ActivityService := services.NewActivityServiceImpl(cel, models.Activity)
 	ActivityHandler := handlers.NewActivityHandler(cel, ActivityService)
 
+	GoalIndicatorService := services.NewGoalIndicatorServiceImpl(cel, models.GoalIndicator)
+	GoalIndicatorHandler := handlers.NewGoalIndicatorHandler(cel, GoalIndicatorService)
+
 	myHandlers := &handlers.Handlers{
 		BudgetHandler:                 BudgetHandler,
 		FinancialBudgetHandler:        FinancialBudgetHandler,
@@ -58,6 +61,7 @@ func initApplication() *celeritas.Celeritas {
 		NonFinancialBudgetGoalHandler: NonFinancialBudgetGoalHandler,
 		ProgramHandler:                ProgramHandler,
 		ActivityHandler:               ActivityHandler,
+		GoalIndicatorHandler:          GoalIndicatorHandler,
 	}
 
 	myMiddleware := &middleware.Middleware{

@@ -1,0 +1,23 @@
+CREATE TABLE IF NOT EXISTS goal_indicators (
+    id serial PRIMARY KEY,
+    goal_id INTEGER NOT NULL REFERENCES non_financial_budget_goals(id),
+    performance_indicator_code TEXT,
+    indicator_source TEXT,
+    base_year TEXT,
+    gender_equality TEXT,
+    base_value TEXT,
+    source_of_information TEXT,
+    unit_of_measure TEXT,
+    indicator_description TEXT,
+    planned_value_1 TEXT,
+    revised_value_1 TEXT,
+    achieved_value_1 TEXT,
+    planned_value_2 TEXT,
+    revised_value_2 TEXT,
+    achieved_value_2 TEXT,
+    planned_value_3 TEXT,
+    revised_value_3 TEXT,
+    achieved_value_3 TEXT,
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP
+);

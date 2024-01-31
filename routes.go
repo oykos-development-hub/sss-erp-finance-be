@@ -56,6 +56,12 @@ func routes(app *celeritas.Celeritas, middleware *middleware.Middleware, handler
 		rt.Get("/activities", handlers.ActivityHandler.GetActivityList)
 		rt.Put("/activities/{id}", handlers.ActivityHandler.UpdateActivity)
 		rt.Delete("/activities/{id}", handlers.ActivityHandler.DeleteActivity)
+
+		rt.Post("/goal-indicators", handlers.GoalIndicatorHandler.CreateGoalIndicator)
+		rt.Get("/goal-indicators/{id}", handlers.GoalIndicatorHandler.GetGoalIndicatorById)
+		rt.Get("/goal-indicators", handlers.GoalIndicatorHandler.GetGoalIndicatorList)
+		rt.Put("/goal-indicators/{id}", handlers.GoalIndicatorHandler.UpdateGoalIndicator)
+		rt.Delete("/goal-indicators/{id}", handlers.GoalIndicatorHandler.DeleteGoalIndicator)
 	})
 
 	return app.Routes

@@ -28,6 +28,7 @@ type Models struct {
 	NonFinancialBudgetGoal NonFinancialBudgetGoal
 	Program                Program
 	Activity               Activity
+	GoalIndicator          GoalIndicator
 }
 
 func New(databasePool *sql.DB) Models {
@@ -50,6 +51,7 @@ func New(databasePool *sql.DB) Models {
 		NonFinancialBudgetGoal: NonFinancialBudgetGoal{},
 		Program:                Program{},
 		Activity:               Activity{},
+		GoalIndicator:          GoalIndicator{},
 	}
 }
 
