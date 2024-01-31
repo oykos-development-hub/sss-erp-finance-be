@@ -35,14 +35,17 @@ func initApplication() *celeritas.Celeritas {
 	FinancialBudgetService := services.NewFinancialBudgetServiceImpl(cel, models.FinancialBudget)
 	FinancialBudgetHandler := handlers.NewFinancialBudgetHandler(cel, FinancialBudgetService)
 
-		
 	FinancialBudgetLimitService := services.NewFinancialBudgetLimitServiceImpl(cel, models.FinancialBudgetLimit)
 	FinancialBudgetLimitHandler := handlers.NewFinancialBudgetLimitHandler(cel, FinancialBudgetLimitService)
 
+	NonFinancialBudgetService := services.NewNonFinancialBudgetServiceImpl(cel, models.NonFinancialBudget)
+	NonFinancialBudgetHandler := handlers.NewNonFinancialBudgetHandler(cel, NonFinancialBudgetService)
+
 	myHandlers := &handlers.Handlers{
-		BudgetHandler:          BudgetHandler,
-		FinancialBudgetHandler: FinancialBudgetHandler,
+		BudgetHandler:               BudgetHandler,
+		FinancialBudgetHandler:      FinancialBudgetHandler,
 		FinancialBudgetLimitHandler: FinancialBudgetLimitHandler,
+		NonFinancialBudgetHandler:   NonFinancialBudgetHandler,
 	}
 
 	myMiddleware := &middleware.Middleware{

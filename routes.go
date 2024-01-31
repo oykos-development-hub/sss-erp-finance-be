@@ -32,6 +32,12 @@ func routes(app *celeritas.Celeritas, middleware *middleware.Middleware, handler
 		rt.Get("/financial-budget-limits", handlers.FinancialBudgetLimitHandler.GetFinancialBudgetLimitList)
 		rt.Put("/financial-budget-limits/{id}", handlers.FinancialBudgetLimitHandler.UpdateFinancialBudgetLimit)
 		rt.Delete("/financial-budget-limits/{id}", handlers.FinancialBudgetLimitHandler.DeleteFinancialBudgetLimit)
+
+		rt.Post("/non-financial-budgets", handlers.NonFinancialBudgetHandler.CreateNonFinancialBudget)
+		rt.Get("/non-financial-budgets/{id}", handlers.NonFinancialBudgetHandler.GetNonFinancialBudgetById)
+		rt.Get("/non-financial-budgets", handlers.NonFinancialBudgetHandler.GetNonFinancialBudgetList)
+		rt.Put("/non-financial-budgets/{id}", handlers.NonFinancialBudgetHandler.UpdateNonFinancialBudget)
+		rt.Delete("/non-financial-budgets/{id}", handlers.NonFinancialBudgetHandler.DeleteNonFinancialBudget)
 	})
 
 	return app.Routes

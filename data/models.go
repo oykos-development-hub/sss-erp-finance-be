@@ -24,6 +24,7 @@ type Models struct {
 	Budget               Budget
 	FinancialBudget      FinancialBudget
 	FinancialBudgetLimit FinancialBudgetLimit
+	NonFinancialBudget   NonFinancialBudget
 }
 
 func New(databasePool *sql.DB) Models {
@@ -42,6 +43,7 @@ func New(databasePool *sql.DB) Models {
 		Budget:               Budget{},
 		FinancialBudget:      FinancialBudget{},
 		FinancialBudgetLimit: FinancialBudgetLimit{},
+		NonFinancialBudget:   NonFinancialBudget{},
 	}
 }
 

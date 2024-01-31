@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS non_financial_budgets;

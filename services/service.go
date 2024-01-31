@@ -34,3 +34,11 @@ type FinancialBudgetLimitService interface {
 	GetFinancialBudgetLimit(id int) (*dto.FinancialBudgetLimitResponseDTO, error)
 	GetFinancialBudgetLimitList(filter dto.FinancialBudgetLimitFilterDTO) ([]dto.FinancialBudgetLimitResponseDTO, *uint64, error)
 }
+
+type NonFinancialBudgetService interface {
+	CreateNonFinancialBudget(input dto.NonFinancialBudgetDTO) (*dto.NonFinancialBudgetResponseDTO, error)
+	UpdateNonFinancialBudget(id int, input dto.NonFinancialBudgetDTO) (*dto.NonFinancialBudgetResponseDTO, error)
+	DeleteNonFinancialBudget(id int) error
+	GetNonFinancialBudget(id int) (*dto.NonFinancialBudgetResponseDTO, error)
+	GetNonFinancialBudgetList(filter dto.NonFinancialBudgetFilterDTO) ([]dto.NonFinancialBudgetResponseDTO, *uint64, error)
+}

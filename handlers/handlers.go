@@ -8,6 +8,7 @@ type Handlers struct {
 	BudgetHandler          BudgetHandler
 	FinancialBudgetHandler FinancialBudgetHandler
 	FinancialBudgetLimitHandler FinancialBudgetLimitHandler
+		NonFinancialBudgetHandler NonFinancialBudgetHandler
 	}
 
 type BudgetHandler interface {
@@ -33,4 +34,12 @@ type FinancialBudgetLimitHandler interface {
 	DeleteFinancialBudgetLimit(w http.ResponseWriter, r *http.Request)
 	GetFinancialBudgetLimitById(w http.ResponseWriter, r *http.Request)
 	GetFinancialBudgetLimitList(w http.ResponseWriter, r *http.Request)
+}
+
+type NonFinancialBudgetHandler interface {
+	CreateNonFinancialBudget(w http.ResponseWriter, r *http.Request)
+	UpdateNonFinancialBudget(w http.ResponseWriter, r *http.Request)
+	DeleteNonFinancialBudget(w http.ResponseWriter, r *http.Request)
+	GetNonFinancialBudgetById(w http.ResponseWriter, r *http.Request)
+	GetNonFinancialBudgetList(w http.ResponseWriter, r *http.Request)
 }
