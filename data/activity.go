@@ -8,12 +8,14 @@ import (
 
 // Activity struct
 type Activity struct {
-	ID          int       `db:"id,omitempty"`
-	Title       string    `db:"title"`
-	Code        string    `db:"code"`
-	Description string    `db:"description"`
-	CreatedAt   time.Time `db:"created_at,omitempty"`
-	UpdatedAt   time.Time `db:"updated_at"`
+	ID                 int       `db:"id,omitempty"`
+	OrganizationUnitID int       `db:"organization_unit_id"`
+	SubProgramID       int       `db:"sub_program_id"`
+	Title              string    `db:"title"`
+	Code               string    `db:"code"`
+	Description        string    `db:"description"`
+	CreatedAt          time.Time `db:"created_at,omitempty"`
+	UpdatedAt          time.Time `db:"updated_at"`
 }
 
 // Table returns the table name

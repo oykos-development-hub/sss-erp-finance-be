@@ -83,10 +83,12 @@ func (h *ActivityServiceImpl) GetActivityList(filter dto.ActivityFilterDTO) ([]d
 	conditionAndExp := &up.AndExpr{}
 	var orders []interface{}
 
-	// example of making conditions
-	// if filter.Year != nil {
-	// 	conditionAndExp = up.And(conditionAndExp, &up.Cond{"year": *filter.Year})
-	// }
+	if filter.FilterBySubProgramID != nil {
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"sub_program_id": *filter.FilterBySubProgramID})
+	}
+	if filter.FilterByOrganizationUnitID != nil {
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"organization_unit_id": *filter.FilterByOrganizationUnitID})
+	}
 
 	if filter.SortByTitle != nil {
 		if *filter.SortByTitle == "asc" {
@@ -97,7 +99,6 @@ func (h *ActivityServiceImpl) GetActivityList(filter dto.ActivityFilterDTO) ([]d
 	}
 
 	orders = append(orders, "-created_at")
-	
 
 	data, total, err := h.repo.GetAll(filter.Page, filter.Size, conditionAndExp, orders)
 	if err != nil {
