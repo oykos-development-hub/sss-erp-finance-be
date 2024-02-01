@@ -7,8 +7,8 @@ import (
 )
 
 type NonFinancialBudgetDTO struct {
-	BudetID    int `json:"budget_id" validate:"required"`
-	ActivityID int `json:"activity_id" validate:"required"`
+	BudetID            int `json:"budget_id" validate:"required"`
+	OrganizationUnitID int `json:"organization_unit_id" validate:"required"`
 
 	ImplContactFullName     string `json:"impl_contact_fullname" validate:"required"`
 	ImplContactWorkingPlace string `json:"impl_contact_working_place" validate:"required"`
@@ -22,9 +22,9 @@ type NonFinancialBudgetDTO struct {
 }
 
 type NonFinancialBudgetResponseDTO struct {
-	ID         int `json:"id"`
-	BudetID    int `json:"budget_id"`
-	ActivityID int `json:"activity_id"`
+	ID                 int `json:"id"`
+	BudetID            int `json:"budget_id"`
+	OrganizationUnitID int `json:"organization_unit_id"`
 
 	ImplContactFullName     string `json:"impl_contact_fullname"`
 	ImplContactWorkingPlace string `json:"impl_contact_working_place"`
@@ -41,17 +41,17 @@ type NonFinancialBudgetResponseDTO struct {
 }
 
 type NonFinancialBudgetFilterDTO struct {
-	Page        *int    `json:"page"`
-	Size        *int    `json:"size"`
-	BudgetID    *int    `json:"budget_id"`
-	SortByTitle *string `json:"sort_by_title"`
-	ActivityID  *int    `json:"activity_id"`
+	Page               *int    `json:"page"`
+	Size               *int    `json:"size"`
+	BudgetID           *int    `json:"budget_id"`
+	SortByTitle        *string `json:"sort_by_title"`
+	OrganizationUnitID *int    `json:"organization_unit_id"`
 }
 
 func (dto NonFinancialBudgetDTO) ToNonFinancialBudget() *data.NonFinancialBudget {
 	return &data.NonFinancialBudget{
 		BudetID:                 dto.BudetID,
-		ActivityID:              dto.ActivityID,
+		OrganizationUnitID:      dto.OrganizationUnitID,
 		ImplContactFullName:     dto.ImplContactFullName,
 		ImplContactWorkingPlace: dto.ImplContactWorkingPlace,
 		ImplContactPhone:        dto.ImplContactPhone,
@@ -67,7 +67,7 @@ func ToNonFinancialBudgetResponseDTO(data data.NonFinancialBudget) NonFinancialB
 	return NonFinancialBudgetResponseDTO{
 		ID:                      data.ID,
 		BudetID:                 data.BudetID,
-		ActivityID:              data.ActivityID,
+		OrganizationUnitID:      data.OrganizationUnitID,
 		ImplContactFullName:     data.ImplContactFullName,
 		ImplContactWorkingPlace: data.ImplContactWorkingPlace,
 		ImplContactPhone:        data.ImplContactPhone,

@@ -8,9 +8,9 @@ import (
 
 // NonFinancialBudget struct
 type NonFinancialBudget struct {
-	ID         int `db:"id,omitempty"`
-	BudetID    int `db:"budget_id"`
-	ActivityID int `db:"activity_id"`
+	ID                 int `db:"id,omitempty"`
+	BudetID            int `db:"budget_id"`
+	OrganizationUnitID int `db:"organization_unit_id"`
 
 	ImplContactFullName     string `db:"impl_contact_fullname"`
 	ImplContactWorkingPlace string `db:"impl_contact_working_place"`
