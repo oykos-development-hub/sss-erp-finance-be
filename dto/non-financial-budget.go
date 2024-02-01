@@ -7,8 +7,8 @@ import (
 )
 
 type NonFinancialBudgetDTO struct {
-	BudetID            int `json:"budget_id" validate:"required"`
-	OrganizationUnitID int `json:"organization_unit_id" validate:"required"`
+	BudetID    int `json:"budget_id" validate:"required"`
+	ActivityID int `json:"activity_id" validate:"required"`
 
 	ImplContactFullName     string `json:"impl_contact_fullname" validate:"required"`
 	ImplContactWorkingPlace string `json:"impl_contact_working_place" validate:"required"`
@@ -22,9 +22,9 @@ type NonFinancialBudgetDTO struct {
 }
 
 type NonFinancialBudgetResponseDTO struct {
-	ID                 int `json:"id"`
-	BudetID            int `json:"budget_id"`
-	OrganizationUnitID int `json:"organization_unit_id"`
+	ID         int `json:"id"`
+	BudetID    int `json:"budget_id"`
+	ActivityID int `json:"activity_id"`
 
 	ImplContactFullName     string `json:"impl_contact_fullname"`
 	ImplContactWorkingPlace string `json:"impl_contact_working_place"`
@@ -45,12 +45,13 @@ type NonFinancialBudgetFilterDTO struct {
 	Size        *int    `json:"size"`
 	BudgetID    *int    `json:"budget_id"`
 	SortByTitle *string `json:"sort_by_title"`
+	ActivityID  *int    `json:"activity_id"`
 }
 
 func (dto NonFinancialBudgetDTO) ToNonFinancialBudget() *data.NonFinancialBudget {
 	return &data.NonFinancialBudget{
 		BudetID:                 dto.BudetID,
-		OrganizationUnitID:      dto.OrganizationUnitID,
+		ActivityID:              dto.ActivityID,
 		ImplContactFullName:     dto.ImplContactFullName,
 		ImplContactWorkingPlace: dto.ImplContactWorkingPlace,
 		ImplContactPhone:        dto.ImplContactPhone,
@@ -66,7 +67,7 @@ func ToNonFinancialBudgetResponseDTO(data data.NonFinancialBudget) NonFinancialB
 	return NonFinancialBudgetResponseDTO{
 		ID:                      data.ID,
 		BudetID:                 data.BudetID,
-		OrganizationUnitID:      data.OrganizationUnitID,
+		ActivityID:              data.ActivityID,
 		ImplContactFullName:     data.ImplContactFullName,
 		ImplContactWorkingPlace: data.ImplContactWorkingPlace,
 		ImplContactPhone:        data.ImplContactPhone,
