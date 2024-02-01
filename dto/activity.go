@@ -31,6 +31,7 @@ type ActivityFilterDTO struct {
 	SortByTitle                *string `json:"sort_by_title"`
 	FilterBySubProgramID       *int    `json:"sub_program_id"`
 	FilterByOrganizationUnitID *int    `json:"organization_unit_id"`
+	Search                     *string `json:"search"`
 }
 
 func (dto ActivityDTO) ToActivity() *data.Activity {

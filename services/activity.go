@@ -1,6 +1,8 @@
 package services
 
 import (
+	"fmt"
+
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
 	"gitlab.sudovi.me/erp/finance-api/errors"
@@ -88,6 +90,16 @@ func (h *ActivityServiceImpl) GetActivityList(filter dto.ActivityFilterDTO) ([]d
 	}
 	if filter.FilterByOrganizationUnitID != nil {
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"organization_unit_id": *filter.FilterByOrganizationUnitID})
+	}
+
+	if filter.Search != nil && *filter.Search != "" {
+		likeCondition := fmt.Sprintf("%%%s%%", *filter.Search)
+		searchCond := up.Or(
+			up.Cond{"title ILIKE": likeCondition},
+			up.Cond{"code ILIKE": likeCondition},
+			up.Cond{"description ILIKE": likeCondition},
+		)
+		conditionAndExp = up.And(conditionAndExp, searchCond)
 	}
 
 	if filter.SortByTitle != nil {
