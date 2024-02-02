@@ -8,7 +8,6 @@ import (
 
 type NonFinancialBudgetGoalDTO struct {
 	NonFinancialBudgetID int    `json:"non_financial_budget_id" validate:"required"`
-	ActivityID           int    `json:"activity_id" validate:"required"`
 	Title                string `json:"title" validate:"required"`
 	Description          string `json:"description"`
 }
@@ -16,7 +15,6 @@ type NonFinancialBudgetGoalDTO struct {
 type NonFinancialBudgetGoalResponseDTO struct {
 	ID                   int       `json:"id"`
 	NonFinancialBudgetID int       `json:"non_financial_budget_id"`
-	ActivityID           int       `json:"activity_id"`
 	Title                string    `json:"title"`
 	Description          string    `json:"description"`
 	CreatedAt            time.Time `json:"created_at"`
@@ -32,7 +30,6 @@ type NonFinancialBudgetGoalFilterDTO struct {
 func (dto NonFinancialBudgetGoalDTO) ToNonFinancialBudgetGoal() *data.NonFinancialBudgetGoal {
 	return &data.NonFinancialBudgetGoal{
 		NonFinancialBudgetID: dto.NonFinancialBudgetID,
-		ActivityID:           dto.ActivityID,
 		Title:                dto.Title,
 		Description:          dto.Description,
 	}
@@ -42,7 +39,6 @@ func ToNonFinancialBudgetGoalResponseDTO(data data.NonFinancialBudgetGoal) NonFi
 	return NonFinancialBudgetGoalResponseDTO{
 		ID:                   data.ID,
 		NonFinancialBudgetID: data.NonFinancialBudgetID,
-		ActivityID:           data.ActivityID,
 		Title:                data.Title,
 		Description:          data.Description,
 		CreatedAt:            data.CreatedAt,
