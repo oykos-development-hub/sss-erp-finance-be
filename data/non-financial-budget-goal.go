@@ -10,8 +10,8 @@ import (
 type NonFinancialBudgetGoal struct {
 	ID                   int       `db:"id,omitempty"`
 	NonFinancialBudgetID int       `db:"non_financial_budget_id"`
-	Title                string    `json:"title"`
-	Description          string    `json:"description"`
+	Title                string    `db:"title"`
+	Description          string    `db:"description"`
 	CreatedAt            time.Time `db:"created_at,omitempty"`
 	UpdatedAt            time.Time `db:"updated_at"`
 }
