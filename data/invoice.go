@@ -10,7 +10,7 @@ import (
 type Invoice struct {
 	ID                    int       `db:"id,omitempty"`
 	InvoiceNumber         string    `db:"invoice_number"`
-	Status                string    `db:"status"`
+	Status                string    `db:"status,omitempty"`
 	GrossPrice            float64   `db:"gross_price"`
 	VATPrice              float64   `db:"vat_price"`
 	SupplierID            int       `db:"supplier_id"`
