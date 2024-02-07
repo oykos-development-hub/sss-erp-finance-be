@@ -1,13 +1,27 @@
 package services
 
-import (
-	"gitlab.sudovi.me/erp/finance-api/dto"
-)
+import "gitlab.sudovi.me/erp/finance-api/dto"
 
 type BaseService interface {
 	RandomString(n int) string
 	Encrypt(text string) (string, error)
 	Decrypt(crypto string) (string, error)
+}
+
+type InvoiceService interface {
+	CreateInvoice(input dto.InvoiceDTO) (*dto.InvoiceResponseDTO, error)
+	UpdateInvoice(id int, input dto.InvoiceDTO) (*dto.InvoiceResponseDTO, error)
+	DeleteInvoice(id int) error
+	GetInvoice(id int) (*dto.InvoiceResponseDTO, error)
+	GetInvoiceList(input dto.InvoicesFilter) ([]dto.InvoiceResponseDTO, *uint64, error)
+}
+
+type ArticleService interface {
+	CreateArticle(input dto.ArticleDTO) (*dto.ArticleResponseDTO, error)
+	UpdateArticle(id int, input dto.ArticleDTO) (*dto.ArticleResponseDTO, error)
+	DeleteArticle(id int) error
+	GetArticle(id int) (*dto.ArticleResponseDTO, error)
+	GetArticleList(filter dto.ArticleFilterDTO) ([]dto.ArticleResponseDTO, *uint64, error)
 }
 
 type BudgetService interface {

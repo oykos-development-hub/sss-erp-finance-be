@@ -7,9 +7,9 @@ import (
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/handlers"
 	"gitlab.sudovi.me/erp/finance-api/middleware"
+	"gitlab.sudovi.me/erp/finance-api/services"
 
 	"github.com/oykos-development-hub/celeritas"
-	"gitlab.sudovi.me/erp/finance-api/services"
 )
 
 func initApplication() *celeritas.Celeritas {
@@ -28,6 +28,12 @@ func initApplication() *celeritas.Celeritas {
 	cel.AppName = "gitlab.sudovi.me/erp/finance-api"
 
 	models := data.New(cel.DB.Pool)
+
+	ArticleService := services.NewArticleServiceImpl(cel, models.Article)
+	ArticleHandler := handlers.NewArticleHandler(cel, ArticleService)
+
+	InvoiceService := services.NewInvoiceServiceImpl(cel, models.Invoice, ArticleService)
+	InvoiceHandler := handlers.NewInvoiceHandler(cel, InvoiceService, ArticleService)
 
 	BudgetService := services.NewBudgetServiceImpl(cel, models.Budget)
 	BudgetHandler := handlers.NewBudgetHandler(cel, BudgetService)
@@ -54,6 +60,9 @@ func initApplication() *celeritas.Celeritas {
 	GoalIndicatorHandler := handlers.NewGoalIndicatorHandler(cel, GoalIndicatorService)
 
 	myHandlers := &handlers.Handlers{
+		InvoiceHandler: InvoiceHandler,
+		ArticleHandler: ArticleHandler,
+
 		BudgetHandler:                 BudgetHandler,
 		FinancialBudgetHandler:        FinancialBudgetHandler,
 		FinancialBudgetLimitHandler:   FinancialBudgetLimitHandler,

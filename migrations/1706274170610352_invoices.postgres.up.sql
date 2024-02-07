@@ -1,0 +1,20 @@
+CREATE TABLE invoices (
+    id serial PRIMARY KEY,
+    invoice_number TEXT,
+    --type TEXT,
+    status TEXT,
+    gross_price FLOAT,
+    vat_price FLOAT,
+    supplier_id INTEGER,
+    order_id INTEGER,
+    organization_unit_id INTEGER,
+    date_of_invoice TIMESTAMP,
+    receipt_date TIMESTAMP,
+    date_of_payment TIMESTAMP,
+    sss_invoice_receipt_date TIMESTAMP,
+    file_id INTEGER,
+    bank_account TEXT,
+    description TEXT,
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP
+);

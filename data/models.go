@@ -3,24 +3,26 @@ package data
 import (
 	"fmt"
 
-	db2 "github.com/upper/db/v4"
-	up "github.com/upper/db/v4"
 	"github.com/upper/db/v4/adapter/mysql"
 	"github.com/upper/db/v4/adapter/postgresql"
 
 	"database/sql"
 	"os"
+
+	up "github.com/upper/db/v4"
 )
 
 //nolint:all
 var db *sql.DB
 
 //nolint:all
-var upper db2.Session
+var upper up.Session
 
 type Models struct {
 	// any models inserted here (and in the New function)
 	// are easily accessible throughout the entire application
+	Invoice                Invoice
+	Article                Article
 	Budget                 Budget
 	FinancialBudget        FinancialBudget
 	FinancialBudgetLimit   FinancialBudgetLimit
@@ -44,6 +46,8 @@ func New(databasePool *sql.DB) Models {
 	}
 
 	return Models{
+		Invoice:                Invoice{},
+		Article:                Article{},
 		Budget:                 Budget{},
 		FinancialBudget:        FinancialBudget{},
 		FinancialBudgetLimit:   FinancialBudgetLimit{},
@@ -56,7 +60,7 @@ func New(databasePool *sql.DB) Models {
 }
 
 //nolint:all
-func getInsertId(i db2.ID) int {
+func getInsertId(i up.ID) int {
 	idType := fmt.Sprintf("%T", i)
 	if idType == "int64" {
 		return int(i.(int64))

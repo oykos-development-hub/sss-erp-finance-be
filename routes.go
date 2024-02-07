@@ -14,6 +14,23 @@ func routes(app *celeritas.Celeritas, middleware *middleware.Middleware, handler
 	//api
 	app.Routes.Route("/api", func(rt chi.Router) {
 
+		rt.Post("/invoices", handlers.InvoiceHandler.CreateInvoice)
+		rt.Get("/invoices/{id}", handlers.InvoiceHandler.GetInvoiceById)
+		rt.Get("/invoices", handlers.InvoiceHandler.GetInvoiceList)
+		rt.Put("/invoices/{id}", handlers.InvoiceHandler.UpdateInvoice)
+		rt.Delete("/invoices/{id}", handlers.InvoiceHandler.DeleteInvoice)
+
+		rt.Post("/accounts", handlers.AccountHandler.CreateAccount)
+		rt.Get("/accounts/{id}", handlers.AccountHandler.GetAccountById)
+		rt.Get("/accounts", handlers.AccountHandler.GetAccountList)
+		rt.Delete("/accounts/{id}", handlers.AccountHandler.DeleteAccount)
+
+		rt.Post("/articles", handlers.ArticleHandler.CreateArticle)
+		rt.Get("/articles/{id}", handlers.ArticleHandler.GetArticleById)
+		rt.Get("/articles", handlers.ArticleHandler.GetArticleList)
+		rt.Put("/articles/{id}", handlers.ArticleHandler.UpdateArticle)
+		rt.Delete("/articles/{id}", handlers.ArticleHandler.DeleteArticle)
+
 		rt.Post("/budgets", handlers.BudgetHandler.CreateBudget)
 		rt.Get("/budgets/{id}", handlers.BudgetHandler.GetBudgetById)
 		rt.Get("/budgets", handlers.BudgetHandler.GetBudgetList)

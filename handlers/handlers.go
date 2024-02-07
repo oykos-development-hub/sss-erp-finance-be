@@ -1,10 +1,11 @@
 package handlers
 
-import (
-	"net/http"
-)
+import "net/http"
 
 type Handlers struct {
+	InvoiceHandler                InvoiceHandler
+	AccountHandler                AccountHandler
+	ArticleHandler                ArticleHandler
 	BudgetHandler                 BudgetHandler
 	FinancialBudgetHandler        FinancialBudgetHandler
 	FinancialBudgetLimitHandler   FinancialBudgetLimitHandler
@@ -12,8 +13,31 @@ type Handlers struct {
 	NonFinancialBudgetGoalHandler NonFinancialBudgetGoalHandler
 	ProgramHandler                ProgramHandler
 	ActivityHandler               ActivityHandler
-	GoalIndicatorHandler GoalIndicatorHandler
-	}
+	GoalIndicatorHandler          GoalIndicatorHandler
+}
+
+type InvoiceHandler interface {
+	CreateInvoice(w http.ResponseWriter, r *http.Request)
+	UpdateInvoice(w http.ResponseWriter, r *http.Request)
+	DeleteInvoice(w http.ResponseWriter, r *http.Request)
+	GetInvoiceById(w http.ResponseWriter, r *http.Request)
+	GetInvoiceList(w http.ResponseWriter, r *http.Request)
+}
+
+type AccountHandler interface {
+	CreateAccount(w http.ResponseWriter, r *http.Request)
+	DeleteAccount(w http.ResponseWriter, r *http.Request)
+	GetAccountById(w http.ResponseWriter, r *http.Request)
+	GetAccountList(w http.ResponseWriter, r *http.Request)
+}
+
+type ArticleHandler interface {
+	CreateArticle(w http.ResponseWriter, r *http.Request)
+	UpdateArticle(w http.ResponseWriter, r *http.Request)
+	DeleteArticle(w http.ResponseWriter, r *http.Request)
+	GetArticleById(w http.ResponseWriter, r *http.Request)
+	GetArticleList(w http.ResponseWriter, r *http.Request)
+}
 
 type BudgetHandler interface {
 	CreateBudget(w http.ResponseWriter, r *http.Request)
