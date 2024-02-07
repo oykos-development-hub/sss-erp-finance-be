@@ -4,7 +4,6 @@ import "net/http"
 
 type Handlers struct {
 	InvoiceHandler                InvoiceHandler
-	AccountHandler                AccountHandler
 	ArticleHandler                ArticleHandler
 	BudgetHandler                 BudgetHandler
 	FinancialBudgetHandler        FinancialBudgetHandler
@@ -22,13 +21,6 @@ type InvoiceHandler interface {
 	DeleteInvoice(w http.ResponseWriter, r *http.Request)
 	GetInvoiceById(w http.ResponseWriter, r *http.Request)
 	GetInvoiceList(w http.ResponseWriter, r *http.Request)
-}
-
-type AccountHandler interface {
-	CreateAccount(w http.ResponseWriter, r *http.Request)
-	DeleteAccount(w http.ResponseWriter, r *http.Request)
-	GetAccountById(w http.ResponseWriter, r *http.Request)
-	GetAccountList(w http.ResponseWriter, r *http.Request)
 }
 
 type ArticleHandler interface {
