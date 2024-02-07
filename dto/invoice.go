@@ -10,7 +10,7 @@ type InvoicesFilter struct {
 	Search             *string `json:"search"`
 	Page               *int    `json:"page"`
 	Size               *int    `json:"size"`
-	Year               *string `json:"year"`
+	Year               *int    `json:"year"`
 	Status             *string `json:"status"`
 	SupplierID         *int    `json:"supplier_id"`
 	OrganizationUnitID *int    `json:"organization_unit_id"`

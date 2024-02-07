@@ -2,6 +2,7 @@ package services
 
 import (
 	"fmt"
+	"time"
 
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
@@ -91,7 +92,11 @@ func (h *InvoiceServiceImpl) GetInvoiceList(input dto.InvoicesFilter) ([]dto.Inv
 	conditionAndExp := &up.AndExpr{}
 
 	if input.Year != nil {
-		conditionAndExp = up.And(conditionAndExp, &up.Cond{"year": *input.Year})
+		year := *input.Year
+		startOfYear := time.Date(year, time.January, 1, 0, 0, 0, 0, time.UTC)
+		endOfYear := startOfYear.AddDate(1, 0, 0).Add(-time.Nanosecond)
+
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"date_of_invoice": up.Between(startOfYear, endOfYear)})
 	}
 
 	if input.Status != nil {
