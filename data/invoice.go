@@ -8,23 +8,23 @@ import (
 
 // Invoice struct
 type Invoice struct {
-	ID                    int       `db:"id,omitempty"`
-	InvoiceNumber         string    `db:"invoice_number"`
-	Status                string    `db:"status,omitempty"`
-	GrossPrice            float64   `db:"gross_price"`
-	VATPrice              float64   `db:"vat_price"`
-	SupplierID            int       `db:"supplier_id"`
-	OrderID               int       `db:"order_id"`
-	OrganizationUnitID    int       `db:"organization_unit_id"`
-	DateOfInvoice         time.Time `db:"date_of_invoice"`
-	ReceiptDate           time.Time `db:"receipt_date"`
-	DateOfPayment         time.Time `db:"date_of_payment"`
-	SSSInvoiceReceiptDate time.Time `db:"sss_invoice_receipt_date"`
-	FileID                int       `db:"file_id"`
-	BankAccount           string    `db:"bank_account"`
-	Description           string    `db:"description"`
-	CreatedAt             time.Time `db:"created_at,omitempty"`
-	UpdatedAt             time.Time `db:"updated_at"`
+	ID                    int        `db:"id,omitempty"`
+	InvoiceNumber         string     `db:"invoice_number"`
+	Status                string     `db:"status,omitempty"`
+	GrossPrice            float64    `db:"gross_price"`
+	VATPrice              float64    `db:"vat_price"`
+	SupplierID            int        `db:"supplier_id"`
+	OrderID               int        `db:"order_id"`
+	OrganizationUnitID    int        `db:"organization_unit_id"`
+	DateOfInvoice         time.Time  `db:"date_of_invoice"`
+	ReceiptDate           time.Time  `db:"receipt_date"`
+	DateOfPayment         time.Time  `db:"date_of_payment"`
+	SSSInvoiceReceiptDate *time.Time `db:"sss_invoice_receipt_date"`
+	FileID                int        `db:"file_id"`
+	BankAccount           string     `db:"bank_account"`
+	Description           string     `db:"description"`
+	CreatedAt             time.Time  `db:"created_at,omitempty"`
+	UpdatedAt             time.Time  `db:"updated_at"`
 }
 
 // Table returns the table name

@@ -17,20 +17,20 @@ type InvoicesFilter struct {
 }
 
 type InvoiceDTO struct {
-	InvoiceNumber         string    `json:"invoice_number"`
-	Status                string    `json:"status"`
-	GrossPrice            float64   `json:"gross_price"`
-	VATPrice              float64   `json:"vat_price"`
-	SupplierID            int       `json:"supplier_id"`
-	OrderID               int       `json:"order_id"`
-	OrganizationUnitID    int       `json:"organization_unit_id"`
-	DateOfInvoice         time.Time `json:"date_of_invoice"`
-	ReceiptDate           time.Time `json:"receipt_date"`
-	DateOfPayment         time.Time `json:"date_of_payment"`
-	SSSInvoiceReceiptDate time.Time `json:"sss_invoice_receipt_date"`
-	FileID                int       `json:"file_id"`
-	BankAccount           string    `json:"bank_account"`
-	Description           string    `json:"description"`
+	InvoiceNumber         string     `json:"invoice_number"`
+	Status                string     `json:"status"`
+	GrossPrice            float64    `json:"gross_price"`
+	VATPrice              float64    `json:"vat_price"`
+	SupplierID            int        `json:"supplier_id"`
+	OrderID               int        `json:"order_id"`
+	OrganizationUnitID    int        `json:"organization_unit_id"`
+	DateOfInvoice         time.Time  `json:"date_of_invoice"`
+	ReceiptDate           time.Time  `json:"receipt_date"`
+	DateOfPayment         time.Time  `json:"date_of_payment"`
+	SSSInvoiceReceiptDate *time.Time `json:"sss_invoice_receipt_date"`
+	FileID                int        `json:"file_id"`
+	BankAccount           string     `json:"bank_account"`
+	Description           string     `json:"description"`
 }
 
 type InvoiceResponseDTO struct {
@@ -45,7 +45,7 @@ type InvoiceResponseDTO struct {
 	DateOfInvoice         time.Time            `json:"date_of_invoice"`
 	ReceiptDate           time.Time            `json:"receipt_date"`
 	DateOfPayment         time.Time            `json:"date_of_payment"`
-	SSSInvoiceReceiptDate time.Time            `json:"sss_invoice_receipt_date"`
+	SSSInvoiceReceiptDate *time.Time           `json:"sss_invoice_receipt_date"`
 	FileID                int                  `json:"file_id"`
 	BankAccount           string               `json:"bank_account"`
 	Description           string               `json:"description"`
