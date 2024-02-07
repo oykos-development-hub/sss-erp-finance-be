@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS goal_indicators (
     id serial PRIMARY KEY,
-    goal_id INTEGER NOT NULL REFERENCES non_financial_budget_goals(id),
+    goal_id INTEGER NOT NULL REFERENCES non_financial_budget_goals(id) ON DELETE CASCADE,
     performance_indicator_code TEXT,
     indicator_source TEXT,
     base_year TEXT,

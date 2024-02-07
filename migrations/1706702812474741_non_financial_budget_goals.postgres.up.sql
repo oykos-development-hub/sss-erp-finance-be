@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS non_financial_budget_goals (
     id serial PRIMARY KEY,
     title TEXT NOT NULL,
     description TEXT NOT NULL,
-    non_financial_budget_id INTEGER NOT NULL REFERENCES non_financial_budgets(id),
+    non_financial_budget_id INTEGER NOT NULL REFERENCES non_financial_budgets(id) ON DELETE CASCADE,
     created_at TIMESTAMP,
     updated_at TIMESTAMP
 );
