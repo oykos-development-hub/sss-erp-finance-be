@@ -102,6 +102,10 @@ func (h *InvoiceServiceImpl) GetInvoiceList(input dto.InvoicesFilter) ([]dto.Inv
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"supplier_id": *input.SupplierID})
 	}
 
+	if input.OrganizationUnitID != nil {
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"organization_unit_id": *input.OrganizationUnitID})
+	}
+
 	if input.Search != nil {
 		likeCondition := fmt.Sprintf("%%%s%%", *input.Search)
 		search := up.Or(
