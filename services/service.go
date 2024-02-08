@@ -88,3 +88,11 @@ type GoalIndicatorService interface {
 	GetGoalIndicator(id int) (*dto.GoalIndicatorResponseDTO, error)
 	GetGoalIndicatorList(filter dto.GoalIndicatorFilterDTO) ([]dto.GoalIndicatorResponseDTO, *uint64, error)
 }
+
+type FilledFinancialBudgetService interface {
+	CreateFilledFinancialBudget(input dto.FilledFinancialBudgetDTO) (*dto.FilledFinancialBudgetResponseDTO, error)
+	UpdateFilledFinancialBudget(id int, input dto.FilledFinancialBudgetDTO) (*dto.FilledFinancialBudgetResponseDTO, error)
+	DeleteFilledFinancialBudget(id int) error
+	GetFilledFinancialBudget(id int) (*dto.FilledFinancialBudgetResponseDTO, error)
+	GetFilledFinancialBudgetList(filter dto.FilledFinancialBudgetFilterDTO) ([]dto.FilledFinancialBudgetResponseDTO, *uint64, error)
+}

@@ -74,6 +74,12 @@ func routes(app *celeritas.Celeritas, middleware *middleware.Middleware, handler
 		rt.Get("/goal-indicators", handlers.GoalIndicatorHandler.GetGoalIndicatorList)
 		rt.Put("/goal-indicators/{id}", handlers.GoalIndicatorHandler.UpdateGoalIndicator)
 		rt.Delete("/goal-indicators/{id}", handlers.GoalIndicatorHandler.DeleteGoalIndicator)
+
+		rt.Post("/filled-financial-budgets", handlers.FilledFinancialBudgetHandler.CreateFilledFinancialBudget)
+		rt.Get("/filled-financial-budgets/{id}", handlers.FilledFinancialBudgetHandler.GetFilledFinancialBudgetById)
+		rt.Get("/filled-financial-budgets", handlers.FilledFinancialBudgetHandler.GetFilledFinancialBudgetList)
+		rt.Put("/filled-financial-budgets/{id}", handlers.FilledFinancialBudgetHandler.UpdateFilledFinancialBudget)
+		rt.Delete("/filled-financial-budgets/{id}", handlers.FilledFinancialBudgetHandler.DeleteFilledFinancialBudget)
 	})
 
 	return app.Routes

@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS filled_financial_budgets;

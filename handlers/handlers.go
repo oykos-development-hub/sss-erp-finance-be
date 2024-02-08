@@ -13,6 +13,7 @@ type Handlers struct {
 	ProgramHandler                ProgramHandler
 	ActivityHandler               ActivityHandler
 	GoalIndicatorHandler          GoalIndicatorHandler
+	FilledFinancialBudgetHandler  FilledFinancialBudgetHandler
 }
 
 type InvoiceHandler interface {
@@ -94,4 +95,12 @@ type GoalIndicatorHandler interface {
 	DeleteGoalIndicator(w http.ResponseWriter, r *http.Request)
 	GetGoalIndicatorById(w http.ResponseWriter, r *http.Request)
 	GetGoalIndicatorList(w http.ResponseWriter, r *http.Request)
+}
+
+type FilledFinancialBudgetHandler interface {
+	CreateFilledFinancialBudget(w http.ResponseWriter, r *http.Request)
+	UpdateFilledFinancialBudget(w http.ResponseWriter, r *http.Request)
+	DeleteFilledFinancialBudget(w http.ResponseWriter, r *http.Request)
+	GetFilledFinancialBudgetById(w http.ResponseWriter, r *http.Request)
+	GetFilledFinancialBudgetList(w http.ResponseWriter, r *http.Request)
 }
