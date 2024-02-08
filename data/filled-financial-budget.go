@@ -8,7 +8,7 @@ import (
 
 // FilledFinancialBudget struct
 type FilledFinancialBudget struct {
-	ID                 int       `db:"id"`
+	ID                 int       `db:"id,omitempty"`
 	OrganizationUnitID int       `db:"organization_unit_id"`
 	FinanceBudgetID    int       `db:"finance_budget_id"`
 	AccountID          int       `db:"account_id"`
