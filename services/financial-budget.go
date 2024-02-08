@@ -84,6 +84,9 @@ func (h *FinancialBudgetServiceImpl) GetFinancialBudgetByBudgetID(id int) (*dto.
 	data, err := h.repo.GetAll(&cond)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
+		return nil, errors.ErrInternalServer
+	}
+	if len(data) == 0 {
 		return nil, errors.ErrNotFound
 	}
 	response := dto.ToFinancialBudgetResponseDTO(*data[0])
