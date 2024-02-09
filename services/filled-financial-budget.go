@@ -84,6 +84,7 @@ func (h *FilledFinancialBudgetServiceImpl) GetFilledFinancialBudgetList(filter d
 	var orders []interface{}
 
 	conditionAndExp = up.And(conditionAndExp, &up.Cond{"organization_unit_id": filter.OrganizationUnitID})
+	conditionAndExp = up.And(conditionAndExp, &up.Cond{"finance_budget_id": filter.FinancialBudgetID})
 
 	if filter.SortByTitle != nil {
 		if *filter.SortByTitle == "asc" {
