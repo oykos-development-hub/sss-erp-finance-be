@@ -13,13 +13,22 @@ const (
 	CurrentBudgetType BudgetType = 2
 )
 
+type BudgetStatus int
+
+const (
+	BudgetCreatedStatus BudgetStatus = 1
+	BudgetSentStatus    BudgetStatus = 2
+	BudgetClosedStatus  BudgetStatus = 3
+)
+
 // Budget struct
 type Budget struct {
-	ID         int        `db:"id,omitempty"`
-	Year       int        `db:"year"`
-	BudgetType BudgetType `db:"budget_type"`
-	CreatedAt  time.Time  `db:"created_at"`
-	UpdatedAt  time.Time  `db:"updated_at"`
+	ID           int          `db:"id,omitempty"`
+	Year         int          `db:"year"`
+	BudgetType   BudgetType   `db:"budget_type"`
+	BudgetStatus BudgetStatus `db:"budget_status"`
+	CreatedAt    time.Time    `db:"created_at"`
+	UpdatedAt    time.Time    `db:"updated_at"`
 }
 
 // Table returns the table name
