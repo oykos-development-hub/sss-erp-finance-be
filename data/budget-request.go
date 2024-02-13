@@ -9,9 +9,8 @@ import (
 type BudgetRequestStatus int
 
 const (
-	BudgetRequestCreatedStatus BudgetRequestStatus = 1
-	BudgetRequestSentStatus    BudgetRequestStatus = 2
-	BudgetRequestClosedStatus  BudgetRequestStatus = 3
+	BudgetRequestSentStatus     BudgetRequestStatus = 2
+	BudgetRequestFinishedStatus BudgetRequestStatus = 3
 )
 
 type RequestType int
@@ -26,7 +25,7 @@ const (
 type BudgetRequest struct {
 	ID                 int                 `db:"id,omitempty"`
 	OrganizationUnitID int                 `db:"organization_unit_id"`
-	BudgetID           int                 `db:"financial_budget_id"`
+	BudgetID           int                 `db:"budget_id"`
 	RequestType        RequestType         `db:"request_type"`
 	Status             BudgetRequestStatus `db:"status"`
 	CreatedAt          time.Time           `db:"created_at,omitempty"`
