@@ -83,7 +83,7 @@ func (h *BudgetRequestServiceImpl) GetBudgetRequestList(filter dto.BudgetRequest
 	conditionAndExp := &up.AndExpr{}
 	var orders []interface{}
 
-	conditionAndExp = up.And(conditionAndExp, &up.Cond{"financial_budget_id": filter.BudgetID})
+	conditionAndExp = up.And(conditionAndExp, &up.Cond{"budget_id": filter.BudgetID})
 	if filter.OrganizationUnitID != nil {
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"organization_unit_id": *filter.OrganizationUnitID})
 	}
