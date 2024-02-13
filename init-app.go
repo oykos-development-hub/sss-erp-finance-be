@@ -62,6 +62,9 @@ func initApplication() *celeritas.Celeritas {
 	FilledFinancialBudgetService := services.NewFilledFinancialBudgetServiceImpl(cel, models.FilledFinancialBudget)
 	FilledFinancialBudgetHandler := handlers.NewFilledFinancialBudgetHandler(cel, FilledFinancialBudgetService)
 
+	BudgetRequestService := services.NewBudgetRequestServiceImpl(cel, models.BudgetRequest)
+	BudgetRequestHandler := handlers.NewBudgetRequestHandler(cel, BudgetRequestService)
+
 	myHandlers := &handlers.Handlers{
 		InvoiceHandler: InvoiceHandler,
 		ArticleHandler: ArticleHandler,
@@ -75,6 +78,7 @@ func initApplication() *celeritas.Celeritas {
 		ActivityHandler:               ActivityHandler,
 		GoalIndicatorHandler:          GoalIndicatorHandler,
 		FilledFinancialBudgetHandler:  FilledFinancialBudgetHandler,
+		BudgetRequestHandler:          BudgetRequestHandler,
 	}
 
 	myMiddleware := &middleware.Middleware{

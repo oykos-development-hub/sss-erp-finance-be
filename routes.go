@@ -80,6 +80,12 @@ func routes(app *celeritas.Celeritas, middleware *middleware.Middleware, handler
 		rt.Get("/filled-financial-budgets", handlers.FilledFinancialBudgetHandler.GetFilledFinancialBudgetList)
 		rt.Put("/filled-financial-budgets/{id}", handlers.FilledFinancialBudgetHandler.UpdateFilledFinancialBudget)
 		rt.Delete("/filled-financial-budgets/{id}", handlers.FilledFinancialBudgetHandler.DeleteFilledFinancialBudget)
+
+		rt.Post("/budget-requests", handlers.BudgetRequestHandler.CreateBudgetRequest)
+		rt.Get("/budget-requests/{id}", handlers.BudgetRequestHandler.GetBudgetRequestById)
+		rt.Get("/budget-requests", handlers.BudgetRequestHandler.GetBudgetRequestList)
+		rt.Put("/budget-requests/{id}", handlers.BudgetRequestHandler.UpdateBudgetRequest)
+		rt.Delete("/budget-requests/{id}", handlers.BudgetRequestHandler.DeleteBudgetRequest)
 	})
 
 	return app.Routes

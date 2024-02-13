@@ -96,3 +96,11 @@ type FilledFinancialBudgetService interface {
 	GetFilledFinancialBudget(id int) (*dto.FilledFinancialBudgetResponseDTO, error)
 	GetFilledFinancialBudgetList(filter dto.FilledFinancialBudgetFilterDTO) ([]dto.FilledFinancialBudgetResponseDTO, *uint64, error)
 }
+
+type BudgetRequestService interface {
+	CreateBudgetRequest(input dto.BudgetRequestDTO) (*dto.BudgetRequestResponseDTO, error)
+	UpdateBudgetRequest(id int, input dto.BudgetRequestDTO) (*dto.BudgetRequestResponseDTO, error)
+	DeleteBudgetRequest(id int) error
+	GetBudgetRequest(id int) (*dto.BudgetRequestResponseDTO, error)
+	GetBudgetRequestList(filter dto.BudgetRequestFilterDTO) ([]dto.BudgetRequestResponseDTO, *uint64, error)
+}
