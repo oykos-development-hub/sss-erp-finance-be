@@ -91,14 +91,6 @@ func (h *BudgetRequestServiceImpl) GetBudgetRequestList(filter dto.BudgetRequest
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"request_type": *filter.RequestType})
 	}
 
-	if filter.SortByTitle != nil {
-		if *filter.SortByTitle == "asc" {
-			orders = append(orders, "-title")
-		} else {
-			orders = append(orders, "title")
-		}
-	}
-
 	orders = append(orders, "-created_at")
 
 	data, total, err := h.repo.GetAll(filter.Page, filter.Size, conditionAndExp, orders)

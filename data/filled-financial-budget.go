@@ -10,7 +10,7 @@ import (
 type FilledFinancialBudget struct {
 	ID                 int       `db:"id,omitempty"`
 	OrganizationUnitID int       `db:"organization_unit_id"`
-	FinanceBudgetID    int       `db:"finance_budget_id"`
+	BudgetRequestID    int       `db:"budget_request_id"`
 	AccountID          int       `db:"account_id"`
 	CurrentYear        int       `db:"current_year"`
 	NextYear           int       `db:"next_year"`

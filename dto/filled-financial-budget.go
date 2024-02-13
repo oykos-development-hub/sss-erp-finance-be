@@ -8,7 +8,7 @@ import (
 
 type FilledFinancialBudgetDTO struct {
 	OrganizationUnitID int    `json:"organization_unit_id" validate:"required"`
-	FinanceBudgetID    int    `json:"finance_budget_id" validate:"required"`
+	BudgetRequestID    int    `json:"budget_request_id" validate:"required"`
 	AccountID          int    `json:"account_id" validate:"required"`
 	CurrentYear        int    `json:"current_year"`
 	NextYear           int    `json:"next_year"`
@@ -19,7 +19,7 @@ type FilledFinancialBudgetDTO struct {
 type FilledFinancialBudgetResponseDTO struct {
 	ID                 int       `json:"id"`
 	OrganizationUnitID int       `json:"organization_unit_id"`
-	FinanceBudgetID    int       `json:"finance_budget_id"`
+	BudgetRequestID    int       `json:"budget_request_id"`
 	AccountID          int       `json:"account_id"`
 	CurrentYear        int       `json:"current_year"`
 	NextYear           int       `json:"next_year"`
@@ -34,13 +34,13 @@ type FilledFinancialBudgetFilterDTO struct {
 	Size               *int    `json:"size"`
 	SortByTitle        *string `json:"sort_by_title"`
 	OrganizationUnitID int     `json:"organization_unit_id" validate:"required"`
-	FinancialBudgetID  int     `json:"financial_budget_id" validate:"required"`
+	BudgetRequestID    int     `json:"budget_request_id" validate:"required"`
 }
 
 func (dto FilledFinancialBudgetDTO) ToFilledFinancialBudget() *data.FilledFinancialBudget {
 	return &data.FilledFinancialBudget{
 		OrganizationUnitID: dto.OrganizationUnitID,
-		FinanceBudgetID:    dto.FinanceBudgetID,
+		BudgetRequestID:    dto.BudgetRequestID,
 		AccountID:          dto.AccountID,
 		CurrentYear:        dto.CurrentYear,
 		NextYear:           dto.NextYear,
@@ -53,7 +53,7 @@ func ToFilledFinancialBudgetResponseDTO(data data.FilledFinancialBudget) FilledF
 	return FilledFinancialBudgetResponseDTO{
 		ID:                 data.ID,
 		OrganizationUnitID: data.OrganizationUnitID,
-		FinanceBudgetID:    data.FinanceBudgetID,
+		BudgetRequestID:    data.BudgetRequestID,
 		AccountID:          data.AccountID,
 		CurrentYear:        data.CurrentYear,
 		NextYear:           data.NextYear,

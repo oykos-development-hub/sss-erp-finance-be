@@ -7,7 +7,6 @@ import (
 )
 
 type BudgetRequestDTO struct {
-	Title              string                   `json:"title" validate:"required"`
 	OrganizationUnitID int                      `json:"organization_unit_id" validate:"required"`
 	BudgetID           int                      `json:"budget_id" validate:"required"`
 	RequestType        data.RequestType         `json:"request_type" validate:"required"`
@@ -27,7 +26,6 @@ type BudgetRequestResponseDTO struct {
 type BudgetRequestFilterDTO struct {
 	Page               *int              `json:"page"`
 	Size               *int              `json:"size"`
-	SortByTitle        *string           `json:"sort_by_title"`
 	OrganizationUnitID *int              `json:"organization_unit_id"`
 	BudgetID           int               `json:"budget_id"`
 	RequestType        *data.RequestType `json:"request_type"`
