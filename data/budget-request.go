@@ -16,8 +16,8 @@ const (
 type RequestType int
 
 const (
-	DonationFinancialRequestType RequestType = 1
-	CurrentFinancialRequestType  RequestType = 2
+	CurrentFinancialRequestType  RequestType = 1
+	DonationFinancialRequestType RequestType = 2
 	NonFinancialRequestType      RequestType = 3
 )
 
