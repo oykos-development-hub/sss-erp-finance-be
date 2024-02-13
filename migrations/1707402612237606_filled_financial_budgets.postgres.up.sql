@@ -1,6 +1,5 @@
 CREATE TABLE IF NOT EXISTS filled_financial_budgets (
     id serial PRIMARY KEY,
-    organization_unit_id INTEGER NOT NULL,
     budget_request_id INTEGER NOT NULL REFERENCES budget_requests(id) ON DELETE CASCADE,
     account_id INTEGER NOT NULL,
     current_year INTEGER NOT NULL,
