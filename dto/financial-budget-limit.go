@@ -7,14 +7,14 @@ import (
 )
 
 type FinancialBudgetLimitDTO struct {
-	FinancialBudgetID  int `json:"financial_budget_id" validate:"required"`
+	BudgetID           int `json:"budget_id" validate:"required"`
 	OrganizationUnitID int `json:"organization_unit_id" validate:"required"`
 	Limit              int `json:"limit" validate:"required"`
 }
 
 type FinancialBudgetLimitResponseDTO struct {
 	ID                 int       `json:"id"`
-	FinancialBudgetID  int       `json:"financial_budget_id"`
+	BudgetID           int       `json:"budget_id"`
 	OrganizationUnitID int       `json:"organization_unit_id"`
 	Limit              int       `json:"limit"`
 	CreatedAt          time.Time `json:"created_at"`
@@ -25,11 +25,12 @@ type FinancialBudgetLimitFilterDTO struct {
 	Page        *int    `json:"page"`
 	Size        *int    `json:"size"`
 	SortByTitle *string `json:"sort_by_title"`
+	BudgetID    int     `json:"budget_id"`
 }
 
 func (dto FinancialBudgetLimitDTO) ToFinancialBudgetLimit() *data.FinancialBudgetLimit {
 	return &data.FinancialBudgetLimit{
-		FinancialBudgetID:  dto.FinancialBudgetID,
+		BudgetID:           dto.BudgetID,
 		OrganizationUnitID: dto.OrganizationUnitID,
 		Limit:              dto.Limit,
 	}
@@ -38,7 +39,7 @@ func (dto FinancialBudgetLimitDTO) ToFinancialBudgetLimit() *data.FinancialBudge
 func ToFinancialBudgetLimitResponseDTO(data data.FinancialBudgetLimit) FinancialBudgetLimitResponseDTO {
 	return FinancialBudgetLimitResponseDTO{
 		ID:                 data.ID,
-		FinancialBudgetID:  data.FinancialBudgetID,
+		BudgetID:           data.BudgetID,
 		OrganizationUnitID: data.OrganizationUnitID,
 		Limit:              data.Limit,
 		CreatedAt:          data.CreatedAt,
