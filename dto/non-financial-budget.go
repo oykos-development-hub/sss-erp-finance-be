@@ -41,7 +41,6 @@ type NonFinancialBudgetResponseDTO struct {
 type NonFinancialBudgetFilterDTO struct {
 	Page        *int    `json:"page"`
 	Size        *int    `json:"size"`
-	BudgetID    *int    `json:"budget_id"`
 	SortByTitle *string `json:"sort_by_title"`
 	RequestID   *int    `json:"request_id"`
 }

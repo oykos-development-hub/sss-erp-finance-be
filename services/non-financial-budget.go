@@ -87,12 +87,8 @@ func (h *NonFinancialBudgetServiceImpl) GetNonFinancialBudgetList(filter dto.Non
 	conditionAndExp := &up.AndExpr{}
 	var orders []interface{}
 
-	if filter.BudgetID != nil {
-		conditionAndExp = up.And(conditionAndExp, &up.Cond{"budget_id": *filter.BudgetID})
-	}
-
 	if filter.RequestID != nil {
-		conditionAndExp = up.And(conditionAndExp, &up.Cond{"request_id": *filter.BudgetID})
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"request_id": *filter.RequestID})
 	}
 
 	if filter.SortByTitle != nil {
