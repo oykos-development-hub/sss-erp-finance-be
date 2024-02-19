@@ -91,6 +91,10 @@ func (h *NonFinancialBudgetServiceImpl) GetNonFinancialBudgetList(filter dto.Non
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"budget_id": *filter.BudgetID})
 	}
 
+	if filter.RequestID != nil {
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"request_id": *filter.BudgetID})
+	}
+
 	if filter.SortByTitle != nil {
 		if *filter.SortByTitle == "asc" {
 			orders = append(orders, "-title")
