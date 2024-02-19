@@ -7,7 +7,6 @@ import (
 )
 
 type NonFinancialBudgetDTO struct {
-	BudetID   int `json:"budget_id" validate:"required"`
 	RequestID int `json:"request_id" validate:"required"`
 
 	ImplContactFullName     string `json:"impl_contact_fullname" validate:"required"`
@@ -23,7 +22,6 @@ type NonFinancialBudgetDTO struct {
 
 type NonFinancialBudgetResponseDTO struct {
 	ID        int `json:"id"`
-	BudetID   int `json:"budget_id"`
 	RequestID int `json:"request_id"`
 
 	ImplContactFullName     string `json:"impl_contact_fullname"`
@@ -50,7 +48,6 @@ type NonFinancialBudgetFilterDTO struct {
 
 func (dto NonFinancialBudgetDTO) ToNonFinancialBudget() *data.NonFinancialBudget {
 	return &data.NonFinancialBudget{
-		BudetID:                 dto.BudetID,
 		RequestID:               dto.RequestID,
 		ImplContactFullName:     dto.ImplContactFullName,
 		ImplContactWorkingPlace: dto.ImplContactWorkingPlace,
@@ -66,7 +63,6 @@ func (dto NonFinancialBudgetDTO) ToNonFinancialBudget() *data.NonFinancialBudget
 func ToNonFinancialBudgetResponseDTO(data data.NonFinancialBudget) NonFinancialBudgetResponseDTO {
 	return NonFinancialBudgetResponseDTO{
 		ID:                      data.ID,
-		BudetID:                 data.BudetID,
 		RequestID:               data.RequestID,
 		ImplContactFullName:     data.ImplContactFullName,
 		ImplContactWorkingPlace: data.ImplContactWorkingPlace,
