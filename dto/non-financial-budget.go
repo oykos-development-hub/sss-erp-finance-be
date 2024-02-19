@@ -39,10 +39,10 @@ type NonFinancialBudgetResponseDTO struct {
 }
 
 type NonFinancialBudgetFilterDTO struct {
-	Page        *int    `json:"page"`
-	Size        *int    `json:"size"`
-	SortByTitle *string `json:"sort_by_title"`
-	RequestID   *int    `json:"request_id"`
+	Page          *int           `json:"page"`
+	Size          *int           `json:"size"`
+	SortByTitle   *string        `json:"sort_by_title"`
+	RequestIDList *[]interface{} `json:"request_id_list"`
 }
 
 func (dto NonFinancialBudgetDTO) ToNonFinancialBudget() *data.NonFinancialBudget {
