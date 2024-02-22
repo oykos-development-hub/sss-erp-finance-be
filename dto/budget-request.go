@@ -24,11 +24,12 @@ type BudgetRequestResponseDTO struct {
 }
 
 type BudgetRequestFilterDTO struct {
-	Page               *int              `json:"page"`
-	Size               *int              `json:"size"`
-	OrganizationUnitID *int              `json:"organization_unit_id"`
-	BudgetID           int               `json:"budget_id"`
-	RequestType        *data.RequestType `json:"request_type"`
+	Page               *int                `json:"page"`
+	Size               *int                `json:"size"`
+	OrganizationUnitID *int                `json:"organization_unit_id"`
+	BudgetID           int                 `json:"budget_id"`
+	RequestType        *data.RequestType   `json:"request_type"`
+	RequestTypes       *[]data.RequestType `json:"request_types"`
 }
 
 func (dto BudgetRequestDTO) ToBudgetRequest() *data.BudgetRequest {
