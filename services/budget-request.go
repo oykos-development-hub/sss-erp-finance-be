@@ -91,7 +91,7 @@ func (h *BudgetRequestServiceImpl) GetBudgetRequestList(filter dto.BudgetRequest
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"request_type": *filter.RequestType})
 	}
 	if filter.RequestTypes != nil {
-		conditionAndExp = up.And(conditionAndExp, &up.Cond{"request_type": up.In(*filter.RequestTypes)})
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"request_type": up.In(*filter.RequestTypes...)})
 	}
 
 	orders = append(orders, "-created_at")
