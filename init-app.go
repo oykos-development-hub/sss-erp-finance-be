@@ -65,6 +65,14 @@ func initApplication() *celeritas.Celeritas {
 	BudgetRequestService := services.NewBudgetRequestServiceImpl(cel, models.BudgetRequest)
 	BudgetRequestHandler := handlers.NewBudgetRequestHandler(cel, BudgetRequestService)
 
+	FineSharedLogicService := services.NewFineSharedLogicServiceImpl(cel, models.Fine, models.FinePayment)
+
+	FinePaymentService := services.NewFinePaymentServiceImpl(cel, models.FinePayment, FineSharedLogicService)
+	FinePaymentHandler := handlers.NewFinePaymentHandler(cel, FinePaymentService)
+
+	FineService := services.NewFineServiceImpl(cel, models.Fine, FineSharedLogicService)
+	FineHandler := handlers.NewFineHandler(cel, FineService)
+
 	myHandlers := &handlers.Handlers{
 		InvoiceHandler: InvoiceHandler,
 		ArticleHandler: ArticleHandler,
@@ -79,6 +87,8 @@ func initApplication() *celeritas.Celeritas {
 		GoalIndicatorHandler:          GoalIndicatorHandler,
 		FilledFinancialBudgetHandler:  FilledFinancialBudgetHandler,
 		BudgetRequestHandler:          BudgetRequestHandler,
+		FineHandler:                   FineHandler,
+		FinePaymentHandler:            FinePaymentHandler,
 	}
 
 	myMiddleware := &middleware.Middleware{

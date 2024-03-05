@@ -86,6 +86,18 @@ func routes(app *celeritas.Celeritas, middleware *middleware.Middleware, handler
 		rt.Get("/budget-requests", handlers.BudgetRequestHandler.GetBudgetRequestList)
 		rt.Put("/budget-requests/{id}", handlers.BudgetRequestHandler.UpdateBudgetRequest)
 		rt.Delete("/budget-requests/{id}", handlers.BudgetRequestHandler.DeleteBudgetRequest)
+
+		rt.Post("/fines", handlers.FineHandler.CreateFine)
+		rt.Get("/fines/{id}", handlers.FineHandler.GetFineById)
+		rt.Get("/fines", handlers.FineHandler.GetFineList)
+		rt.Put("/fines/{id}", handlers.FineHandler.UpdateFine)
+		rt.Delete("/fines/{id}", handlers.FineHandler.DeleteFine)
+
+		rt.Post("/fine-payments", handlers.FinePaymentHandler.CreateFinePayment)
+		rt.Get("/fine-payments/{id}", handlers.FinePaymentHandler.GetFinePaymentById)
+		rt.Get("/fine-payments", handlers.FinePaymentHandler.GetFinePaymentList)
+		rt.Put("/fine-payments/{id}", handlers.FinePaymentHandler.UpdateFinePayment)
+		rt.Delete("/fine-payments/{id}", handlers.FinePaymentHandler.DeleteFinePayment)
 	})
 
 	return app.Routes

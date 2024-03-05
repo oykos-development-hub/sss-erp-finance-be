@@ -1,6 +1,9 @@
 package services
 
-import "gitlab.sudovi.me/erp/finance-api/dto"
+import (
+	"gitlab.sudovi.me/erp/finance-api/data"
+	"gitlab.sudovi.me/erp/finance-api/dto"
+)
 
 type BaseService interface {
 	RandomString(n int) string
@@ -103,4 +106,24 @@ type BudgetRequestService interface {
 	DeleteBudgetRequest(id int) error
 	GetBudgetRequest(id int) (*dto.BudgetRequestResponseDTO, error)
 	GetBudgetRequestList(filter dto.BudgetRequestFilterDTO) ([]dto.BudgetRequestResponseDTO, *uint64, error)
+}
+
+type FineSharedLogicService interface {
+	CalculateFineDetailsAndUpdateStatus(fineId int) (*dto.FineFeeDetailsDTO, data.FineStatus, error)
+}
+
+type FineService interface {
+	CreateFine(input dto.FineDTO) (*dto.FineResponseDTO, error)
+	GetFine(id int) (*dto.FineResponseDTO, error)
+	GetFineList(filter dto.FineFilterDTO) ([]dto.FineResponseDTO, *uint64, error)
+	UpdateFine(id int, input dto.FineDTO) (*dto.FineResponseDTO, error)
+	DeleteFine(id int) error
+}
+
+type FinePaymentService interface {
+	CreateFinePayment(input dto.FinePaymentDTO) (*dto.FinePaymentResponseDTO, error)
+	DeleteFinePayment(id int) error
+	UpdateFinePayment(id int, input dto.FinePaymentDTO) (*dto.FinePaymentResponseDTO, error)
+	GetFinePayment(id int) (*dto.FinePaymentResponseDTO, error)
+	GetFinePaymentList(filter dto.FinePaymentFilterDTO) ([]dto.FinePaymentResponseDTO, *uint64, error)
 }
