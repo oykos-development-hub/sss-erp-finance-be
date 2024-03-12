@@ -42,9 +42,7 @@ func (h *FineServiceImpl) CreateFine(input dto.FineDTO) (*dto.FineResponseDTO, e
 		return nil, errors.ErrInternalServer
 	}
 
-	res := dto.ToFineResponseDTO(*fine)
-
-	return &res, nil
+	return h.createFineResponse(fine)
 }
 
 // GetFine returns a fine by id
@@ -55,16 +53,7 @@ func (h *FineServiceImpl) GetFine(id int) (*dto.FineResponseDTO, error) {
 		return nil, errors.ErrNotFound
 	}
 
-	response := dto.ToFineResponseDTO(*fine)
-	var newStatus data.FineStatus
-	response.FineFeeDetailsDTO, newStatus, err = h.fineSharedLogicService.CalculateFineDetailsAndUpdateStatus(fine.ID)
-	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, err
-	}
-	response.Status = newStatus
-
-	return &response, nil
+	return h.createFineResponse(fine)
 }
 
 // UpdateFine updates a fine
@@ -82,17 +71,7 @@ func (h *FineServiceImpl) UpdateFine(id int, input dto.FineDTO) (*dto.FineRespon
 		return nil, errors.ErrInternalServer
 	}
 
-	response := dto.ToFineResponseDTO(*fine)
-
-	var newStatus data.FineStatus
-	response.FineFeeDetailsDTO, newStatus, err = h.fineSharedLogicService.CalculateFineDetailsAndUpdateStatus(fine.ID)
-	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, err
-	}
-	response.Status = newStatus
-
-	return &response, nil
+	return h.createFineResponse(fine)
 }
 
 // DeleteFine deletes a fine by its id
@@ -141,12 +120,50 @@ func (h *FineServiceImpl) GetFineList(input dto.FineFilterDTO) ([]dto.FineRespon
 		}
 	}
 
-	data, total, err := h.repo.GetAll(input.Page, input.Size, conditionAndExp)
+	fines, total, err := h.repo.GetAll(input.Page, input.Size, conditionAndExp)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return nil, nil, err
 	}
-	response := dto.ToFineListResponseDTO(data)
+
+	var finesList []data.Fine
+	for _, fine := range fines {
+		finesList = append(finesList, *fine)
+	}
+
+	response, err := h.convertFinesToResponses(finesList)
+	if err != nil {
+		h.App.ErrorLog.Println(err)
+		return nil, nil, err
+	}
 
 	return response, total, nil
+}
+
+// convertFinesToResponses is a helper method that converts a list of fines to a list of response DTOs.
+func (h *FineServiceImpl) convertFinesToResponses(fines []data.Fine) ([]dto.FineResponseDTO, error) {
+	var responses []dto.FineResponseDTO
+	for _, fee := range fines {
+		response, err := h.createFineResponse(&fee)
+		if err != nil {
+			return nil, err
+		}
+		responses = append(responses, *response)
+	}
+	return responses, nil
+}
+
+// createFineResponse creates a FineResponseDTO from a Fine
+func (h *FineServiceImpl) createFineResponse(fine *data.Fine) (*dto.FineResponseDTO, error) {
+	response := dto.ToFineResponseDTO(*fine)
+	var newStatus data.FineStatus
+	var err error
+	response.FineFeeDetailsDTO, newStatus, err = h.fineSharedLogicService.CalculateFineDetailsAndUpdateStatus(fine.ID)
+	if err != nil {
+		h.App.ErrorLog.Println(err)
+		return nil, err
+	}
+	response.Status = newStatus
+
+	return &response, nil
 }
