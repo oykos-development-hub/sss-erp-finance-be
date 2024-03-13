@@ -33,6 +33,8 @@ type Models struct {
 	GoalIndicator          GoalIndicator
 	FilledFinancialBudget  FilledFinancialBudget
 	BudgetRequest          BudgetRequest
+    Fee                    Fee
+	FeePayment             FeePayment
 	Fine                   Fine
 	FinePayment            FinePayment
 }
@@ -62,6 +64,8 @@ func New(databasePool *sql.DB) Models {
 		GoalIndicator:          GoalIndicator{},
 		FilledFinancialBudget:  FilledFinancialBudget{},
 		BudgetRequest:          BudgetRequest{},
+		Fee:                    Fee{},
+		FeePayment:             FeePayment{},
 		Fine:                   Fine{},
 		FinePayment:            FinePayment{},
 	}

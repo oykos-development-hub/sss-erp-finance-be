@@ -15,8 +15,12 @@ type Handlers struct {
 	GoalIndicatorHandler          GoalIndicatorHandler
 	FilledFinancialBudgetHandler  FilledFinancialBudgetHandler
 	BudgetRequestHandler          BudgetRequestHandler
-	FineHandler                   FineHandler
-	FinePaymentHandler            FinePaymentHandler
+
+	FeeHandler        FeeHandler
+	FeePaymentHandler FeePaymentHandler
+
+	FineHandler        FineHandler
+	FinePaymentHandler FinePaymentHandler
 }
 
 type InvoiceHandler interface {
@@ -114,6 +118,22 @@ type BudgetRequestHandler interface {
 	DeleteBudgetRequest(w http.ResponseWriter, r *http.Request)
 	GetBudgetRequestById(w http.ResponseWriter, r *http.Request)
 	GetBudgetRequestList(w http.ResponseWriter, r *http.Request)
+}
+
+type FeeHandler interface {
+	CreateFee(w http.ResponseWriter, r *http.Request)
+	GetFeeById(w http.ResponseWriter, r *http.Request)
+	UpdateFee(w http.ResponseWriter, r *http.Request)
+	DeleteFee(w http.ResponseWriter, r *http.Request)
+	GetFeeList(w http.ResponseWriter, r *http.Request)
+}
+
+type FeePaymentHandler interface {
+	CreateFeePayment(w http.ResponseWriter, r *http.Request)
+	DeleteFeePayment(w http.ResponseWriter, r *http.Request)
+	UpdateFeePayment(w http.ResponseWriter, r *http.Request)
+	GetFeePaymentById(w http.ResponseWriter, r *http.Request)
+	GetFeePaymentList(w http.ResponseWriter, r *http.Request)
 }
 
 type FineHandler interface {

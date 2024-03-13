@@ -108,6 +108,26 @@ type BudgetRequestService interface {
 	GetBudgetRequestList(filter dto.BudgetRequestFilterDTO) ([]dto.BudgetRequestResponseDTO, *uint64, error)
 }
 
+type FeeSharedLogicService interface {
+	CalculateFeeDetailsAndUpdateStatus(fineId int) (*dto.FeeDetailsDTO, data.FeeStatus, error)
+}
+
+type FeeService interface {
+	CreateFee(input dto.FeeDTO) (*dto.FeeResponseDTO, error)
+	GetFee(id int) (*dto.FeeResponseDTO, error)
+	GetFeeList(filter dto.FeeFilterDTO) ([]dto.FeeResponseDTO, *uint64, error)
+	UpdateFee(id int, input dto.FeeDTO) (*dto.FeeResponseDTO, error)
+	DeleteFee(id int) error
+}
+
+type FeePaymentService interface {
+	CreateFeePayment(input dto.FeePaymentDTO) (*dto.FeePaymentResponseDTO, error)
+	DeleteFeePayment(id int) error
+	UpdateFeePayment(id int, input dto.FeePaymentDTO) (*dto.FeePaymentResponseDTO, error)
+	GetFeePayment(id int) (*dto.FeePaymentResponseDTO, error)
+	GetFeePaymentList(filter dto.FeePaymentFilterDTO) ([]dto.FeePaymentResponseDTO, *uint64, error)
+}
+
 type FineSharedLogicService interface {
 	CalculateFineDetailsAndUpdateStatus(fineId int) (*dto.FineFeeDetailsDTO, data.FineStatus, error)
 }

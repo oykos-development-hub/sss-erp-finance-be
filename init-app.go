@@ -65,6 +65,15 @@ func initApplication() *celeritas.Celeritas {
 	BudgetRequestService := services.NewBudgetRequestServiceImpl(cel, models.BudgetRequest)
 	BudgetRequestHandler := handlers.NewBudgetRequestHandler(cel, BudgetRequestService)
 
+ 
+	FeeSharedLogicService := services.NewFeeSharedLogicServiceImpl(cel, models.Fee, models.FeePayment)
+
+	FeePaymentService := services.NewFeePaymentServiceImpl(cel, models.FeePayment, FeeSharedLogicService)
+	FeePaymentHandler := handlers.NewFeePaymentHandler(cel, FeePaymentService)
+
+	FeeService := services.NewFeeServiceImpl(cel, models.Fee, FeeSharedLogicService)
+	FeeHandler := handlers.NewFeeHandler(cel, FeeService)
+ 
 	FineSharedLogicService := services.NewFineSharedLogicServiceImpl(cel, models.Fine, models.FinePayment)
 
 	FinePaymentService := services.NewFinePaymentServiceImpl(cel, models.FinePayment, FineSharedLogicService)
@@ -72,6 +81,7 @@ func initApplication() *celeritas.Celeritas {
 
 	FineService := services.NewFineServiceImpl(cel, models.Fine, FineSharedLogicService)
 	FineHandler := handlers.NewFineHandler(cel, FineService)
+ 
 
 	myHandlers := &handlers.Handlers{
 		InvoiceHandler: InvoiceHandler,
@@ -87,8 +97,13 @@ func initApplication() *celeritas.Celeritas {
 		GoalIndicatorHandler:          GoalIndicatorHandler,
 		FilledFinancialBudgetHandler:  FilledFinancialBudgetHandler,
 		BudgetRequestHandler:          BudgetRequestHandler,
+ 
+		FeeHandler:                    FeeHandler,
+		FeePaymentHandler:             FeePaymentHandler,
+ 
 		FineHandler:                   FineHandler,
 		FinePaymentHandler:            FinePaymentHandler,
+ 
 	}
 
 	myMiddleware := &middleware.Middleware{
