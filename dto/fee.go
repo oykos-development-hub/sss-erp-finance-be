@@ -21,7 +21,7 @@ type FeeDTO struct {
 	ExecutionDate          time.Time        `json:"execution_date"`
 	PaymentDeadlineDate    time.Time        `json:"payment_deadline_date"`
 	Description            string           `json:"description"`
-	Status                 data.FeeStatus   `json:"status" validate:"required,oneof=1 2 3"`
+	Status                 *data.FeeStatus  `json:"status"`
 	CourtAccountID         *int             `json:"court_account"`
 	File                   pq.Int64Array    `json:"file"`
 }
@@ -77,7 +77,7 @@ func (dto FeeDTO) ToFee() *data.Fee {
 		ExecutionDate:          dto.ExecutionDate,
 		PaymentDeadlineDate:    dto.PaymentDeadlineDate,
 		Description:            dto.Description,
-		Status:                 dto.Status,
+		Status:                 *dto.Status,
 		CourtAccountID:         dto.CourtAccountID,
 		File:                   dto.File,
 	}

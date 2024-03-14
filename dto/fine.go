@@ -21,7 +21,7 @@ type FineDTO struct {
 	ExecutionDate          time.Time        `json:"execution_date"`
 	PaymentDeadlineDate    time.Time        `json:"payment_deadline_date"`
 	Description            string           `json:"description"`
-	Status                 data.FineStatus  `json:"status" validate:"required,oneof=1 2 3"`
+	Status                 *data.FineStatus `json:"status"`
 	CourtCosts             *float64         `json:"court_costs"`
 	CourtAccountID         *int             `json:"court_account_id"`
 	File                   pq.Int64Array    `json:"file"`
@@ -86,33 +86,10 @@ func (dto FineDTO) ToFine() *data.Fine {
 		ExecutionDate:          dto.ExecutionDate,
 		PaymentDeadlineDate:    dto.PaymentDeadlineDate,
 		Description:            dto.Description,
-		Status:                 dto.Status,
+		Status:                 *dto.Status,
 		CourtCosts:             dto.CourtCosts,
 		CourtAccountID:         dto.CourtAccountID,
 		File:                   dto.File,
-	}
-}
-
-// ToFineDTO converts Fine to FineDTO
-func ToFineDTO(data data.Fine) FineDTO {
-	return FineDTO{
-		ActType:                data.ActType,
-		DecisionNumber:         data.DecisionNumber,
-		DecisionDate:           data.DecisionDate,
-		Subject:                data.Subject,
-		JMBG:                   data.JMBG,
-		Residence:              data.Residence,
-		Amount:                 data.Amount,
-		PaymentReferenceNumber: data.PaymentReferenceNumber,
-		DebitReferenceNumber:   data.DebitReferenceNumber,
-		AccountID:              data.AccountID,
-		ExecutionDate:          data.ExecutionDate,
-		PaymentDeadlineDate:    data.PaymentDeadlineDate,
-		Description:            data.Description,
-		Status:                 data.Status,
-		CourtCosts:             data.CourtCosts,
-		CourtAccountID:         data.CourtAccountID,
-		File:                   data.File,
 	}
 }
 
