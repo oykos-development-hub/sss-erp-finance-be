@@ -9,7 +9,7 @@ import (
 
 type FineDTO struct {
 	ActType                data.FineActType `json:"act_type" validate:"required,oneof=1 2"`
-	DecisionNumber         int              `json:"decision_number" validate:"required"`
+	DecisionNumber         string           `json:"decision_number" validate:"required"`
 	DecisionDate           time.Time        `json:"decision_date"`
 	Subject                string           `json:"subject"`
 	JMBG                   string           `json:"jmbg" validate:"required"`
@@ -30,7 +30,7 @@ type FineDTO struct {
 type FineResponseDTO struct {
 	ID                     int                `json:"id"`
 	ActType                data.FineActType   `json:"act_type"`
-	DecisionNumber         int                `json:"decision_number"`
+	DecisionNumber         string             `json:"decision_number"`
 	DecisionDate           time.Time          `json:"decision_date"`
 	Subject                string             `json:"subject"`
 	JMBG                   string             `json:"jmbg"`

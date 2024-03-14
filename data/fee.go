@@ -33,7 +33,7 @@ type Fee struct {
 	ID                     int           `db:"id,omitempty"`
 	FeeTypeID              FeeType       `db:"fee_type_id"`
 	FeeSubcategoryID       FeeCategory   `db:"fee_subcategory_id"`
-	DecisionNumber         int           `db:"decision_number"`
+	DecisionNumber         string        `db:"decision_number"`
 	DecisionDate           time.Time     `db:"decision_date"`
 	Subject                string        `db:"subject"`
 	JMBG                   string        `db:"jmbg"`

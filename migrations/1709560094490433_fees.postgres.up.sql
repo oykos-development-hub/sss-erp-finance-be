@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS fees (
     id serial PRIMARY KEY,
     fee_type_id INTEGER NOT NULL,
     fee_subcategory_id INTEGER NOT NULL,
-    decision_number  INTEGER NOT NULL,
+    decision_number  TEXT NOT NULL,
     decision_date TIMESTAMP,
     subject TEXT,
     jmbg TEXT NOT NULL,

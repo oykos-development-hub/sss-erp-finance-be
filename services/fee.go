@@ -2,7 +2,6 @@ package services
 
 import (
 	"fmt"
-	"strconv"
 
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
@@ -104,16 +103,10 @@ func (h *FeeServiceImpl) GetFeeList(input dto.FeeFilterDTO) ([]dto.FeeResponseDT
 			up.Cond{"subject ILIKE": likeCondition},
 			up.Cond{"description ILIKE": likeCondition},
 			up.Cond{"jmbg ILIKE": likeCondition},
+			up.Cond{"decision_number ILIKE": likeCondition},
 		)
 
-		if num, err := strconv.Atoi(*input.Search); err == nil {
-			numericConditions := up.Or(
-				up.Cond{"decision_number": num},
-			)
-			conditionAndExp = up.And(conditionAndExp, up.Or(stringConditions, numericConditions))
-		} else {
-			conditionAndExp = up.And(conditionAndExp, stringConditions)
-		}
+		conditionAndExp = up.And(conditionAndExp, stringConditions)
 	}
 
 	fees, total, err := h.repo.GetAll(input.Page, input.Size, conditionAndExp)

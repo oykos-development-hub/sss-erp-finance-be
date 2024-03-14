@@ -30,7 +30,7 @@ const (
 type Fine struct {
 	ID                     int           `db:"id,omitempty"`
 	ActType                FineActType   `db:"act_type"`
-	DecisionNumber         int           `db:"decision_number"`
+	DecisionNumber         string        `db:"decision_number"`
 	DecisionDate           time.Time     `db:"decision_date"`
 	Subject                string        `db:"subject"`
 	JMBG                   string        `db:"jmbg"`

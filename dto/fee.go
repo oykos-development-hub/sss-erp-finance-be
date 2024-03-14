@@ -10,7 +10,7 @@ import (
 type FeeDTO struct {
 	FeeTypeID              data.FeeType     `json:"fee_type" validate:"required,oneof=1 2"`
 	FeeSubcategoryID       data.FeeCategory `json:"fee_subcategory" validate:"required"`
-	DecisionNumber         int              `json:"decision_number" validate:"required"`
+	DecisionNumber         string           `json:"decision_number" validate:"required"`
 	DecisionDate           time.Time        `json:"decision_date"`
 	Subject                string           `json:"subject"`
 	JMBG                   string           `json:"jmbg" validate:"required"`
@@ -30,7 +30,7 @@ type FeeResponseDTO struct {
 	ID                     int              `json:"id"`
 	FeeTypeID              data.FeeType     `json:"fee_type_id"`
 	FeeSubcategoryID       data.FeeCategory `json:"fee_subcategory_id"`
-	DecisionNumber         int              `json:"decision_number"`
+	DecisionNumber         string           `json:"decision_number"`
 	DecisionDate           time.Time        `json:"decision_date"`
 	Subject                string           `json:"subject"`
 	JMBG                   string           `json:"jmbg"`
