@@ -87,7 +87,6 @@ func routes(app *celeritas.Celeritas, middleware *middleware.Middleware, handler
 		rt.Put("/budget-requests/{id}", handlers.BudgetRequestHandler.UpdateBudgetRequest)
 		rt.Delete("/budget-requests/{id}", handlers.BudgetRequestHandler.DeleteBudgetRequest)
 
- 
 		rt.Post("/fees", handlers.FeeHandler.CreateFee)
 		rt.Get("/fees/{id}", handlers.FeeHandler.GetFeeById)
 		rt.Get("/fees", handlers.FeeHandler.GetFeeList)
@@ -99,7 +98,7 @@ func routes(app *celeritas.Celeritas, middleware *middleware.Middleware, handler
 		rt.Get("/fee-payments", handlers.FeePaymentHandler.GetFeePaymentList)
 		rt.Put("/fee-payments/{id}", handlers.FeePaymentHandler.UpdateFeePayment)
 		rt.Delete("/fee-payments/{id}", handlers.FeePaymentHandler.DeleteFeePayment)
- 
+
 		rt.Post("/fines", handlers.FineHandler.CreateFine)
 		rt.Get("/fines/{id}", handlers.FineHandler.GetFineById)
 		rt.Get("/fines", handlers.FineHandler.GetFineList)
@@ -111,7 +110,18 @@ func routes(app *celeritas.Celeritas, middleware *middleware.Middleware, handler
 		rt.Get("/fine-payments", handlers.FinePaymentHandler.GetFinePaymentList)
 		rt.Put("/fine-payments/{id}", handlers.FinePaymentHandler.UpdateFinePayment)
 		rt.Delete("/fine-payments/{id}", handlers.FinePaymentHandler.DeleteFinePayment)
- 
+
+		rt.Post("/procedure-costs", handlers.ProcedureCostHandler.CreateProcedureCost)
+		rt.Get("/procedure-costs/{id}", handlers.ProcedureCostHandler.GetProcedureCostById)
+		rt.Get("/procedure-costs", handlers.ProcedureCostHandler.GetProcedureCostList)
+		rt.Put("/procedure-costs/{id}", handlers.ProcedureCostHandler.UpdateProcedureCost)
+		rt.Delete("/procedure-costs/{id}", handlers.ProcedureCostHandler.DeleteProcedureCost)
+
+		rt.Post("/procedure-cost-payments", handlers.ProcedureCostPaymentHandler.CreateProcedureCostPayment)
+		rt.Get("/procedure-cost-payments/{id}", handlers.ProcedureCostPaymentHandler.GetProcedureCostPaymentById)
+		rt.Get("/procedure-cost-payments", handlers.ProcedureCostPaymentHandler.GetProcedureCostPaymentList)
+		rt.Put("/procedure-cost-payments/{id}", handlers.ProcedureCostPaymentHandler.UpdateProcedureCostPayment)
+		rt.Delete("/procedure-cost-payments/{id}", handlers.ProcedureCostPaymentHandler.DeleteProcedureCostPayment)
 	})
 
 	return app.Routes

@@ -147,3 +147,23 @@ type FinePaymentService interface {
 	GetFinePayment(id int) (*dto.FinePaymentResponseDTO, error)
 	GetFinePaymentList(filter dto.FinePaymentFilterDTO) ([]dto.FinePaymentResponseDTO, *uint64, error)
 }
+
+type ProcedureCostSharedLogicService interface {
+	CalculateProcedureCostDetailsAndUpdateStatus(procedureCostId int) (*dto.ProcedureCostDetailsDTO, data.ProcedureCostStatus, error)
+}
+
+type ProcedureCostService interface {
+	CreateProcedureCost(input dto.ProcedureCostDTO) (*dto.ProcedureCostResponseDTO, error)
+	GetProcedureCost(id int) (*dto.ProcedureCostResponseDTO, error)
+	GetProcedureCostList(filter dto.ProcedureCostFilterDTO) ([]dto.ProcedureCostResponseDTO, *uint64, error)
+	UpdateProcedureCost(id int, input dto.ProcedureCostDTO) (*dto.ProcedureCostResponseDTO, error)
+	DeleteProcedureCost(id int) error
+}
+
+type ProcedureCostPaymentService interface {
+	CreateProcedureCostPayment(input dto.ProcedureCostPaymentDTO) (*dto.ProcedureCostPaymentResponseDTO, error)
+	DeleteProcedureCostPayment(id int) error
+	UpdateProcedureCostPayment(id int, input dto.ProcedureCostPaymentDTO) (*dto.ProcedureCostPaymentResponseDTO, error)
+	GetProcedureCostPayment(id int) (*dto.ProcedureCostPaymentResponseDTO, error)
+	GetProcedureCostPaymentList(filter dto.ProcedureCostPaymentFilterDTO) ([]dto.ProcedureCostPaymentResponseDTO, *uint64, error)
+}

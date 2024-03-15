@@ -65,7 +65,8 @@ func initApplication() *celeritas.Celeritas {
 	BudgetRequestService := services.NewBudgetRequestServiceImpl(cel, models.BudgetRequest)
 	BudgetRequestHandler := handlers.NewBudgetRequestHandler(cel, BudgetRequestService)
 
- 
+	// fees
+
 	FeeSharedLogicService := services.NewFeeSharedLogicServiceImpl(cel, models.Fee, models.FeePayment)
 
 	FeePaymentService := services.NewFeePaymentServiceImpl(cel, models.FeePayment, FeeSharedLogicService)
@@ -73,7 +74,8 @@ func initApplication() *celeritas.Celeritas {
 
 	FeeService := services.NewFeeServiceImpl(cel, models.Fee, FeeSharedLogicService)
 	FeeHandler := handlers.NewFeeHandler(cel, FeeService)
- 
+
+	// fines
 	FineSharedLogicService := services.NewFineSharedLogicServiceImpl(cel, models.Fine, models.FinePayment)
 
 	FinePaymentService := services.NewFinePaymentServiceImpl(cel, models.FinePayment, FineSharedLogicService)
@@ -81,7 +83,15 @@ func initApplication() *celeritas.Celeritas {
 
 	FineService := services.NewFineServiceImpl(cel, models.Fine, FineSharedLogicService)
 	FineHandler := handlers.NewFineHandler(cel, FineService)
- 
+
+	// procedure cost
+	ProcedureCostSharedLogicService := services.NewProcedureCostSharedLogicServiceImpl(cel, models.ProcedureCost, models.ProcedureCostPayment)
+
+	ProcedureCostPaymentService := services.NewProcedureCostPaymentServiceImpl(cel, models.ProcedureCostPayment, ProcedureCostSharedLogicService)
+	ProcedureCostPaymentHandler := handlers.NewProcedureCostPaymentHandler(cel, ProcedureCostPaymentService)
+
+	ProcedureCostService := services.NewProcedureCostServiceImpl(cel, models.ProcedureCost, ProcedureCostSharedLogicService)
+	ProcedureCostHandler := handlers.NewProcedureCostHandler(cel, ProcedureCostService)
 
 	myHandlers := &handlers.Handlers{
 		InvoiceHandler: InvoiceHandler,
@@ -97,13 +107,15 @@ func initApplication() *celeritas.Celeritas {
 		GoalIndicatorHandler:          GoalIndicatorHandler,
 		FilledFinancialBudgetHandler:  FilledFinancialBudgetHandler,
 		BudgetRequestHandler:          BudgetRequestHandler,
- 
-		FeeHandler:                    FeeHandler,
-		FeePaymentHandler:             FeePaymentHandler,
- 
-		FineHandler:                   FineHandler,
-		FinePaymentHandler:            FinePaymentHandler,
- 
+
+		FeeHandler:        FeeHandler,
+		FeePaymentHandler: FeePaymentHandler,
+
+		FineHandler:        FineHandler,
+		FinePaymentHandler: FinePaymentHandler,
+
+		ProcedureCostHandler:        ProcedureCostHandler,
+		ProcedureCostPaymentHandler: ProcedureCostPaymentHandler,
 	}
 
 	myMiddleware := &middleware.Middleware{

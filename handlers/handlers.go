@@ -21,6 +21,9 @@ type Handlers struct {
 
 	FineHandler        FineHandler
 	FinePaymentHandler FinePaymentHandler
+
+	ProcedureCostHandler        ProcedureCostHandler
+	ProcedureCostPaymentHandler ProcedureCostPaymentHandler
 }
 
 type InvoiceHandler interface {
@@ -150,4 +153,21 @@ type FinePaymentHandler interface {
 	UpdateFinePayment(w http.ResponseWriter, r *http.Request)
 	GetFinePaymentById(w http.ResponseWriter, r *http.Request)
 	GetFinePaymentList(w http.ResponseWriter, r *http.Request)
+}
+
+// procedure costs
+type ProcedureCostHandler interface {
+	CreateProcedureCost(w http.ResponseWriter, r *http.Request)
+	GetProcedureCostById(w http.ResponseWriter, r *http.Request)
+	UpdateProcedureCost(w http.ResponseWriter, r *http.Request)
+	DeleteProcedureCost(w http.ResponseWriter, r *http.Request)
+	GetProcedureCostList(w http.ResponseWriter, r *http.Request)
+}
+
+type ProcedureCostPaymentHandler interface {
+	CreateProcedureCostPayment(w http.ResponseWriter, r *http.Request)
+	DeleteProcedureCostPayment(w http.ResponseWriter, r *http.Request)
+	UpdateProcedureCostPayment(w http.ResponseWriter, r *http.Request)
+	GetProcedureCostPaymentById(w http.ResponseWriter, r *http.Request)
+	GetProcedureCostPaymentList(w http.ResponseWriter, r *http.Request)
 }
