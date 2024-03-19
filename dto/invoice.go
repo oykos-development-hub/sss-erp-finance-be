@@ -14,6 +14,7 @@ type InvoicesFilter struct {
 	Status             *string `json:"status"`
 	SupplierID         *int    `json:"supplier_id"`
 	OrganizationUnitID *int    `json:"organization_unit_id"`
+	Type               *string `json:"type"`
 }
 
 type InvoiceDTO struct {
@@ -21,6 +22,7 @@ type InvoiceDTO struct {
 	Status                string     `json:"status"`
 	Type                  string     `json:"type"`
 	TypeOfSubject         int        `json:"type_of_subject"`
+	TypeOfContract        int        `json:"type_of_contract"`
 	SourceOfFunding       int        `json:"source_of_funding"`
 	Supplier              string     `json:"supplier"`
 	GrossPrice            float64    `json:"gross_price"`
@@ -31,6 +33,7 @@ type InvoiceDTO struct {
 	DateOfInvoice         time.Time  `json:"date_of_invoice"`
 	ReceiptDate           time.Time  `json:"receipt_date"`
 	DateOfPayment         time.Time  `json:"date_of_payment"`
+	DateOfStart           time.Time  `json:"date_of_start"`
 	SSSInvoiceReceiptDate *time.Time `json:"sss_invoice_receipt_date"`
 	FileID                int        `json:"file_id"`
 	BankAccount           string     `json:"bank_account"`
@@ -42,6 +45,7 @@ type InvoiceResponseDTO struct {
 	InvoiceNumber         string               `json:"invoice_number"`
 	Type                  string               `json:"type"`
 	TypeOfSubject         int                  `json:"type_of_subject"`
+	TypeOfContract        int                  `json:"type_of_contract"`
 	SourceOfFunding       int                  `json:"source_of_funding"`
 	Supplier              string               `json:"supplier"`
 	Status                string               `json:"status"`
@@ -54,6 +58,7 @@ type InvoiceResponseDTO struct {
 	ReceiptDate           time.Time            `json:"receipt_date"`
 	DateOfPayment         time.Time            `json:"date_of_payment"`
 	SSSInvoiceReceiptDate *time.Time           `json:"sss_invoice_receipt_date"`
+	DateOfStart           time.Time            `json:"date_of_start"`
 	FileID                int                  `json:"file_id"`
 	BankAccount           string               `json:"bank_account"`
 	Description           string               `json:"description"`
@@ -82,6 +87,8 @@ func (dto InvoiceDTO) ToInvoice() *data.Invoice {
 		TypeOfSubject:         dto.TypeOfSubject,
 		SourceOfFunding:       dto.SourceOfFunding,
 		Supplier:              dto.Supplier,
+		TypeOfContract:        dto.TypeOfContract,
+		DateOfStart:           dto.DateOfStart,
 	}
 }
 
@@ -106,6 +113,8 @@ func ToInvoiceResponseDTO(data data.Invoice) InvoiceResponseDTO {
 		TypeOfSubject:         data.TypeOfSubject,
 		SourceOfFunding:       data.SourceOfFunding,
 		Supplier:              data.Supplier,
+		TypeOfContract:        data.TypeOfContract,
+		DateOfStart:           data.DateOfStart,
 		CreatedAt:             data.CreatedAt,
 		UpdatedAt:             data.UpdatedAt,
 	}

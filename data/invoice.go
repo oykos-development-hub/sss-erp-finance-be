@@ -12,6 +12,7 @@ type Invoice struct {
 	InvoiceNumber         string     `db:"invoice_number"`
 	Type                  string     `db:"type"`
 	TypeOfSubject         int        `db:"type_of_subject"`
+	TypeOfContract        int        `db:"type_of_contract"`
 	SourceOfFunding       int        `db:"source_of_funding"`
 	Supplier              string     `db:"supplier"`
 	Status                string     `db:"status,omitempty"`
@@ -24,6 +25,7 @@ type Invoice struct {
 	ReceiptDate           time.Time  `db:"receipt_date"`
 	DateOfPayment         time.Time  `db:"date_of_payment"`
 	SSSInvoiceReceiptDate *time.Time `db:"sss_invoice_receipt_date"`
+	DateOfStart           time.Time  `db:"date_of_start"`
 	FileID                int        `db:"file_id"`
 	BankAccount           string     `db:"bank_account"`
 	Description           string     `db:"description"`

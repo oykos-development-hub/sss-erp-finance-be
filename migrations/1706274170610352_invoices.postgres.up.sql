@@ -3,6 +3,7 @@ CREATE TABLE invoices (
     invoice_number TEXT,
     type TEXT NOT NULL,
     type_of_subject INTEGER,
+    type_of_contract INTEGER,
     status TEXT,
     source_of_funding INTEGER,
     gross_price FLOAT,
@@ -15,6 +16,7 @@ CREATE TABLE invoices (
     receipt_date TIMESTAMP,                --datum prijema,
     date_of_payment TIMESTAMP,             --datum placanja,
     sss_invoice_receipt_date TIMESTAMP,    --datum sss, 
+    date_of_start TIMESTAMP,               --datum pocetka ugovora
     file_id INTEGER,
     bank_account TEXT,
     description TEXT,
