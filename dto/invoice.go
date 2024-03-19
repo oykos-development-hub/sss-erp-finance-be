@@ -19,6 +19,10 @@ type InvoicesFilter struct {
 type InvoiceDTO struct {
 	InvoiceNumber         string     `json:"invoice_number"`
 	Status                string     `json:"status"`
+	Type                  string     `json:"type"`
+	TypeOfSubject         int        `json:"type_of_subject"`
+	SourceOfFunding       int        `json:"source_of_funding"`
+	Supplier              string     `json:"supplier"`
 	GrossPrice            float64    `json:"gross_price"`
 	VATPrice              float64    `json:"vat_price"`
 	SupplierID            int        `json:"supplier_id"`
@@ -36,6 +40,10 @@ type InvoiceDTO struct {
 type InvoiceResponseDTO struct {
 	ID                    int                  `json:"id"`
 	InvoiceNumber         string               `json:"invoice_number"`
+	Type                  string               `json:"type"`
+	TypeOfSubject         int                  `json:"type_of_subject"`
+	SourceOfFunding       int                  `json:"source_of_funding"`
+	Supplier              string               `json:"supplier"`
 	Status                string               `json:"status"`
 	GrossPrice            float64              `json:"gross_price"`
 	VATPrice              float64              `json:"vat_price"`
@@ -70,6 +78,10 @@ func (dto InvoiceDTO) ToInvoice() *data.Invoice {
 		FileID:                dto.FileID,
 		BankAccount:           dto.BankAccount,
 		Description:           dto.Description,
+		Type:                  dto.Type,
+		TypeOfSubject:         dto.TypeOfSubject,
+		SourceOfFunding:       dto.SourceOfFunding,
+		Supplier:              dto.Supplier,
 	}
 }
 
@@ -90,6 +102,10 @@ func ToInvoiceResponseDTO(data data.Invoice) InvoiceResponseDTO {
 		FileID:                data.FileID,
 		BankAccount:           data.BankAccount,
 		Description:           data.Description,
+		Type:                  data.Type,
+		TypeOfSubject:         data.TypeOfSubject,
+		SourceOfFunding:       data.SourceOfFunding,
+		Supplier:              data.Supplier,
 		CreatedAt:             data.CreatedAt,
 		UpdatedAt:             data.UpdatedAt,
 	}

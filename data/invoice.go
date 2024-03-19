@@ -10,6 +10,10 @@ import (
 type Invoice struct {
 	ID                    int        `db:"id,omitempty"`
 	InvoiceNumber         string     `db:"invoice_number"`
+	Type                  string     `db:"type"`
+	TypeOfSubject         int        `db:"type_of_subject"`
+	SourceOfFunding       int        `db:"source_of_funding"`
+	Supplier              string     `db:"supplier"`
 	Status                string     `db:"status,omitempty"`
 	GrossPrice            float64    `db:"gross_price"`
 	VATPrice              float64    `db:"vat_price"`
