@@ -15,17 +15,16 @@ type Handlers struct {
 	GoalIndicatorHandler          GoalIndicatorHandler
 	FilledFinancialBudgetHandler  FilledFinancialBudgetHandler
 	BudgetRequestHandler          BudgetRequestHandler
-
-	FeeHandler        FeeHandler
-	FeePaymentHandler FeePaymentHandler
-
-	FineHandler        FineHandler
-	FinePaymentHandler FinePaymentHandler
-
-	ProcedureCostHandler        ProcedureCostHandler
-	ProcedureCostPaymentHandler ProcedureCostPaymentHandler
-	AdditionalExpenseHandler AdditionalExpenseHandler
-	}
+	FeeHandler                    FeeHandler
+	FeePaymentHandler             FeePaymentHandler
+	FineHandler                   FineHandler
+	FinePaymentHandler            FinePaymentHandler
+	ProcedureCostHandler          ProcedureCostHandler
+	ProcedureCostPaymentHandler   ProcedureCostPaymentHandler
+	AdditionalExpenseHandler      AdditionalExpenseHandler
+	FlatRateHandler               FlatRateHandler
+	FlatRatePaymentHandler        FlatRatePaymentHandler
+}
 
 type InvoiceHandler interface {
 	CreateInvoice(w http.ResponseWriter, r *http.Request)
@@ -124,6 +123,7 @@ type BudgetRequestHandler interface {
 	GetBudgetRequestList(w http.ResponseWriter, r *http.Request)
 }
 
+// fees
 type FeeHandler interface {
 	CreateFee(w http.ResponseWriter, r *http.Request)
 	GetFeeById(w http.ResponseWriter, r *http.Request)
@@ -140,6 +140,7 @@ type FeePaymentHandler interface {
 	GetFeePaymentList(w http.ResponseWriter, r *http.Request)
 }
 
+// fines
 type FineHandler interface {
 	CreateFine(w http.ResponseWriter, r *http.Request)
 	GetFineById(w http.ResponseWriter, r *http.Request)
@@ -179,4 +180,21 @@ type AdditionalExpenseHandler interface {
 	DeleteAdditionalExpense(w http.ResponseWriter, r *http.Request)
 	GetAdditionalExpenseById(w http.ResponseWriter, r *http.Request)
 	GetAdditionalExpenseList(w http.ResponseWriter, r *http.Request)
+}
+
+// flat rate
+type FlatRateHandler interface {
+	CreateFlatRate(w http.ResponseWriter, r *http.Request)
+	GetFlatRateById(w http.ResponseWriter, r *http.Request)
+	UpdateFlatRate(w http.ResponseWriter, r *http.Request)
+	DeleteFlatRate(w http.ResponseWriter, r *http.Request)
+	GetFlatRateList(w http.ResponseWriter, r *http.Request)
+}
+
+type FlatRatePaymentHandler interface {
+	CreateFlatRatePayment(w http.ResponseWriter, r *http.Request)
+	GetFlatRatePaymentById(w http.ResponseWriter, r *http.Request)
+	UpdateFlatRatePayment(w http.ResponseWriter, r *http.Request)
+	DeleteFlatRatePayment(w http.ResponseWriter, r *http.Request)
+	GetFlatRatePaymentList(w http.ResponseWriter, r *http.Request)
 }

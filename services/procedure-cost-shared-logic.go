@@ -68,12 +68,12 @@ func (h *ProcedureCostSharedLogicServiceImpl) CalculateProcedureCostDetailsAndUp
 	var newStatus data.ProcedureCostStatus
 	const tolerance = 0.00001
 
-	LeftToPayAmount := math.Max(0, details.LeftToPayAmount)
-	CourtCostsLeftToPayAmount := math.Max(0, details.CourtCostsLeftToPayAmount)
+	leftToPayAmount := math.Max(0, details.LeftToPayAmount)
+	courtCostsLeftToPayAmount := math.Max(0, details.CourtCostsLeftToPayAmount)
 
-	if math.Abs(LeftToPayAmount-0) < tolerance && math.Abs(CourtCostsLeftToPayAmount-0) < tolerance {
+	if math.Abs(leftToPayAmount-0) < tolerance && math.Abs(courtCostsLeftToPayAmount-0) < tolerance {
 		newStatus = data.PaidProcedureCostStatus
-	} else if (LeftToPayAmount > 0 || CourtCostsLeftToPayAmount > 0) && (details.CourtCostsPaid > 0 || details.AllPaymentAmount > 0) {
+	} else if (leftToPayAmount > 0 || courtCostsLeftToPayAmount > 0) && (details.CourtCostsPaid > 0 || details.AllPaymentAmount > 0) {
 		newStatus = data.PartProcedureCostStatus
 	} else {
 		newStatus = data.UnpaidProcedureCostStatus

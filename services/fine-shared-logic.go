@@ -74,7 +74,7 @@ func (h *FineSharedLogicServiceImpl) CalculateFineDetailsAndUpdateStatus(fineId 
 
 	if math.Abs(feeLeftToPayAmount-0) < tolerance && math.Abs(feeCourtCostsLeftToPayAmount-0) < tolerance {
 		newStatus = data.PaidFineStatus
-	} else if feeLeftToPayAmount > 0 || feeCourtCostsLeftToPayAmount > 0 {
+	} else if (feeLeftToPayAmount > 0 || feeCourtCostsLeftToPayAmount > 0) && (details.FeeAllPaymentAmount > 0 || details.FeeCourtCostsPaid > 0) {
 		newStatus = data.PartFineStatus
 	} else {
 		newStatus = data.UnpaidFineStatus

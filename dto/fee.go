@@ -51,7 +51,7 @@ type FeeResponseDTO struct {
 
 type FeeDetailsDTO struct {
 	FeeLeftToPayAmount  float64 `json:"fee_left_to_pay_amount"`
-	FeeAllPaymentAmount float64 `json:"fee_all_payment_amount"`
+	FeeAllPaymentAmount float64 `json:"fee_all_payments_amount"`
 }
 
 type FeeFilterDTO struct {

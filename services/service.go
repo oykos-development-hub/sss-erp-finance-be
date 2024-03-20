@@ -175,3 +175,23 @@ type AdditionalExpenseService interface {
 	GetAdditionalExpense(id int) (*dto.AdditionalExpenseResponseDTO, error)
 	GetAdditionalExpenseList(filter dto.AdditionalExpenseFilterDTO) ([]dto.AdditionalExpenseResponseDTO, *uint64, error)
 }
+
+type FlatRateSharedLogicService interface {
+	CalculateFlatRateDetailsAndUpdateStatus(flatRateId int) (*dto.FlatRateDetailsDTO, data.FlatRateStatus, error)
+}
+
+type FlatRateService interface {
+	CreateFlatRate(input dto.FlatRateDTO) (*dto.FlatRateResponseDTO, error)
+	GetFlatRate(id int) (*dto.FlatRateResponseDTO, error)
+	GetFlatRateList(filter dto.FlatRateFilterDTO) ([]dto.FlatRateResponseDTO, *uint64, error)
+	UpdateFlatRate(id int, input dto.FlatRateDTO) (*dto.FlatRateResponseDTO, error)
+	DeleteFlatRate(id int) error
+}
+
+type FlatRatePaymentService interface {
+	CreateFlatRatePayment(input dto.FlatRatePaymentDTO) (*dto.FlatRatePaymentResponseDTO, error)
+	DeleteFlatRatePayment(id int) error
+	UpdateFlatRatePayment(id int, input dto.FlatRatePaymentDTO) (*dto.FlatRatePaymentResponseDTO, error)
+	GetFlatRatePayment(id int) (*dto.FlatRatePaymentResponseDTO, error)
+	GetFlatRatePaymentList(filter dto.FlatRatePaymentFilterDTO) ([]dto.FlatRatePaymentResponseDTO, *uint64, error)
+}

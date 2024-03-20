@@ -122,12 +122,24 @@ func routes(app *celeritas.Celeritas, middleware *middleware.Middleware, handler
 		rt.Get("/procedure-cost-payments", handlers.ProcedureCostPaymentHandler.GetProcedureCostPaymentList)
 		rt.Put("/procedure-cost-payments/{id}", handlers.ProcedureCostPaymentHandler.UpdateProcedureCostPayment)
 		rt.Delete("/procedure-cost-payments/{id}", handlers.ProcedureCostPaymentHandler.DeleteProcedureCostPayment)
-	
+
 		rt.Post("/additional-expenses", handlers.AdditionalExpenseHandler.CreateAdditionalExpense)
-rt.Get("/additional-expenses/{id}", handlers.AdditionalExpenseHandler.GetAdditionalExpenseById)
-rt.Get("/additional-expenses", handlers.AdditionalExpenseHandler.GetAdditionalExpenseList)
-rt.Put("/additional-expenses/{id}", handlers.AdditionalExpenseHandler.UpdateAdditionalExpense)
-rt.Delete("/additional-expenses/{id}", handlers.AdditionalExpenseHandler.DeleteAdditionalExpense)
+		rt.Get("/additional-expenses/{id}", handlers.AdditionalExpenseHandler.GetAdditionalExpenseById)
+		rt.Get("/additional-expenses", handlers.AdditionalExpenseHandler.GetAdditionalExpenseList)
+		rt.Put("/additional-expenses/{id}", handlers.AdditionalExpenseHandler.UpdateAdditionalExpense)
+		rt.Delete("/additional-expenses/{id}", handlers.AdditionalExpenseHandler.DeleteAdditionalExpense)
+
+		rt.Post("/flat-rates", handlers.FlatRateHandler.CreateFlatRate)
+		rt.Get("/flat-rates/{id}", handlers.FlatRateHandler.GetFlatRateById)
+		rt.Get("/flat-rates", handlers.FlatRateHandler.GetFlatRateList)
+		rt.Put("/flat-rates/{id}", handlers.FlatRateHandler.UpdateFlatRate)
+		rt.Delete("/flat-rates/{id}", handlers.FlatRateHandler.DeleteFlatRate)
+
+		rt.Post("/flat-rate-payments", handlers.FlatRatePaymentHandler.CreateFlatRatePayment)
+		rt.Get("/flat-rate-payments/{id}", handlers.FlatRatePaymentHandler.GetFlatRatePaymentById)
+		rt.Get("/flat-rate-payments", handlers.FlatRatePaymentHandler.GetFlatRatePaymentList)
+		rt.Put("/flat-rate-payments/{id}", handlers.FlatRatePaymentHandler.UpdateFlatRatePayment)
+		rt.Delete("/flat-rate-payments/{id}", handlers.FlatRatePaymentHandler.DeleteFlatRatePayment)
 	})
 
 	return app.Routes

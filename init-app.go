@@ -97,6 +97,14 @@ func initApplication() *celeritas.Celeritas {
 	ProcedureCostService := services.NewProcedureCostServiceImpl(cel, models.ProcedureCost, ProcedureCostSharedLogicService)
 	ProcedureCostHandler := handlers.NewProcedureCostHandler(cel, ProcedureCostService)
 
+	FlatRateSharedLogicService := services.NewFlatRateSharedLogicServiceImpl(cel, models.FlatRate, models.FlatRatePayment)
+
+	FlatRatePaymentService := services.NewFlatRatePaymentServiceImpl(cel, models.FlatRatePayment, FlatRateSharedLogicService)
+	FlatRatePaymentHandler := handlers.NewFlatRatePaymentHandler(cel, FlatRatePaymentService)
+
+	FlatRateService := services.NewFlatRateServiceImpl(cel, models.FlatRate, FlatRateSharedLogicService)
+	FlatRateHandler := handlers.NewFlatRateHandler(cel, FlatRateService)
+
 	myHandlers := &handlers.Handlers{
 		InvoiceHandler: InvoiceHandler,
 		ArticleHandler: ArticleHandler,
@@ -120,6 +128,8 @@ func initApplication() *celeritas.Celeritas {
 
 		ProcedureCostHandler:        ProcedureCostHandler,
 		ProcedureCostPaymentHandler: ProcedureCostPaymentHandler,
+		FlatRateHandler:             FlatRateHandler,
+		FlatRatePaymentHandler:      FlatRatePaymentHandler,
 		AdditionalExpenseHandler:    AdditionalExpenseHandler,
 	}
 

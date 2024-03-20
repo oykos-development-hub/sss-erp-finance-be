@@ -33,14 +33,16 @@ type Models struct {
 	GoalIndicator          GoalIndicator
 	FilledFinancialBudget  FilledFinancialBudget
 	BudgetRequest          BudgetRequest
-    Fee                    Fee
+	Fee                    Fee
 	FeePayment             FeePayment
 	Fine                   Fine
 	FinePayment            FinePayment
 	ProcedureCost          ProcedureCost
 	ProcedureCostPayment   ProcedureCostPayment
-	AdditionalExpense AdditionalExpense
-	}
+	AdditionalExpense      AdditionalExpense
+	FlatRate               FlatRate
+	FlatRatePayment        FlatRatePayment
+}
 
 func New(databasePool *sql.DB) Models {
 	db = databasePool
@@ -73,7 +75,9 @@ func New(databasePool *sql.DB) Models {
 		FinePayment:            FinePayment{},
 		ProcedureCost:          ProcedureCost{},
 		ProcedureCostPayment:   ProcedureCostPayment{},
-		AdditionalExpense: AdditionalExpense{},
+		AdditionalExpense:      AdditionalExpense{},
+		FlatRate:               FlatRate{},
+		FlatRatePayment:        FlatRatePayment{},
 	}
 }
 
