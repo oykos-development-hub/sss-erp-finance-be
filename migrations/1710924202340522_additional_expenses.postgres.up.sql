@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS additional_expenses (
     title text,
     status integer not null,
     subject_id integer not null,
+    organization_unit_id integer not null,
     bank_account integer not null,
     invoice_id integer not null references invoices(id) on delete cascade,
     created_at TIMESTAMP,

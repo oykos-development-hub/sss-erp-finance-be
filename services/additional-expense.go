@@ -97,6 +97,10 @@ func (h *AdditionalExpenseServiceImpl) GetAdditionalExpenseList(filter dto.Addit
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"subject_id": *filter.SubjectID})
 	}
 
+	if filter.OrganizationUnitID != nil {
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"organization_unit_id": *filter.OrganizationUnitID})
+	}
+
 	if filter.Search != nil {
 		likeCondition := fmt.Sprintf("%%%s%%", *filter.Search)
 		search := up.Or(
