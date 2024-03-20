@@ -24,7 +24,8 @@ type Handlers struct {
 
 	ProcedureCostHandler        ProcedureCostHandler
 	ProcedureCostPaymentHandler ProcedureCostPaymentHandler
-}
+	AdditionalExpenseHandler AdditionalExpenseHandler
+	}
 
 type InvoiceHandler interface {
 	CreateInvoice(w http.ResponseWriter, r *http.Request)
@@ -170,4 +171,12 @@ type ProcedureCostPaymentHandler interface {
 	UpdateProcedureCostPayment(w http.ResponseWriter, r *http.Request)
 	GetProcedureCostPaymentById(w http.ResponseWriter, r *http.Request)
 	GetProcedureCostPaymentList(w http.ResponseWriter, r *http.Request)
+}
+
+type AdditionalExpenseHandler interface {
+	CreateAdditionalExpense(w http.ResponseWriter, r *http.Request)
+	UpdateAdditionalExpense(w http.ResponseWriter, r *http.Request)
+	DeleteAdditionalExpense(w http.ResponseWriter, r *http.Request)
+	GetAdditionalExpenseById(w http.ResponseWriter, r *http.Request)
+	GetAdditionalExpenseList(w http.ResponseWriter, r *http.Request)
 }

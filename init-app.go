@@ -32,7 +32,11 @@ func initApplication() *celeritas.Celeritas {
 	ArticleService := services.NewArticleServiceImpl(cel, models.Article)
 	ArticleHandler := handlers.NewArticleHandler(cel, ArticleService)
 
-	InvoiceService := services.NewInvoiceServiceImpl(cel, models.Invoice, ArticleService)
+	//obligations and demands
+	AdditionalExpenseService := services.NewAdditionalExpenseServiceImpl(cel, models.AdditionalExpense)
+	AdditionalExpenseHandler := handlers.NewAdditionalExpenseHandler(cel, AdditionalExpenseService)
+
+	InvoiceService := services.NewInvoiceServiceImpl(cel, models.Invoice, ArticleService, AdditionalExpenseService)
 	InvoiceHandler := handlers.NewInvoiceHandler(cel, InvoiceService, ArticleService)
 
 	BudgetService := services.NewBudgetServiceImpl(cel, models.Budget)
@@ -116,6 +120,7 @@ func initApplication() *celeritas.Celeritas {
 
 		ProcedureCostHandler:        ProcedureCostHandler,
 		ProcedureCostPaymentHandler: ProcedureCostPaymentHandler,
+		AdditionalExpenseHandler:    AdditionalExpenseHandler,
 	}
 
 	myMiddleware := &middleware.Middleware{

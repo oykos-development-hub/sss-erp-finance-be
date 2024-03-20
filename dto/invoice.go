@@ -41,30 +41,31 @@ type InvoiceDTO struct {
 }
 
 type InvoiceResponseDTO struct {
-	ID                    int                  `json:"id"`
-	InvoiceNumber         string               `json:"invoice_number"`
-	Type                  string               `json:"type"`
-	TypeOfSubject         int                  `json:"type_of_subject"`
-	TypeOfContract        int                  `json:"type_of_contract"`
-	SourceOfFunding       int                  `json:"source_of_funding"`
-	Supplier              string               `json:"supplier"`
-	Status                string               `json:"status"`
-	GrossPrice            float64              `json:"gross_price"`
-	VATPrice              float64              `json:"vat_price"`
-	SupplierID            int                  `json:"supplier_id"`
-	OrderID               int                  `json:"order_id"`
-	OrganizationUnitID    int                  `json:"organization_unit_id"`
-	DateOfInvoice         time.Time            `json:"date_of_invoice"`
-	ReceiptDate           time.Time            `json:"receipt_date"`
-	DateOfPayment         time.Time            `json:"date_of_payment"`
-	SSSInvoiceReceiptDate *time.Time           `json:"sss_invoice_receipt_date"`
-	DateOfStart           time.Time            `json:"date_of_start"`
-	FileID                int                  `json:"file_id"`
-	BankAccount           string               `json:"bank_account"`
-	Description           string               `json:"description"`
-	Articles              []ArticleResponseDTO `json:"articles"`
-	CreatedAt             time.Time            `json:"created_at"`
-	UpdatedAt             time.Time            `json:"updated_at"`
+	ID                    int                            `json:"id"`
+	InvoiceNumber         string                         `json:"invoice_number"`
+	Type                  string                         `json:"type"`
+	TypeOfSubject         int                            `json:"type_of_subject"`
+	TypeOfContract        int                            `json:"type_of_contract"`
+	SourceOfFunding       int                            `json:"source_of_funding"`
+	Supplier              string                         `json:"supplier"`
+	Status                string                         `json:"status"`
+	GrossPrice            float64                        `json:"gross_price"`
+	VATPrice              float64                        `json:"vat_price"`
+	SupplierID            int                            `json:"supplier_id"`
+	OrderID               int                            `json:"order_id"`
+	OrganizationUnitID    int                            `json:"organization_unit_id"`
+	DateOfInvoice         time.Time                      `json:"date_of_invoice"`
+	ReceiptDate           time.Time                      `json:"receipt_date"`
+	DateOfPayment         time.Time                      `json:"date_of_payment"`
+	SSSInvoiceReceiptDate *time.Time                     `json:"sss_invoice_receipt_date"`
+	DateOfStart           time.Time                      `json:"date_of_start"`
+	FileID                int                            `json:"file_id"`
+	BankAccount           string                         `json:"bank_account"`
+	Description           string                         `json:"description"`
+	Articles              []ArticleResponseDTO           `json:"articles"`
+	AdditionalExpenses    []AdditionalExpenseResponseDTO `json:"additional_expenses"`
+	CreatedAt             time.Time                      `json:"created_at"`
+	UpdatedAt             time.Time                      `json:"updated_at"`
 }
 
 func (dto InvoiceDTO) ToInvoice() *data.Invoice {

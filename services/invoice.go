@@ -13,16 +13,18 @@ import (
 )
 
 type InvoiceServiceImpl struct {
-	App              *celeritas.Celeritas
-	repo             data.Invoice
-	articlesServices ArticleService
+	App                *celeritas.Celeritas
+	repo               data.Invoice
+	articlesServices   ArticleService
+	additionalExpenses AdditionalExpenseService
 }
 
-func NewInvoiceServiceImpl(app *celeritas.Celeritas, repo data.Invoice, articles ArticleService) InvoiceService {
+func NewInvoiceServiceImpl(app *celeritas.Celeritas, repo data.Invoice, articles ArticleService, additionalExpenses AdditionalExpenseService) InvoiceService {
 	return &InvoiceServiceImpl{
-		App:              app,
-		repo:             repo,
-		articlesServices: articles,
+		App:                app,
+		repo:               repo,
+		articlesServices:   articles,
+		additionalExpenses: additionalExpenses,
 	}
 }
 
@@ -96,6 +98,15 @@ func (h *InvoiceServiceImpl) GetInvoice(id int) (*dto.InvoiceResponseDTO, error)
 	}
 
 	response.Articles = articles
+
+	additionaExpenses, _, err := h.additionalExpenses.GetAdditionalExpenseList(dto.AdditionalExpenseFilterDTO{InvoiceID: &id})
+
+	if err != nil {
+		h.App.ErrorLog.Println(err)
+		return nil, err
+	}
+
+	response.AdditionalExpenses = additionaExpenses
 
 	return &response, nil
 }

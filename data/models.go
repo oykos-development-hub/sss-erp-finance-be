@@ -39,7 +39,8 @@ type Models struct {
 	FinePayment            FinePayment
 	ProcedureCost          ProcedureCost
 	ProcedureCostPayment   ProcedureCostPayment
-}
+	AdditionalExpense AdditionalExpense
+	}
 
 func New(databasePool *sql.DB) Models {
 	db = databasePool
@@ -72,6 +73,7 @@ func New(databasePool *sql.DB) Models {
 		FinePayment:            FinePayment{},
 		ProcedureCost:          ProcedureCost{},
 		ProcedureCostPayment:   ProcedureCostPayment{},
+		AdditionalExpense: AdditionalExpense{},
 	}
 }
 
