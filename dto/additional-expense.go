@@ -9,6 +9,7 @@ import (
 type AdditionalExpenseDTO struct {
 	Title       string                       `json:"title"`
 	AccountID   int                          `json:"account_id"`
+	Price       float32                      `json:"price"`
 	SubjectID   int                          `json:"subject_id"`
 	BankAccount int                          `json:"bank_account"`
 	InvoiceID   int                          `json:"invoice_id"`
@@ -19,6 +20,7 @@ type AdditionalExpenseResponseDTO struct {
 	ID          int                          `json:"id"`
 	Title       string                       `json:"title"`
 	AccountID   int                          `json:"account_id"`
+	Price       float32                      `json:"price"`
 	SubjectID   int                          `json:"subject_id"`
 	BankAccount int                          `json:"bank_account"`
 	InvoiceID   int                          `json:"invoice_id"`

@@ -22,6 +22,7 @@ type AdditionalExpense struct {
 	SubjectID   int                     `db:"subject_id"`
 	BankAccount int                     `db:"bank_account"`
 	InvoiceID   int                     `db:"invoice_id"`
+	Price       float32                 `db:"price"`
 	Status      AdditionalExpenseStatus `db:"status"`
 	CreatedAt   time.Time               `db:"created_at,omitempty"`
 	UpdatedAt   time.Time               `db:"updated_at"`
