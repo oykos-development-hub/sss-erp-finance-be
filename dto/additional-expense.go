@@ -11,7 +11,7 @@ type AdditionalExpenseDTO struct {
 	AccountID   int                          `json:"account_id"`
 	Price       float32                      `json:"price"`
 	SubjectID   int                          `json:"subject_id"`
-	BankAccount int                          `json:"bank_account"`
+	BankAccount string                       `json:"bank_account"`
 	InvoiceID   int                          `json:"invoice_id"`
 	Status      data.AdditionalExpenseStatus `json:"status"`
 }
@@ -22,7 +22,7 @@ type AdditionalExpenseResponseDTO struct {
 	AccountID   int                          `json:"account_id"`
 	Price       float32                      `json:"price"`
 	SubjectID   int                          `json:"subject_id"`
-	BankAccount int                          `json:"bank_account"`
+	BankAccount string                       `json:"bank_account"`
 	InvoiceID   int                          `json:"invoice_id"`
 	Status      data.AdditionalExpenseStatus `json:"status"`
 	CreatedAt   time.Time                    `json:"created_at"`

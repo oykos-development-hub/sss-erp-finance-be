@@ -19,6 +19,7 @@ type Invoice struct {
 	GrossPrice            float64    `db:"gross_price"`
 	VATPrice              float64    `db:"vat_price"`
 	SupplierID            int        `db:"supplier_id"`
+	ActivityID            int        `db:"activity_id"`
 	OrderID               int        `db:"order_id"`
 	OrganizationUnitID    int        `db:"organization_unit_id"`
 	DateOfInvoice         time.Time  `db:"date_of_invoice"`
@@ -26,6 +27,7 @@ type Invoice struct {
 	DateOfPayment         time.Time  `db:"date_of_payment"`
 	SSSInvoiceReceiptDate *time.Time `db:"sss_invoice_receipt_date"`
 	DateOfStart           time.Time  `db:"date_of_start"`
+	DateOfEnd             time.Time  `db:"date_of_end"`
 	FileID                int        `db:"file_id"`
 	BankAccount           string     `db:"bank_account"`
 	Description           string     `db:"description"`

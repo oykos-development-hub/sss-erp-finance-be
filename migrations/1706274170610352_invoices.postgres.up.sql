@@ -12,6 +12,7 @@ CREATE TABLE invoices (
     supplier_id INTEGER,
     order_id INTEGER,
     organization_unit_id INTEGER,
+    activity_id INTEGER,
     date_of_invoice TIMESTAMP,             --datum fakture/resenja, 
     receipt_date TIMESTAMP,                --datum prijema,
     date_of_payment TIMESTAMP,             --datum placanja,

@@ -20,7 +20,7 @@ type AdditionalExpense struct {
 	Title       string                  `db:"title"`
 	AccountID   int                     `db:"account_id"`
 	SubjectID   int                     `db:"subject_id"`
-	BankAccount int                     `db:"bank_account"`
+	BankAccount string                  `db:"bank_account"`
 	InvoiceID   int                     `db:"invoice_id"`
 	Price       float32                 `db:"price"`
 	Status      AdditionalExpenseStatus `db:"status"`
