@@ -87,6 +87,9 @@ func (h *BudgetServiceImpl) GetBudgetList(input dto.GetBudgetListInput) ([]dto.B
 	if input.BudgetType != nil {
 		cond["budget_type"] = input.BudgetType
 	}
+	if input.BudgetStatus != nil {
+		cond["budget_status"] = input.BudgetStatus
+	}
 
 	data, err := h.repo.GetAll(&cond)
 	if err != nil {

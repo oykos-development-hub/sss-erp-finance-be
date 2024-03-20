@@ -7,8 +7,9 @@ import (
 )
 
 type GetBudgetListInput struct {
-	Year       *int `json:"year"`
-	BudgetType *int `json:"budget_type"`
+	Year         *int `json:"year"`
+	BudgetType   *int `json:"budget_type"`
+	BudgetStatus *int `json:"budget_status"`
 }
 
 type BudgetDTO struct {
