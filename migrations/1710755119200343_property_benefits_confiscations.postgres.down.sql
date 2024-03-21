@@ -1,0 +1,2 @@
+DROP TABLE IF EXISTS property_benefits_confiscations
+DROP TABLE IF EXISTS property_benefits_confiscations_payments

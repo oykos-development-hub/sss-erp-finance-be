@@ -24,6 +24,8 @@ type Handlers struct {
 	AdditionalExpenseHandler      AdditionalExpenseHandler
 	FlatRateHandler               FlatRateHandler
 	FlatRatePaymentHandler        FlatRatePaymentHandler
+	PropBenConfHandler            PropBenConfHandler
+	PropBenConfPaymentHandler     PropBenConfPaymentHandler
 }
 
 type InvoiceHandler interface {
@@ -197,4 +199,21 @@ type FlatRatePaymentHandler interface {
 	UpdateFlatRatePayment(w http.ResponseWriter, r *http.Request)
 	DeleteFlatRatePayment(w http.ResponseWriter, r *http.Request)
 	GetFlatRatePaymentList(w http.ResponseWriter, r *http.Request)
+}
+
+// property benefits confiscation
+type PropBenConfHandler interface {
+	CreatePropBenConf(w http.ResponseWriter, r *http.Request)
+	GetPropBenConfById(w http.ResponseWriter, r *http.Request)
+	UpdatePropBenConf(w http.ResponseWriter, r *http.Request)
+	DeletePropBenConf(w http.ResponseWriter, r *http.Request)
+	GetPropBenConfList(w http.ResponseWriter, r *http.Request)
+}
+
+type PropBenConfPaymentHandler interface {
+	CreatePropBenConfPayment(w http.ResponseWriter, r *http.Request)
+	DeletePropBenConfPayment(w http.ResponseWriter, r *http.Request)
+	UpdatePropBenConfPayment(w http.ResponseWriter, r *http.Request)
+	GetPropBenConfPaymentById(w http.ResponseWriter, r *http.Request)
+	GetPropBenConfPaymentList(w http.ResponseWriter, r *http.Request)
 }

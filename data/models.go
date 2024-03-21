@@ -42,6 +42,8 @@ type Models struct {
 	AdditionalExpense      AdditionalExpense
 	FlatRate               FlatRate
 	FlatRatePayment        FlatRatePayment
+	PropBenConf            PropBenConf
+	PropBenConfPayment     PropBenConfPayment
 }
 
 func New(databasePool *sql.DB) Models {
@@ -78,6 +80,8 @@ func New(databasePool *sql.DB) Models {
 		AdditionalExpense:      AdditionalExpense{},
 		FlatRate:               FlatRate{},
 		FlatRatePayment:        FlatRatePayment{},
+		PropBenConf:            PropBenConf{},
+		PropBenConfPayment:     PropBenConfPayment{},
 	}
 }
 

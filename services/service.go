@@ -195,3 +195,23 @@ type FlatRatePaymentService interface {
 	GetFlatRatePayment(id int) (*dto.FlatRatePaymentResponseDTO, error)
 	GetFlatRatePaymentList(filter dto.FlatRatePaymentFilterDTO) ([]dto.FlatRatePaymentResponseDTO, *uint64, error)
 }
+
+type PropBenConfSharedLogicService interface {
+	CalculatePropBenConfDetailsAndUpdateStatus(propbenconfId int) (*dto.PropBenConfDetailsDTO, data.PropBenConfStatus, error)
+}
+
+type PropBenConfService interface {
+	CreatePropBenConf(input dto.PropBenConfDTO) (*dto.PropBenConfResponseDTO, error)
+	GetPropBenConf(id int) (*dto.PropBenConfResponseDTO, error)
+	GetPropBenConfList(filter dto.PropBenConfFilterDTO) ([]dto.PropBenConfResponseDTO, *uint64, error)
+	UpdatePropBenConf(id int, input dto.PropBenConfDTO) (*dto.PropBenConfResponseDTO, error)
+	DeletePropBenConf(id int) error
+}
+
+type PropBenConfPaymentService interface {
+	CreatePropBenConfPayment(input dto.PropBenConfPaymentDTO) (*dto.PropBenConfPaymentResponseDTO, error)
+	DeletePropBenConfPayment(id int) error
+	UpdatePropBenConfPayment(id int, input dto.PropBenConfPaymentDTO) (*dto.PropBenConfPaymentResponseDTO, error)
+	GetPropBenConfPayment(id int) (*dto.PropBenConfPaymentResponseDTO, error)
+	GetPropBenConfPaymentList(filter dto.PropBenConfPaymentFilterDTO) ([]dto.PropBenConfPaymentResponseDTO, *uint64, error)
+}

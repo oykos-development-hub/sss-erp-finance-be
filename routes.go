@@ -140,6 +140,18 @@ func routes(app *celeritas.Celeritas, middleware *middleware.Middleware, handler
 		rt.Get("/flat-rate-payments", handlers.FlatRatePaymentHandler.GetFlatRatePaymentList)
 		rt.Put("/flat-rate-payments/{id}", handlers.FlatRatePaymentHandler.UpdateFlatRatePayment)
 		rt.Delete("/flat-rate-payments/{id}", handlers.FlatRatePaymentHandler.DeleteFlatRatePayment)
+
+		rt.Post("/property-benefits-confiscations", handlers.PropBenConfHandler.CreatePropBenConf)
+		rt.Get("/property-benefits-confiscations/{id}", handlers.PropBenConfHandler.GetPropBenConfById)
+		rt.Get("/property-benefits-confiscations", handlers.PropBenConfHandler.GetPropBenConfList)
+		rt.Put("/property-benefits-confiscations/{id}", handlers.PropBenConfHandler.UpdatePropBenConf)
+		rt.Delete("/property-benefits-confiscations/{id}", handlers.PropBenConfHandler.DeletePropBenConf)
+
+		rt.Post("/property-benefits-confiscation-payments", handlers.PropBenConfPaymentHandler.CreatePropBenConfPayment)
+		rt.Get("/property-benefits-confiscation-payments/{id}", handlers.PropBenConfPaymentHandler.GetPropBenConfPaymentById)
+		rt.Get("/property-benefits-confiscation-payments", handlers.PropBenConfPaymentHandler.GetPropBenConfPaymentList)
+		rt.Put("/property-benefits-confiscation-payments/{id}", handlers.PropBenConfPaymentHandler.UpdatePropBenConfPayment)
+		rt.Delete("/property-benefits-confiscation-payments/{id}", handlers.PropBenConfPaymentHandler.DeletePropBenConfPayment)
 	})
 
 	return app.Routes

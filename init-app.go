@@ -105,6 +105,15 @@ func initApplication() *celeritas.Celeritas {
 	FlatRateService := services.NewFlatRateServiceImpl(cel, models.FlatRate, FlatRateSharedLogicService)
 	FlatRateHandler := handlers.NewFlatRateHandler(cel, FlatRateService)
 
+	// property benefits confiscation
+	PropBenConfSharedLogicService := services.NewPropBenConfSharedLogicServiceImpl(cel, models.PropBenConf, models.PropBenConfPayment)
+
+	PropBenConfService := services.NewPropBenConfServiceImpl(cel, models.PropBenConf, PropBenConfSharedLogicService)
+	PropBenConfHandler := handlers.NewPropBenConfHandler(cel, PropBenConfService)
+
+	PropBenConfPaymentService := services.NewPropBenConfPaymentServiceImpl(cel, models.PropBenConfPayment, PropBenConfSharedLogicService)
+	PropBenConfPaymentHandler := handlers.NewPropBenConfPaymentHandler(cel, PropBenConfPaymentService)
+
 	myHandlers := &handlers.Handlers{
 		InvoiceHandler: InvoiceHandler,
 		ArticleHandler: ArticleHandler,
@@ -131,6 +140,9 @@ func initApplication() *celeritas.Celeritas {
 		FlatRateHandler:             FlatRateHandler,
 		FlatRatePaymentHandler:      FlatRatePaymentHandler,
 		AdditionalExpenseHandler:    AdditionalExpenseHandler,
+
+		PropBenConfHandler:        PropBenConfHandler,
+		PropBenConfPaymentHandler: PropBenConfPaymentHandler,
 	}
 
 	myMiddleware := &middleware.Middleware{
