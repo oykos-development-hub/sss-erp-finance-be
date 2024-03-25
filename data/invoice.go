@@ -8,31 +8,32 @@ import (
 
 // Invoice struct
 type Invoice struct {
-	ID                    int        `db:"id,omitempty"`
-	InvoiceNumber         string     `db:"invoice_number"`
-	Type                  string     `db:"type"`
-	TypeOfSubject         int        `db:"type_of_subject"`
-	TypeOfContract        int        `db:"type_of_contract"`
-	SourceOfFunding       int        `db:"source_of_funding"`
-	Supplier              string     `db:"supplier"`
-	Status                string     `db:"status,omitempty"`
-	GrossPrice            float64    `db:"gross_price"`
-	VATPrice              float64    `db:"vat_price"`
-	SupplierID            int        `db:"supplier_id"`
-	ActivityID            int        `db:"activity_id"`
-	OrderID               int        `db:"order_id"`
-	OrganizationUnitID    int        `db:"organization_unit_id"`
-	DateOfInvoice         time.Time  `db:"date_of_invoice"`
-	ReceiptDate           time.Time  `db:"receipt_date"`
-	DateOfPayment         time.Time  `db:"date_of_payment"`
-	SSSInvoiceReceiptDate *time.Time `db:"sss_invoice_receipt_date"`
-	DateOfStart           time.Time  `db:"date_of_start"`
-	DateOfEnd             time.Time  `db:"date_of_end"`
-	FileID                int        `db:"file_id"`
-	BankAccount           string     `db:"bank_account"`
-	Description           string     `db:"description"`
-	CreatedAt             time.Time  `db:"created_at,omitempty"`
-	UpdatedAt             time.Time  `db:"updated_at"`
+	ID                     int        `db:"id,omitempty"`
+	InvoiceNumber          string     `db:"invoice_number"`
+	Type                   string     `db:"type"`
+	TaxAuthorityCodebookID int        `db:"tax_authority_codebook_id"`
+	TypeOfSubject          int        `db:"type_of_subject"`
+	TypeOfContract         int        `db:"type_of_contract"`
+	SourceOfFunding        int        `db:"source_of_funding"`
+	Supplier               string     `db:"supplier"`
+	Status                 string     `db:"status,omitempty"`
+	GrossPrice             float64    `db:"gross_price"`
+	VATPrice               float64    `db:"vat_price"`
+	SupplierID             int        `db:"supplier_id"`
+	ActivityID             int        `db:"activity_id"`
+	OrderID                int        `db:"order_id"`
+	OrganizationUnitID     int        `db:"organization_unit_id"`
+	DateOfInvoice          time.Time  `db:"date_of_invoice"`
+	ReceiptDate            time.Time  `db:"receipt_date"`
+	DateOfPayment          time.Time  `db:"date_of_payment"`
+	SSSInvoiceReceiptDate  *time.Time `db:"sss_invoice_receipt_date"`
+	DateOfStart            time.Time  `db:"date_of_start"`
+	DateOfEnd              time.Time  `db:"date_of_end"`
+	FileID                 int        `db:"file_id"`
+	BankAccount            string     `db:"bank_account"`
+	Description            string     `db:"description"`
+	CreatedAt              time.Time  `db:"created_at,omitempty"`
+	UpdatedAt              time.Time  `db:"updated_at"`
 }
 
 // Table returns the table name

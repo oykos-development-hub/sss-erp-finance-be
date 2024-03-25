@@ -19,112 +19,118 @@ type InvoicesFilter struct {
 }
 
 type InvoiceDTO struct {
-	InvoiceNumber         string     `json:"invoice_number"`
-	Status                string     `json:"status"`
-	Type                  string     `json:"type"`
-	TypeOfSubject         int        `json:"type_of_subject"`
-	TypeOfContract        int        `json:"type_of_contract"`
-	SourceOfFunding       int        `json:"source_of_funding"`
-	Supplier              string     `json:"supplier"`
-	GrossPrice            float64    `json:"gross_price"`
-	VATPrice              float64    `json:"vat_price"`
-	SupplierID            int        `json:"supplier_id"`
-	OrderID               int        `json:"order_id"`
-	OrganizationUnitID    int        `json:"organization_unit_id"`
-	ActivityID            int        `json:"activity_id"`
-	DateOfInvoice         time.Time  `json:"date_of_invoice"`
-	ReceiptDate           time.Time  `json:"receipt_date"`
-	DateOfPayment         time.Time  `json:"date_of_payment"`
-	DateOfStart           time.Time  `json:"date_of_start"`
-	DateOfEnd             time.Time  `json:"date_of_end"`
-	SSSInvoiceReceiptDate *time.Time `json:"sss_invoice_receipt_date"`
-	FileID                int        `json:"file_id"`
-	BankAccount           string     `json:"bank_account"`
-	Description           string     `json:"description"`
+	InvoiceNumber          string     `json:"invoice_number"`
+	Status                 string     `json:"status"`
+	Type                   string     `json:"type"`
+	TaxAuthorityCodebookID int        `json:"tax_authority_codebook_id"`
+	TypeOfSubject          int        `json:"type_of_subject"`
+	TypeOfContract         int        `json:"type_of_contract"`
+	SourceOfFunding        int        `json:"source_of_funding"`
+	Supplier               string     `json:"supplier"`
+	GrossPrice             float64    `json:"gross_price"`
+	VATPrice               float64    `json:"vat_price"`
+	SupplierID             int        `json:"supplier_id"`
+	OrderID                int        `json:"order_id"`
+	OrganizationUnitID     int        `json:"organization_unit_id"`
+	ActivityID             int        `json:"activity_id"`
+	DateOfInvoice          time.Time  `json:"date_of_invoice"`
+	ReceiptDate            time.Time  `json:"receipt_date"`
+	DateOfPayment          time.Time  `json:"date_of_payment"`
+	DateOfStart            time.Time  `json:"date_of_start"`
+	DateOfEnd              time.Time  `json:"date_of_end"`
+	SSSInvoiceReceiptDate  *time.Time `json:"sss_invoice_receipt_date"`
+	FileID                 int        `json:"file_id"`
+	BankAccount            string     `json:"bank_account"`
+	Description            string     `json:"description"`
 }
 
 type InvoiceResponseDTO struct {
-	ID                    int                            `json:"id"`
-	InvoiceNumber         string                         `json:"invoice_number"`
-	Type                  string                         `json:"type"`
-	TypeOfSubject         int                            `json:"type_of_subject"`
-	TypeOfContract        int                            `json:"type_of_contract"`
-	SourceOfFunding       int                            `json:"source_of_funding"`
-	Supplier              string                         `json:"supplier"`
-	Status                string                         `json:"status"`
-	GrossPrice            float64                        `json:"gross_price"`
-	VATPrice              float64                        `json:"vat_price"`
-	SupplierID            int                            `json:"supplier_id"`
-	OrderID               int                            `json:"order_id"`
-	OrganizationUnitID    int                            `json:"organization_unit_id"`
-	ActivityID            int                            `json:"activity_id"`
-	DateOfInvoice         time.Time                      `json:"date_of_invoice"`
-	ReceiptDate           time.Time                      `json:"receipt_date"`
-	DateOfPayment         time.Time                      `json:"date_of_payment"`
-	SSSInvoiceReceiptDate *time.Time                     `json:"sss_invoice_receipt_date"`
-	DateOfStart           time.Time                      `json:"date_of_start"`
-	DateOfEnd             time.Time                      `json:"date_of_end"`
-	FileID                int                            `json:"file_id"`
-	BankAccount           string                         `json:"bank_account"`
-	Description           string                         `json:"description"`
-	Articles              []ArticleResponseDTO           `json:"articles"`
-	AdditionalExpenses    []AdditionalExpenseResponseDTO `json:"additional_expenses"`
-	CreatedAt             time.Time                      `json:"created_at"`
-	UpdatedAt             time.Time                      `json:"updated_at"`
+	ID                     int                            `json:"id"`
+	InvoiceNumber          string                         `json:"invoice_number"`
+	Type                   string                         `json:"type"`
+	TaxAuthorityCodebookID int                            `json:"tax_authority_codebook_id"`
+	TypeOfSubject          int                            `json:"type_of_subject"`
+	TypeOfContract         int                            `json:"type_of_contract"`
+	SourceOfFunding        int                            `json:"source_of_funding"`
+	Supplier               string                         `json:"supplier"`
+	Status                 string                         `json:"status"`
+	GrossPrice             float64                        `json:"gross_price"`
+	VATPrice               float64                        `json:"vat_price"`
+	SupplierID             int                            `json:"supplier_id"`
+	OrderID                int                            `json:"order_id"`
+	OrganizationUnitID     int                            `json:"organization_unit_id"`
+	ActivityID             int                            `json:"activity_id"`
+	DateOfInvoice          time.Time                      `json:"date_of_invoice"`
+	ReceiptDate            time.Time                      `json:"receipt_date"`
+	DateOfPayment          time.Time                      `json:"date_of_payment"`
+	SSSInvoiceReceiptDate  *time.Time                     `json:"sss_invoice_receipt_date"`
+	DateOfStart            time.Time                      `json:"date_of_start"`
+	DateOfEnd              time.Time                      `json:"date_of_end"`
+	FileID                 int                            `json:"file_id"`
+	BankAccount            string                         `json:"bank_account"`
+	Description            string                         `json:"description"`
+	Articles               []ArticleResponseDTO           `json:"articles"`
+	AdditionalExpenses     []AdditionalExpenseResponseDTO `json:"additional_expenses"`
+	CreatedAt              time.Time                      `json:"created_at"`
+	UpdatedAt              time.Time                      `json:"updated_at"`
 }
 
 func (dto InvoiceDTO) ToInvoice() *data.Invoice {
 	return &data.Invoice{
-		InvoiceNumber:         dto.InvoiceNumber,
-		Status:                dto.Status,
-		GrossPrice:            dto.GrossPrice,
-		VATPrice:              dto.VATPrice,
-		SupplierID:            dto.SupplierID,
-		OrderID:               dto.OrderID,
-		OrganizationUnitID:    dto.OrganizationUnitID,
-		DateOfInvoice:         dto.DateOfInvoice,
-		ReceiptDate:           dto.ReceiptDate,
-		DateOfPayment:         dto.DateOfPayment,
-		SSSInvoiceReceiptDate: dto.SSSInvoiceReceiptDate,
-		FileID:                dto.FileID,
-		BankAccount:           dto.BankAccount,
-		Description:           dto.Description,
-		Type:                  dto.Type,
-		TypeOfSubject:         dto.TypeOfSubject,
-		SourceOfFunding:       dto.SourceOfFunding,
-		Supplier:              dto.Supplier,
-		TypeOfContract:        dto.TypeOfContract,
-		DateOfStart:           dto.DateOfStart,
-		DateOfEnd:             dto.DateOfEnd,
+		InvoiceNumber:          dto.InvoiceNumber,
+		Status:                 dto.Status,
+		GrossPrice:             dto.GrossPrice,
+		VATPrice:               dto.VATPrice,
+		TaxAuthorityCodebookID: dto.TaxAuthorityCodebookID,
+		ActivityID:             dto.ActivityID,
+		SupplierID:             dto.SupplierID,
+		OrderID:                dto.OrderID,
+		OrganizationUnitID:     dto.OrganizationUnitID,
+		DateOfInvoice:          dto.DateOfInvoice,
+		ReceiptDate:            dto.ReceiptDate,
+		DateOfPayment:          dto.DateOfPayment,
+		SSSInvoiceReceiptDate:  dto.SSSInvoiceReceiptDate,
+		FileID:                 dto.FileID,
+		BankAccount:            dto.BankAccount,
+		Description:            dto.Description,
+		Type:                   dto.Type,
+		TypeOfSubject:          dto.TypeOfSubject,
+		SourceOfFunding:        dto.SourceOfFunding,
+		Supplier:               dto.Supplier,
+		TypeOfContract:         dto.TypeOfContract,
+		DateOfStart:            dto.DateOfStart,
+		DateOfEnd:              dto.DateOfEnd,
 	}
 }
 
 func ToInvoiceResponseDTO(data data.Invoice) InvoiceResponseDTO {
 	return InvoiceResponseDTO{
-		ID:                    data.ID,
-		InvoiceNumber:         data.InvoiceNumber,
-		Status:                data.Status,
-		GrossPrice:            data.GrossPrice,
-		VATPrice:              data.VATPrice,
-		SupplierID:            data.SupplierID,
-		OrderID:               data.OrderID,
-		OrganizationUnitID:    data.OrganizationUnitID,
-		DateOfInvoice:         data.DateOfInvoice,
-		ReceiptDate:           data.ReceiptDate,
-		DateOfPayment:         data.DateOfPayment,
-		SSSInvoiceReceiptDate: data.SSSInvoiceReceiptDate,
-		FileID:                data.FileID,
-		BankAccount:           data.BankAccount,
-		Description:           data.Description,
-		Type:                  data.Type,
-		TypeOfSubject:         data.TypeOfSubject,
-		SourceOfFunding:       data.SourceOfFunding,
-		Supplier:              data.Supplier,
-		TypeOfContract:        data.TypeOfContract,
-		DateOfStart:           data.DateOfStart,
-		DateOfEnd:             data.DateOfEnd,
-		CreatedAt:             data.CreatedAt,
-		UpdatedAt:             data.UpdatedAt,
+		ID:                     data.ID,
+		InvoiceNumber:          data.InvoiceNumber,
+		Status:                 data.Status,
+		GrossPrice:             data.GrossPrice,
+		VATPrice:               data.VATPrice,
+		TaxAuthorityCodebookID: data.TaxAuthorityCodebookID,
+		ActivityID:             data.ActivityID,
+		SupplierID:             data.SupplierID,
+		OrderID:                data.OrderID,
+		OrganizationUnitID:     data.OrganizationUnitID,
+		DateOfInvoice:          data.DateOfInvoice,
+		ReceiptDate:            data.ReceiptDate,
+		DateOfPayment:          data.DateOfPayment,
+		SSSInvoiceReceiptDate:  data.SSSInvoiceReceiptDate,
+		FileID:                 data.FileID,
+		BankAccount:            data.BankAccount,
+		Description:            data.Description,
+		Type:                   data.Type,
+		TypeOfSubject:          data.TypeOfSubject,
+		SourceOfFunding:        data.SourceOfFunding,
+		Supplier:               data.Supplier,
+		TypeOfContract:         data.TypeOfContract,
+		DateOfStart:            data.DateOfStart,
+		DateOfEnd:              data.DateOfEnd,
+		CreatedAt:              data.CreatedAt,
+		UpdatedAt:              data.UpdatedAt,
 	}
 }
 
