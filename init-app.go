@@ -114,6 +114,9 @@ func initApplication() *celeritas.Celeritas {
 	PropBenConfPaymentService := services.NewPropBenConfPaymentServiceImpl(cel, models.PropBenConfPayment, PropBenConfSharedLogicService)
 	PropBenConfPaymentHandler := handlers.NewPropBenConfPaymentHandler(cel, PropBenConfPaymentService)
 
+	TaxAuthorityCodebookService := services.NewTaxAuthorityCodebookServiceImpl(cel, models.TaxAuthorityCodebook)
+	TaxAuthorityCodebookHandler := handlers.NewTaxAuthorityCodebookHandler(cel, TaxAuthorityCodebookService)
+
 	myHandlers := &handlers.Handlers{
 		InvoiceHandler: InvoiceHandler,
 		ArticleHandler: ArticleHandler,
@@ -141,8 +144,9 @@ func initApplication() *celeritas.Celeritas {
 		FlatRatePaymentHandler:      FlatRatePaymentHandler,
 		AdditionalExpenseHandler:    AdditionalExpenseHandler,
 
-		PropBenConfHandler:        PropBenConfHandler,
-		PropBenConfPaymentHandler: PropBenConfPaymentHandler,
+		PropBenConfHandler:          PropBenConfHandler,
+		PropBenConfPaymentHandler:   PropBenConfPaymentHandler,
+		TaxAuthorityCodebookHandler: TaxAuthorityCodebookHandler,
 	}
 
 	myMiddleware := &middleware.Middleware{

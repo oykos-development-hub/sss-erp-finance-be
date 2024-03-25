@@ -26,6 +26,7 @@ type Handlers struct {
 	FlatRatePaymentHandler        FlatRatePaymentHandler
 	PropBenConfHandler            PropBenConfHandler
 	PropBenConfPaymentHandler     PropBenConfPaymentHandler
+	TaxAuthorityCodebookHandler   TaxAuthorityCodebookHandler
 }
 
 type InvoiceHandler interface {
@@ -216,4 +217,12 @@ type PropBenConfPaymentHandler interface {
 	UpdatePropBenConfPayment(w http.ResponseWriter, r *http.Request)
 	GetPropBenConfPaymentById(w http.ResponseWriter, r *http.Request)
 	GetPropBenConfPaymentList(w http.ResponseWriter, r *http.Request)
+}
+
+type TaxAuthorityCodebookHandler interface {
+	CreateTaxAuthorityCodebook(w http.ResponseWriter, r *http.Request)
+	UpdateTaxAuthorityCodebook(w http.ResponseWriter, r *http.Request)
+	DeleteTaxAuthorityCodebook(w http.ResponseWriter, r *http.Request)
+	GetTaxAuthorityCodebookById(w http.ResponseWriter, r *http.Request)
+	GetTaxAuthorityCodebookList(w http.ResponseWriter, r *http.Request)
 }

@@ -44,6 +44,7 @@ type Models struct {
 	FlatRatePayment        FlatRatePayment
 	PropBenConf            PropBenConf
 	PropBenConfPayment     PropBenConfPayment
+	TaxAuthorityCodebook   TaxAuthorityCodebook
 }
 
 func New(databasePool *sql.DB) Models {
@@ -78,10 +79,6 @@ func New(databasePool *sql.DB) Models {
 		ProcedureCost:          ProcedureCost{},
 		ProcedureCostPayment:   ProcedureCostPayment{},
 		AdditionalExpense:      AdditionalExpense{},
-		FlatRate:               FlatRate{},
-		FlatRatePayment:        FlatRatePayment{},
-		PropBenConf:            PropBenConf{},
-		PropBenConfPayment:     PropBenConfPayment{},
 	}
 }
 

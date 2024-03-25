@@ -152,6 +152,12 @@ func routes(app *celeritas.Celeritas, middleware *middleware.Middleware, handler
 		rt.Get("/property-benefits-confiscation-payments", handlers.PropBenConfPaymentHandler.GetPropBenConfPaymentList)
 		rt.Put("/property-benefits-confiscation-payments/{id}", handlers.PropBenConfPaymentHandler.UpdatePropBenConfPayment)
 		rt.Delete("/property-benefits-confiscation-payments/{id}", handlers.PropBenConfPaymentHandler.DeletePropBenConfPayment)
+
+		rt.Post("/tax-authority-codebooks", handlers.TaxAuthorityCodebookHandler.CreateTaxAuthorityCodebook)
+		rt.Get("/tax-authority-codebooks/{id}", handlers.TaxAuthorityCodebookHandler.GetTaxAuthorityCodebookById)
+		rt.Get("/tax-authority-codebooks", handlers.TaxAuthorityCodebookHandler.GetTaxAuthorityCodebookList)
+		rt.Put("/tax-authority-codebooks/{id}", handlers.TaxAuthorityCodebookHandler.UpdateTaxAuthorityCodebook)
+		rt.Delete("/tax-authority-codebooks/{id}", handlers.TaxAuthorityCodebookHandler.DeleteTaxAuthorityCodebook)
 	})
 
 	return app.Routes
