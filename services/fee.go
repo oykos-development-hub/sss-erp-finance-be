@@ -97,7 +97,7 @@ func (h *FeeServiceImpl) GetFeeList(input dto.FeeFilterDTO) ([]dto.FeeResponseDT
 	}
 
 	// combine search by subject, jmbg and description with filter by decision number
-	if input.Search != nil {
+	if input.Search != nil && *input.Search != "" {
 		likeCondition := fmt.Sprintf("%%%s%%", *input.Search)
 		stringConditions := up.Or(
 			up.Cond{"subject ILIKE": likeCondition},

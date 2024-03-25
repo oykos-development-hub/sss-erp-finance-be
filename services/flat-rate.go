@@ -101,7 +101,7 @@ func (h *FlatRateServiceImpl) GetFlatRateList(input dto.FlatRateFilterDTO) ([]dt
 	}
 
 	// combine search by subject, jmbg and description with filter by decision number
-	if input.Search != nil {
+	if input.Search != nil && *input.Search != "" {
 		likeCondition := fmt.Sprintf("%%%s%%", *input.Search)
 		stringConditions := up.Or(
 			up.Cond{"subject ILIKE": likeCondition},
