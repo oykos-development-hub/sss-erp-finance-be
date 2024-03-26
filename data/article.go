@@ -12,6 +12,7 @@ type Article struct {
 	Title         string    `db:"title"`
 	NetPrice      float64   `db:"net_price"`
 	VatPrice      float64   `db:"vat_price"`
+	VatPercentage int       `db:"vat_percentage"`
 	Description   string    `db:"description"`
 	InvoiceID     int       `db:"invoice_id"`
 	AccountID     int       `db:"account_id"`

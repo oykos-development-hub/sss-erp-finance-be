@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS articles (
     title VARCHAR ( 255 ) NOT NULL,
     net_price NUMERIC(10, 2) NOT NULL,
     vat_price NUMERIC(10, 2) NOT NULL,
+    vat_percentage INTEGER,
     description TEXT,
     invoice_id INT NOT NULL,
     account_id INT NOT NULL,

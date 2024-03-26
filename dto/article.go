@@ -10,6 +10,7 @@ type ArticleDTO struct {
 	Title         string  `json:"title"`
 	NetPrice      float64 `json:"net_price"`
 	VatPrice      float64 `json:"vat_price"`
+	VatPercentage int     `json:"vat_percentage"`
 	Description   string  `json:"description"`
 	InvoiceID     int     `json:"invoice_id"`
 	AccountID     int     `json:"account_id"`
@@ -21,6 +22,7 @@ type ArticleResponseDTO struct {
 	Title         string    `json:"title"`
 	NetPrice      float64   `json:"net_price"`
 	VatPrice      float64   `json:"vat_price"`
+	VatPercentage int       `json:"vat_percentage"`
 	Description   string    `json:"description"`
 	InvoiceID     int       `json:"invoice_id"`
 	AccountID     int       `json:"account_id"`
@@ -41,6 +43,7 @@ func (dto ArticleDTO) ToArticle() *data.Article {
 		Title:         dto.Title,
 		NetPrice:      dto.NetPrice,
 		VatPrice:      dto.VatPrice,
+		VatPercentage: dto.VatPercentage,
 		Description:   dto.Description,
 		InvoiceID:     dto.InvoiceID,
 		AccountID:     dto.AccountID,
@@ -54,6 +57,7 @@ func ToArticleResponseDTO(data data.Article) ArticleResponseDTO {
 		Title:         data.Title,
 		NetPrice:      data.NetPrice,
 		VatPrice:      data.VatPrice,
+		VatPercentage: data.VatPercentage,
 		Description:   data.Description,
 		InvoiceID:     data.InvoiceID,
 		AccountID:     data.AccountID,
