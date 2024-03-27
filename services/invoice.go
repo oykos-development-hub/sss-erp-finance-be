@@ -49,6 +49,7 @@ func (h *InvoiceServiceImpl) CreateInvoice(input dto.InvoiceDTO) (*dto.InvoiceRe
 
 		for _, additionalExpense := range input.AdditionalExpenses {
 			additionalExpenseData := additionalExpense.ToAdditionalExpense()
+			additionalExpenseData.InvoiceID = id
 			if _, err = h.additionalExpensesRepo.Insert(tx, *additionalExpenseData); err != nil {
 				return err
 			}
