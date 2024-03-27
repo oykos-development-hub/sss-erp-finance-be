@@ -58,7 +58,7 @@ func (t *PropBenConf) Table() string {
 // Get gets one record from the database, by id, using upper
 func (t *PropBenConf) Get(id int) (*PropBenConf, error) {
 	var one PropBenConf
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 
 	res := collection.Find(up.Cond{"id": id})
 	err := res.One(&one)
@@ -72,7 +72,7 @@ func (t *PropBenConf) Get(id int) (*PropBenConf, error) {
 func (t *PropBenConf) Insert(m PropBenConf) (int, error) {
 	m.CreatedAt = time.Now()
 	m.UpdatedAt = time.Now()
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 	res, err := collection.Insert(m)
 	if err != nil {
 		return 0, err
@@ -85,7 +85,7 @@ func (t *PropBenConf) Insert(m PropBenConf) (int, error) {
 
 // GetAll gets all records from the database, using upper
 func (t *PropBenConf) GetAll(page *int, size *int, condition *up.AndExpr) ([]*PropBenConf, *uint64, error) {
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 	var all []*PropBenConf
 	var res up.Result
 
@@ -114,7 +114,7 @@ func (t *PropBenConf) GetAll(page *int, size *int, condition *up.AndExpr) ([]*Pr
 // Update updates a record in the database, using upper
 func (t *PropBenConf) Update(m PropBenConf) error {
 	m.UpdatedAt = time.Now()
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 	res := collection.Find(m.ID)
 	err := res.Update(&m)
 	if err != nil {
@@ -125,7 +125,7 @@ func (t *PropBenConf) Update(m PropBenConf) error {
 
 // Delete deletes a record from the database by id, using upper
 func (t *PropBenConf) Delete(id int) error {
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 	res := collection.Find(id)
 	err := res.Delete()
 	if err != nil {

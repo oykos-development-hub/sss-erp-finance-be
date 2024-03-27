@@ -23,7 +23,7 @@ func (t *FinancialBudgetLimit) Table() string {
 
 // GetAll gets all records from the database, using upper
 func (t *FinancialBudgetLimit) GetAll(page *int, size *int, condition *up.AndExpr, orders []interface{}) ([]*FinancialBudgetLimit, *uint64, error) {
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 	var all []*FinancialBudgetLimit
 	var res up.Result
 
@@ -52,7 +52,7 @@ func (t *FinancialBudgetLimit) GetAll(page *int, size *int, condition *up.AndExp
 // Get gets one record from the database, by id, using upper
 func (t *FinancialBudgetLimit) Get(id int) (*FinancialBudgetLimit, error) {
 	var one FinancialBudgetLimit
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 
 	res := collection.Find(up.Cond{"id": id})
 	err := res.One(&one)
@@ -65,7 +65,7 @@ func (t *FinancialBudgetLimit) Get(id int) (*FinancialBudgetLimit, error) {
 // Update updates a record in the database, using upper
 func (t *FinancialBudgetLimit) Update(m FinancialBudgetLimit) error {
 	m.UpdatedAt = time.Now()
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 	res := collection.Find(m.ID)
 	err := res.Update(&m)
 	if err != nil {
@@ -76,7 +76,7 @@ func (t *FinancialBudgetLimit) Update(m FinancialBudgetLimit) error {
 
 // Delete deletes a record from the database by id, using upper
 func (t *FinancialBudgetLimit) Delete(id int) error {
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 	res := collection.Find(id)
 	err := res.Delete()
 	if err != nil {
@@ -89,7 +89,7 @@ func (t *FinancialBudgetLimit) Delete(id int) error {
 func (t *FinancialBudgetLimit) Insert(m FinancialBudgetLimit) (int, error) {
 	m.CreatedAt = time.Now()
 	m.UpdatedAt = time.Now()
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 	res, err := collection.Insert(m)
 	if err != nil {
 		return 0, err

@@ -26,7 +26,7 @@ func (t *TaxAuthorityCodebook) Table() string {
 
 // GetAll gets all records from the database, using upper
 func (t *TaxAuthorityCodebook) GetAll(page *int, size *int, condition *up.AndExpr, orders []interface{}) ([]*TaxAuthorityCodebook, *uint64, error) {
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 	var all []*TaxAuthorityCodebook
 	var res up.Result
 
@@ -55,7 +55,7 @@ func (t *TaxAuthorityCodebook) GetAll(page *int, size *int, condition *up.AndExp
 // Get gets one record from the database, by id, using upper
 func (t *TaxAuthorityCodebook) Get(id int) (*TaxAuthorityCodebook, error) {
 	var one TaxAuthorityCodebook
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 
 	res := collection.Find(up.Cond{"id": id})
 	err := res.One(&one)
@@ -68,7 +68,7 @@ func (t *TaxAuthorityCodebook) Get(id int) (*TaxAuthorityCodebook, error) {
 // Update updates a record in the database, using upper
 func (t *TaxAuthorityCodebook) Update(m TaxAuthorityCodebook) error {
 	m.UpdatedAt = time.Now()
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 	res := collection.Find(m.ID)
 	err := res.Update(&m)
 	if err != nil {
@@ -79,7 +79,7 @@ func (t *TaxAuthorityCodebook) Update(m TaxAuthorityCodebook) error {
 
 // Delete deletes a record from the database by id, using upper
 func (t *TaxAuthorityCodebook) Delete(id int) error {
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 	res := collection.Find(id)
 	err := res.Delete()
 	if err != nil {
@@ -92,7 +92,7 @@ func (t *TaxAuthorityCodebook) Delete(id int) error {
 func (t *TaxAuthorityCodebook) Insert(m TaxAuthorityCodebook) (int, error) {
 	m.CreatedAt = time.Now()
 	m.UpdatedAt = time.Now()
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 	res, err := collection.Insert(m)
 	if err != nil {
 		return 0, err

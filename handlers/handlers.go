@@ -178,8 +178,6 @@ type ProcedureCostPaymentHandler interface {
 }
 
 type AdditionalExpenseHandler interface {
-	CreateAdditionalExpense(w http.ResponseWriter, r *http.Request)
-	UpdateAdditionalExpense(w http.ResponseWriter, r *http.Request)
 	DeleteAdditionalExpense(w http.ResponseWriter, r *http.Request)
 	GetAdditionalExpenseById(w http.ResponseWriter, r *http.Request)
 	GetAdditionalExpenseList(w http.ResponseWriter, r *http.Request)

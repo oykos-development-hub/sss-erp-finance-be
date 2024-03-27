@@ -30,7 +30,7 @@ const (
 type ProcedureCost struct {
 	ID                     int                 `db:"id,omitempty"`
 	ProcedureCostType      ProcedureCostType   `db:"procedure_cost_type"`
-	DecisionNumber         string                 `db:"decision_number"`
+	DecisionNumber         string              `db:"decision_number"`
 	DecisionDate           time.Time           `db:"decision_date"`
 	Subject                string              `db:"subject"`
 	JMBG                   string              `db:"jmbg"`
@@ -58,7 +58,7 @@ func (t *ProcedureCost) Table() string {
 // Get gets one record from the database, by id, using upper
 func (t *ProcedureCost) Get(id int) (*ProcedureCost, error) {
 	var one ProcedureCost
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 
 	res := collection.Find(up.Cond{"id": id})
 	err := res.One(&one)
@@ -72,7 +72,7 @@ func (t *ProcedureCost) Get(id int) (*ProcedureCost, error) {
 func (t *ProcedureCost) Insert(m ProcedureCost) (int, error) {
 	m.CreatedAt = time.Now()
 	m.UpdatedAt = time.Now()
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 	res, err := collection.Insert(m)
 	if err != nil {
 		return 0, err
@@ -85,7 +85,7 @@ func (t *ProcedureCost) Insert(m ProcedureCost) (int, error) {
 
 // GetAll gets all records from the database, using upper
 func (t *ProcedureCost) GetAll(page *int, size *int, condition *up.AndExpr) ([]*ProcedureCost, *uint64, error) {
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 	var all []*ProcedureCost
 	var res up.Result
 
@@ -114,7 +114,7 @@ func (t *ProcedureCost) GetAll(page *int, size *int, condition *up.AndExpr) ([]*
 // Update updates a record in the database, using upper
 func (t *ProcedureCost) Update(m ProcedureCost) error {
 	m.UpdatedAt = time.Now()
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 	res := collection.Find(m.ID)
 	err := res.Update(&m)
 	if err != nil {
@@ -125,7 +125,7 @@ func (t *ProcedureCost) Update(m ProcedureCost) error {
 
 // Delete deletes a record from the database by id, using upper
 func (t *ProcedureCost) Delete(id int) error {
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 	res := collection.Find(id)
 	err := res.Delete()
 	if err != nil {

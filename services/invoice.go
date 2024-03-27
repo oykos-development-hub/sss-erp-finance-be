@@ -13,61 +13,94 @@ import (
 )
 
 type InvoiceServiceImpl struct {
-	App                *celeritas.Celeritas
-	repo               data.Invoice
-	articlesServices   ArticleService
-	additionalExpenses AdditionalExpenseService
+	App                    *celeritas.Celeritas
+	repo                   data.Invoice
+	additionalExpensesRepo data.AdditionalExpense
+	articlesServices       ArticleService
+	additionalExpenses     AdditionalExpenseService
 }
 
-func NewInvoiceServiceImpl(app *celeritas.Celeritas, repo data.Invoice, articles ArticleService, additionalExpenses AdditionalExpenseService) InvoiceService {
+func NewInvoiceServiceImpl(app *celeritas.Celeritas, repo data.Invoice, additionalExpensesRepo data.AdditionalExpense, articles ArticleService, additionalExpenses AdditionalExpenseService) InvoiceService {
 	return &InvoiceServiceImpl{
-		App:                app,
-		repo:               repo,
-		articlesServices:   articles,
-		additionalExpenses: additionalExpenses,
+		App:                    app,
+		repo:                   repo,
+		additionalExpensesRepo: additionalExpensesRepo,
+		articlesServices:       articles,
+		additionalExpenses:     additionalExpenses,
 	}
 }
 
 func (h *InvoiceServiceImpl) CreateInvoice(input dto.InvoiceDTO) (*dto.InvoiceResponseDTO, error) {
-	data := input.ToInvoice()
+	invoice := input.ToInvoice()
 
-	if data.SSSInvoiceReceiptDate != nil {
-		data.Status = "waiting"
+	if invoice.SSSInvoiceReceiptDate != nil {
+		invoice.Status = "waiting"
 	} else {
-		data.Status = "created"
+		invoice.Status = "created"
 	}
 
-	id, err := h.repo.Insert(*data)
+	var id int
+	err := data.Upper.Tx(func(tx up.Session) error {
+		var err error
+		id, err = h.repo.Insert(tx, *invoice)
+		if err != nil {
+			return errors.ErrInternalServer
+		}
+
+		for _, additionalExpense := range input.AdditionalExpenses {
+			additionalExpenseData := additionalExpense.ToAdditionalExpense()
+			if _, err = h.additionalExpensesRepo.Insert(tx, *additionalExpenseData); err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
 	if err != nil {
 		return nil, errors.ErrInternalServer
 	}
 
-	data, err = data.Get(id)
+	response, err := h.repo.Get(id)
 	if err != nil {
 		return nil, errors.ErrInternalServer
 	}
 
-	res := dto.ToInvoiceResponseDTO(*data)
+	res := dto.ToInvoiceResponseDTO(*response)
 
 	return &res, nil
 }
 
 func (h *InvoiceServiceImpl) UpdateInvoice(id int, input dto.InvoiceDTO) (*dto.InvoiceResponseDTO, error) {
-	data := input.ToInvoice()
-	data.ID = id
+	invoice := input.ToInvoice()
+	invoice.ID = id
 
-	if data.SSSInvoiceReceiptDate != nil {
-		data.Status = "waiting"
+	if invoice.SSSInvoiceReceiptDate != nil {
+		invoice.Status = "waiting"
 	} else {
-		data.Status = "created"
+		invoice.Status = "created"
 	}
 
-	err := h.repo.Update(*data)
+	err := data.Upper.Tx(func(tx up.Session) error {
+		var err error
+		err = h.repo.Update(tx, *invoice)
+		if err != nil {
+			return errors.ErrInternalServer
+		}
+
+		for _, additionalExpense := range input.AdditionalExpenses {
+			additionalExpenseData := additionalExpense.ToAdditionalExpense()
+			if err = h.additionalExpensesRepo.Update(tx, *additionalExpenseData); err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
 	if err != nil {
 		return nil, errors.ErrInternalServer
 	}
 
-	response := dto.ToInvoiceResponseDTO(*data)
+	response := dto.ToInvoiceResponseDTO(*invoice)
 
 	return &response, nil
 }

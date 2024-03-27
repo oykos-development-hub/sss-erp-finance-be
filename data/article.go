@@ -28,7 +28,7 @@ func (t *Article) Table() string {
 
 // GetAll gets all records from the database, using upper
 func (t *Article) GetAll(page *int, size *int, condition *up.AndExpr, orders []interface{}) ([]*Article, *uint64, error) {
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 	var all []*Article
 	var res up.Result
 
@@ -57,7 +57,7 @@ func (t *Article) GetAll(page *int, size *int, condition *up.AndExpr, orders []i
 // Get gets one record from the database, by id, using upper
 func (t *Article) Get(id int) (*Article, error) {
 	var one Article
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 
 	res := collection.Find(up.Cond{"id": id})
 	err := res.One(&one)
@@ -70,7 +70,7 @@ func (t *Article) Get(id int) (*Article, error) {
 // Update updates a record in the database, using upper
 func (t *Article) Update(m Article) error {
 	m.UpdatedAt = time.Now()
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 	res := collection.Find(m.ID)
 	err := res.Update(&m)
 	if err != nil {
@@ -81,7 +81,7 @@ func (t *Article) Update(m Article) error {
 
 // Delete deletes a record from the database by id, using upper
 func (t *Article) Delete(id int) error {
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 	res := collection.Find(id)
 	err := res.Delete()
 	if err != nil {
@@ -94,7 +94,7 @@ func (t *Article) Delete(id int) error {
 func (t *Article) Insert(m Article) (int, error) {
 	m.CreatedAt = time.Now()
 	m.UpdatedAt = time.Now()
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 	res, err := collection.Insert(m)
 	if err != nil {
 		return 0, err

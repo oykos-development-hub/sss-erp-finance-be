@@ -43,7 +43,7 @@ func (t *Invoice) Table() string {
 
 // GetAll gets all records from the database, using upper
 func (t *Invoice) GetAll(page *int, size *int, condition *up.AndExpr) ([]*Invoice, *uint64, error) {
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 	var all []*Invoice
 	var res up.Result
 
@@ -72,7 +72,7 @@ func (t *Invoice) GetAll(page *int, size *int, condition *up.AndExpr) ([]*Invoic
 // Get gets one record from the database, by id, using upper
 func (t *Invoice) Get(id int) (*Invoice, error) {
 	var one Invoice
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 
 	res := collection.Find(up.Cond{"id": id})
 	err := res.One(&one)
@@ -83,9 +83,9 @@ func (t *Invoice) Get(id int) (*Invoice, error) {
 }
 
 // Update updates a record in the database, using upper
-func (t *Invoice) Update(m Invoice) error {
+func (t *Invoice) Update(tx up.Session, m Invoice) error {
 	m.UpdatedAt = time.Now()
-	collection := upper.Collection(t.Table())
+	collection := tx.Collection(t.Table())
 	res := collection.Find(m.ID)
 	err := res.Update(&m)
 	if err != nil {
@@ -96,7 +96,7 @@ func (t *Invoice) Update(m Invoice) error {
 
 // Delete deletes a record from the database by id, using upper
 func (t *Invoice) Delete(id int) error {
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 	res := collection.Find(id)
 	err := res.Delete()
 	if err != nil {
@@ -106,10 +106,10 @@ func (t *Invoice) Delete(id int) error {
 }
 
 // Insert inserts a model into the database, using upper
-func (t *Invoice) Insert(m Invoice) (int, error) {
+func (t *Invoice) Insert(tx up.Session, m Invoice) (int, error) {
 	m.CreatedAt = time.Now()
 	m.UpdatedAt = time.Now()
-	collection := upper.Collection(t.Table())
+	collection := tx.Collection(t.Table())
 	res, err := collection.Insert(m)
 	if err != nil {
 		return 0, err
@@ -122,7 +122,7 @@ func (t *Invoice) Insert(m Invoice) (int, error) {
 
 // Builder is an example of using upper's sql builder
 func (t *Invoice) Builder(id int) ([]*Invoice, error) {
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 
 	var result []*Invoice
 

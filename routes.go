@@ -123,10 +123,8 @@ func routes(app *celeritas.Celeritas, middleware *middleware.Middleware, handler
 		rt.Put("/procedure-cost-payments/{id}", handlers.ProcedureCostPaymentHandler.UpdateProcedureCostPayment)
 		rt.Delete("/procedure-cost-payments/{id}", handlers.ProcedureCostPaymentHandler.DeleteProcedureCostPayment)
 
-		rt.Post("/additional-expenses", handlers.AdditionalExpenseHandler.CreateAdditionalExpense)
 		rt.Get("/additional-expenses/{id}", handlers.AdditionalExpenseHandler.GetAdditionalExpenseById)
 		rt.Get("/additional-expenses", handlers.AdditionalExpenseHandler.GetAdditionalExpenseList)
-		rt.Put("/additional-expenses/{id}", handlers.AdditionalExpenseHandler.UpdateAdditionalExpense)
 		rt.Delete("/additional-expenses/{id}", handlers.AdditionalExpenseHandler.DeleteAdditionalExpense)
 
 		rt.Post("/flat-rates", handlers.FlatRateHandler.CreateFlatRate)

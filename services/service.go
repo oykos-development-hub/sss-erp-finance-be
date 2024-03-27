@@ -169,8 +169,6 @@ type ProcedureCostPaymentService interface {
 }
 
 type AdditionalExpenseService interface {
-	CreateAdditionalExpense(input dto.AdditionalExpenseDTO) (*dto.AdditionalExpenseResponseDTO, error)
-	UpdateAdditionalExpense(id int, input dto.AdditionalExpenseDTO) (*dto.AdditionalExpenseResponseDTO, error)
 	DeleteAdditionalExpense(id int) error
 	GetAdditionalExpense(id int) (*dto.AdditionalExpenseResponseDTO, error)
 	GetAdditionalExpenseList(filter dto.AdditionalExpenseFilterDTO) ([]dto.AdditionalExpenseResponseDTO, *uint64, error)

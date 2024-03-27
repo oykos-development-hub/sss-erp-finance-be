@@ -58,7 +58,7 @@ func (t *Fee) Table() string {
 // Get gets one record from the database, by id, using upper
 func (t *Fee) Get(id int) (*Fee, error) {
 	var one Fee
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 
 	res := collection.Find(up.Cond{"id": id})
 	err := res.One(&one)
@@ -72,7 +72,7 @@ func (t *Fee) Get(id int) (*Fee, error) {
 func (t *Fee) Insert(m Fee) (int, error) {
 	m.CreatedAt = time.Now()
 	m.UpdatedAt = time.Now()
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 	res, err := collection.Insert(m)
 	if err != nil {
 		return 0, err
@@ -85,7 +85,7 @@ func (t *Fee) Insert(m Fee) (int, error) {
 
 // GetAll gets all records from the database, using upper
 func (t *Fee) GetAll(page *int, size *int, condition *up.AndExpr) ([]*Fee, *uint64, error) {
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 	var all []*Fee
 	var res up.Result
 
@@ -114,7 +114,7 @@ func (t *Fee) GetAll(page *int, size *int, condition *up.AndExpr) ([]*Fee, *uint
 // Update updates a record in the database, using upper
 func (t *Fee) Update(m Fee) error {
 	m.UpdatedAt = time.Now()
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 	res := collection.Find(m.ID)
 	err := res.Update(&m)
 	if err != nil {
@@ -125,7 +125,7 @@ func (t *Fee) Update(m Fee) error {
 
 // Delete deletes a record from the database by id, using upper
 func (t *Fee) Delete(id int) error {
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 	res := collection.Find(id)
 	err := res.Delete()
 	if err != nil {

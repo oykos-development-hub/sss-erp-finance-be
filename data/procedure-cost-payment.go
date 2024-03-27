@@ -47,7 +47,7 @@ func (t *ProcedureCostPayment) Table() string {
 func (t *ProcedureCostPayment) Insert(m ProcedureCostPayment) (int, error) {
 	m.CreatedAt = time.Now()
 	m.UpdatedAt = time.Now()
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 	res, err := collection.Insert(m)
 	if err != nil {
 		return 0, err
@@ -61,7 +61,7 @@ func (t *ProcedureCostPayment) Insert(m ProcedureCostPayment) (int, error) {
 // Get gets one record from the database, by id, using upper
 func (t *ProcedureCostPayment) Get(id int) (*ProcedureCostPayment, error) {
 	var one ProcedureCostPayment
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 
 	res := collection.Find(up.Cond{"id": id})
 	err := res.One(&one)
@@ -73,7 +73,7 @@ func (t *ProcedureCostPayment) Get(id int) (*ProcedureCostPayment, error) {
 
 // GetAll gets all records from the database, using upper
 func (t *ProcedureCostPayment) GetAll(condition *up.Cond) ([]*ProcedureCostPayment, *uint64, error) {
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 	var all []*ProcedureCostPayment
 	var res up.Result
 
@@ -97,7 +97,7 @@ func (t *ProcedureCostPayment) GetAll(condition *up.Cond) ([]*ProcedureCostPayme
 
 // Delete deletes a record from the database by id, using upper
 func (t *ProcedureCostPayment) Delete(id int) error {
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 	res := collection.Find(id)
 	err := res.Delete()
 	if err != nil {
@@ -109,7 +109,7 @@ func (t *ProcedureCostPayment) Delete(id int) error {
 // Update updates a record in the database, using upper
 func (t *ProcedureCostPayment) Update(m ProcedureCostPayment) error {
 	m.UpdatedAt = time.Now()
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 	res := collection.Find(m.ID)
 	err := res.Update(&m)
 	if err != nil {

@@ -58,7 +58,7 @@ func (t *FlatRate) Table() string {
 // Get gets one record from the database, by id, using upper
 func (t *FlatRate) Get(id int) (*FlatRate, error) {
 	var one FlatRate
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 
 	res := collection.Find(up.Cond{"id": id})
 	err := res.One(&one)
@@ -72,7 +72,7 @@ func (t *FlatRate) Get(id int) (*FlatRate, error) {
 func (t *FlatRate) Insert(m FlatRate) (int, error) {
 	m.CreatedAt = time.Now()
 	m.UpdatedAt = time.Now()
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 	res, err := collection.Insert(m)
 	if err != nil {
 		return 0, err
@@ -85,7 +85,7 @@ func (t *FlatRate) Insert(m FlatRate) (int, error) {
 
 // GetAll gets all records from the database, using upper
 func (t *FlatRate) GetAll(page *int, size *int, condition *up.AndExpr) ([]*FlatRate, *uint64, error) {
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 	var all []*FlatRate
 	var res up.Result
 
@@ -114,7 +114,7 @@ func (t *FlatRate) GetAll(page *int, size *int, condition *up.AndExpr) ([]*FlatR
 // Update updates a record in the database, using upper
 func (t *FlatRate) Update(m FlatRate) error {
 	m.UpdatedAt = time.Now()
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 	res := collection.Find(m.ID)
 	err := res.Update(&m)
 	if err != nil {
@@ -125,7 +125,7 @@ func (t *FlatRate) Update(m FlatRate) error {
 
 // Delete deletes a record from the database by id, using upper
 func (t *FlatRate) Delete(id int) error {
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 	res := collection.Find(id)
 	err := res.Delete()
 	if err != nil {

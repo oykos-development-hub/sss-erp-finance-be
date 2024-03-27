@@ -23,43 +23,6 @@ func NewAdditionalExpenseServiceImpl(app *celeritas.Celeritas, repo data.Additio
 	}
 }
 
-func (h *AdditionalExpenseServiceImpl) CreateAdditionalExpense(input dto.AdditionalExpenseDTO) (*dto.AdditionalExpenseResponseDTO, error) {
-	data := input.ToAdditionalExpense()
-
-	id, err := h.repo.Insert(*data)
-	if err != nil {
-		return nil, errors.ErrInternalServer
-	}
-
-	data, err = data.Get(id)
-	if err != nil {
-		return nil, errors.ErrInternalServer
-	}
-
-	res := dto.ToAdditionalExpenseResponseDTO(*data)
-
-	return &res, nil
-}
-
-func (h *AdditionalExpenseServiceImpl) UpdateAdditionalExpense(id int, input dto.AdditionalExpenseDTO) (*dto.AdditionalExpenseResponseDTO, error) {
-	data := input.ToAdditionalExpense()
-	data.ID = id
-
-	err := h.repo.Update(*data)
-	if err != nil {
-		return nil, errors.ErrInternalServer
-	}
-
-	data, err = h.repo.Get(id)
-	if err != nil {
-		return nil, errors.ErrInternalServer
-	}
-
-	response := dto.ToAdditionalExpenseResponseDTO(*data)
-
-	return &response, nil
-}
-
 func (h *AdditionalExpenseServiceImpl) DeleteAdditionalExpense(id int) error {
 	err := h.repo.Delete(id)
 	if err != nil {

@@ -8,8 +8,8 @@ import (
 	"gitlab.sudovi.me/erp/finance-api/errors"
 	"gitlab.sudovi.me/erp/finance-api/services"
 
-	"github.com/oykos-development-hub/celeritas"
 	"github.com/go-chi/chi/v5"
+	"github.com/oykos-development-hub/celeritas"
 )
 
 // AdditionalExpenseHandler is a concrete type that implements AdditionalExpenseHandler
@@ -24,54 +24,6 @@ func NewAdditionalExpenseHandler(app *celeritas.Celeritas, additionalexpenseServ
 		App:     app,
 		service: additionalexpenseService,
 	}
-}
-
-func (h *additionalexpenseHandlerImpl) CreateAdditionalExpense(w http.ResponseWriter, r *http.Request) {
-	var input dto.AdditionalExpenseDTO
-	err := h.App.ReadJSON(w, r, &input)
-	if err != nil {
-		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
-		return
-	}
-
-	validator := h.App.Validator().ValidateStruct(&input)
-	if !validator.Valid() {
-		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
-		return
-	}
-
-	res, err := h.service.CreateAdditionalExpense(input)
-	if err != nil {
-		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
-		return
-	}
-
-	_ = h.App.WriteDataResponse(w, http.StatusOK, "AdditionalExpense created successfuly", res)
-}
-
-func (h *additionalexpenseHandlerImpl) UpdateAdditionalExpense(w http.ResponseWriter, r *http.Request) {
-	id, _ := strconv.Atoi(chi.URLParam(r, "id"))
-
-	var input dto.AdditionalExpenseDTO
-	err := h.App.ReadJSON(w, r, &input)
-	if err != nil {
-		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
-		return
-	}
-
-	validator := h.App.Validator().ValidateStruct(&input)
-	if !validator.Valid() {
-		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
-		return
-	}
-
-	res, err := h.service.UpdateAdditionalExpense(id, input)
-	if err != nil {
-		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
-		return
-	}
-
-	_ = h.App.WriteDataResponse(w, http.StatusOK, "AdditionalExpense updated successfuly", res)
 }
 
 func (h *additionalexpenseHandlerImpl) DeleteAdditionalExpense(w http.ResponseWriter, r *http.Request) {
