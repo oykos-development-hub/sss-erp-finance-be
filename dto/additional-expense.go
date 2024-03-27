@@ -7,6 +7,7 @@ import (
 )
 
 type AdditionalExpenseDTO struct {
+	ID                 int                          `json:"id"`
 	Title              string                       `json:"title"`
 	AccountID          int                          `json:"account_id"`
 	OrganizationUnitID int                          `json:"organization_unit_id"`
@@ -45,6 +46,7 @@ type AdditionalExpenseFilterDTO struct {
 
 func (dto AdditionalExpenseDTO) ToAdditionalExpense() *data.AdditionalExpense {
 	return &data.AdditionalExpense{
+		ID:                 dto.ID,
 		Title:              dto.Title,
 		AccountID:          dto.AccountID,
 		SubjectID:          dto.SubjectID,
