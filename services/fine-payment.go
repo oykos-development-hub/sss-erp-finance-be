@@ -26,6 +26,7 @@ func NewFinePaymentServiceImpl(app *celeritas.Celeritas, repo data.FinePayment, 
 // CreateFinePayment creates a new fine payment
 func (h *FinePaymentServiceImpl) CreateFinePayment(input dto.FinePaymentDTO) (*dto.FinePaymentResponseDTO, error) {
 	finePayment := input.ToFinePayment()
+	finePayment.Status = data.PaidFinePeymentStatus
 
 	id, err := h.repo.Insert(*finePayment)
 	if err != nil {

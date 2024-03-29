@@ -26,6 +26,7 @@ func NewPropBenConfPaymentServiceImpl(app *celeritas.Celeritas, repo data.PropBe
 // CreatePropBenConfPayment creates a new propbenconf payment
 func (h *PropBenConfPaymentServiceImpl) CreatePropBenConfPayment(input dto.PropBenConfPaymentDTO) (*dto.PropBenConfPaymentResponseDTO, error) {
 	propbenconfPayment := input.ToPropBenConfPayment()
+	propbenconfPayment.Status = data.PaidPropBenConfPeymentStatus
 
 	id, err := h.repo.Insert(*propbenconfPayment)
 	if err != nil {

@@ -7,15 +7,15 @@ import (
 )
 
 type FeePaymentDTO struct {
-	FeeID                  int                   `json:"fee_id" validate:"required"`
-	PaymentMethod          data.FeePaymentMethod `json:"payment_method" validate:"required,oneof=1 2 3"`
-	Amount                 float64               `json:"amount" validate:"required"`
-	PaymentDate            time.Time             `json:"payment_date"`
-	PaymentDueDate         time.Time             `json:"payment_due_date"`
-	ReceiptNumber          string                `json:"receipt_number"`
-	PaymentReferenceNumber string                `json:"payment_reference_number"`
-	DebitReferenceNumber   string                `json:"debit_reference_number"`
-	Status                 data.FeePaymentStatus `json:"status" validate:"required,oneof=1 2 3"`
+	FeeID                  int                    `json:"fee_id" validate:"required"`
+	PaymentMethod          data.FeePaymentMethod  `json:"payment_method" validate:"required,oneof=1 2 3"`
+	Amount                 float64                `json:"amount" validate:"required"`
+	PaymentDate            time.Time              `json:"payment_date"`
+	PaymentDueDate         time.Time              `json:"payment_due_date"`
+	ReceiptNumber          string                 `json:"receipt_number"`
+	PaymentReferenceNumber string                 `json:"payment_reference_number"`
+	DebitReferenceNumber   string                 `json:"debit_reference_number"`
+	Status                 *data.FeePaymentStatus `json:"status"`
 }
 
 type FeePaymentResponseDTO struct {
@@ -48,7 +48,7 @@ func (dto FeePaymentDTO) ToFeePayment() *data.FeePayment {
 		ReceiptNumber:          dto.ReceiptNumber,
 		PaymentReferenceNumber: dto.PaymentReferenceNumber,
 		DebitReferenceNumber:   dto.DebitReferenceNumber,
-		Status:                 dto.Status,
+		Status:                 *dto.Status,
 	}
 }
 

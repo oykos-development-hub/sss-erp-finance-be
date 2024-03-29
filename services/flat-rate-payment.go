@@ -25,21 +25,22 @@ func NewFlatRatePaymentServiceImpl(app *celeritas.Celeritas, repo data.FlatRateP
 
 // CreateFlatRatePayment creates a new FlatRate payment
 func (h *FlatRatePaymentServiceImpl) CreateFlatRatePayment(input dto.FlatRatePaymentDTO) (*dto.FlatRatePaymentResponseDTO, error) {
-	FlatRatePayment := input.ToFlatRatePayment()
+	flatRatePayment := input.ToFlatRatePayment()
+	flatRatePayment.Status = data.PaidFlatRatePeymentStatus
 
-	id, err := h.repo.Insert(*FlatRatePayment)
+	id, err := h.repo.Insert(*flatRatePayment)
 	if err != nil {
 		return nil, errors.ErrInternalServer
 	}
 
-	FlatRatePayment, err = FlatRatePayment.Get(id)
+	flatRatePayment, err = flatRatePayment.Get(id)
 	if err != nil {
 		return nil, errors.ErrInternalServer
 	}
 
-	res := dto.ToFlatRatePaymentResponseDTO(*FlatRatePayment)
+	res := dto.ToFlatRatePaymentResponseDTO(*flatRatePayment)
 
-	_, _, err = h.FlatRateSharedLogicService.CalculateFlatRateDetailsAndUpdateStatus(FlatRatePayment.FlatRateID)
+	_, _, err = h.FlatRateSharedLogicService.CalculateFlatRateDetailsAndUpdateStatus(flatRatePayment.FlatRateID)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return nil, err

@@ -26,6 +26,7 @@ func NewProcedureCostPaymentServiceImpl(app *celeritas.Celeritas, repo data.Proc
 // CreateProcedureCostPayment creates a new procedurecost payment
 func (h *ProcedureCostPaymentServiceImpl) CreateProcedureCostPayment(input dto.ProcedureCostPaymentDTO) (*dto.ProcedureCostPaymentResponseDTO, error) {
 	procedurecostPayment := input.ToProcedureCostPayment()
+	procedurecostPayment.Status = data.PaidProcedureCostPeymentStatus
 
 	id, err := h.repo.Insert(*procedurecostPayment)
 	if err != nil {

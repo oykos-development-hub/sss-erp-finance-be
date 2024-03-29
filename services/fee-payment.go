@@ -26,6 +26,7 @@ func NewFeePaymentServiceImpl(app *celeritas.Celeritas, repo data.FeePayment, fe
 // CreateFeePayment creates a new fee payment
 func (h *FeePaymentServiceImpl) CreateFeePayment(input dto.FeePaymentDTO) (*dto.FeePaymentResponseDTO, error) {
 	feePayment := input.ToFeePayment()
+	feePayment.Status = data.PaidFeePeymentStatus
 
 	id, err := h.repo.Insert(*feePayment)
 	if err != nil {

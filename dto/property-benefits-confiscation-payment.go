@@ -15,7 +15,7 @@ type PropBenConfPaymentDTO struct {
 	ReceiptNumber          string                        `json:"receipt_number"`
 	PaymentReferenceNumber string                        `json:"payment_reference_number"`
 	DebitReferenceNumber   string                        `json:"debit_reference_number"`
-	Status                 data.PropBenConfPaymentStatus `json:"status" validate:"required,oneof=1 2 3"`
+	Status                 data.PropBenConfPaymentStatus `json:"status"`
 }
 
 type PropBenConfPaymentResponseDTO struct {
