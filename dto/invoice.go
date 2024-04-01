@@ -15,6 +15,7 @@ type InvoicesFilter struct {
 	SupplierID         *int    `json:"supplier_id"`
 	OrganizationUnitID *int    `json:"organization_unit_id"`
 	ActivityID         *int    `json:"activity_id"`
+	OrderID            *int    `json:"order_id"`
 	Type               *string `json:"type"`
 }
 

@@ -164,6 +164,10 @@ func (h *InvoiceServiceImpl) GetInvoiceList(input dto.InvoicesFilter) ([]dto.Inv
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"supplier_id": *input.SupplierID})
 	}
 
+	if input.OrderID != nil {
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"order_id": *input.OrderID})
+	}
+
 	if input.ActivityID != nil {
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"activity_id": *input.ActivityID})
 	}
