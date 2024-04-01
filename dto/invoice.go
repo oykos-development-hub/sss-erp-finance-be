@@ -33,6 +33,8 @@ type InvoiceDTO struct {
 	OrderID                int                    `json:"order_id"`
 	OrganizationUnitID     int                    `json:"organization_unit_id"`
 	ActivityID             int                    `json:"activity_id"`
+	ProFormaInvoiceNumber  string                 `json:"pro_forma_invoice_number"`
+	ProFormaInvoiceDate    time.Time              `json:"pro_forma_invoice_date"`
 	DateOfInvoice          time.Time              `json:"date_of_invoice"`
 	ReceiptDate            time.Time              `json:"receipt_date"`
 	DateOfPayment          time.Time              `json:"date_of_payment"`
@@ -61,6 +63,8 @@ type InvoiceResponseDTO struct {
 	OrderID                int                            `json:"order_id"`
 	OrganizationUnitID     int                            `json:"organization_unit_id"`
 	ActivityID             int                            `json:"activity_id"`
+	ProFormaInvoiceNumber  string                         `json:"pro_forma_invoice_number"`
+	ProFormaInvoiceDate    time.Time                      `json:"pro_forma_invoice_date"`
 	DateOfInvoice          time.Time                      `json:"date_of_invoice"`
 	ReceiptDate            time.Time                      `json:"receipt_date"`
 	DateOfPayment          time.Time                      `json:"date_of_payment"`
@@ -87,6 +91,8 @@ func (dto InvoiceDTO) ToInvoice() *data.Invoice {
 		SupplierID:             dto.SupplierID,
 		OrderID:                dto.OrderID,
 		OrganizationUnitID:     dto.OrganizationUnitID,
+		ProFormaInvoiceNumber:  dto.ProFormaInvoiceNumber,
+		ProFormaInvoiceDate:    dto.ProFormaInvoiceDate,
 		DateOfInvoice:          dto.DateOfInvoice,
 		ReceiptDate:            dto.ReceiptDate,
 		DateOfPayment:          dto.DateOfPayment,

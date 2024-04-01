@@ -1,6 +1,8 @@
 CREATE TABLE invoices (
     id serial PRIMARY KEY,
     invoice_number TEXT,
+    pro_forma_invoice_number TEXT,
+    pro_forma_invoice_date TIMESTAMP,
     type TEXT NOT NULL,
     type_of_subject INTEGER,
     type_of_contract INTEGER,
