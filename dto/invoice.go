@@ -35,7 +35,7 @@ type InvoiceDTO struct {
 	OrganizationUnitID     int                    `json:"organization_unit_id"`
 	ActivityID             int                    `json:"activity_id"`
 	ProFormaInvoiceNumber  string                 `json:"pro_forma_invoice_number"`
-	ProFormaInvoiceDate    time.Time              `json:"pro_forma_invoice_date"`
+	ProFormaInvoiceDate    *time.Time             `json:"pro_forma_invoice_date"`
 	DateOfInvoice          time.Time              `json:"date_of_invoice"`
 	ReceiptDate            time.Time              `json:"receipt_date"`
 	DateOfPayment          time.Time              `json:"date_of_payment"`
@@ -65,7 +65,7 @@ type InvoiceResponseDTO struct {
 	OrganizationUnitID     int                            `json:"organization_unit_id"`
 	ActivityID             int                            `json:"activity_id"`
 	ProFormaInvoiceNumber  string                         `json:"pro_forma_invoice_number"`
-	ProFormaInvoiceDate    time.Time                      `json:"pro_forma_invoice_date"`
+	ProFormaInvoiceDate    *time.Time                     `json:"pro_forma_invoice_date"`
 	DateOfInvoice          time.Time                      `json:"date_of_invoice"`
 	ReceiptDate            time.Time                      `json:"receipt_date"`
 	DateOfPayment          time.Time                      `json:"date_of_payment"`
