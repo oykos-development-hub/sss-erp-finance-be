@@ -17,10 +17,12 @@ type InvoicesFilter struct {
 	ActivityID         *int    `json:"activity_id"`
 	OrderID            *int    `json:"order_id"`
 	Type               *string `json:"type"`
+	PassedToInventory  *bool   `json:"passed_to_inventory"`
 }
 
 type InvoiceDTO struct {
 	InvoiceNumber          string                 `json:"invoice_number"`
+	PassedToInventory      bool                   `json:"passed_to_inventory"`
 	Status                 string                 `json:"status"`
 	Type                   string                 `json:"type"`
 	TaxAuthorityCodebookID int                    `json:"tax_authority_codebook_id"`
@@ -51,6 +53,7 @@ type InvoiceDTO struct {
 type InvoiceResponseDTO struct {
 	ID                     int                            `json:"id"`
 	InvoiceNumber          string                         `json:"invoice_number"`
+	PassedToInventory      bool                           `json:"passed_to_inventory"`
 	Type                   string                         `json:"type"`
 	TaxAuthorityCodebookID int                            `json:"tax_authority_codebook_id"`
 	TypeOfSubject          int                            `json:"type_of_subject"`
@@ -84,6 +87,7 @@ type InvoiceResponseDTO struct {
 func (dto InvoiceDTO) ToInvoice() *data.Invoice {
 	return &data.Invoice{
 		InvoiceNumber:          dto.InvoiceNumber,
+		PassedToInventory:      dto.PassedToInventory,
 		Status:                 dto.Status,
 		GrossPrice:             dto.GrossPrice,
 		VATPrice:               dto.VATPrice,
@@ -114,6 +118,7 @@ func (dto InvoiceDTO) ToInvoice() *data.Invoice {
 func ToInvoiceResponseDTO(data data.Invoice) InvoiceResponseDTO {
 	return InvoiceResponseDTO{
 		ID:                     data.ID,
+		PassedToInventory:      data.PassedToInventory,
 		InvoiceNumber:          data.InvoiceNumber,
 		Status:                 data.Status,
 		GrossPrice:             data.GrossPrice,

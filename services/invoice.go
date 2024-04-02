@@ -180,6 +180,10 @@ func (h *InvoiceServiceImpl) GetInvoiceList(input dto.InvoicesFilter) ([]dto.Inv
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"type": *input.Type})
 	}
 
+	if input.PassedToInventory != nil {
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"passed_to_inventory": *input.PassedToInventory})
+	}
+
 	if input.Search != nil {
 		likeCondition := fmt.Sprintf("%%%s%%", *input.Search)
 		search := up.Or(

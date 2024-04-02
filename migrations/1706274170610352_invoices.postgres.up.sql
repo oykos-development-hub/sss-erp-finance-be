@@ -1,6 +1,7 @@
 CREATE TABLE invoices (
     id serial PRIMARY KEY,
     invoice_number TEXT,
+    passed_to_inventory BOOLEAN DEFAULT false,
     pro_forma_invoice_number TEXT,
     pro_forma_invoice_date TIMESTAMP,
     type TEXT NOT NULL,
