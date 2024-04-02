@@ -14,6 +14,7 @@ type Article struct {
 	VatPrice      float64   `db:"vat_price"`
 	VatPercentage int       `db:"vat_percentage"`
 	Description   string    `db:"description"`
+	Amount        int       `db:"amount"`
 	InvoiceID     int       `db:"invoice_id"`
 	AccountID     int       `db:"account_id"`
 	CostAccountID int       `db:"cost_account_id"`
