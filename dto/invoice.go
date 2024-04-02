@@ -137,6 +137,8 @@ func ToInvoiceResponseDTO(data data.Invoice) InvoiceResponseDTO {
 		TypeOfContract:         data.TypeOfContract,
 		DateOfStart:            data.DateOfStart,
 		DateOfEnd:              data.DateOfEnd,
+		ProFormaInvoiceNumber:  data.ProFormaInvoiceNumber,
+		ProFormaInvoiceDate:    data.ProFormaInvoiceDate,
 		CreatedAt:              data.CreatedAt,
 		UpdatedAt:              data.UpdatedAt,
 	}
