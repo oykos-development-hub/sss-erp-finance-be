@@ -46,6 +46,7 @@ type Models struct {
 	PropBenConfPayment     PropBenConfPayment
 	TaxAuthorityCodebook   TaxAuthorityCodebook
 	Salary Salary
+		SalaryAdditionalExpense SalaryAdditionalExpense
 	}
 
 func New(databasePool *sql.DB) Models {
@@ -81,6 +82,7 @@ func New(databasePool *sql.DB) Models {
 		ProcedureCostPayment:   ProcedureCostPayment{},
 		AdditionalExpense:      AdditionalExpense{},
 		Salary: Salary{},
+		SalaryAdditionalExpense: SalaryAdditionalExpense{},
 	}
 }
 

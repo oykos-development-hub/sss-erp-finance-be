@@ -7,24 +7,26 @@ import (
 )
 
 type SalaryDTO struct {
-	ActivityID         int       `json:"activity_id"`
-	Month              string    `json:"month"`
-	DateOfCalculation  time.Time `json:"date_of_calculation"`
-	Description        string    `json:"description"`
-	OrganizationUnitID int       `json:"organization_unit_id"`
-	Status             string    `json:"status"`
+	ActivityID               int                          `json:"activity_id"`
+	Month                    string                       `json:"month"`
+	DateOfCalculation        time.Time                    `json:"date_of_calculation"`
+	Description              string                       `json:"description"`
+	OrganizationUnitID       int                          `json:"organization_unit_id"`
+	Status                   string                       `json:"status"`
+	SalaryAdditionalExpenses []SalaryAdditionalExpenseDTO `json:"salary_additional_expenses"`
 }
 
 type SalaryResponseDTO struct {
-	ID                 int       `json:"id"`
-	ActivityID         int       `json:"activity_id"`
-	Month              string    `json:"month"`
-	DateOfCalculation  time.Time `json:"date_of_calculation"`
-	Description        string    `json:"description"`
-	Status             string    `json:"status"`
-	OrganizationUnitID int       `json:"organization_unit_id"`
-	CreatedAt          time.Time `json:"created_at"`
-	UpdatedAt          time.Time `json:"updated_at"`
+	ID                       int                                  `json:"id"`
+	ActivityID               int                                  `json:"activity_id"`
+	Month                    string                               `json:"month"`
+	DateOfCalculation        time.Time                            `json:"date_of_calculation"`
+	Description              string                               `json:"description"`
+	Status                   string                               `json:"status"`
+	OrganizationUnitID       int                                  `json:"organization_unit_id"`
+	SalaryAdditionalExpenses []SalaryAdditionalExpenseResponseDTO `json:"salary_additional_expenses"`
+	CreatedAt                time.Time                            `json:"created_at"`
+	UpdatedAt                time.Time                            `json:"updated_at"`
 }
 
 type SalaryFilterDTO struct {

@@ -162,6 +162,12 @@ func routes(app *celeritas.Celeritas, middleware *middleware.Middleware, handler
 		rt.Get("/salaries", handlers.SalaryHandler.GetSalaryList)
 		rt.Put("/salaries/{id}", handlers.SalaryHandler.UpdateSalary)
 		rt.Delete("/salaries/{id}", handlers.SalaryHandler.DeleteSalary)
+	
+		rt.Post("/salary-additional-expenses", handlers.SalaryAdditionalExpenseHandler.CreateSalaryAdditionalExpense)
+rt.Get("/salary-additional-expenses/{id}", handlers.SalaryAdditionalExpenseHandler.GetSalaryAdditionalExpenseById)
+rt.Get("/salary-additional-expenses", handlers.SalaryAdditionalExpenseHandler.GetSalaryAdditionalExpenseList)
+rt.Put("/salary-additional-expenses/{id}", handlers.SalaryAdditionalExpenseHandler.UpdateSalaryAdditionalExpense)
+rt.Delete("/salary-additional-expenses/{id}", handlers.SalaryAdditionalExpenseHandler.DeleteSalaryAdditionalExpense)
 	})
 
 	return app.Routes

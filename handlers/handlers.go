@@ -28,6 +28,7 @@ type Handlers struct {
 	PropBenConfPaymentHandler     PropBenConfPaymentHandler
 	TaxAuthorityCodebookHandler   TaxAuthorityCodebookHandler
 	SalaryHandler SalaryHandler
+		SalaryAdditionalExpenseHandler SalaryAdditionalExpenseHandler
 	}
 
 type InvoiceHandler interface {
@@ -232,4 +233,12 @@ type SalaryHandler interface {
 	DeleteSalary(w http.ResponseWriter, r *http.Request)
 	GetSalaryById(w http.ResponseWriter, r *http.Request)
 	GetSalaryList(w http.ResponseWriter, r *http.Request)
+}
+
+type SalaryAdditionalExpenseHandler interface {
+	CreateSalaryAdditionalExpense(w http.ResponseWriter, r *http.Request)
+	UpdateSalaryAdditionalExpense(w http.ResponseWriter, r *http.Request)
+	DeleteSalaryAdditionalExpense(w http.ResponseWriter, r *http.Request)
+	GetSalaryAdditionalExpenseById(w http.ResponseWriter, r *http.Request)
+	GetSalaryAdditionalExpenseList(w http.ResponseWriter, r *http.Request)
 }

@@ -1,6 +1,8 @@
 package services
 
 import (
+	"time"
+
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
 	"gitlab.sudovi.me/erp/finance-api/errors"
@@ -10,14 +12,18 @@ import (
 )
 
 type SalaryServiceImpl struct {
-	App  *celeritas.Celeritas
-	repo data.Salary
+	App                         *celeritas.Celeritas
+	repo                        data.Salary
+	salaryAdditionalExpenseRepo data.SalaryAdditionalExpense
+	salaryAdditionalService     SalaryAdditionalExpenseService
 }
 
-func NewSalaryServiceImpl(app *celeritas.Celeritas, repo data.Salary) SalaryService {
+func NewSalaryServiceImpl(app *celeritas.Celeritas, repo data.Salary, salaryAdditionalExpenseRepo data.SalaryAdditionalExpense, salaryAdditionalService SalaryAdditionalExpenseService) SalaryService {
 	return &SalaryServiceImpl{
-		App:  app,
-		repo: repo,
+		App:                         app,
+		repo:                        repo,
+		salaryAdditionalExpenseRepo: salaryAdditionalExpenseRepo,
+		salaryAdditionalService:     salaryAdditionalService,
 	}
 }
 
@@ -30,6 +36,14 @@ func (h *SalaryServiceImpl) CreateSalary(input dto.SalaryDTO) (*dto.SalaryRespon
 		id, err = h.repo.Insert(tx, *dataToInsert)
 		if err != nil {
 			return errors.ErrInternalServer
+		}
+
+		for _, additionalExpense := range input.SalaryAdditionalExpenses {
+			additionalExpenseData := additionalExpense.ToSalaryAdditionalExpense()
+			_, err = h.salaryAdditionalExpenseRepo.Insert(tx, *additionalExpenseData)
+			if err != nil {
+				return errors.ErrInternalServer
+			}
 		}
 
 		return nil
@@ -92,6 +106,17 @@ func (h *SalaryServiceImpl) GetSalary(id int) (*dto.SalaryResponseDTO, error) {
 	}
 	response := dto.ToSalaryResponseDTO(*data)
 
+	additionalExpenses, _, err := h.salaryAdditionalService.GetSalaryAdditionalExpenseList(dto.SalaryAdditionalExpenseFilterDTO{
+		SalaryID: &id,
+	})
+
+	if err != nil {
+		h.App.ErrorLog.Println(err)
+		return nil, errors.ErrInternalServer
+	}
+
+	response.SalaryAdditionalExpenses = additionalExpenses
+
 	return &response, nil
 }
 
@@ -99,21 +124,35 @@ func (h *SalaryServiceImpl) GetSalaryList(filter dto.SalaryFilterDTO) ([]dto.Sal
 	conditionAndExp := &up.AndExpr{}
 	var orders []interface{}
 
-	// example of making conditions
-	// if filter.Year != nil {
-	// 	conditionAndExp = up.And(conditionAndExp, &up.Cond{"year": *filter.Year})
-	// }
+	if filter.ActivityID != nil {
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"activity_id": *filter.ActivityID})
+	}
 
-	if filter.SortByTitle != nil {
+	if filter.OrganizationUnitID != nil {
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"organization_unit_id": *filter.OrganizationUnitID})
+	}
+
+	if filter.Status != nil {
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"status": *filter.Status})
+	}
+
+	if filter.Year != nil {
+		year := *filter.Year
+		startOfYear := time.Date(year, time.January, 1, 0, 0, 0, 0, time.UTC)
+		endOfYear := startOfYear.AddDate(1, 0, 0).Add(-time.Nanosecond)
+
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"date_of_calculation": up.Between(startOfYear, endOfYear)})
+	}
+
+	/*if filter.SortByTitle != nil {
 		if *filter.SortByTitle == "asc" {
 			orders = append(orders, "-title")
 		} else {
 			orders = append(orders, "title")
 		}
-	}
+	}*/
 
 	orders = append(orders, "-created_at")
-	
 
 	data, total, err := h.repo.GetAll(filter.Page, filter.Size, conditionAndExp, orders)
 	if err != nil {

@@ -117,8 +117,10 @@ func initApplication() *celeritas.Celeritas {
 	TaxAuthorityCodebookService := services.NewTaxAuthorityCodebookServiceImpl(cel, models.TaxAuthorityCodebook)
 	TaxAuthorityCodebookHandler := handlers.NewTaxAuthorityCodebookHandler(cel, TaxAuthorityCodebookService)
 
-		
-	SalaryService := services.NewSalaryServiceImpl(cel, models.Salary)
+	SalaryAdditionalExpenseService := services.NewSalaryAdditionalExpenseServiceImpl(cel, models.SalaryAdditionalExpense)
+	SalaryAdditionalExpenseHandler := handlers.NewSalaryAdditionalExpenseHandler(cel, SalaryAdditionalExpenseService)
+
+	SalaryService := services.NewSalaryServiceImpl(cel, models.Salary, models.SalaryAdditionalExpense, SalaryAdditionalExpenseService)
 	SalaryHandler := handlers.NewSalaryHandler(cel, SalaryService)
 
 	myHandlers := &handlers.Handlers{
@@ -148,10 +150,11 @@ func initApplication() *celeritas.Celeritas {
 		FlatRatePaymentHandler:      FlatRatePaymentHandler,
 		AdditionalExpenseHandler:    AdditionalExpenseHandler,
 
-		PropBenConfHandler:          PropBenConfHandler,
-		PropBenConfPaymentHandler:   PropBenConfPaymentHandler,
-		TaxAuthorityCodebookHandler: TaxAuthorityCodebookHandler,
-		SalaryHandler: SalaryHandler,
+		PropBenConfHandler:             PropBenConfHandler,
+		PropBenConfPaymentHandler:      PropBenConfPaymentHandler,
+		TaxAuthorityCodebookHandler:    TaxAuthorityCodebookHandler,
+		SalaryHandler:                  SalaryHandler,
+		SalaryAdditionalExpenseHandler: SalaryAdditionalExpenseHandler,
 	}
 
 	myMiddleware := &middleware.Middleware{

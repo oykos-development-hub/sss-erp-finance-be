@@ -229,3 +229,11 @@ type SalaryService interface {
 	GetSalary(id int) (*dto.SalaryResponseDTO, error)
 	GetSalaryList(filter dto.SalaryFilterDTO) ([]dto.SalaryResponseDTO, *uint64, error)
 }
+
+type SalaryAdditionalExpenseService interface {
+	CreateSalaryAdditionalExpense(input dto.SalaryAdditionalExpenseDTO) (*dto.SalaryAdditionalExpenseResponseDTO, error)
+	UpdateSalaryAdditionalExpense(id int, input dto.SalaryAdditionalExpenseDTO) (*dto.SalaryAdditionalExpenseResponseDTO, error)
+	DeleteSalaryAdditionalExpense(id int) error
+	GetSalaryAdditionalExpense(id int) (*dto.SalaryAdditionalExpenseResponseDTO, error)
+	GetSalaryAdditionalExpenseList(filter dto.SalaryAdditionalExpenseFilterDTO) ([]dto.SalaryAdditionalExpenseResponseDTO, *uint64, error)
+}
