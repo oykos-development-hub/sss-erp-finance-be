@@ -16,6 +16,7 @@ type SalaryAdditionalExpense struct {
 	BankAccount        string    `db:"bank_account"`
 	Status             string    `db:"status"`
 	OrganizationUnitID int       `db:"organization_unit_id"`
+	Type               string    `json:"type"`
 	CreatedAt          time.Time `db:"created_at,omitempty"`
 	UpdatedAt          time.Time `db:"updated_at"`
 }

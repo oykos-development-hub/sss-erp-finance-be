@@ -11,6 +11,7 @@ type Invoice struct {
 	ID                     int        `db:"id,omitempty"`
 	InvoiceNumber          string     `db:"invoice_number"`
 	PassedToInventory      bool       `db:"passed_to_inventory"`
+	PassedToAccounting     bool       `db:"passed_to_accounting"`
 	ProFormaInvoiceNumber  string     `db:"pro_forma_invoice_number"`
 	ProFormaInvoiceDate    *time.Time `db:"pro_forma_invoice_date"`
 	Type                   string     `db:"type"`

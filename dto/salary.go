@@ -25,6 +25,9 @@ type SalaryResponseDTO struct {
 	Status                   string                               `json:"status"`
 	OrganizationUnitID       int                                  `json:"organization_unit_id"`
 	SalaryAdditionalExpenses []SalaryAdditionalExpenseResponseDTO `json:"salary_additional_expenses"`
+	GrossPrice               float64                              `json:"gross_price"`
+	VatPrice                 float64                              `json:"vat_price"`
+	NetPrice                 float64                              `json:"net_price"`
 	CreatedAt                time.Time                            `json:"created_at"`
 	UpdatedAt                time.Time                            `json:"updated_at"`
 }
