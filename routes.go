@@ -156,6 +156,12 @@ func routes(app *celeritas.Celeritas, middleware *middleware.Middleware, handler
 		rt.Get("/tax-authority-codebooks", handlers.TaxAuthorityCodebookHandler.GetTaxAuthorityCodebookList)
 		rt.Put("/tax-authority-codebooks/{id}", handlers.TaxAuthorityCodebookHandler.UpdateTaxAuthorityCodebook)
 		rt.Delete("/tax-authority-codebooks/{id}", handlers.TaxAuthorityCodebookHandler.DeleteTaxAuthorityCodebook)
+
+		rt.Post("/salaries", handlers.SalaryHandler.CreateSalary)
+		rt.Get("/salaries/{id}", handlers.SalaryHandler.GetSalaryById)
+		rt.Get("/salaries", handlers.SalaryHandler.GetSalaryList)
+		rt.Put("/salaries/{id}", handlers.SalaryHandler.UpdateSalary)
+		rt.Delete("/salaries/{id}", handlers.SalaryHandler.DeleteSalary)
 	})
 
 	return app.Routes

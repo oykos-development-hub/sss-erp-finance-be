@@ -1,0 +1,71 @@
+package dto
+
+import (
+	"time"
+
+	"gitlab.sudovi.me/erp/finance-api/data"
+)
+
+type SalaryDTO struct {
+	ActivityID         int       `json:"activity_id"`
+	Month              string    `json:"month"`
+	DateOfCalculation  time.Time `json:"date_of_calculation"`
+	Description        string    `json:"description"`
+	OrganizationUnitID int       `json:"organization_unit_id"`
+	Status             string    `json:"status"`
+}
+
+type SalaryResponseDTO struct {
+	ID                 int       `json:"id"`
+	ActivityID         int       `json:"activity_id"`
+	Month              string    `json:"month"`
+	DateOfCalculation  time.Time `json:"date_of_calculation"`
+	Description        string    `json:"description"`
+	Status             string    `json:"status"`
+	OrganizationUnitID int       `json:"organization_unit_id"`
+	CreatedAt          time.Time `json:"created_at"`
+	UpdatedAt          time.Time `json:"updated_at"`
+}
+
+type SalaryFilterDTO struct {
+	Page               *int    `json:"page"`
+	Size               *int    `json:"size"`
+	SortByTitle        *string `json:"sort_by_title"`
+	Status             *string `json:"status"`
+	Year               *int    `json:"year"`
+	ActivityID         *int    `json:"activity_id"`
+	OrganizationUnitID *int    `json:"organization_unit_id"`
+}
+
+func (dto SalaryDTO) ToSalary() *data.Salary {
+	return &data.Salary{
+		ActivityID:         dto.ActivityID,
+		Month:              dto.Month,
+		DateOfCalculation:  dto.DateOfCalculation,
+		Description:        dto.Description,
+		Status:             dto.Status,
+		OrganizationUnitID: dto.OrganizationUnitID,
+	}
+}
+
+func ToSalaryResponseDTO(data data.Salary) SalaryResponseDTO {
+	return SalaryResponseDTO{
+		ID:                 data.ID,
+		ActivityID:         data.ActivityID,
+		Month:              data.Month,
+		DateOfCalculation:  data.DateOfCalculation,
+		Description:        data.Description,
+		Status:             data.Status,
+		OrganizationUnitID: data.OrganizationUnitID,
+		CreatedAt:          data.CreatedAt,
+		UpdatedAt:          data.UpdatedAt,
+	}
+}
+
+func ToSalaryListResponseDTO(salaries []*data.Salary) []SalaryResponseDTO {
+	dtoList := make([]SalaryResponseDTO, len(salaries))
+	for i, x := range salaries {
+		dtoList[i] = ToSalaryResponseDTO(*x)
+	}
+	return dtoList
+}

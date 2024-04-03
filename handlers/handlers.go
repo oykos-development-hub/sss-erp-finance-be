@@ -27,7 +27,8 @@ type Handlers struct {
 	PropBenConfHandler            PropBenConfHandler
 	PropBenConfPaymentHandler     PropBenConfPaymentHandler
 	TaxAuthorityCodebookHandler   TaxAuthorityCodebookHandler
-}
+	SalaryHandler SalaryHandler
+	}
 
 type InvoiceHandler interface {
 	CreateInvoice(w http.ResponseWriter, r *http.Request)
@@ -223,4 +224,12 @@ type TaxAuthorityCodebookHandler interface {
 	DeleteTaxAuthorityCodebook(w http.ResponseWriter, r *http.Request)
 	GetTaxAuthorityCodebookById(w http.ResponseWriter, r *http.Request)
 	GetTaxAuthorityCodebookList(w http.ResponseWriter, r *http.Request)
+}
+
+type SalaryHandler interface {
+	CreateSalary(w http.ResponseWriter, r *http.Request)
+	UpdateSalary(w http.ResponseWriter, r *http.Request)
+	DeleteSalary(w http.ResponseWriter, r *http.Request)
+	GetSalaryById(w http.ResponseWriter, r *http.Request)
+	GetSalaryList(w http.ResponseWriter, r *http.Request)
 }

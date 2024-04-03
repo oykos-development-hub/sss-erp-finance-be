@@ -221,3 +221,11 @@ type TaxAuthorityCodebookService interface {
 	GetTaxAuthorityCodebook(id int) (*dto.TaxAuthorityCodebookResponseDTO, error)
 	GetTaxAuthorityCodebookList(filter dto.TaxAuthorityCodebookFilterDTO) ([]dto.TaxAuthorityCodebookResponseDTO, *uint64, error)
 }
+
+type SalaryService interface {
+	CreateSalary(input dto.SalaryDTO) (*dto.SalaryResponseDTO, error)
+	UpdateSalary(id int, input dto.SalaryDTO) (*dto.SalaryResponseDTO, error)
+	DeleteSalary(id int) error
+	GetSalary(id int) (*dto.SalaryResponseDTO, error)
+	GetSalaryList(filter dto.SalaryFilterDTO) ([]dto.SalaryResponseDTO, *uint64, error)
+}
