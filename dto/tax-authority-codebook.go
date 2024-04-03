@@ -9,7 +9,8 @@ import (
 type TaxAuthorityCodebookDTO struct {
 	Title                                string  `json:"title"`
 	Code                                 string  `json:"code"`
-	Percentage                           float64 `json:"percentage"`
+	ReleasePercentage                    float64 `json:"release_percentage"`
+	TaxPercentage                        float64 `json:"tax_percentage"`
 	PreviousIncomePercentageLessThan700  float64 `json:"previous_income_percentage_less_than_700"`
 	PreviousIncomePercentageLessThan1000 float64 `json:"previous_income_percentage_less_than_1000"`
 	PreviousIncomePercentageMoreThan1000 float64 `json:"previous_income_percentage_more_than_1000"`
@@ -19,7 +20,8 @@ type TaxAuthorityCodebookResponseDTO struct {
 	ID                                   int       `json:"id"`
 	Title                                string    `json:"title"`
 	Code                                 string    `json:"code"`
-	Percentage                           float64   `json:"percentage"`
+	ReleasePercentage                    float64   `json:"release_percentage"`
+	TaxPercentage                        float64   `json:"tax_percentage"`
 	PreviousIncomePercentageLessThan700  float64   `json:"previous_income_percentage_less_than_700"`
 	PreviousIncomePercentageLessThan1000 float64   `json:"previous_income_percentage_less_than_1000"`
 	PreviousIncomePercentageMoreThan1000 float64   `json:"previous_income_percentage_more_than_1000"`
@@ -38,7 +40,8 @@ func (dto TaxAuthorityCodebookDTO) ToTaxAuthorityCodebook() *data.TaxAuthorityCo
 	return &data.TaxAuthorityCodebook{
 		Title:                                dto.Title,
 		Code:                                 dto.Code,
-		Percentage:                           dto.Percentage,
+		TaxPercentage:                        dto.TaxPercentage,
+		ReleasePercentage:                    dto.ReleasePercentage,
 		PreviousIncomePercentageLessThan700:  dto.PreviousIncomePercentageLessThan700,
 		PreviousIncomePercentageLessThan1000: dto.PreviousIncomePercentageLessThan1000,
 		PreviousIncomePercentageMoreThan1000: dto.PreviousIncomePercentageMoreThan1000,
@@ -50,7 +53,8 @@ func ToTaxAuthorityCodebookResponseDTO(data data.TaxAuthorityCodebook) TaxAuthor
 		ID:                                   data.ID,
 		Title:                                data.Title,
 		Code:                                 data.Code,
-		Percentage:                           data.Percentage,
+		TaxPercentage:                        data.TaxPercentage,
+		ReleasePercentage:                    data.ReleasePercentage,
 		PreviousIncomePercentageLessThan700:  data.PreviousIncomePercentageLessThan700,
 		PreviousIncomePercentageLessThan1000: data.PreviousIncomePercentageLessThan1000,
 		PreviousIncomePercentageMoreThan1000: data.PreviousIncomePercentageMoreThan1000,

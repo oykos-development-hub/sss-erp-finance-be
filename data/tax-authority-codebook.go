@@ -11,7 +11,8 @@ type TaxAuthorityCodebook struct {
 	ID                                   int       `db:"id,omitempty"`
 	Title                                string    `db:"title"`
 	Code                                 string    `db:"code"`
-	Percentage                           float64   `db:"percentage"`
+	ReleasePercentage                    float64   `db:"release_percentage"`
+	TaxPercentage                        float64   `db:"tax_percentage"`
 	PreviousIncomePercentageLessThan700  float64   `db:"previous_income_percentage_less_than_700"`
 	PreviousIncomePercentageLessThan1000 float64   `db:"previous_income_percentage_less_than_1000"`
 	PreviousIncomePercentageMoreThan1000 float64   `db:"previous_income_percentage_more_than_1000"`
