@@ -14,6 +14,7 @@ type TaxAuthorityCodebookDTO struct {
 	PreviousIncomePercentageLessThan700  float64 `json:"previous_income_percentage_less_than_700"`
 	PreviousIncomePercentageLessThan1000 float64 `json:"previous_income_percentage_less_than_1000"`
 	PreviousIncomePercentageMoreThan1000 float64 `json:"previous_income_percentage_more_than_1000"`
+	Active                               bool    `json:"active"`
 }
 
 type TaxAuthorityCodebookResponseDTO struct {
@@ -25,6 +26,7 @@ type TaxAuthorityCodebookResponseDTO struct {
 	PreviousIncomePercentageLessThan700  float64   `json:"previous_income_percentage_less_than_700"`
 	PreviousIncomePercentageLessThan1000 float64   `json:"previous_income_percentage_less_than_1000"`
 	PreviousIncomePercentageMoreThan1000 float64   `json:"previous_income_percentage_more_than_1000"`
+	Active                               bool      `json:"active"`
 	CreatedAt                            time.Time `json:"created_at"`
 	UpdatedAt                            time.Time `json:"updated_at"`
 }
@@ -34,6 +36,7 @@ type TaxAuthorityCodebookFilterDTO struct {
 	Size        *int    `json:"size"`
 	SortByTitle *string `json:"sort_by_title"`
 	Search      *string `json:"search"`
+	Active      *bool   `json:"active"`
 }
 
 func (dto TaxAuthorityCodebookDTO) ToTaxAuthorityCodebook() *data.TaxAuthorityCodebook {
@@ -42,6 +45,7 @@ func (dto TaxAuthorityCodebookDTO) ToTaxAuthorityCodebook() *data.TaxAuthorityCo
 		Code:                                 dto.Code,
 		TaxPercentage:                        dto.TaxPercentage,
 		ReleasePercentage:                    dto.ReleasePercentage,
+		Active:                               dto.Active,
 		PreviousIncomePercentageLessThan700:  dto.PreviousIncomePercentageLessThan700,
 		PreviousIncomePercentageLessThan1000: dto.PreviousIncomePercentageLessThan1000,
 		PreviousIncomePercentageMoreThan1000: dto.PreviousIncomePercentageMoreThan1000,
@@ -53,6 +57,7 @@ func ToTaxAuthorityCodebookResponseDTO(data data.TaxAuthorityCodebook) TaxAuthor
 		ID:                                   data.ID,
 		Title:                                data.Title,
 		Code:                                 data.Code,
+		Active:                               data.Active,
 		TaxPercentage:                        data.TaxPercentage,
 		ReleasePercentage:                    data.ReleasePercentage,
 		PreviousIncomePercentageLessThan700:  data.PreviousIncomePercentageLessThan700,

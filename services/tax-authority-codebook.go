@@ -94,6 +94,10 @@ func (h *TaxAuthorityCodebookServiceImpl) GetTaxAuthorityCodebookList(filter dto
 		conditionAndExp = up.And(conditionAndExp, search)
 	}
 
+	if filter.Active != nil {
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"active": *filter.Active})
+	}
+
 	if filter.SortByTitle != nil {
 		if *filter.SortByTitle == "asc" {
 			orders = append(orders, "-title")

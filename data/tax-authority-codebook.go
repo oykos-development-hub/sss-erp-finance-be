@@ -16,6 +16,7 @@ type TaxAuthorityCodebook struct {
 	PreviousIncomePercentageLessThan700  float64   `db:"previous_income_percentage_less_than_700"`
 	PreviousIncomePercentageLessThan1000 float64   `db:"previous_income_percentage_less_than_1000"`
 	PreviousIncomePercentageMoreThan1000 float64   `db:"previous_income_percentage_more_than_1000"`
+	Active                               bool      `db:"active"`
 	CreatedAt                            time.Time `db:"created_at,omitempty"`
 	UpdatedAt                            time.Time `db:"updated_at"`
 }
