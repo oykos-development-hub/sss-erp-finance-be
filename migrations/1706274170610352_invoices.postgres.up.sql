@@ -23,6 +23,7 @@ CREATE TABLE invoices (
     sss_invoice_receipt_date TIMESTAMP,    --datum sss, 
     date_of_start TIMESTAMP,               --datum pocetka ugovora
     file_id INTEGER,
+    pro_forma_invoice_file_id INTEGER,
     bank_account TEXT,
     description TEXT,
     created_at TIMESTAMP,

@@ -33,6 +33,7 @@ type Invoice struct {
 	SSSInvoiceReceiptDate  *time.Time `db:"sss_invoice_receipt_date"`
 	DateOfStart            time.Time  `db:"date_of_start"`
 	DateOfEnd              time.Time  `db:"date_of_end"`
+	ProFormaInvoiceFileID  int        `db:"pro_forma_invoice_file_id"`
 	FileID                 int        `db:"file_id"`
 	BankAccount            string     `db:"bank_account"`
 	Description            string     `db:"description"`

@@ -47,6 +47,7 @@ type InvoiceDTO struct {
 	SSSInvoiceReceiptDate  *time.Time             `json:"sss_invoice_receipt_date"`
 	AdditionalExpenses     []AdditionalExpenseDTO `json:"additional_expenses"`
 	FileID                 int                    `json:"file_id"`
+	ProFormaInvoiceFileID  int                    `json:"pro_forma_invoice_file_id"`
 	BankAccount            string                 `json:"bank_account"`
 	Description            string                 `json:"description"`
 }
@@ -78,6 +79,7 @@ type InvoiceResponseDTO struct {
 	DateOfStart            time.Time                      `json:"date_of_start"`
 	DateOfEnd              time.Time                      `json:"date_of_end"`
 	FileID                 int                            `json:"file_id"`
+	ProFormaInvoiceFileID  int                            `json:"pro_forma_invoice_file_id"`
 	BankAccount            string                         `json:"bank_account"`
 	Description            string                         `json:"description"`
 	Articles               []ArticleResponseDTO           `json:"articles"`
@@ -106,6 +108,7 @@ func (dto InvoiceDTO) ToInvoice() *data.Invoice {
 		DateOfPayment:          dto.DateOfPayment,
 		SSSInvoiceReceiptDate:  dto.SSSInvoiceReceiptDate,
 		FileID:                 dto.FileID,
+		ProFormaInvoiceFileID:  dto.ProFormaInvoiceFileID,
 		BankAccount:            dto.BankAccount,
 		Description:            dto.Description,
 		Type:                   dto.Type,
@@ -137,6 +140,7 @@ func ToInvoiceResponseDTO(data data.Invoice) InvoiceResponseDTO {
 		DateOfPayment:          data.DateOfPayment,
 		SSSInvoiceReceiptDate:  data.SSSInvoiceReceiptDate,
 		FileID:                 data.FileID,
+		ProFormaInvoiceFileID:  data.ProFormaInvoiceFileID,
 		BankAccount:            data.BankAccount,
 		Description:            data.Description,
 		Type:                   data.Type,
