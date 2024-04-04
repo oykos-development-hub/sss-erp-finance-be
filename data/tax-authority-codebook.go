@@ -13,6 +13,7 @@ type TaxAuthorityCodebook struct {
 	Code                                 string    `db:"code"`
 	ReleasePercentage                    float64   `db:"release_percentage"`
 	TaxPercentage                        float64   `db:"tax_percentage"`
+	PioPercentage                        float64   `db:"pio_percentage"`
 	PreviousIncomePercentageLessThan700  float64   `db:"previous_income_percentage_less_than_700"`
 	PreviousIncomePercentageLessThan1000 float64   `db:"previous_income_percentage_less_than_1000"`
 	PreviousIncomePercentageMoreThan1000 float64   `db:"previous_income_percentage_more_than_1000"`

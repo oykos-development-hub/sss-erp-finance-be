@@ -11,6 +11,7 @@ type TaxAuthorityCodebookDTO struct {
 	Code                                 string  `json:"code"`
 	ReleasePercentage                    float64 `json:"release_percentage"`
 	TaxPercentage                        float64 `json:"tax_percentage"`
+	PioPercentage                        float64 `json:"pio_percentage"`
 	PreviousIncomePercentageLessThan700  float64 `json:"previous_income_percentage_less_than_700"`
 	PreviousIncomePercentageLessThan1000 float64 `json:"previous_income_percentage_less_than_1000"`
 	PreviousIncomePercentageMoreThan1000 float64 `json:"previous_income_percentage_more_than_1000"`
@@ -23,6 +24,7 @@ type TaxAuthorityCodebookResponseDTO struct {
 	Code                                 string    `json:"code"`
 	ReleasePercentage                    float64   `json:"release_percentage"`
 	TaxPercentage                        float64   `json:"tax_percentage"`
+	PioPercentage                        float64   `json:"pio_percentage"`
 	PreviousIncomePercentageLessThan700  float64   `json:"previous_income_percentage_less_than_700"`
 	PreviousIncomePercentageLessThan1000 float64   `json:"previous_income_percentage_less_than_1000"`
 	PreviousIncomePercentageMoreThan1000 float64   `json:"previous_income_percentage_more_than_1000"`
@@ -44,6 +46,7 @@ func (dto TaxAuthorityCodebookDTO) ToTaxAuthorityCodebook() *data.TaxAuthorityCo
 		Title:                                dto.Title,
 		Code:                                 dto.Code,
 		TaxPercentage:                        dto.TaxPercentage,
+		PioPercentage:                        dto.PioPercentage,
 		ReleasePercentage:                    dto.ReleasePercentage,
 		Active:                               dto.Active,
 		PreviousIncomePercentageLessThan700:  dto.PreviousIncomePercentageLessThan700,
@@ -58,6 +61,7 @@ func ToTaxAuthorityCodebookResponseDTO(data data.TaxAuthorityCodebook) TaxAuthor
 		Title:                                data.Title,
 		Code:                                 data.Code,
 		Active:                               data.Active,
+		PioPercentage:                        data.PioPercentage,
 		TaxPercentage:                        data.TaxPercentage,
 		ReleasePercentage:                    data.ReleasePercentage,
 		PreviousIncomePercentageLessThan700:  data.PreviousIncomePercentageLessThan700,

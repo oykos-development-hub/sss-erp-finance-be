@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS tax_authority_codebooks (
     code TEXT NOT NULL,
     tax_percentage FLOAT NOT NULL,
     release_percentage FLOAT NOT NULL,
+    pio_percentage FLOAT,
     previous_income_percentage_less_than_700 FLOAT,
     previous_income_percentage_less_than_1000 FLOAT,
     previous_income_percentage_more_than_1000 FLOAT,
