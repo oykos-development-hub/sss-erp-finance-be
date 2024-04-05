@@ -3,6 +3,7 @@ CREATE TABLE invoices (
     invoice_number TEXT,
     passed_to_inventory BOOLEAN DEFAULT false,
     passed_to_accounting BOOLEAN DEFAULT false,
+    is_invoice BOOLEAN DEFAULT false,
     pro_forma_invoice_number TEXT,
     pro_forma_invoice_date TIMESTAMP,
     type TEXT NOT NULL,
