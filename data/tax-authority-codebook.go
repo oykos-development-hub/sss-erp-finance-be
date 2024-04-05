@@ -10,14 +10,29 @@ import (
 type TaxAuthorityCodebook struct {
 	ID                                   int       `db:"id,omitempty"`
 	Title                                string    `db:"title"`
+	Active                               bool      `db:"active"`
 	Code                                 string    `db:"code"`
-	ReleasePercentage                    float64   `db:"release_percentage"`
 	TaxPercentage                        float64   `db:"tax_percentage"`
+	TaxSupplierID                        int       `db:"tax_supplier_id"`
+	ReleasePercentage                    float64   `db:"release_percentage"`
 	PioPercentage                        float64   `db:"pio_percentage"`
+	PioSupplierID                        int       `db:"pio_supplier_id"`
+	PioPercentageEmployerPercentage      float64   `db:"pio_percentage_employer_percentage"`
+	PioEmployerSupplierID                int       `db:"pio_employer_supplier_id"`
+	PioPercentageEmployeePercentage      float64   `db:"pio_percentage_employee_percentage"`
+	PioEmployeeSupplierID                int       `db:"pio_employee_supplier_id"`
+	UnemploymentPercentage               float64   `db:"unemployment_percentage"`
+	UnemploymentSupplierID               int       `db:"unemployment_supplier_id"`
+	UnemploymentEmployerPercentage       float64   `db:"unemployment_employer_percentage"`
+	UnemploymentEmployerSupplierID       int       `db:"unemployment_employer_supplier_id"`
+	UnemploymentEmployeePercentage       float64   `db:"unemployment_employee_percentage"`
+	UnemploymentEmployeeSupplierID       int       `db:"unemployment_employee_supplier_id"`
+	LaborFund                            float64   `db:"labor_fund"`
+	LaborFundSupplierID                  int       `db:"labor_fund_supplier_id"`
 	PreviousIncomePercentageLessThan700  float64   `db:"previous_income_percentage_less_than_700"`
 	PreviousIncomePercentageLessThan1000 float64   `db:"previous_income_percentage_less_than_1000"`
 	PreviousIncomePercentageMoreThan1000 float64   `db:"previous_income_percentage_more_than_1000"`
-	Active                               bool      `db:"active"`
+	Coefficient                          float64   `db:"coefficient"`
 	CreatedAt                            time.Time `db:"created_at,omitempty"`
 	UpdatedAt                            time.Time `db:"updated_at"`
 }

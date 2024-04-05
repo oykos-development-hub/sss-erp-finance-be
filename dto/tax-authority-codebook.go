@@ -9,26 +9,56 @@ import (
 type TaxAuthorityCodebookDTO struct {
 	Title                                string  `json:"title"`
 	Code                                 string  `json:"code"`
-	ReleasePercentage                    float64 `json:"release_percentage"`
+	Active                               bool    `json:"active"`
 	TaxPercentage                        float64 `json:"tax_percentage"`
+	TaxSupplierID                        int     `json:"tax_supplier_id"`
+	ReleasePercentage                    float64 `json:"release_percentage"`
 	PioPercentage                        float64 `json:"pio_percentage"`
+	PioSupplierID                        int     `json:"pio_supplier_id"`
+	PioPercentageEmployerPercentage      float64 `json:"pio_percentage_employer_percentage"`
+	PioEmployerSupplierID                int     `json:"pio_employer_supplier_id"`
+	PioPercentageEmployeePercentage      float64 `json:"pio_percentage_employee_percentage"`
+	PioEmployeeSupplierID                int     `json:"pio_employee_supplier_id"`
+	UnemploymentPercentage               float64 `json:"unemployment_percentage"`
+	UnemploymentSupplierID               int     `json:"unemployment_supplier_id"`
+	UnemploymentEmployerPercentage       float64 `json:"unemployment_employer_percentage"`
+	UnemploymentEmployerSupplierID       int     `json:"unemployment_employer_supplier_id"`
+	UnemploymentEmployeePercentage       float64 `json:"unemployment_employee_percentage"`
+	UnemploymentEmployeeSupplierID       int     `json:"unemployment_employee_supplier_id"`
+	LaborFund                            float64 `json:"labor_fund"`
+	LaborFundSupplierID                  int     `json:"labor_fund_supplier_id"`
 	PreviousIncomePercentageLessThan700  float64 `json:"previous_income_percentage_less_than_700"`
 	PreviousIncomePercentageLessThan1000 float64 `json:"previous_income_percentage_less_than_1000"`
 	PreviousIncomePercentageMoreThan1000 float64 `json:"previous_income_percentage_more_than_1000"`
-	Active                               bool    `json:"active"`
+	Coefficient                          float64 `json:"coefficient"`
 }
 
 type TaxAuthorityCodebookResponseDTO struct {
 	ID                                   int       `json:"id"`
 	Title                                string    `json:"title"`
 	Code                                 string    `json:"code"`
-	ReleasePercentage                    float64   `json:"release_percentage"`
+	Active                               bool      `json:"active"`
 	TaxPercentage                        float64   `json:"tax_percentage"`
+	TaxSupplierID                        int       `json:"tax_supplier_id"`
+	ReleasePercentage                    float64   `json:"release_percentage"`
 	PioPercentage                        float64   `json:"pio_percentage"`
+	PioSupplierID                        int       `json:"pio_supplier_id"`
+	PioPercentageEmployerPercentage      float64   `json:"pio_percentage_employer_percentage"`
+	PioEmployerSupplierID                int       `json:"pio_employer_supplier_id"`
+	PioPercentageEmployeePercentage      float64   `json:"pio_percentage_employee_percentage"`
+	PioEmployeeSupplierID                int       `json:"pio_employee_supplier_id"`
+	UnemploymentPercentage               float64   `json:"unemployment_percentage"`
+	UnemploymentSupplierID               int       `json:"unemployment_supplier_id"`
+	UnemploymentEmployerPercentage       float64   `json:"unemployment_employer_percentage"`
+	UnemploymentEmployerSupplierID       int       `json:"unemployment_employer_supplier_id"`
+	UnemploymentEmployeePercentage       float64   `json:"unemployment_employee_percentage"`
+	UnemploymentEmployeeSupplierID       int       `json:"unemployment_employee_supplier_id"`
+	LaborFund                            float64   `json:"labor_fund"`
+	LaborFundSupplierID                  int       `json:"labor_fund_supplier_id"`
 	PreviousIncomePercentageLessThan700  float64   `json:"previous_income_percentage_less_than_700"`
 	PreviousIncomePercentageLessThan1000 float64   `json:"previous_income_percentage_less_than_1000"`
 	PreviousIncomePercentageMoreThan1000 float64   `json:"previous_income_percentage_more_than_1000"`
-	Active                               bool      `json:"active"`
+	Coefficient                          float64   `json:"coefficient"`
 	CreatedAt                            time.Time `json:"created_at"`
 	UpdatedAt                            time.Time `json:"updated_at"`
 }
@@ -46,12 +76,26 @@ func (dto TaxAuthorityCodebookDTO) ToTaxAuthorityCodebook() *data.TaxAuthorityCo
 		Title:                                dto.Title,
 		Code:                                 dto.Code,
 		TaxPercentage:                        dto.TaxPercentage,
-		PioPercentage:                        dto.PioPercentage,
+		TaxSupplierID:                        dto.TaxSupplierID,
 		ReleasePercentage:                    dto.ReleasePercentage,
-		Active:                               dto.Active,
+		PioPercentage:                        dto.PioPercentage,
+		PioSupplierID:                        dto.PioSupplierID,
+		PioPercentageEmployerPercentage:      dto.PioPercentageEmployerPercentage,
+		PioEmployerSupplierID:                dto.PioEmployerSupplierID,
+		PioPercentageEmployeePercentage:      dto.PioPercentageEmployeePercentage,
+		PioEmployeeSupplierID:                dto.PioEmployeeSupplierID,
+		UnemploymentPercentage:               dto.UnemploymentPercentage,
+		UnemploymentSupplierID:               dto.UnemploymentSupplierID,
+		UnemploymentEmployerPercentage:       dto.UnemploymentEmployerPercentage,
+		UnemploymentEmployerSupplierID:       dto.UnemploymentEmployerSupplierID,
+		UnemploymentEmployeePercentage:       dto.UnemploymentEmployeePercentage,
+		UnemploymentEmployeeSupplierID:       dto.UnemploymentEmployeeSupplierID,
+		LaborFund:                            dto.LaborFund,
+		LaborFundSupplierID:                  dto.LaborFundSupplierID,
 		PreviousIncomePercentageLessThan700:  dto.PreviousIncomePercentageLessThan700,
 		PreviousIncomePercentageLessThan1000: dto.PreviousIncomePercentageLessThan1000,
 		PreviousIncomePercentageMoreThan1000: dto.PreviousIncomePercentageMoreThan1000,
+		Coefficient:                          dto.Coefficient,
 	}
 }
 
@@ -60,13 +104,27 @@ func ToTaxAuthorityCodebookResponseDTO(data data.TaxAuthorityCodebook) TaxAuthor
 		ID:                                   data.ID,
 		Title:                                data.Title,
 		Code:                                 data.Code,
-		Active:                               data.Active,
-		PioPercentage:                        data.PioPercentage,
 		TaxPercentage:                        data.TaxPercentage,
+		TaxSupplierID:                        data.TaxSupplierID,
 		ReleasePercentage:                    data.ReleasePercentage,
+		PioPercentage:                        data.PioPercentage,
+		PioSupplierID:                        data.PioSupplierID,
+		PioPercentageEmployerPercentage:      data.PioPercentageEmployerPercentage,
+		PioEmployerSupplierID:                data.PioEmployerSupplierID,
+		PioPercentageEmployeePercentage:      data.PioPercentageEmployeePercentage,
+		PioEmployeeSupplierID:                data.PioEmployeeSupplierID,
+		UnemploymentPercentage:               data.UnemploymentPercentage,
+		UnemploymentSupplierID:               data.UnemploymentSupplierID,
+		UnemploymentEmployerPercentage:       data.UnemploymentEmployerPercentage,
+		UnemploymentEmployerSupplierID:       data.UnemploymentEmployerSupplierID,
+		UnemploymentEmployeePercentage:       data.UnemploymentEmployeePercentage,
+		UnemploymentEmployeeSupplierID:       data.UnemploymentEmployeeSupplierID,
+		LaborFund:                            data.LaborFund,
+		LaborFundSupplierID:                  data.LaborFundSupplierID,
 		PreviousIncomePercentageLessThan700:  data.PreviousIncomePercentageLessThan700,
 		PreviousIncomePercentageLessThan1000: data.PreviousIncomePercentageLessThan1000,
 		PreviousIncomePercentageMoreThan1000: data.PreviousIncomePercentageMoreThan1000,
+		Coefficient:                          data.Coefficient,
 		CreatedAt:                            data.CreatedAt,
 		UpdatedAt:                            data.UpdatedAt,
 	}
