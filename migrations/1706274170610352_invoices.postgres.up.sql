@@ -1,4 +1,4 @@
-CREATE TABLE invoices (
+CREATE TABLE IF NOT EXISTS invoices (
     id serial PRIMARY KEY,
     invoice_number TEXT,
     passed_to_inventory BOOLEAN DEFAULT false,
