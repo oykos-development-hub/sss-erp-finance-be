@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS flat_rates (
 
 CREATE TABLE IF NOT EXISTS flat_rate_payments (
     id serial PRIMARY KEY,
-    flat_rate_id INT NULL REFERENCES flat_rate (id) ON DELETE CASCADE,
+    flat_rate_id INT NULL REFERENCES flat_rates (id) ON DELETE CASCADE,
     payment_method INTEGER NOT NULL,
     amount NUMERIC(10, 2) NOT NULL,
     payment_date TIMESTAMP,
