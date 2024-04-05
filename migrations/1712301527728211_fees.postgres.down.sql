@@ -1,0 +1,2 @@
+DROP TABLE IF EXISTS fees
+DROP TABLE IF EXISTS fee_payments
