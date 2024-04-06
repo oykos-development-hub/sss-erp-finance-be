@@ -37,6 +37,7 @@ type FixedDepositResponseDTO struct {
 	Type                 string                            `json:"type"`
 	Items                []FixedDepositItemResponseDTO     `json:"items"`
 	Dispatches           []FixedDepositDispatchResponseDTO `json:"dispatches"`
+	Judges               []FixedDepositJudgeResponseDTO    `json:"judges"`
 	CreatedAt            time.Time                         `json:"created_at"`
 	UpdatedAt            time.Time                         `json:"updated_at"`
 }

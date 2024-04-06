@@ -123,6 +123,15 @@ func (h *FixedDepositServiceImpl) GetFixedDeposit(id int) (*dto.FixedDepositResp
 
 	response.Dispatches = dispatches
 
+	judges, _, err := h.judges.GetFixedDepositJudgeList(dto.FixedDepositJudgeFilterDTO{DepositID: &id})
+
+	if err != nil {
+		h.App.ErrorLog.Println(err)
+		return nil, errors.ErrInternalServer
+	}
+
+	response.Judges = judges
+
 	return &response, nil
 }
 
