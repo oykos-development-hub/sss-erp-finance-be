@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS fixed_deposit_items (
     category_id INTEGER,
     type_id INTEGER,
     unit_id INTEGER,
+    currency_id INTEGER,
     amount FLOAT,
     serial_number TEXT,
     date_of_confiscation TIMESTAMP,

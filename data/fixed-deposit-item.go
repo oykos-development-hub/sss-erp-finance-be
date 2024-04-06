@@ -14,7 +14,7 @@ type FixedDepositItem struct {
 	TypeID             int        `db:"type_id"`
 	UnitID             int        `db:"unit_id"`
 	Amount             float32    `db:"amount"`
-	CurencyID          int        `db:"curency_id"`
+	CurrencyID         int        `db:"currency_id"`
 	SerialNumber       string     `db:"serial_number"`
 	DateOfConfiscation *time.Time `db:"date_of_confiscation"`
 	CaseNumber         string     `db:"case_number"`
