@@ -29,6 +29,10 @@ type Handlers struct {
 	TaxAuthorityCodebookHandler   TaxAuthorityCodebookHandler
 	SalaryHandler SalaryHandler
 		SalaryAdditionalExpenseHandler SalaryAdditionalExpenseHandler
+		FixedDepositHandler FixedDepositHandler
+		FixedDepositItemHandler FixedDepositItemHandler
+		FixedDepositDispatchHandler FixedDepositDispatchHandler
+		FixedDepositJudgeHandler FixedDepositJudgeHandler
 	}
 
 type InvoiceHandler interface {
@@ -241,4 +245,36 @@ type SalaryAdditionalExpenseHandler interface {
 	DeleteSalaryAdditionalExpense(w http.ResponseWriter, r *http.Request)
 	GetSalaryAdditionalExpenseById(w http.ResponseWriter, r *http.Request)
 	GetSalaryAdditionalExpenseList(w http.ResponseWriter, r *http.Request)
+}
+
+type FixedDepositHandler interface {
+	CreateFixedDeposit(w http.ResponseWriter, r *http.Request)
+	UpdateFixedDeposit(w http.ResponseWriter, r *http.Request)
+	DeleteFixedDeposit(w http.ResponseWriter, r *http.Request)
+	GetFixedDepositById(w http.ResponseWriter, r *http.Request)
+	GetFixedDepositList(w http.ResponseWriter, r *http.Request)
+}
+
+type FixedDepositItemHandler interface {
+	CreateFixedDepositItem(w http.ResponseWriter, r *http.Request)
+	UpdateFixedDepositItem(w http.ResponseWriter, r *http.Request)
+	DeleteFixedDepositItem(w http.ResponseWriter, r *http.Request)
+	GetFixedDepositItemById(w http.ResponseWriter, r *http.Request)
+	GetFixedDepositItemList(w http.ResponseWriter, r *http.Request)
+}
+
+type FixedDepositDispatchHandler interface {
+	CreateFixedDepositDispatch(w http.ResponseWriter, r *http.Request)
+	UpdateFixedDepositDispatch(w http.ResponseWriter, r *http.Request)
+	DeleteFixedDepositDispatch(w http.ResponseWriter, r *http.Request)
+	GetFixedDepositDispatchById(w http.ResponseWriter, r *http.Request)
+	GetFixedDepositDispatchList(w http.ResponseWriter, r *http.Request)
+}
+
+type FixedDepositJudgeHandler interface {
+	CreateFixedDepositJudge(w http.ResponseWriter, r *http.Request)
+	UpdateFixedDepositJudge(w http.ResponseWriter, r *http.Request)
+	DeleteFixedDepositJudge(w http.ResponseWriter, r *http.Request)
+	GetFixedDepositJudgeById(w http.ResponseWriter, r *http.Request)
+	GetFixedDepositJudgeList(w http.ResponseWriter, r *http.Request)
 }

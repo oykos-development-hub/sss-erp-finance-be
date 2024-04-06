@@ -168,6 +168,30 @@ rt.Get("/salary-additional-expenses/{id}", handlers.SalaryAdditionalExpenseHandl
 rt.Get("/salary-additional-expenses", handlers.SalaryAdditionalExpenseHandler.GetSalaryAdditionalExpenseList)
 rt.Put("/salary-additional-expenses/{id}", handlers.SalaryAdditionalExpenseHandler.UpdateSalaryAdditionalExpense)
 rt.Delete("/salary-additional-expenses/{id}", handlers.SalaryAdditionalExpenseHandler.DeleteSalaryAdditionalExpense)
+	
+		rt.Post("/fixed-deposits", handlers.FixedDepositHandler.CreateFixedDeposit)
+rt.Get("/fixed-deposits/{id}", handlers.FixedDepositHandler.GetFixedDepositById)
+rt.Get("/fixed-deposits", handlers.FixedDepositHandler.GetFixedDepositList)
+rt.Put("/fixed-deposits/{id}", handlers.FixedDepositHandler.UpdateFixedDeposit)
+rt.Delete("/fixed-deposits/{id}", handlers.FixedDepositHandler.DeleteFixedDeposit)
+	
+		rt.Post("/fixed-deposit-items", handlers.FixedDepositItemHandler.CreateFixedDepositItem)
+rt.Get("/fixed-deposit-items/{id}", handlers.FixedDepositItemHandler.GetFixedDepositItemById)
+rt.Get("/fixed-deposit-items", handlers.FixedDepositItemHandler.GetFixedDepositItemList)
+rt.Put("/fixed-deposit-items/{id}", handlers.FixedDepositItemHandler.UpdateFixedDepositItem)
+rt.Delete("/fixed-deposit-items/{id}", handlers.FixedDepositItemHandler.DeleteFixedDepositItem)
+	
+		rt.Post("/fixed-deposit-dispatches", handlers.FixedDepositDispatchHandler.CreateFixedDepositDispatch)
+rt.Get("/fixed-deposit-dispatches/{id}", handlers.FixedDepositDispatchHandler.GetFixedDepositDispatchById)
+rt.Get("/fixed-deposit-dispatches", handlers.FixedDepositDispatchHandler.GetFixedDepositDispatchList)
+rt.Put("/fixed-deposit-dispatches/{id}", handlers.FixedDepositDispatchHandler.UpdateFixedDepositDispatch)
+rt.Delete("/fixed-deposit-dispatches/{id}", handlers.FixedDepositDispatchHandler.DeleteFixedDepositDispatch)
+	
+		rt.Post("/fixed-deposit-judges", handlers.FixedDepositJudgeHandler.CreateFixedDepositJudge)
+rt.Get("/fixed-deposit-judges/{id}", handlers.FixedDepositJudgeHandler.GetFixedDepositJudgeById)
+rt.Get("/fixed-deposit-judges", handlers.FixedDepositJudgeHandler.GetFixedDepositJudgeList)
+rt.Put("/fixed-deposit-judges/{id}", handlers.FixedDepositJudgeHandler.UpdateFixedDepositJudge)
+rt.Delete("/fixed-deposit-judges/{id}", handlers.FixedDepositJudgeHandler.DeleteFixedDepositJudge)
 	})
 
 	return app.Routes

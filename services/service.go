@@ -237,3 +237,35 @@ type SalaryAdditionalExpenseService interface {
 	GetSalaryAdditionalExpense(id int) (*dto.SalaryAdditionalExpenseResponseDTO, error)
 	GetSalaryAdditionalExpenseList(filter dto.SalaryAdditionalExpenseFilterDTO) ([]dto.SalaryAdditionalExpenseResponseDTO, *uint64, error)
 }
+
+type FixedDepositService interface {
+	CreateFixedDeposit(input dto.FixedDepositDTO) (*dto.FixedDepositResponseDTO, error)
+	UpdateFixedDeposit(id int, input dto.FixedDepositDTO) (*dto.FixedDepositResponseDTO, error)
+	DeleteFixedDeposit(id int) error
+	GetFixedDeposit(id int) (*dto.FixedDepositResponseDTO, error)
+	GetFixedDepositList(filter dto.FixedDepositFilterDTO) ([]dto.FixedDepositResponseDTO, *uint64, error)
+}
+
+type FixedDepositItemService interface {
+	CreateFixedDepositItem(input dto.FixedDepositItemDTO) (*dto.FixedDepositItemResponseDTO, error)
+	UpdateFixedDepositItem(id int, input dto.FixedDepositItemDTO) (*dto.FixedDepositItemResponseDTO, error)
+	DeleteFixedDepositItem(id int) error
+	GetFixedDepositItem(id int) (*dto.FixedDepositItemResponseDTO, error)
+	GetFixedDepositItemList(filter dto.FixedDepositItemFilterDTO) ([]dto.FixedDepositItemResponseDTO, *uint64, error)
+}
+
+type FixedDepositDispatchService interface {
+	CreateFixedDepositDispatch(input dto.FixedDepositDispatchDTO) (*dto.FixedDepositDispatchResponseDTO, error)
+	UpdateFixedDepositDispatch(id int, input dto.FixedDepositDispatchDTO) (*dto.FixedDepositDispatchResponseDTO, error)
+	DeleteFixedDepositDispatch(id int) error
+	GetFixedDepositDispatch(id int) (*dto.FixedDepositDispatchResponseDTO, error)
+	GetFixedDepositDispatchList(filter dto.FixedDepositDispatchFilterDTO) ([]dto.FixedDepositDispatchResponseDTO, *uint64, error)
+}
+
+type FixedDepositJudgeService interface {
+	CreateFixedDepositJudge(input dto.FixedDepositJudgeDTO) (*dto.FixedDepositJudgeResponseDTO, error)
+	UpdateFixedDepositJudge(id int, input dto.FixedDepositJudgeDTO) (*dto.FixedDepositJudgeResponseDTO, error)
+	DeleteFixedDepositJudge(id int) error
+	GetFixedDepositJudge(id int) (*dto.FixedDepositJudgeResponseDTO, error)
+	GetFixedDepositJudgeList(filter dto.FixedDepositJudgeFilterDTO) ([]dto.FixedDepositJudgeResponseDTO, *uint64, error)
+}

@@ -123,6 +123,18 @@ func initApplication() *celeritas.Celeritas {
 	SalaryService := services.NewSalaryServiceImpl(cel, models.Salary, models.SalaryAdditionalExpense, SalaryAdditionalExpenseService)
 	SalaryHandler := handlers.NewSalaryHandler(cel, SalaryService)
 
+	FixedDepositItemService := services.NewFixedDepositItemServiceImpl(cel, models.FixedDepositItem)
+	FixedDepositItemHandler := handlers.NewFixedDepositItemHandler(cel, FixedDepositItemService)
+
+	FixedDepositDispatchService := services.NewFixedDepositDispatchServiceImpl(cel, models.FixedDepositDispatch)
+	FixedDepositDispatchHandler := handlers.NewFixedDepositDispatchHandler(cel, FixedDepositDispatchService)
+
+	FixedDepositJudgeService := services.NewFixedDepositJudgeServiceImpl(cel, models.FixedDepositJudge)
+	FixedDepositJudgeHandler := handlers.NewFixedDepositJudgeHandler(cel, FixedDepositJudgeService)
+
+	FixedDepositService := services.NewFixedDepositServiceImpl(cel, models.FixedDeposit, FixedDepositItemService, FixedDepositDispatchService, FixedDepositJudgeService)
+	FixedDepositHandler := handlers.NewFixedDepositHandler(cel, FixedDepositService)
+
 	myHandlers := &handlers.Handlers{
 		InvoiceHandler: InvoiceHandler,
 		ArticleHandler: ArticleHandler,
@@ -155,6 +167,10 @@ func initApplication() *celeritas.Celeritas {
 		TaxAuthorityCodebookHandler:    TaxAuthorityCodebookHandler,
 		SalaryHandler:                  SalaryHandler,
 		SalaryAdditionalExpenseHandler: SalaryAdditionalExpenseHandler,
+		FixedDepositHandler:            FixedDepositHandler,
+		FixedDepositItemHandler:        FixedDepositItemHandler,
+		FixedDepositDispatchHandler:    FixedDepositDispatchHandler,
+		FixedDepositJudgeHandler:       FixedDepositJudgeHandler,
 	}
 
 	myMiddleware := &middleware.Middleware{

@@ -47,6 +47,10 @@ type Models struct {
 	TaxAuthorityCodebook   TaxAuthorityCodebook
 	Salary Salary
 		SalaryAdditionalExpense SalaryAdditionalExpense
+		FixedDeposit FixedDeposit
+		FixedDepositItem FixedDepositItem
+		FixedDepositDispatch FixedDepositDispatch
+		FixedDepositJudge FixedDepositJudge
 	}
 
 func New(databasePool *sql.DB) Models {
@@ -83,6 +87,10 @@ func New(databasePool *sql.DB) Models {
 		AdditionalExpense:      AdditionalExpense{},
 		Salary: Salary{},
 		SalaryAdditionalExpense: SalaryAdditionalExpense{},
+		FixedDeposit: FixedDeposit{},
+		FixedDepositItem: FixedDepositItem{},
+		FixedDepositDispatch: FixedDepositDispatch{},
+		FixedDepositJudge: FixedDepositJudge{},
 	}
 }
 

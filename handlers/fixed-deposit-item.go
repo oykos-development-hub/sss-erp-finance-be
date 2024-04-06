@@ -1,0 +1,119 @@
+package handlers
+
+import (
+	"net/http"
+	"strconv"
+
+	"gitlab.sudovi.me/erp/finance-api/dto"
+	"gitlab.sudovi.me/erp/finance-api/errors"
+	"gitlab.sudovi.me/erp/finance-api/services"
+
+	"github.com/oykos-development-hub/celeritas"
+	"github.com/go-chi/chi/v5"
+)
+
+// FixedDepositItemHandler is a concrete type that implements FixedDepositItemHandler
+type fixeddeposititemHandlerImpl struct {
+	App     *celeritas.Celeritas
+	service services.FixedDepositItemService
+}
+
+// NewFixedDepositItemHandler initializes a new FixedDepositItemHandler with its dependencies
+func NewFixedDepositItemHandler(app *celeritas.Celeritas, fixeddeposititemService services.FixedDepositItemService) FixedDepositItemHandler {
+	return &fixeddeposititemHandlerImpl{
+		App:     app,
+		service: fixeddeposititemService,
+	}
+}
+
+func (h *fixeddeposititemHandlerImpl) CreateFixedDepositItem(w http.ResponseWriter, r *http.Request) {
+	var input dto.FixedDepositItemDTO
+	err := h.App.ReadJSON(w, r, &input)
+	if err != nil {
+		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
+		return
+	}
+
+	validator := h.App.Validator().ValidateStruct(&input)
+	if !validator.Valid() {
+		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
+		return
+	}
+
+	res, err := h.service.CreateFixedDepositItem(input)
+	if err != nil {
+		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
+		return
+	}
+
+	_ = h.App.WriteDataResponse(w, http.StatusOK, "FixedDepositItem created successfuly", res)
+}
+
+func (h *fixeddeposititemHandlerImpl) UpdateFixedDepositItem(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.Atoi(chi.URLParam(r, "id"))
+
+	var input dto.FixedDepositItemDTO
+	err := h.App.ReadJSON(w, r, &input)
+	if err != nil {
+		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
+		return
+	}
+
+	validator := h.App.Validator().ValidateStruct(&input)
+	if !validator.Valid() {
+		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
+		return
+	}
+
+	res, err := h.service.UpdateFixedDepositItem(id, input)
+	if err != nil {
+		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
+		return
+	}
+
+	_ = h.App.WriteDataResponse(w, http.StatusOK, "FixedDepositItem updated successfuly", res)
+}
+
+func (h *fixeddeposititemHandlerImpl) DeleteFixedDepositItem(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.Atoi(chi.URLParam(r, "id"))
+
+	err := h.service.DeleteFixedDepositItem(id)
+	if err != nil {
+		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
+		return
+	}
+
+	_ = h.App.WriteSuccessResponse(w, http.StatusOK, "FixedDepositItem deleted successfuly")
+}
+
+func (h *fixeddeposititemHandlerImpl) GetFixedDepositItemById(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.Atoi(chi.URLParam(r, "id"))
+
+	res, err := h.service.GetFixedDepositItem(id)
+	if err != nil {
+		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
+		return
+	}
+
+	_ = h.App.WriteDataResponse(w, http.StatusOK, "", res)
+}
+
+func (h *fixeddeposititemHandlerImpl) GetFixedDepositItemList(w http.ResponseWriter, r *http.Request) {
+	var filter dto.FixedDepositItemFilterDTO
+
+	_ = h.App.ReadJSON(w, r, &filter)
+
+	validator := h.App.Validator().ValidateStruct(&filter)
+	if !validator.Valid() {
+		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
+		return
+	}
+
+	res, total, err := h.service.GetFixedDepositItemList(filter)
+	if err != nil {
+		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
+		return
+	}
+
+	_ = h.App.WriteDataResponseWithTotal(w, http.StatusOK, "", res, int(*total))
+}
