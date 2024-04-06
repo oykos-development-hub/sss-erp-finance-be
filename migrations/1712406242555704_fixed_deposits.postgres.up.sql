@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS fixed_deposits (
     date_of_case TIMESTAMP, --datum predemta
     date_of_finality TIMESTAMP, --datum pravosnaznosti
     date_of_enforceability TIMESTAMP, --datum izvrsnosti
+    date_of_end TIMESTAMP, -- datum zakljucenja
     account_id INTEGER,
     file_id INTEGER,
     status TEXT,

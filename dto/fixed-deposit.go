@@ -15,6 +15,7 @@ type FixedDepositDTO struct {
 	DateOfCase           *time.Time `json:"date_of_case"`
 	DateOfFinality       *time.Time `json:"date_of_finality"`
 	DateOfEnforceability *time.Time `json:"date_of_enforceability"`
+	DateOfEnd            *time.Time `json:"date_of_end"`
 	AccountID            int        `json:"account_id"`
 	Type                 string     `json:"type"`
 	FileID               int        `json:"file_id"`
@@ -31,6 +32,7 @@ type FixedDepositResponseDTO struct {
 	DateOfCase           *time.Time                        `json:"date_of_case"`
 	DateOfFinality       *time.Time                        `json:"date_of_finality"`
 	DateOfEnforceability *time.Time                        `json:"date_of_enforceability"`
+	DateOfEnd            *time.Time                        `json:"date_of_end"`
 	AccountID            int                               `json:"account_id"`
 	FileID               int                               `json:"file_id"`
 	Status               string                            `json:"status"`
@@ -64,6 +66,7 @@ func (dto FixedDepositDTO) ToFixedDeposit() *data.FixedDeposit {
 		DateOfCase:           dto.DateOfCase,
 		DateOfFinality:       dto.DateOfFinality,
 		DateOfEnforceability: dto.DateOfEnforceability,
+		DateOfEnd:            dto.DateOfEnd,
 		AccountID:            dto.AccountID,
 		Type:                 dto.Type,
 		FileID:               dto.FileID,
@@ -72,7 +75,7 @@ func (dto FixedDepositDTO) ToFixedDeposit() *data.FixedDeposit {
 }
 
 func ToFixedDepositResponseDTO(data data.FixedDeposit) FixedDepositResponseDTO {
-	return FixedDepositResponseDTO{
+	item := FixedDepositResponseDTO{
 		ID:                 data.ID,
 		OrganizationUnitID: data.OrganizationUnitID,
 		Subject:            data.Subject,
@@ -81,6 +84,7 @@ func ToFixedDepositResponseDTO(data data.FixedDeposit) FixedDepositResponseDTO {
 		DateOfRecipiet:     data.DateOfRecipiet,
 		DateOfCase:         data.DateOfCase,
 		DateOfFinality:     data.DateOfFinality,
+		DateOfEnd:          data.DateOfEnd,
 		AccountID:          data.AccountID,
 		FileID:             data.FileID,
 		Type:               data.Type,
@@ -88,6 +92,14 @@ func ToFixedDepositResponseDTO(data data.FixedDeposit) FixedDepositResponseDTO {
 		CreatedAt:          data.CreatedAt,
 		UpdatedAt:          data.UpdatedAt,
 	}
+
+	if data.DateOfEnd == nil {
+		item.Status = "U radu"
+	} else {
+		item.Status = "Zakljucen"
+	}
+
+	return item
 }
 
 func ToFixedDepositListResponseDTO(fixed_deposits []*data.FixedDeposit) []FixedDepositResponseDTO {

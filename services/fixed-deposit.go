@@ -148,7 +148,12 @@ func (h *FixedDepositServiceImpl) GetFixedDepositList(filter dto.FixedDepositFil
 	}
 
 	if filter.Status != nil {
-		conditionAndExp = up.And(conditionAndExp, &up.Cond{"status": *filter.Status})
+		switch *filter.Status {
+		case "U radu":
+			conditionAndExp = up.And(conditionAndExp, &up.Cond{"date_of_end is": nil})
+		case "Zaključen":
+			conditionAndExp = up.And(conditionAndExp, &up.Cond{"date_of_end is not": nil})
+		}
 	}
 
 	if filter.Subject != nil {

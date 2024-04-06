@@ -17,6 +17,7 @@ type FixedDeposit struct {
 	DateOfCase           *time.Time `db:"date_of_case"`
 	DateOfFinality       *time.Time `db:"date_of_finality"`
 	DateOfEnforceability *time.Time `db:"date_of_enforceability"`
+	DateOfEnd            *time.Time `db:"date_of_end"`
 	AccountID            int        `db:"account_id"`
 	FileID               int        `db:"file_id"`
 	Status               string     `db:"status"`
