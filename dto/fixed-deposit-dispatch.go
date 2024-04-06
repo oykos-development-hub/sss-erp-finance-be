@@ -11,7 +11,7 @@ type FixedDepositDispatchDTO struct {
 	CategoryID   int        `json:"category_id"`
 	TypeID       int        `json:"type_id"`
 	UnitID       int        `json:"unit_id"`
-	CurencyID    int        `json:"curency_id"`
+	CurrencyID   int        `json:"currency_id"`
 	Amount       float32    `json:"amount"`
 	SerialNumber string     `json:"serial_number"`
 	DateOfAction *time.Time `json:"date_of_action"`
@@ -28,7 +28,7 @@ type FixedDepositDispatchResponseDTO struct {
 	CategoryID   int        `json:"category_id"`
 	TypeID       int        `json:"type_id"`
 	UnitID       int        `json:"unit_id"`
-	CurencyID    int        `json:"curency_id"`
+	CurrencyID   int        `json:"currency_id"`
 	Amount       float32    `json:"amount"`
 	SerialNumber string     `json:"serial_number"`
 	DateOfAction *time.Time `json:"date_of_action"`
@@ -54,7 +54,7 @@ func (dto FixedDepositDispatchDTO) ToFixedDepositDispatch() *data.FixedDepositDi
 		CategoryID:   dto.CategoryID,
 		TypeID:       dto.TypeID,
 		UnitID:       dto.UnitID,
-		CurencyID:    dto.CurencyID,
+		CurrencyID:   dto.CurrencyID,
 		Amount:       dto.Amount,
 		SerialNumber: dto.SerialNumber,
 		DateOfAction: dto.DateOfAction,
@@ -73,7 +73,7 @@ func ToFixedDepositDispatchResponseDTO(data data.FixedDepositDispatch) FixedDepo
 		CategoryID:   data.CategoryID,
 		TypeID:       data.TypeID,
 		UnitID:       data.UnitID,
-		CurencyID:    data.CurencyID,
+		CurrencyID:   data.CurrencyID,
 		Amount:       data.Amount,
 		SerialNumber: data.SerialNumber,
 		DateOfAction: data.DateOfAction,
