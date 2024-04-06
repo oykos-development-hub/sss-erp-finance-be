@@ -51,6 +51,8 @@ type Models struct {
 		FixedDepositItem FixedDepositItem
 		FixedDepositDispatch FixedDepositDispatch
 		FixedDepositJudge FixedDepositJudge
+		FixedDepositWill FixedDepositWill
+		FixedDepositWillDispatch FixedDepositWillDispatch
 	}
 
 func New(databasePool *sql.DB) Models {
@@ -91,6 +93,8 @@ func New(databasePool *sql.DB) Models {
 		FixedDepositItem: FixedDepositItem{},
 		FixedDepositDispatch: FixedDepositDispatch{},
 		FixedDepositJudge: FixedDepositJudge{},
+		FixedDepositWill: FixedDepositWill{},
+		FixedDepositWillDispatch: FixedDepositWillDispatch{},
 	}
 }
 

@@ -135,6 +135,12 @@ func initApplication() *celeritas.Celeritas {
 	FixedDepositService := services.NewFixedDepositServiceImpl(cel, models.FixedDeposit, FixedDepositItemService, FixedDepositDispatchService, FixedDepositJudgeService)
 	FixedDepositHandler := handlers.NewFixedDepositHandler(cel, FixedDepositService)
 
+	FixedDepositWillDispatchService := services.NewFixedDepositWillDispatchServiceImpl(cel, models.FixedDepositWillDispatch)
+	FixedDepositWillDispatchHandler := handlers.NewFixedDepositWillDispatchHandler(cel, FixedDepositWillDispatchService)
+
+	FixedDepositWillService := services.NewFixedDepositWillServiceImpl(cel, models.FixedDepositWill, FixedDepositJudgeService, FixedDepositWillDispatchService)
+	FixedDepositWillHandler := handlers.NewFixedDepositWillHandler(cel, FixedDepositWillService)
+
 	myHandlers := &handlers.Handlers{
 		InvoiceHandler: InvoiceHandler,
 		ArticleHandler: ArticleHandler,
@@ -162,15 +168,17 @@ func initApplication() *celeritas.Celeritas {
 		FlatRatePaymentHandler:      FlatRatePaymentHandler,
 		AdditionalExpenseHandler:    AdditionalExpenseHandler,
 
-		PropBenConfHandler:             PropBenConfHandler,
-		PropBenConfPaymentHandler:      PropBenConfPaymentHandler,
-		TaxAuthorityCodebookHandler:    TaxAuthorityCodebookHandler,
-		SalaryHandler:                  SalaryHandler,
-		SalaryAdditionalExpenseHandler: SalaryAdditionalExpenseHandler,
-		FixedDepositHandler:            FixedDepositHandler,
-		FixedDepositItemHandler:        FixedDepositItemHandler,
-		FixedDepositDispatchHandler:    FixedDepositDispatchHandler,
-		FixedDepositJudgeHandler:       FixedDepositJudgeHandler,
+		PropBenConfHandler:              PropBenConfHandler,
+		PropBenConfPaymentHandler:       PropBenConfPaymentHandler,
+		TaxAuthorityCodebookHandler:     TaxAuthorityCodebookHandler,
+		SalaryHandler:                   SalaryHandler,
+		SalaryAdditionalExpenseHandler:  SalaryAdditionalExpenseHandler,
+		FixedDepositHandler:             FixedDepositHandler,
+		FixedDepositItemHandler:         FixedDepositItemHandler,
+		FixedDepositDispatchHandler:     FixedDepositDispatchHandler,
+		FixedDepositJudgeHandler:        FixedDepositJudgeHandler,
+		FixedDepositWillHandler:         FixedDepositWillHandler,
+		FixedDepositWillDispatchHandler: FixedDepositWillDispatchHandler,
 	}
 
 	myMiddleware := &middleware.Middleware{

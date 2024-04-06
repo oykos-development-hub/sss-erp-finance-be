@@ -192,6 +192,18 @@ rt.Get("/fixed-deposit-judges/{id}", handlers.FixedDepositJudgeHandler.GetFixedD
 rt.Get("/fixed-deposit-judges", handlers.FixedDepositJudgeHandler.GetFixedDepositJudgeList)
 rt.Put("/fixed-deposit-judges/{id}", handlers.FixedDepositJudgeHandler.UpdateFixedDepositJudge)
 rt.Delete("/fixed-deposit-judges/{id}", handlers.FixedDepositJudgeHandler.DeleteFixedDepositJudge)
+	
+		rt.Post("/fixed-deposit-wills", handlers.FixedDepositWillHandler.CreateFixedDepositWill)
+rt.Get("/fixed-deposit-wills/{id}", handlers.FixedDepositWillHandler.GetFixedDepositWillById)
+rt.Get("/fixed-deposit-wills", handlers.FixedDepositWillHandler.GetFixedDepositWillList)
+rt.Put("/fixed-deposit-wills/{id}", handlers.FixedDepositWillHandler.UpdateFixedDepositWill)
+rt.Delete("/fixed-deposit-wills/{id}", handlers.FixedDepositWillHandler.DeleteFixedDepositWill)
+	
+		rt.Post("/fixed-deposit-will-dispatches", handlers.FixedDepositWillDispatchHandler.CreateFixedDepositWillDispatch)
+rt.Get("/fixed-deposit-will-dispatches/{id}", handlers.FixedDepositWillDispatchHandler.GetFixedDepositWillDispatchById)
+rt.Get("/fixed-deposit-will-dispatches", handlers.FixedDepositWillDispatchHandler.GetFixedDepositWillDispatchList)
+rt.Put("/fixed-deposit-will-dispatches/{id}", handlers.FixedDepositWillDispatchHandler.UpdateFixedDepositWillDispatch)
+rt.Delete("/fixed-deposit-will-dispatches/{id}", handlers.FixedDepositWillDispatchHandler.DeleteFixedDepositWillDispatch)
 	})
 
 	return app.Routes

@@ -6,34 +6,27 @@ import (
 	up "github.com/upper/db/v4"
 )
 
-// FixedDeposit struct
-type FixedDeposit struct {
-	ID                   int        `db:"id,omitempty"`
-	OrganizationUnitID   int        `db:"organization_unit_id"`
-	JudgeID              int        `db:"judge_id"`
-	Subject              string     `db:"subject"`
-	CaseNumber           string     `db:"case_number"`
-	DateOfRecipiet       *time.Time `db:"date_of_recipiet"`
-	DateOfCase           *time.Time `db:"date_of_case"`
-	DateOfFinality       *time.Time `db:"date_of_finality"`
-	DateOfEnforceability *time.Time `db:"date_of_enforceability"`
-	DateOfEnd            *time.Time `db:"date_of_end"`
-	AccountID            int        `db:"account_id"`
-	FileID               int        `db:"file_id"`
-	Type                 string     `db:"type"`
-	CreatedAt            time.Time  `db:"created_at,omitempty"`
-	UpdatedAt            time.Time  `db:"updated_at"`
+// FixedDepositWillDispatch struct
+type FixedDepositWillDispatch struct {
+	ID             int       `db:"id,omitempty"`
+	WillID         int       `db:"will_id"`
+	DispatchTypeID int       `db:"dispatch_type_id"`
+	JudgeID        int       `db:"judge_id"`
+	CaseNumber     string    `db:"case_number"`
+	DateOfDispatch time.Time `db:"date_of_dispatch"`
+	CreatedAt      time.Time `db:"created_at,omitempty"`
+	UpdatedAt      time.Time `db:"updated_at"`
 }
 
 // Table returns the table name
-func (t *FixedDeposit) Table() string {
-	return "fixed_deposits"
+func (t *FixedDepositWillDispatch) Table() string {
+	return "fixed_deposit_will_dispatches"
 }
 
 // GetAll gets all records from the database, using upper
-func (t *FixedDeposit) GetAll(page *int, size *int, condition *up.AndExpr, orders []interface{}) ([]*FixedDeposit, *uint64, error) {
+func (t *FixedDepositWillDispatch) GetAll(page *int, size *int, condition *up.AndExpr, orders []interface{}) ([]*FixedDepositWillDispatch, *uint64, error) {
 	collection := Upper.Collection(t.Table())
-	var all []*FixedDeposit
+	var all []*FixedDepositWillDispatch
 	var res up.Result
 
 	if condition != nil {
@@ -59,8 +52,8 @@ func (t *FixedDeposit) GetAll(page *int, size *int, condition *up.AndExpr, order
 }
 
 // Get gets one record from the database, by id, using upper
-func (t *FixedDeposit) Get(id int) (*FixedDeposit, error) {
-	var one FixedDeposit
+func (t *FixedDepositWillDispatch) Get(id int) (*FixedDepositWillDispatch, error) {
+	var one FixedDepositWillDispatch
 	collection := Upper.Collection(t.Table())
 
 	res := collection.Find(up.Cond{"id": id})
@@ -72,7 +65,7 @@ func (t *FixedDeposit) Get(id int) (*FixedDeposit, error) {
 }
 
 // Update updates a record in the database, using upper
-func (t *FixedDeposit) Update(tx up.Session, m FixedDeposit) error {
+func (t *FixedDepositWillDispatch) Update(tx up.Session, m FixedDepositWillDispatch) error {
 	m.UpdatedAt = time.Now()
 	collection := tx.Collection(t.Table())
 	res := collection.Find(m.ID)
@@ -84,7 +77,7 @@ func (t *FixedDeposit) Update(tx up.Session, m FixedDeposit) error {
 }
 
 // Delete deletes a record from the database by id, using upper
-func (t *FixedDeposit) Delete(id int) error {
+func (t *FixedDepositWillDispatch) Delete(id int) error {
 	collection := Upper.Collection(t.Table())
 	res := collection.Find(id)
 	err := res.Delete()
@@ -95,7 +88,7 @@ func (t *FixedDeposit) Delete(id int) error {
 }
 
 // Insert inserts a model into the database, using upper
-func (t *FixedDeposit) Insert(tx up.Session, m FixedDeposit) (int, error) {
+func (t *FixedDepositWillDispatch) Insert(tx up.Session, m FixedDepositWillDispatch) (int, error) {
 	m.CreatedAt = time.Now()
 	m.UpdatedAt = time.Now()
 	collection := tx.Collection(t.Table())

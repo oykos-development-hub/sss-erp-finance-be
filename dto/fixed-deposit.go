@@ -70,7 +70,6 @@ func (dto FixedDepositDTO) ToFixedDeposit() *data.FixedDeposit {
 		AccountID:            dto.AccountID,
 		Type:                 dto.Type,
 		FileID:               dto.FileID,
-		Status:               dto.Status,
 	}
 }
 
@@ -88,7 +87,6 @@ func ToFixedDepositResponseDTO(data data.FixedDeposit) FixedDepositResponseDTO {
 		AccountID:          data.AccountID,
 		FileID:             data.FileID,
 		Type:               data.Type,
-		Status:             data.Status,
 		CreatedAt:          data.CreatedAt,
 		UpdatedAt:          data.UpdatedAt,
 	}

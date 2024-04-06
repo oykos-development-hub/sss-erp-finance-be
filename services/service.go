@@ -269,3 +269,19 @@ type FixedDepositJudgeService interface {
 	GetFixedDepositJudge(id int) (*dto.FixedDepositJudgeResponseDTO, error)
 	GetFixedDepositJudgeList(filter dto.FixedDepositJudgeFilterDTO) ([]dto.FixedDepositJudgeResponseDTO, *uint64, error)
 }
+
+type FixedDepositWillService interface {
+	CreateFixedDepositWill(input dto.FixedDepositWillDTO) (*dto.FixedDepositWillResponseDTO, error)
+	UpdateFixedDepositWill(id int, input dto.FixedDepositWillDTO) (*dto.FixedDepositWillResponseDTO, error)
+	DeleteFixedDepositWill(id int) error
+	GetFixedDepositWill(id int) (*dto.FixedDepositWillResponseDTO, error)
+	GetFixedDepositWillList(filter dto.FixedDepositWillFilterDTO) ([]dto.FixedDepositWillResponseDTO, *uint64, error)
+}
+
+type FixedDepositWillDispatchService interface {
+	CreateFixedDepositWillDispatch(input dto.FixedDepositWillDispatchDTO) (*dto.FixedDepositWillDispatchResponseDTO, error)
+	UpdateFixedDepositWillDispatch(id int, input dto.FixedDepositWillDispatchDTO) (*dto.FixedDepositWillDispatchResponseDTO, error)
+	DeleteFixedDepositWillDispatch(id int) error
+	GetFixedDepositWillDispatch(id int) (*dto.FixedDepositWillDispatchResponseDTO, error)
+	GetFixedDepositWillDispatchList(filter dto.FixedDepositWillDispatchFilterDTO) ([]dto.FixedDepositWillDispatchResponseDTO, *uint64, error)
+}

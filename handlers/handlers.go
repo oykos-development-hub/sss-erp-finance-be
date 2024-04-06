@@ -33,6 +33,8 @@ type Handlers struct {
 		FixedDepositItemHandler FixedDepositItemHandler
 		FixedDepositDispatchHandler FixedDepositDispatchHandler
 		FixedDepositJudgeHandler FixedDepositJudgeHandler
+		FixedDepositWillHandler FixedDepositWillHandler
+		FixedDepositWillDispatchHandler FixedDepositWillDispatchHandler
 	}
 
 type InvoiceHandler interface {
@@ -277,4 +279,20 @@ type FixedDepositJudgeHandler interface {
 	DeleteFixedDepositJudge(w http.ResponseWriter, r *http.Request)
 	GetFixedDepositJudgeById(w http.ResponseWriter, r *http.Request)
 	GetFixedDepositJudgeList(w http.ResponseWriter, r *http.Request)
+}
+
+type FixedDepositWillHandler interface {
+	CreateFixedDepositWill(w http.ResponseWriter, r *http.Request)
+	UpdateFixedDepositWill(w http.ResponseWriter, r *http.Request)
+	DeleteFixedDepositWill(w http.ResponseWriter, r *http.Request)
+	GetFixedDepositWillById(w http.ResponseWriter, r *http.Request)
+	GetFixedDepositWillList(w http.ResponseWriter, r *http.Request)
+}
+
+type FixedDepositWillDispatchHandler interface {
+	CreateFixedDepositWillDispatch(w http.ResponseWriter, r *http.Request)
+	UpdateFixedDepositWillDispatch(w http.ResponseWriter, r *http.Request)
+	DeleteFixedDepositWillDispatch(w http.ResponseWriter, r *http.Request)
+	GetFixedDepositWillDispatchById(w http.ResponseWriter, r *http.Request)
+	GetFixedDepositWillDispatchList(w http.ResponseWriter, r *http.Request)
 }
