@@ -19,6 +19,7 @@ type FixedDepositItem struct {
 	DateOfConfiscation *time.Time `db:"date_of_confiscation"`
 	CaseNumber         string     `db:"case_number"`
 	JudgeID            int        `db:"judge_id"`
+	FileID             int        `db:"file_id"`
 	CreatedAt          time.Time  `db:"created_at,omitempty"`
 	UpdatedAt          time.Time  `db:"updated_at"`
 }

@@ -14,6 +14,7 @@ type FixedDepositJudge struct {
 	WillID      int        `db:"will_id"`
 	DateOfStart time.Time  `db:"date_of_start"`
 	DateOfEnd   *time.Time `db:"date_of_end"`
+	FileID      int        `db:"file_id"`
 	CreatedAt   time.Time  `db:"created_at,omitempty"`
 	UpdatedAt   time.Time  `db:"updated_at"`
 }

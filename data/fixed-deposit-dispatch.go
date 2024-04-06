@@ -21,6 +21,7 @@ type FixedDepositDispatch struct {
 	ActionID     int        `db:"action_id"`
 	CaseNumber   string     `db:"case_number"`
 	JudgeID      int        `db:"judge_id"`
+	FileID       int        `db:"file_id"`
 	CreatedAt    time.Time  `db:"created_at,omitempty"`
 	UpdatedAt    time.Time  `db:"updated_at"`
 }

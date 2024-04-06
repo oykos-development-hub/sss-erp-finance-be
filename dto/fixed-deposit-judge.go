@@ -12,6 +12,7 @@ type FixedDepositJudgeDTO struct {
 	WillID      int        `json:"will_id"`
 	DateOfStart time.Time  `json:"date_of_start"`
 	DateOfEnd   *time.Time `json:"date_of_end"`
+	FileID      int        `json:"file_id"`
 }
 
 type FixedDepositJudgeResponseDTO struct {
@@ -21,6 +22,7 @@ type FixedDepositJudgeResponseDTO struct {
 	WillID      int        `json:"will_id"`
 	DateOfStart time.Time  `json:"date_of_start"`
 	DateOfEnd   *time.Time `json:"date_of_end"`
+	FileID      int        `json:"file_id"`
 	CreatedAt   time.Time  `json:"created_at"`
 	UpdatedAt   time.Time  `json:"updated_at"`
 }
@@ -40,6 +42,7 @@ func (dto FixedDepositJudgeDTO) ToFixedDepositJudge() *data.FixedDepositJudge {
 		WillID:      dto.WillID,
 		DateOfStart: dto.DateOfStart,
 		DateOfEnd:   dto.DateOfEnd,
+		FileID:      dto.FileID,
 	}
 }
 
@@ -51,6 +54,7 @@ func ToFixedDepositJudgeResponseDTO(data data.FixedDepositJudge) FixedDepositJud
 		WillID:      data.WillID,
 		DateOfStart: data.DateOfStart,
 		DateOfEnd:   data.DateOfEnd,
+		FileID:      data.FileID,
 		CreatedAt:   data.CreatedAt,
 		UpdatedAt:   data.UpdatedAt,
 	}

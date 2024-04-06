@@ -17,6 +17,7 @@ type FixedDepositItemDTO struct {
 	DateOfConfiscation *time.Time `json:"date_of_confiscation"`
 	CaseNumber         string     `json:"case_number"`
 	JudgeID            int        `json:"judge_id"`
+	FileID             int        `json:"file_id"`
 }
 
 type FixedDepositItemResponseDTO struct {
@@ -31,6 +32,7 @@ type FixedDepositItemResponseDTO struct {
 	DateOfConfiscation *time.Time `json:"date_of_confiscation"`
 	CaseNumber         string     `json:"case_number"`
 	JudgeID            int        `json:"judge_id"`
+	FileID             int        `json:"file_id"`
 	CreatedAt          time.Time  `json:"created_at"`
 	UpdatedAt          time.Time  `json:"updated_at"`
 }
@@ -54,6 +56,7 @@ func (dto FixedDepositItemDTO) ToFixedDepositItem() *data.FixedDepositItem {
 		DateOfConfiscation: dto.DateOfConfiscation,
 		CaseNumber:         dto.CaseNumber,
 		JudgeID:            dto.JudgeID,
+		FileID:             dto.FileID,
 	}
 }
 
@@ -70,6 +73,7 @@ func ToFixedDepositItemResponseDTO(data data.FixedDepositItem) FixedDepositItemR
 		DateOfConfiscation: data.DateOfConfiscation,
 		CaseNumber:         data.CaseNumber,
 		JudgeID:            data.JudgeID,
+		FileID:             data.FileID,
 		CreatedAt:          data.CreatedAt,
 		UpdatedAt:          data.UpdatedAt,
 	}
