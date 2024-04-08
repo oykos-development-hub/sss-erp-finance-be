@@ -7,6 +7,7 @@ import (
 )
 
 type SalaryAdditionalExpenseDTO struct {
+	ID                 int     `json:"id"`
 	SalaryID           int     `json:"salary_id"`
 	AccountID          int     `json:"account_id"`
 	Amount             float64 `json:"amount"`

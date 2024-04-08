@@ -67,11 +67,59 @@ func (h *SalaryServiceImpl) UpdateSalary(id int, input dto.SalaryDTO) (*dto.Sala
 	dataToInsert := input.ToSalary()
 	dataToInsert.ID = id
 
-	err := data.Upper.Tx(func(tx up.Session) error {
+	oldData, err := h.GetSalary(id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	err = data.Upper.Tx(func(tx up.Session) error {
 		err := h.repo.Update(tx, *dataToInsert)
 		if err != nil {
 			return errors.ErrInternalServer
 		}
+
+		validExpenses := make(map[int]bool)
+
+		for _, item := range oldData.SalaryAdditionalExpenses {
+			validExpenses[item.ID] = false
+		}
+
+		for _, item := range input.SalaryAdditionalExpenses {
+			_, exists := validExpenses[item.ID]
+			if exists {
+				validExpenses[item.ID] = true
+			} else {
+				additionalExpenseData := item.ToSalaryAdditionalExpense()
+				_, err = h.salaryAdditionalExpenseRepo.Insert(tx, *additionalExpenseData)
+
+				if err != nil {
+					return err
+				}
+			}
+		}
+
+		for itemID, exists := range validExpenses {
+			if !exists {
+				err := h.salaryAdditionalExpenseRepo.Delete(itemID)
+
+				if err != nil {
+					return err
+				}
+			} else {
+				for _, item := range input.SalaryAdditionalExpenses {
+					if item.ID == itemID {
+						additionalExpenseData := item.ToSalaryAdditionalExpense()
+						additionalExpenseData.ID = id
+						err := h.salaryAdditionalExpenseRepo.Update(tx, *additionalExpenseData)
+						if err != nil {
+							return err
+						}
+					}
+				}
+			}
+		}
+
 		return nil
 	})
 	if err != nil {
