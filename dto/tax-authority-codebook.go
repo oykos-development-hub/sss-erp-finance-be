@@ -31,6 +31,9 @@ type TaxAuthorityCodebookDTO struct {
 	PreviousIncomePercentageLessThan1000 float64 `json:"previous_income_percentage_less_than_1000"`
 	PreviousIncomePercentageMoreThan1000 float64 `json:"previous_income_percentage_more_than_1000"`
 	Coefficient                          float64 `json:"coefficient"`
+	CoefficientLess700                   float64 `json:"coefficient_less_700"`
+	CoefficientLess1000                  float64 `json:"coefficient_less_1000"`
+	CoefficientMore1000                  float64 `json:"coefficient_more_1000"`
 }
 
 type TaxAuthorityCodebookResponseDTO struct {
@@ -59,6 +62,9 @@ type TaxAuthorityCodebookResponseDTO struct {
 	PreviousIncomePercentageLessThan1000 float64   `json:"previous_income_percentage_less_than_1000"`
 	PreviousIncomePercentageMoreThan1000 float64   `json:"previous_income_percentage_more_than_1000"`
 	Coefficient                          float64   `json:"coefficient"`
+	CoefficientLess700                   float64   `json:"coefficient_less_700"`
+	CoefficientLess1000                  float64   `json:"coefficient_less_1000"`
+	CoefficientMore1000                  float64   `json:"coefficient_more_1000"`
 	CreatedAt                            time.Time `json:"created_at"`
 	UpdatedAt                            time.Time `json:"updated_at"`
 }
@@ -96,6 +102,10 @@ func (dto TaxAuthorityCodebookDTO) ToTaxAuthorityCodebook() *data.TaxAuthorityCo
 		PreviousIncomePercentageLessThan1000: dto.PreviousIncomePercentageLessThan1000,
 		PreviousIncomePercentageMoreThan1000: dto.PreviousIncomePercentageMoreThan1000,
 		Coefficient:                          dto.Coefficient,
+		Active:                               dto.Active,
+		CoefficientLess700:                   dto.CoefficientLess700,
+		CoefficientLess1000:                  dto.CoefficientLess1000,
+		CoefficientMore1000:                  dto.CoefficientMore1000,
 	}
 }
 
@@ -125,6 +135,10 @@ func ToTaxAuthorityCodebookResponseDTO(data data.TaxAuthorityCodebook) TaxAuthor
 		PreviousIncomePercentageLessThan1000: data.PreviousIncomePercentageLessThan1000,
 		PreviousIncomePercentageMoreThan1000: data.PreviousIncomePercentageMoreThan1000,
 		Coefficient:                          data.Coefficient,
+		Active:                               data.Active,
+		CoefficientLess700:                   data.CoefficientLess700,
+		CoefficientLess1000:                  data.CoefficientLess1000,
+		CoefficientMore1000:                  data.CoefficientMore1000,
 		CreatedAt:                            data.CreatedAt,
 		UpdatedAt:                            data.UpdatedAt,
 	}

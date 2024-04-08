@@ -33,6 +33,9 @@ type TaxAuthorityCodebook struct {
 	PreviousIncomePercentageLessThan1000 float64   `db:"previous_income_percentage_less_than_1000"`
 	PreviousIncomePercentageMoreThan1000 float64   `db:"previous_income_percentage_more_than_1000"`
 	Coefficient                          float64   `db:"coefficient"`
+	CoefficientLess700                   float64   `db:"coefficient_less_700"`
+	CoefficientLess1000                  float64   `db:"coefficient_less_1000"`
+	CoefficientMore1000                  float64   `db:"coefficient_more_1000"`
 	CreatedAt                            time.Time `db:"created_at,omitempty"`
 	UpdatedAt                            time.Time `db:"updated_at"`
 }

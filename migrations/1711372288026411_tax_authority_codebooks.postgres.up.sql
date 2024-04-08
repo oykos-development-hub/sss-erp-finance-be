@@ -24,6 +24,9 @@ CREATE TABLE IF NOT EXISTS tax_authority_codebooks (
     previous_income_percentage_less_than_1000 FLOAT,
     previous_income_percentage_more_than_1000 FLOAT,
     coefficient FLOAT,
+    coefficient_less_700 FLOAT,
+    coefficient_less_1000 FLOAT,
+    coefficient_more_1000 FLOAT,
     created_at TIMESTAMP,
     updated_at TIMESTAMP
 );
