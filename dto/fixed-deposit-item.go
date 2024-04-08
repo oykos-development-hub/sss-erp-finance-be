@@ -10,8 +10,8 @@ type FixedDepositItemDTO struct {
 	DepositID          int        `json:"deposit_id"`
 	CategoryID         int        `json:"category_id"`
 	TypeID             int        `json:"type_id"`
-	UnitID             int        `json:"unit_id"`
-	CurrencyID         int        `json:"currency_id"`
+	Unit               string     `json:"unit"`
+	Currency           string     `json:"currency"`
 	Amount             float32    `json:"amount"`
 	SerialNumber       string     `json:"serial_number"`
 	DateOfConfiscation *time.Time `json:"date_of_confiscation"`
@@ -25,8 +25,8 @@ type FixedDepositItemResponseDTO struct {
 	DepositID          int        `json:"deposit_id"`
 	CategoryID         int        `json:"category_id"`
 	TypeID             int        `json:"type_id"`
-	UnitID             int        `json:"unit_id"`
-	CurrencyID         int        `json:"currency_id"`
+	Unit               string     `json:"unit"`
+	Currency           string     `json:"currency"`
 	Amount             float32    `json:"amount"`
 	SerialNumber       string     `json:"serial_number"`
 	DateOfConfiscation *time.Time `json:"date_of_confiscation"`
@@ -49,9 +49,7 @@ func (dto FixedDepositItemDTO) ToFixedDepositItem() *data.FixedDepositItem {
 		DepositID:          dto.DepositID,
 		CategoryID:         dto.CategoryID,
 		TypeID:             dto.TypeID,
-		CurrencyID:         dto.CurrencyID,
-		UnitID:             dto.UnitID,
-		Amount:             dto.Amount,
+		Currency:           dto.Currency,
 		SerialNumber:       dto.SerialNumber,
 		DateOfConfiscation: dto.DateOfConfiscation,
 		CaseNumber:         dto.CaseNumber,
@@ -65,9 +63,9 @@ func ToFixedDepositItemResponseDTO(data data.FixedDepositItem) FixedDepositItemR
 		ID:                 data.ID,
 		DepositID:          data.DepositID,
 		CategoryID:         data.CategoryID,
-		CurrencyID:         data.CurrencyID,
+		Currency:           data.Currency,
 		TypeID:             data.TypeID,
-		UnitID:             data.UnitID,
+		Unit:               data.Unit,
 		Amount:             data.Amount,
 		SerialNumber:       data.SerialNumber,
 		DateOfConfiscation: data.DateOfConfiscation,

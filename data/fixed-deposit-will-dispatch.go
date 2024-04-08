@@ -10,7 +10,7 @@ import (
 type FixedDepositWillDispatch struct {
 	ID             int       `db:"id,omitempty"`
 	WillID         int       `db:"will_id"`
-	DispatchTypeID int       `db:"dispatch_type_id"`
+	DispatchType   string    `db:"dispatch_type"`
 	JudgeID        int       `db:"judge_id"`
 	CaseNumber     string    `db:"case_number"`
 	DateOfDispatch time.Time `db:"date_of_dispatch"`

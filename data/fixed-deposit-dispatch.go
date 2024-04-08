@@ -12,13 +12,13 @@ type FixedDepositDispatch struct {
 	DepositID    int        `db:"deposit_id"`
 	CategoryID   int        `db:"category_id"`
 	TypeID       int        `db:"type_id"`
-	UnitID       int        `db:"unit_id"`
-	CurrencyID   int        `db:"currency_id"`
+	Unit         string     `db:"unit"`
+	Currency     string     `db:"currency"`
 	Amount       float32    `db:"amount"`
 	SerialNumber string     `db:"serial_number"`
 	DateOfAction *time.Time `db:"date_of_action"`
 	Subject      string     `db:"subject"`
-	ActionID     int        `db:"action_id"`
+	Action       string     `db:"action"`
 	CaseNumber   string     `db:"case_number"`
 	JudgeID      int        `db:"judge_id"`
 	FileID       int        `db:"file_id"`

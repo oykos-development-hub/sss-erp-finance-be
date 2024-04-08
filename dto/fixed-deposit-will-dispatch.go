@@ -8,7 +8,7 @@ import (
 
 type FixedDepositWillDispatchDTO struct {
 	WillID         int       `json:"will_id"`
-	DispatchTypeID int       `json:"dispatch_type_id"`
+	DispatchType   string    `json:"dispatch_type"`
 	JudgeID        int       `json:"judge_id"`
 	CaseNumber     string    `json:"case_number"`
 	DateOfDispatch time.Time `json:"date_of_dispatch"`
@@ -18,7 +18,7 @@ type FixedDepositWillDispatchDTO struct {
 type FixedDepositWillDispatchResponseDTO struct {
 	ID             int       `json:"id"`
 	WillID         int       `json:"will_id"`
-	DispatchTypeID int       `json:"dispatch_type_id"`
+	DispatchType   string    `json:"dispatch_type"`
 	JudgeID        int       `json:"judge_id"`
 	CaseNumber     string    `json:"case_number"`
 	DateOfDispatch time.Time `json:"date_of_dispatch"`
@@ -37,7 +37,7 @@ type FixedDepositWillDispatchFilterDTO struct {
 func (dto FixedDepositWillDispatchDTO) ToFixedDepositWillDispatch() *data.FixedDepositWillDispatch {
 	return &data.FixedDepositWillDispatch{
 		WillID:         dto.WillID,
-		DispatchTypeID: dto.DispatchTypeID,
+		DispatchType:   dto.DispatchType,
 		JudgeID:        dto.JudgeID,
 		CaseNumber:     dto.CaseNumber,
 		DateOfDispatch: dto.DateOfDispatch,
@@ -49,7 +49,7 @@ func ToFixedDepositWillDispatchResponseDTO(data data.FixedDepositWillDispatch) F
 	return FixedDepositWillDispatchResponseDTO{
 		ID:             data.ID,
 		WillID:         data.WillID,
-		DispatchTypeID: data.DispatchTypeID,
+		DispatchType:   data.DispatchType,
 		JudgeID:        data.JudgeID,
 		CaseNumber:     data.CaseNumber,
 		DateOfDispatch: data.DateOfDispatch,

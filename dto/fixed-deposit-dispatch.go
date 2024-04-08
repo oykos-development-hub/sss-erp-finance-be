@@ -10,13 +10,13 @@ type FixedDepositDispatchDTO struct {
 	DepositID    int        `json:"deposit_id"`
 	CategoryID   int        `json:"category_id"`
 	TypeID       int        `json:"type_id"`
-	UnitID       int        `json:"unit_id"`
-	CurrencyID   int        `json:"currency_id"`
+	Unit         string     `json:"unit"`
+	Currency     string     `json:"currency"`
 	Amount       float32    `json:"amount"`
 	SerialNumber string     `json:"serial_number"`
 	DateOfAction *time.Time `json:"date_of_action"`
 	Subject      string     `json:"subject"`
-	ActionID     int        `json:"action_id"`
+	Action       string     `json:"action"`
 	CaseNumber   string     `json:"case_number"`
 	JudgeID      int        `json:"judge_id"`
 	FileID       int        `json:"file_id"`
@@ -27,13 +27,13 @@ type FixedDepositDispatchResponseDTO struct {
 	DepositID    int        `json:"deposit_id"`
 	CategoryID   int        `json:"category_id"`
 	TypeID       int        `json:"type_id"`
-	UnitID       int        `json:"unit_id"`
-	CurrencyID   int        `json:"currency_id"`
+	Unit         string     `json:"unit"`
+	Currency     string     `json:"currency"`
 	Amount       float32    `json:"amount"`
 	SerialNumber string     `json:"serial_number"`
 	DateOfAction *time.Time `json:"date_of_action"`
 	Subject      string     `json:"subject"`
-	ActionID     int        `json:"action_id"`
+	Action       string     `json:"action"`
 	CaseNumber   string     `json:"case_number"`
 	JudgeID      int        `json:"judge_id"`
 	FileID       int        `json:"file_id"`
@@ -53,13 +53,13 @@ func (dto FixedDepositDispatchDTO) ToFixedDepositDispatch() *data.FixedDepositDi
 		DepositID:    dto.DepositID,
 		CategoryID:   dto.CategoryID,
 		TypeID:       dto.TypeID,
-		UnitID:       dto.UnitID,
-		CurrencyID:   dto.CurrencyID,
+		Unit:         dto.Unit,
+		Currency:     dto.Currency,
 		Amount:       dto.Amount,
 		SerialNumber: dto.SerialNumber,
 		DateOfAction: dto.DateOfAction,
 		Subject:      dto.Subject,
-		ActionID:     dto.ActionID,
+		Action:       dto.Action,
 		CaseNumber:   dto.CaseNumber,
 		FileID:       dto.FileID,
 		JudgeID:      dto.JudgeID,
@@ -72,13 +72,13 @@ func ToFixedDepositDispatchResponseDTO(data data.FixedDepositDispatch) FixedDepo
 		DepositID:    data.DepositID,
 		CategoryID:   data.CategoryID,
 		TypeID:       data.TypeID,
-		UnitID:       data.UnitID,
-		CurrencyID:   data.CurrencyID,
+		Unit:         data.Unit,
+		Currency:     data.Currency,
 		Amount:       data.Amount,
 		SerialNumber: data.SerialNumber,
 		DateOfAction: data.DateOfAction,
 		Subject:      data.Subject,
-		ActionID:     data.ActionID,
+		Action:       data.Action,
 		CaseNumber:   data.CaseNumber,
 		JudgeID:      data.JudgeID,
 		FileID:       data.FileID,
