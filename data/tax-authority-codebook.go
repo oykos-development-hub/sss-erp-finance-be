@@ -36,6 +36,7 @@ type TaxAuthorityCodebook struct {
 	CoefficientLess700                   float64   `db:"coefficient_less_700"`
 	CoefficientLess1000                  float64   `db:"coefficient_less_1000"`
 	CoefficientMore1000                  float64   `db:"coefficient_more_1000"`
+	IncludeSubtax                        bool      `db:"include_subtax"`
 	CreatedAt                            time.Time `db:"created_at,omitempty"`
 	UpdatedAt                            time.Time `db:"updated_at"`
 }

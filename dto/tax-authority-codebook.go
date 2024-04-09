@@ -34,6 +34,7 @@ type TaxAuthorityCodebookDTO struct {
 	CoefficientLess700                   float64 `json:"coefficient_less_700"`
 	CoefficientLess1000                  float64 `json:"coefficient_less_1000"`
 	CoefficientMore1000                  float64 `json:"coefficient_more_1000"`
+	IncludeSubtax                        bool    `json:"include_subtax"`
 }
 
 type TaxAuthorityCodebookResponseDTO struct {
@@ -65,6 +66,7 @@ type TaxAuthorityCodebookResponseDTO struct {
 	CoefficientLess700                   float64   `json:"coefficient_less_700"`
 	CoefficientLess1000                  float64   `json:"coefficient_less_1000"`
 	CoefficientMore1000                  float64   `json:"coefficient_more_1000"`
+	IncludeSubtax                        bool      `json:"include_subtax"`
 	CreatedAt                            time.Time `json:"created_at"`
 	UpdatedAt                            time.Time `json:"updated_at"`
 }
@@ -106,6 +108,7 @@ func (dto TaxAuthorityCodebookDTO) ToTaxAuthorityCodebook() *data.TaxAuthorityCo
 		CoefficientLess700:                   dto.CoefficientLess700,
 		CoefficientLess1000:                  dto.CoefficientLess1000,
 		CoefficientMore1000:                  dto.CoefficientMore1000,
+		IncludeSubtax:                        dto.IncludeSubtax,
 	}
 }
 
@@ -139,6 +142,7 @@ func ToTaxAuthorityCodebookResponseDTO(data data.TaxAuthorityCodebook) TaxAuthor
 		CoefficientLess700:                   data.CoefficientLess700,
 		CoefficientLess1000:                  data.CoefficientLess1000,
 		CoefficientMore1000:                  data.CoefficientMore1000,
+		IncludeSubtax:                        data.IncludeSubtax,
 		CreatedAt:                            data.CreatedAt,
 		UpdatedAt:                            data.UpdatedAt,
 	}
