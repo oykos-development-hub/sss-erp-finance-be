@@ -31,24 +31,20 @@ func (h *SalaryServiceImpl) CreateSalary(input dto.SalaryDTO) (*dto.SalaryRespon
 	dataToInsert := input.ToSalary()
 
 	var id int
-	err := data.Upper.Tx(func(tx up.Session) error {
-		var err error
-		id, err = h.repo.Insert(tx, *dataToInsert)
+	var err error
+	id, err = h.repo.Insert(data.Upper, *dataToInsert)
+	if err != nil {
+		return nil, errors.ErrInternalServer
+	}
+
+	for _, additionalExpense := range input.SalaryAdditionalExpenses {
+		additionalExpenseData := additionalExpense.ToSalaryAdditionalExpense()
+		additionalExpenseData.SalaryID = id
+		_, err = h.salaryAdditionalExpenseRepo.Insert(data.Upper, *additionalExpenseData)
 		if err != nil {
-			return errors.ErrInternalServer
+			return nil, errors.ErrInternalServer
 		}
-
-		for _, additionalExpense := range input.SalaryAdditionalExpenses {
-			additionalExpenseData := additionalExpense.ToSalaryAdditionalExpense()
-			additionalExpenseData.SalaryID = id
-			_, err = h.salaryAdditionalExpenseRepo.Insert(tx, *additionalExpenseData)
-			if err != nil {
-				return errors.ErrInternalServer
-			}
-		}
-
-		return nil
-	})
+	}
 
 	if err != nil {
 		return nil, errors.ErrInternalServer
