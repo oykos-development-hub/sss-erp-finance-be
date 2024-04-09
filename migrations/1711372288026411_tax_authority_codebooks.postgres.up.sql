@@ -27,6 +27,9 @@ CREATE TABLE IF NOT EXISTS tax_authority_codebooks (
     coefficient_less_700 FLOAT,
     coefficient_less_1000 FLOAT,
     coefficient_more_1000 FLOAT,
+    amount_less_700 FLOAT,
+    amount_less_1000 FLOAT,
+    amount_more_1000 FLOAT,
     include_subtax BOOLEAN,
     created_at TIMESTAMP,
     updated_at TIMESTAMP

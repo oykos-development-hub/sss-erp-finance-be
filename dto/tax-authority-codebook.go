@@ -34,6 +34,9 @@ type TaxAuthorityCodebookDTO struct {
 	CoefficientLess700                   float64 `json:"coefficient_less_700"`
 	CoefficientLess1000                  float64 `json:"coefficient_less_1000"`
 	CoefficientMore1000                  float64 `json:"coefficient_more_1000"`
+	AmountLess700                        float64 `json:"amount_less_700"`
+	AmountLess1000                       float64 `json:"amount_less_1000"`
+	AmountMore1000                       float64 `json:"amount_more_1000"`
 	IncludeSubtax                        bool    `json:"include_subtax"`
 }
 
@@ -66,6 +69,9 @@ type TaxAuthorityCodebookResponseDTO struct {
 	CoefficientLess700                   float64   `json:"coefficient_less_700"`
 	CoefficientLess1000                  float64   `json:"coefficient_less_1000"`
 	CoefficientMore1000                  float64   `json:"coefficient_more_1000"`
+	AmountLess700                        float64   `json:"amount_less_700"`
+	AmountLess1000                       float64   `json:"amount_less_1000"`
+	AmountMore1000                       float64   `json:"amount_more_1000"`
 	IncludeSubtax                        bool      `json:"include_subtax"`
 	CreatedAt                            time.Time `json:"created_at"`
 	UpdatedAt                            time.Time `json:"updated_at"`
@@ -108,6 +114,9 @@ func (dto TaxAuthorityCodebookDTO) ToTaxAuthorityCodebook() *data.TaxAuthorityCo
 		CoefficientLess700:                   dto.CoefficientLess700,
 		CoefficientLess1000:                  dto.CoefficientLess1000,
 		CoefficientMore1000:                  dto.CoefficientMore1000,
+		AmountLess700:                        dto.AmountLess700,
+		AmountLess1000:                       dto.AmountLess1000,
+		AmountMore1000:                       dto.AmountMore1000,
 		IncludeSubtax:                        dto.IncludeSubtax,
 	}
 }
@@ -143,6 +152,9 @@ func ToTaxAuthorityCodebookResponseDTO(data data.TaxAuthorityCodebook) TaxAuthor
 		CoefficientLess1000:                  data.CoefficientLess1000,
 		CoefficientMore1000:                  data.CoefficientMore1000,
 		IncludeSubtax:                        data.IncludeSubtax,
+		AmountLess700:                        data.AmountLess700,
+		AmountLess1000:                       data.AmountLess1000,
+		AmountMore1000:                       data.AmountMore1000,
 		CreatedAt:                            data.CreatedAt,
 		UpdatedAt:                            data.UpdatedAt,
 	}
