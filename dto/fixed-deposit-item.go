@@ -53,6 +53,8 @@ func (dto FixedDepositItemDTO) ToFixedDepositItem() *data.FixedDepositItem {
 		SerialNumber:       dto.SerialNumber,
 		DateOfConfiscation: dto.DateOfConfiscation,
 		CaseNumber:         dto.CaseNumber,
+		Unit:               dto.Unit,
+		Amount:             dto.Amount,
 		JudgeID:            dto.JudgeID,
 		FileID:             dto.FileID,
 	}
