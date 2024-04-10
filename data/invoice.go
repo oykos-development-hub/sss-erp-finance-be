@@ -25,6 +25,7 @@ type Invoice struct {
 	GrossPrice             float64    `db:"gross_price"`
 	VATPrice               float64    `db:"vat_price"`
 	SupplierID             int        `db:"supplier_id"`
+	TypeOfDecision         string     `db:"type_of_descision"`
 	ActivityID             int        `db:"activity_id"`
 	OrderID                int        `db:"order_id"`
 	OrganizationUnitID     int        `db:"organization_unit_id"`

@@ -35,6 +35,7 @@ type InvoiceDTO struct {
 	GrossPrice             float64                `json:"gross_price"`
 	VATPrice               float64                `json:"vat_price"`
 	SupplierID             int                    `json:"supplier_id"`
+	TypeOfDecision         string                 `json:"type_of_descision"`
 	OrderID                int                    `json:"order_id"`
 	OrganizationUnitID     int                    `json:"organization_unit_id"`
 	ActivityID             int                    `json:"activity_id"`
@@ -67,6 +68,7 @@ type InvoiceResponseDTO struct {
 	Supplier               string                         `json:"supplier"`
 	Status                 string                         `json:"status"`
 	GrossPrice             float64                        `json:"gross_price"`
+	TypeOfDecision         string                         `json:"type_of_descision"`
 	VATPrice               float64                        `json:"vat_price"`
 	SupplierID             int                            `json:"supplier_id"`
 	OrderID                int                            `json:"order_id"`
@@ -114,6 +116,7 @@ func (dto InvoiceDTO) ToInvoice() *data.Invoice {
 		ProFormaInvoiceFileID:  dto.ProFormaInvoiceFileID,
 		BankAccount:            dto.BankAccount,
 		Description:            dto.Description,
+		TypeOfDecision:         dto.TypeOfDecision,
 		Type:                   dto.Type,
 		TypeOfSubject:          dto.TypeOfSubject,
 		SourceOfFunding:        dto.SourceOfFunding,
@@ -146,6 +149,7 @@ func ToInvoiceResponseDTO(data data.Invoice) InvoiceResponseDTO {
 		FileID:                 data.FileID,
 		ProFormaInvoiceFileID:  data.ProFormaInvoiceFileID,
 		BankAccount:            data.BankAccount,
+		TypeOfDecision:         data.TypeOfDecision,
 		Description:            data.Description,
 		Type:                   data.Type,
 		TypeOfSubject:          data.TypeOfSubject,

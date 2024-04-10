@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS invoices (
     order_id INTEGER,
     organization_unit_id INTEGER,
     activity_id INTEGER,
+    type_of_decision TEXT,
     date_of_invoice TIMESTAMP,             --datum fakture/resenja, 
     receipt_date TIMESTAMP,                --datum prijema,
     date_of_payment TIMESTAMP,             --datum placanja,
