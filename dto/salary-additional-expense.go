@@ -8,6 +8,7 @@ import (
 
 type SalaryAdditionalExpenseDTO struct {
 	ID                 int     `json:"id"`
+	Title              string  `json:"title"`
 	SalaryID           int     `json:"salary_id"`
 	AccountID          int     `json:"account_id"`
 	Amount             float64 `json:"amount"`
@@ -20,6 +21,7 @@ type SalaryAdditionalExpenseDTO struct {
 
 type SalaryAdditionalExpenseResponseDTO struct {
 	ID                 int       `json:"id"`
+	Title              string    `json:"title"`
 	SalaryID           int       `json:"salary_id"`
 	AccountID          int       `json:"account_id"`
 	Amount             float64   `json:"amount"`
@@ -44,6 +46,7 @@ type SalaryAdditionalExpenseFilterDTO struct {
 func (dto SalaryAdditionalExpenseDTO) ToSalaryAdditionalExpense() *data.SalaryAdditionalExpense {
 	return &data.SalaryAdditionalExpense{
 		SalaryID:           dto.SalaryID,
+		Title:              dto.Title,
 		AccountID:          dto.AccountID,
 		Amount:             dto.Amount,
 		SubjectID:          dto.SubjectID,
@@ -57,6 +60,7 @@ func (dto SalaryAdditionalExpenseDTO) ToSalaryAdditionalExpense() *data.SalaryAd
 func ToSalaryAdditionalExpenseResponseDTO(data data.SalaryAdditionalExpense) SalaryAdditionalExpenseResponseDTO {
 	return SalaryAdditionalExpenseResponseDTO{
 		ID:                 data.ID,
+		Title:              data.Title,
 		SalaryID:           data.SalaryID,
 		AccountID:          data.AccountID,
 		Amount:             data.Amount,

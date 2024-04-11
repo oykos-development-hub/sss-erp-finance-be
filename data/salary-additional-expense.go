@@ -17,6 +17,7 @@ type SalaryAdditionalExpense struct {
 	Status             string    `db:"status"`
 	OrganizationUnitID int       `db:"organization_unit_id"`
 	Type               string    `db:"type"`
+	Title              string    `db:"title"`
 	CreatedAt          time.Time `db:"created_at,omitempty"`
 	UpdatedAt          time.Time `db:"updated_at"`
 }

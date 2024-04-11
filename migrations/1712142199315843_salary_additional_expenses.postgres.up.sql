@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS salary_additional_expenses (
     subject_id INTEGER,
     bank_account TEXT,
     status TEXT NOT NULL,
+    title TEXT,
     organization_unit_id INTEGER NOT NULL,
     created_at TIMESTAMP,
     updated_at TIMESTAMP
