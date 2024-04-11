@@ -8,8 +8,8 @@ import (
 	"gitlab.sudovi.me/erp/finance-api/errors"
 	"gitlab.sudovi.me/erp/finance-api/services"
 
-	"github.com/oykos-development-hub/celeritas"
 	"github.com/go-chi/chi/v5"
+	"github.com/oykos-development-hub/celeritas"
 )
 
 // TaxAuthorityCodebookHandler is a concrete type that implements TaxAuthorityCodebookHandler
@@ -72,6 +72,31 @@ func (h *taxauthoritycodebookHandlerImpl) UpdateTaxAuthorityCodebook(w http.Resp
 	}
 
 	_ = h.App.WriteDataResponse(w, http.StatusOK, "TaxAuthorityCodebook updated successfuly", res)
+}
+
+func (h *taxauthoritycodebookHandlerImpl) DeactivateTaxAuthorityCodebook(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.Atoi(chi.URLParam(r, "id"))
+
+	var input dto.TaxAuthorityCodebookDTO
+	err := h.App.ReadJSON(w, r, &input)
+	if err != nil {
+		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
+		return
+	}
+
+	validator := h.App.Validator().ValidateStruct(&input)
+	if !validator.Valid() {
+		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
+		return
+	}
+
+	err = h.service.DeactivateTaxAuthorityCodebook(id, input.Active)
+	if err != nil {
+		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
+		return
+	}
+
+	_ = h.App.WriteDataResponse(w, http.StatusOK, "TaxAuthorityCodebook updated successfuly", nil)
 }
 
 func (h *taxauthoritycodebookHandlerImpl) DeleteTaxAuthorityCodebook(w http.ResponseWriter, r *http.Request) {

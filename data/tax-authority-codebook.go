@@ -113,6 +113,18 @@ func (t *TaxAuthorityCodebook) Delete(id int) error {
 	return nil
 }
 
+func (t *TaxAuthorityCodebook) Deactivate(id int, active bool) error {
+	query := `update tax_authority_codebooks set active = $1 where id = $2`
+
+	rows, err := Upper.SQL().Query(query, active, id)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	return nil
+}
+
 // Insert inserts a model into the database, using upper
 func (t *TaxAuthorityCodebook) Insert(m TaxAuthorityCodebook) (int, error) {
 	m.CreatedAt = time.Now()

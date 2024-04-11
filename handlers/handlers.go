@@ -3,39 +3,39 @@ package handlers
 import "net/http"
 
 type Handlers struct {
-	InvoiceHandler                InvoiceHandler
-	ArticleHandler                ArticleHandler
-	BudgetHandler                 BudgetHandler
-	FinancialBudgetHandler        FinancialBudgetHandler
-	FinancialBudgetLimitHandler   FinancialBudgetLimitHandler
-	NonFinancialBudgetHandler     NonFinancialBudgetHandler
-	NonFinancialBudgetGoalHandler NonFinancialBudgetGoalHandler
-	ProgramHandler                ProgramHandler
-	ActivityHandler               ActivityHandler
-	GoalIndicatorHandler          GoalIndicatorHandler
-	FilledFinancialBudgetHandler  FilledFinancialBudgetHandler
-	BudgetRequestHandler          BudgetRequestHandler
-	FeeHandler                    FeeHandler
-	FeePaymentHandler             FeePaymentHandler
-	FineHandler                   FineHandler
-	FinePaymentHandler            FinePaymentHandler
-	ProcedureCostHandler          ProcedureCostHandler
-	ProcedureCostPaymentHandler   ProcedureCostPaymentHandler
-	AdditionalExpenseHandler      AdditionalExpenseHandler
-	FlatRateHandler               FlatRateHandler
-	FlatRatePaymentHandler        FlatRatePaymentHandler
-	PropBenConfHandler            PropBenConfHandler
-	PropBenConfPaymentHandler     PropBenConfPaymentHandler
-	TaxAuthorityCodebookHandler   TaxAuthorityCodebookHandler
-	SalaryHandler SalaryHandler
-		SalaryAdditionalExpenseHandler SalaryAdditionalExpenseHandler
-		FixedDepositHandler FixedDepositHandler
-		FixedDepositItemHandler FixedDepositItemHandler
-		FixedDepositDispatchHandler FixedDepositDispatchHandler
-		FixedDepositJudgeHandler FixedDepositJudgeHandler
-		FixedDepositWillHandler FixedDepositWillHandler
-		FixedDepositWillDispatchHandler FixedDepositWillDispatchHandler
-	}
+	InvoiceHandler                  InvoiceHandler
+	ArticleHandler                  ArticleHandler
+	BudgetHandler                   BudgetHandler
+	FinancialBudgetHandler          FinancialBudgetHandler
+	FinancialBudgetLimitHandler     FinancialBudgetLimitHandler
+	NonFinancialBudgetHandler       NonFinancialBudgetHandler
+	NonFinancialBudgetGoalHandler   NonFinancialBudgetGoalHandler
+	ProgramHandler                  ProgramHandler
+	ActivityHandler                 ActivityHandler
+	GoalIndicatorHandler            GoalIndicatorHandler
+	FilledFinancialBudgetHandler    FilledFinancialBudgetHandler
+	BudgetRequestHandler            BudgetRequestHandler
+	FeeHandler                      FeeHandler
+	FeePaymentHandler               FeePaymentHandler
+	FineHandler                     FineHandler
+	FinePaymentHandler              FinePaymentHandler
+	ProcedureCostHandler            ProcedureCostHandler
+	ProcedureCostPaymentHandler     ProcedureCostPaymentHandler
+	AdditionalExpenseHandler        AdditionalExpenseHandler
+	FlatRateHandler                 FlatRateHandler
+	FlatRatePaymentHandler          FlatRatePaymentHandler
+	PropBenConfHandler              PropBenConfHandler
+	PropBenConfPaymentHandler       PropBenConfPaymentHandler
+	TaxAuthorityCodebookHandler     TaxAuthorityCodebookHandler
+	SalaryHandler                   SalaryHandler
+	SalaryAdditionalExpenseHandler  SalaryAdditionalExpenseHandler
+	FixedDepositHandler             FixedDepositHandler
+	FixedDepositItemHandler         FixedDepositItemHandler
+	FixedDepositDispatchHandler     FixedDepositDispatchHandler
+	FixedDepositJudgeHandler        FixedDepositJudgeHandler
+	FixedDepositWillHandler         FixedDepositWillHandler
+	FixedDepositWillDispatchHandler FixedDepositWillDispatchHandler
+}
 
 type InvoiceHandler interface {
 	CreateInvoice(w http.ResponseWriter, r *http.Request)
@@ -228,6 +228,7 @@ type PropBenConfPaymentHandler interface {
 type TaxAuthorityCodebookHandler interface {
 	CreateTaxAuthorityCodebook(w http.ResponseWriter, r *http.Request)
 	UpdateTaxAuthorityCodebook(w http.ResponseWriter, r *http.Request)
+	DeactivateTaxAuthorityCodebook(w http.ResponseWriter, r *http.Request)
 	DeleteTaxAuthorityCodebook(w http.ResponseWriter, r *http.Request)
 	GetTaxAuthorityCodebookById(w http.ResponseWriter, r *http.Request)
 	GetTaxAuthorityCodebookList(w http.ResponseWriter, r *http.Request)

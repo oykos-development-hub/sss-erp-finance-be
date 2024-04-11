@@ -218,6 +218,7 @@ type TaxAuthorityCodebookService interface {
 	CreateTaxAuthorityCodebook(input dto.TaxAuthorityCodebookDTO) (*dto.TaxAuthorityCodebookResponseDTO, error)
 	UpdateTaxAuthorityCodebook(id int, input dto.TaxAuthorityCodebookDTO) (*dto.TaxAuthorityCodebookResponseDTO, error)
 	DeleteTaxAuthorityCodebook(id int) error
+	DeactivateTaxAuthorityCodebook(id int, active bool) error
 	GetTaxAuthorityCodebook(id int) (*dto.TaxAuthorityCodebookResponseDTO, error)
 	GetTaxAuthorityCodebookList(filter dto.TaxAuthorityCodebookFilterDTO) ([]dto.TaxAuthorityCodebookResponseDTO, *uint64, error)
 }

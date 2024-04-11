@@ -155,6 +155,7 @@ func routes(app *celeritas.Celeritas, middleware *middleware.Middleware, handler
 		rt.Get("/tax-authority-codebooks/{id}", handlers.TaxAuthorityCodebookHandler.GetTaxAuthorityCodebookById)
 		rt.Get("/tax-authority-codebooks", handlers.TaxAuthorityCodebookHandler.GetTaxAuthorityCodebookList)
 		rt.Put("/tax-authority-codebooks/{id}", handlers.TaxAuthorityCodebookHandler.UpdateTaxAuthorityCodebook)
+		rt.Put("/tax-authority-codebook-deactivate/{id}", handlers.TaxAuthorityCodebookHandler.DeactivateTaxAuthorityCodebook)
 		rt.Delete("/tax-authority-codebooks/{id}", handlers.TaxAuthorityCodebookHandler.DeleteTaxAuthorityCodebook)
 
 		rt.Post("/salaries", handlers.SalaryHandler.CreateSalary)
@@ -162,48 +163,48 @@ func routes(app *celeritas.Celeritas, middleware *middleware.Middleware, handler
 		rt.Get("/salaries", handlers.SalaryHandler.GetSalaryList)
 		rt.Put("/salaries/{id}", handlers.SalaryHandler.UpdateSalary)
 		rt.Delete("/salaries/{id}", handlers.SalaryHandler.DeleteSalary)
-	
+
 		rt.Post("/salary-additional-expenses", handlers.SalaryAdditionalExpenseHandler.CreateSalaryAdditionalExpense)
-rt.Get("/salary-additional-expenses/{id}", handlers.SalaryAdditionalExpenseHandler.GetSalaryAdditionalExpenseById)
-rt.Get("/salary-additional-expenses", handlers.SalaryAdditionalExpenseHandler.GetSalaryAdditionalExpenseList)
-rt.Put("/salary-additional-expenses/{id}", handlers.SalaryAdditionalExpenseHandler.UpdateSalaryAdditionalExpense)
-rt.Delete("/salary-additional-expenses/{id}", handlers.SalaryAdditionalExpenseHandler.DeleteSalaryAdditionalExpense)
-	
+		rt.Get("/salary-additional-expenses/{id}", handlers.SalaryAdditionalExpenseHandler.GetSalaryAdditionalExpenseById)
+		rt.Get("/salary-additional-expenses", handlers.SalaryAdditionalExpenseHandler.GetSalaryAdditionalExpenseList)
+		rt.Put("/salary-additional-expenses/{id}", handlers.SalaryAdditionalExpenseHandler.UpdateSalaryAdditionalExpense)
+		rt.Delete("/salary-additional-expenses/{id}", handlers.SalaryAdditionalExpenseHandler.DeleteSalaryAdditionalExpense)
+
 		rt.Post("/fixed-deposits", handlers.FixedDepositHandler.CreateFixedDeposit)
-rt.Get("/fixed-deposits/{id}", handlers.FixedDepositHandler.GetFixedDepositById)
-rt.Get("/fixed-deposits", handlers.FixedDepositHandler.GetFixedDepositList)
-rt.Put("/fixed-deposits/{id}", handlers.FixedDepositHandler.UpdateFixedDeposit)
-rt.Delete("/fixed-deposits/{id}", handlers.FixedDepositHandler.DeleteFixedDeposit)
-	
+		rt.Get("/fixed-deposits/{id}", handlers.FixedDepositHandler.GetFixedDepositById)
+		rt.Get("/fixed-deposits", handlers.FixedDepositHandler.GetFixedDepositList)
+		rt.Put("/fixed-deposits/{id}", handlers.FixedDepositHandler.UpdateFixedDeposit)
+		rt.Delete("/fixed-deposits/{id}", handlers.FixedDepositHandler.DeleteFixedDeposit)
+
 		rt.Post("/fixed-deposit-items", handlers.FixedDepositItemHandler.CreateFixedDepositItem)
-rt.Get("/fixed-deposit-items/{id}", handlers.FixedDepositItemHandler.GetFixedDepositItemById)
-rt.Get("/fixed-deposit-items", handlers.FixedDepositItemHandler.GetFixedDepositItemList)
-rt.Put("/fixed-deposit-items/{id}", handlers.FixedDepositItemHandler.UpdateFixedDepositItem)
-rt.Delete("/fixed-deposit-items/{id}", handlers.FixedDepositItemHandler.DeleteFixedDepositItem)
-	
+		rt.Get("/fixed-deposit-items/{id}", handlers.FixedDepositItemHandler.GetFixedDepositItemById)
+		rt.Get("/fixed-deposit-items", handlers.FixedDepositItemHandler.GetFixedDepositItemList)
+		rt.Put("/fixed-deposit-items/{id}", handlers.FixedDepositItemHandler.UpdateFixedDepositItem)
+		rt.Delete("/fixed-deposit-items/{id}", handlers.FixedDepositItemHandler.DeleteFixedDepositItem)
+
 		rt.Post("/fixed-deposit-dispatches", handlers.FixedDepositDispatchHandler.CreateFixedDepositDispatch)
-rt.Get("/fixed-deposit-dispatches/{id}", handlers.FixedDepositDispatchHandler.GetFixedDepositDispatchById)
-rt.Get("/fixed-deposit-dispatches", handlers.FixedDepositDispatchHandler.GetFixedDepositDispatchList)
-rt.Put("/fixed-deposit-dispatches/{id}", handlers.FixedDepositDispatchHandler.UpdateFixedDepositDispatch)
-rt.Delete("/fixed-deposit-dispatches/{id}", handlers.FixedDepositDispatchHandler.DeleteFixedDepositDispatch)
-	
+		rt.Get("/fixed-deposit-dispatches/{id}", handlers.FixedDepositDispatchHandler.GetFixedDepositDispatchById)
+		rt.Get("/fixed-deposit-dispatches", handlers.FixedDepositDispatchHandler.GetFixedDepositDispatchList)
+		rt.Put("/fixed-deposit-dispatches/{id}", handlers.FixedDepositDispatchHandler.UpdateFixedDepositDispatch)
+		rt.Delete("/fixed-deposit-dispatches/{id}", handlers.FixedDepositDispatchHandler.DeleteFixedDepositDispatch)
+
 		rt.Post("/fixed-deposit-judges", handlers.FixedDepositJudgeHandler.CreateFixedDepositJudge)
-rt.Get("/fixed-deposit-judges/{id}", handlers.FixedDepositJudgeHandler.GetFixedDepositJudgeById)
-rt.Get("/fixed-deposit-judges", handlers.FixedDepositJudgeHandler.GetFixedDepositJudgeList)
-rt.Put("/fixed-deposit-judges/{id}", handlers.FixedDepositJudgeHandler.UpdateFixedDepositJudge)
-rt.Delete("/fixed-deposit-judges/{id}", handlers.FixedDepositJudgeHandler.DeleteFixedDepositJudge)
-	
+		rt.Get("/fixed-deposit-judges/{id}", handlers.FixedDepositJudgeHandler.GetFixedDepositJudgeById)
+		rt.Get("/fixed-deposit-judges", handlers.FixedDepositJudgeHandler.GetFixedDepositJudgeList)
+		rt.Put("/fixed-deposit-judges/{id}", handlers.FixedDepositJudgeHandler.UpdateFixedDepositJudge)
+		rt.Delete("/fixed-deposit-judges/{id}", handlers.FixedDepositJudgeHandler.DeleteFixedDepositJudge)
+
 		rt.Post("/fixed-deposit-wills", handlers.FixedDepositWillHandler.CreateFixedDepositWill)
-rt.Get("/fixed-deposit-wills/{id}", handlers.FixedDepositWillHandler.GetFixedDepositWillById)
-rt.Get("/fixed-deposit-wills", handlers.FixedDepositWillHandler.GetFixedDepositWillList)
-rt.Put("/fixed-deposit-wills/{id}", handlers.FixedDepositWillHandler.UpdateFixedDepositWill)
-rt.Delete("/fixed-deposit-wills/{id}", handlers.FixedDepositWillHandler.DeleteFixedDepositWill)
-	
+		rt.Get("/fixed-deposit-wills/{id}", handlers.FixedDepositWillHandler.GetFixedDepositWillById)
+		rt.Get("/fixed-deposit-wills", handlers.FixedDepositWillHandler.GetFixedDepositWillList)
+		rt.Put("/fixed-deposit-wills/{id}", handlers.FixedDepositWillHandler.UpdateFixedDepositWill)
+		rt.Delete("/fixed-deposit-wills/{id}", handlers.FixedDepositWillHandler.DeleteFixedDepositWill)
+
 		rt.Post("/fixed-deposit-will-dispatches", handlers.FixedDepositWillDispatchHandler.CreateFixedDepositWillDispatch)
-rt.Get("/fixed-deposit-will-dispatches/{id}", handlers.FixedDepositWillDispatchHandler.GetFixedDepositWillDispatchById)
-rt.Get("/fixed-deposit-will-dispatches", handlers.FixedDepositWillDispatchHandler.GetFixedDepositWillDispatchList)
-rt.Put("/fixed-deposit-will-dispatches/{id}", handlers.FixedDepositWillDispatchHandler.UpdateFixedDepositWillDispatch)
-rt.Delete("/fixed-deposit-will-dispatches/{id}", handlers.FixedDepositWillDispatchHandler.DeleteFixedDepositWillDispatch)
+		rt.Get("/fixed-deposit-will-dispatches/{id}", handlers.FixedDepositWillDispatchHandler.GetFixedDepositWillDispatchById)
+		rt.Get("/fixed-deposit-will-dispatches", handlers.FixedDepositWillDispatchHandler.GetFixedDepositWillDispatchList)
+		rt.Put("/fixed-deposit-will-dispatches/{id}", handlers.FixedDepositWillDispatchHandler.UpdateFixedDepositWillDispatch)
+		rt.Delete("/fixed-deposit-will-dispatches/{id}", handlers.FixedDepositWillDispatchHandler.DeleteFixedDepositWillDispatch)
 	})
 
 	return app.Routes

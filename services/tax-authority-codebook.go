@@ -70,6 +70,16 @@ func (h *TaxAuthorityCodebookServiceImpl) DeleteTaxAuthorityCodebook(id int) err
 	return nil
 }
 
+func (h *TaxAuthorityCodebookServiceImpl) DeactivateTaxAuthorityCodebook(id int, active bool) error {
+	err := h.repo.Deactivate(id, active)
+	if err != nil {
+		h.App.ErrorLog.Println(err)
+		return errors.ErrInternalServer
+	}
+
+	return nil
+}
+
 func (h *TaxAuthorityCodebookServiceImpl) GetTaxAuthorityCodebook(id int) (*dto.TaxAuthorityCodebookResponseDTO, error) {
 	data, err := h.repo.Get(id)
 	if err != nil {
