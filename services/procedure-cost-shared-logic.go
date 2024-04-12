@@ -58,7 +58,7 @@ func (h *ProcedureCostSharedLogicServiceImpl) CalculateProcedureCostDetailsAndUp
 	}
 
 	details.AmountGracePeriodDueDate = procedurecost.DecisionDate.AddDate(0, 0, data.ProcedureCostGracePeriod)
-	details.AmountGracePeriod = procedurecost.Amount * 2 / 3
+	details.AmountGracePeriod = math.Ceil(float64(procedurecost.Amount) * 2 / 3)
 
 	if time.Until(details.AmountGracePeriodDueDate) > 0 {
 		details.AmountGracePeriodAvailable = true

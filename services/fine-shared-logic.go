@@ -59,7 +59,7 @@ func (h *FineSharedLogicServiceImpl) CalculateFineDetailsAndUpdateStatus(fineId 
 	}
 
 	details.FeeAmountGracePeriodDueDate = fine.DecisionDate.AddDate(0, 0, data.FineGracePeriod)
-	details.FeeAmountGracePeriod = fine.Amount * 2 / 3
+	details.FeeAmountGracePeriod = math.Ceil(float64(fine.Amount) * 2 / 3)
 
 	if time.Until(details.FeeAmountGracePeriodDueDate) > 0 {
 		details.FeeAmountGracePeriodAvailable = true

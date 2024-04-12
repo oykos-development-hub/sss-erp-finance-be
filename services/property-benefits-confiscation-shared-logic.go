@@ -59,7 +59,7 @@ func (h *PropBenConfSharedLogicServiceImpl) CalculatePropBenConfDetailsAndUpdate
 	}
 
 	details.AmountGracePeriodDueDate = propbenconf.DecisionDate.AddDate(0, 0, data.PropBenConfGracePeriod)
-	details.AmountGracePeriod = propbenconf.Amount * 2 / 3
+	details.AmountGracePeriod = math.Ceil(float64(propbenconf.Amount) * 2 / 3)
 
 	if time.Until(details.AmountGracePeriodDueDate) > 0 {
 		details.AmountGracePeriodAvailable = true

@@ -59,7 +59,7 @@ func (h *FlatRateSharedLogicServiceImpl) CalculateFlatRateDetailsAndUpdateStatus
 	}
 
 	details.AmountGracePeriodDueDate = flatrate.DecisionDate.AddDate(0, 0, data.FlatRateGracePeriod)
-	details.AmountGracePeriod = flatrate.Amount * 2 / 3
+	details.AmountGracePeriod = math.Ceil(float64(flatrate.Amount) * 2 / 3)
 
 	if time.Until(details.AmountGracePeriodDueDate) > 0 {
 		details.AmountGracePeriodAvailable = true
