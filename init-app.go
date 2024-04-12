@@ -141,6 +141,10 @@ func initApplication() *celeritas.Celeritas {
 	FixedDepositWillService := services.NewFixedDepositWillServiceImpl(cel, models.FixedDepositWill, FixedDepositJudgeService, FixedDepositWillDispatchService)
 	FixedDepositWillHandler := handlers.NewFixedDepositWillHandler(cel, FixedDepositWillService)
 
+		
+	DepositPaymentService := services.NewDepositPaymentServiceImpl(cel, models.DepositPayment)
+	DepositPaymentHandler := handlers.NewDepositPaymentHandler(cel, DepositPaymentService)
+
 	myHandlers := &handlers.Handlers{
 		InvoiceHandler: InvoiceHandler,
 		ArticleHandler: ArticleHandler,
@@ -179,6 +183,7 @@ func initApplication() *celeritas.Celeritas {
 		FixedDepositJudgeHandler:        FixedDepositJudgeHandler,
 		FixedDepositWillHandler:         FixedDepositWillHandler,
 		FixedDepositWillDispatchHandler: FixedDepositWillDispatchHandler,
+		DepositPaymentHandler: DepositPaymentHandler,
 	}
 
 	myMiddleware := &middleware.Middleware{

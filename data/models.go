@@ -21,39 +21,40 @@ var Upper up.Session
 type Models struct {
 	// any models inserted here (and in the New function)
 	// are easily accessible throughout the entire application
-	Invoice                Invoice
-	Article                Article
-	Budget                 Budget
-	FinancialBudget        FinancialBudget
-	FinancialBudgetLimit   FinancialBudgetLimit
-	NonFinancialBudget     NonFinancialBudget
-	NonFinancialBudgetGoal NonFinancialBudgetGoal
-	Program                Program
-	Activity               Activity
-	GoalIndicator          GoalIndicator
-	FilledFinancialBudget  FilledFinancialBudget
-	BudgetRequest          BudgetRequest
-	Fee                    Fee
-	FeePayment             FeePayment
-	Fine                   Fine
-	FinePayment            FinePayment
-	ProcedureCost          ProcedureCost
-	ProcedureCostPayment   ProcedureCostPayment
-	AdditionalExpense      AdditionalExpense
-	FlatRate               FlatRate
-	FlatRatePayment        FlatRatePayment
-	PropBenConf            PropBenConf
-	PropBenConfPayment     PropBenConfPayment
-	TaxAuthorityCodebook   TaxAuthorityCodebook
-	Salary Salary
-		SalaryAdditionalExpense SalaryAdditionalExpense
-		FixedDeposit FixedDeposit
-		FixedDepositItem FixedDepositItem
-		FixedDepositDispatch FixedDepositDispatch
-		FixedDepositJudge FixedDepositJudge
-		FixedDepositWill FixedDepositWill
-		FixedDepositWillDispatch FixedDepositWillDispatch
-	}
+	Invoice                  Invoice
+	Article                  Article
+	Budget                   Budget
+	FinancialBudget          FinancialBudget
+	FinancialBudgetLimit     FinancialBudgetLimit
+	NonFinancialBudget       NonFinancialBudget
+	NonFinancialBudgetGoal   NonFinancialBudgetGoal
+	Program                  Program
+	Activity                 Activity
+	GoalIndicator            GoalIndicator
+	FilledFinancialBudget    FilledFinancialBudget
+	BudgetRequest            BudgetRequest
+	Fee                      Fee
+	FeePayment               FeePayment
+	Fine                     Fine
+	FinePayment              FinePayment
+	ProcedureCost            ProcedureCost
+	ProcedureCostPayment     ProcedureCostPayment
+	AdditionalExpense        AdditionalExpense
+	FlatRate                 FlatRate
+	FlatRatePayment          FlatRatePayment
+	PropBenConf              PropBenConf
+	PropBenConfPayment       PropBenConfPayment
+	TaxAuthorityCodebook     TaxAuthorityCodebook
+	Salary                   Salary
+	SalaryAdditionalExpense  SalaryAdditionalExpense
+	FixedDeposit             FixedDeposit
+	FixedDepositItem         FixedDepositItem
+	FixedDepositDispatch     FixedDepositDispatch
+	FixedDepositJudge        FixedDepositJudge
+	FixedDepositWill         FixedDepositWill
+	FixedDepositWillDispatch FixedDepositWillDispatch
+	DepositPayment           DepositPayment
+}
 
 func New(databasePool *sql.DB) Models {
 	//db = databasePool
@@ -68,33 +69,34 @@ func New(databasePool *sql.DB) Models {
 	}
 
 	return Models{
-		Invoice:                Invoice{},
-		Article:                Article{},
-		Budget:                 Budget{},
-		FinancialBudget:        FinancialBudget{},
-		FinancialBudgetLimit:   FinancialBudgetLimit{},
-		NonFinancialBudget:     NonFinancialBudget{},
-		NonFinancialBudgetGoal: NonFinancialBudgetGoal{},
-		Program:                Program{},
-		Activity:               Activity{},
-		GoalIndicator:          GoalIndicator{},
-		FilledFinancialBudget:  FilledFinancialBudget{},
-		BudgetRequest:          BudgetRequest{},
-		Fee:                    Fee{},
-		FeePayment:             FeePayment{},
-		Fine:                   Fine{},
-		FinePayment:            FinePayment{},
-		ProcedureCost:          ProcedureCost{},
-		ProcedureCostPayment:   ProcedureCostPayment{},
-		AdditionalExpense:      AdditionalExpense{},
-		Salary: Salary{},
-		SalaryAdditionalExpense: SalaryAdditionalExpense{},
-		FixedDeposit: FixedDeposit{},
-		FixedDepositItem: FixedDepositItem{},
-		FixedDepositDispatch: FixedDepositDispatch{},
-		FixedDepositJudge: FixedDepositJudge{},
-		FixedDepositWill: FixedDepositWill{},
+		Invoice:                  Invoice{},
+		Article:                  Article{},
+		Budget:                   Budget{},
+		FinancialBudget:          FinancialBudget{},
+		FinancialBudgetLimit:     FinancialBudgetLimit{},
+		NonFinancialBudget:       NonFinancialBudget{},
+		NonFinancialBudgetGoal:   NonFinancialBudgetGoal{},
+		Program:                  Program{},
+		Activity:                 Activity{},
+		GoalIndicator:            GoalIndicator{},
+		FilledFinancialBudget:    FilledFinancialBudget{},
+		BudgetRequest:            BudgetRequest{},
+		Fee:                      Fee{},
+		FeePayment:               FeePayment{},
+		Fine:                     Fine{},
+		FinePayment:              FinePayment{},
+		ProcedureCost:            ProcedureCost{},
+		ProcedureCostPayment:     ProcedureCostPayment{},
+		AdditionalExpense:        AdditionalExpense{},
+		Salary:                   Salary{},
+		SalaryAdditionalExpense:  SalaryAdditionalExpense{},
+		FixedDeposit:             FixedDeposit{},
+		FixedDepositItem:         FixedDepositItem{},
+		FixedDepositDispatch:     FixedDepositDispatch{},
+		FixedDepositJudge:        FixedDepositJudge{},
+		FixedDepositWill:         FixedDepositWill{},
 		FixedDepositWillDispatch: FixedDepositWillDispatch{},
+		DepositPayment:           DepositPayment{},
 	}
 }
 

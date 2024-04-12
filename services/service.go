@@ -286,3 +286,11 @@ type FixedDepositWillDispatchService interface {
 	GetFixedDepositWillDispatch(id int) (*dto.FixedDepositWillDispatchResponseDTO, error)
 	GetFixedDepositWillDispatchList(filter dto.FixedDepositWillDispatchFilterDTO) ([]dto.FixedDepositWillDispatchResponseDTO, *uint64, error)
 }
+
+type DepositPaymentService interface {
+	CreateDepositPayment(input dto.DepositPaymentDTO) (*dto.DepositPaymentResponseDTO, error)
+	UpdateDepositPayment(id int, input dto.DepositPaymentDTO) (*dto.DepositPaymentResponseDTO, error)
+	DeleteDepositPayment(id int) error
+	GetDepositPayment(id int) (*dto.DepositPaymentResponseDTO, error)
+	GetDepositPaymentList(filter dto.DepositPaymentFilterDTO) ([]dto.DepositPaymentResponseDTO, *uint64, error)
+}

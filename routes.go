@@ -205,6 +205,12 @@ func routes(app *celeritas.Celeritas, middleware *middleware.Middleware, handler
 		rt.Get("/fixed-deposit-will-dispatches", handlers.FixedDepositWillDispatchHandler.GetFixedDepositWillDispatchList)
 		rt.Put("/fixed-deposit-will-dispatches/{id}", handlers.FixedDepositWillDispatchHandler.UpdateFixedDepositWillDispatch)
 		rt.Delete("/fixed-deposit-will-dispatches/{id}", handlers.FixedDepositWillDispatchHandler.DeleteFixedDepositWillDispatch)
+	
+		rt.Post("/deposit-payments", handlers.DepositPaymentHandler.CreateDepositPayment)
+rt.Get("/deposit-payments/{id}", handlers.DepositPaymentHandler.GetDepositPaymentById)
+rt.Get("/deposit-payments", handlers.DepositPaymentHandler.GetDepositPaymentList)
+rt.Put("/deposit-payments/{id}", handlers.DepositPaymentHandler.UpdateDepositPayment)
+rt.Delete("/deposit-payments/{id}", handlers.DepositPaymentHandler.DeleteDepositPayment)
 	})
 
 	return app.Routes
