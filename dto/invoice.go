@@ -70,6 +70,7 @@ type InvoiceResponseDTO struct {
 	GrossPrice             float64                        `json:"gross_price"`
 	TypeOfDecision         string                         `json:"type_of_decision"`
 	VATPrice               float64                        `json:"vat_price"`
+	NetPrice               float64                        `json:"net_price"`
 	SupplierID             int                            `json:"supplier_id"`
 	OrderID                int                            `json:"order_id"`
 	OrganizationUnitID     int                            `json:"organization_unit_id"`

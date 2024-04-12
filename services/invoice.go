@@ -203,5 +203,20 @@ func (h *InvoiceServiceImpl) GetInvoiceList(input dto.InvoicesFilter) ([]dto.Inv
 	}
 	response := dto.ToInvoiceListResponseDTO(data)
 
+	for i := 0; i < len(response); i++ {
+		additionalExpenses, _, err := h.additionalExpenses.GetAdditionalExpenseList(dto.AdditionalExpenseFilterDTO{
+			InvoiceID: &response[i].ID,
+		})
+
+		if err != nil {
+			h.App.ErrorLog.Println(err)
+			return nil, nil, err
+		}
+
+		if len(additionalExpenses) > 0 {
+			response[i].NetPrice = float64(additionalExpenses[len(additionalExpenses)-1].Price)
+		}
+	}
+
 	return response, total, nil
 }

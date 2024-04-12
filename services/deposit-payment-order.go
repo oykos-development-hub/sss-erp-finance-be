@@ -96,6 +96,15 @@ func (h *DepositPaymentOrderServiceImpl) GetDepositPaymentOrder(id int) (*dto.De
 	}
 	response := dto.ToDepositPaymentOrderResponseDTO(*data)
 
+	additionalExpenses, _, err := h.additionalExpenses.GetDepositAdditionalExpenseList(dto.DepositAdditionalExpenseFilterDTO{PaymentOrderID: &id})
+
+	if err != nil {
+		h.App.ErrorLog.Println(err)
+		return nil, err
+	}
+
+	response.AdditionalExpenses = additionalExpenses
+
 	return &response, nil
 }
 
