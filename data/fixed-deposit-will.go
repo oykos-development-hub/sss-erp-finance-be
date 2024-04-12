@@ -74,6 +74,11 @@ func (t *FixedDepositWill) Get(id int) (*FixedDepositWill, error) {
 // Update updates a record in the database, using upper
 func (t *FixedDepositWill) Update(tx up.Session, m FixedDepositWill) error {
 	m.UpdatedAt = time.Now()
+
+	if m.DateOfEnd != nil {
+		m.Status = "Zaključen"
+	}
+
 	collection := tx.Collection(t.Table())
 	res := collection.Find(m.ID)
 	err := res.Update(&m)
