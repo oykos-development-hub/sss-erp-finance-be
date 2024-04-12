@@ -126,21 +126,3 @@ func (t *Invoice) Insert(tx up.Session, m Invoice) (int, error) {
 
 	return id, nil
 }
-
-// Builder is an example of using upper's sql builder
-func (t *Invoice) Builder(id int) ([]*Invoice, error) {
-	collection := Upper.Collection(t.Table())
-
-	var result []*Invoice
-
-	err := collection.Session().
-		SQL().
-		SelectFrom(t.Table()).
-		Where("id > ?", id).
-		OrderBy("id").
-		All(&result)
-	if err != nil {
-		return nil, err
-	}
-	return result, nil
-}

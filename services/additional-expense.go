@@ -50,6 +50,8 @@ func (h *AdditionalExpenseServiceImpl) GetAdditionalExpenseList(filter dto.Addit
 
 	if filter.InvoiceID != nil {
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"invoice_id": *filter.InvoiceID})
+	} else {
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"title <> ": "Neto"})
 	}
 
 	if filter.Status != nil {
