@@ -156,7 +156,7 @@ func (h *InvoiceServiceImpl) GetInvoiceList(input dto.InvoicesFilter) ([]dto.Inv
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"date_of_invoice": up.Between(startOfYear, endOfYear)})
 	}
 
-	if input.Status != nil {
+	if input.Status != nil && *input.Status != "" {
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"status": *input.Status})
 	}
 
@@ -184,7 +184,7 @@ func (h *InvoiceServiceImpl) GetInvoiceList(input dto.InvoicesFilter) ([]dto.Inv
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"passed_to_inventory": *input.PassedToInventory})
 	}
 
-	if input.Search != nil {
+	if input.Search != nil && *input.Search != "" {
 		likeCondition := fmt.Sprintf("%%%s%%", *input.Search)
 		search := up.Or(
 			up.Cond{"invoice_number ILIKE": likeCondition},
