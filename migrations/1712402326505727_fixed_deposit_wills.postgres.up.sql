@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS fixed_deposit_wills (
     father_name TEXT,
     date_of_birth TIMESTAMP,
     jmbg TEXT,
+    description TEXT,
     case_number_si TEXT,
     case_number_rs TEXT,
     date_of_receipt_si TIMESTAMP,

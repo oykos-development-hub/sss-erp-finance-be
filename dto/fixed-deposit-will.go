@@ -14,6 +14,7 @@ type FixedDepositWillDTO struct {
 	JMBG               string     `json:"jmbg"`
 	CaseNumberSI       string     `json:"case_number_si"`
 	CaseNumberRS       string     `json:"case_number_rs"`
+	Description        string     `json:"description"`
 	DateOfReceiptSI    *time.Time `json:"date_of_receipt_si"`
 	DateOfReceiptRS    *time.Time `json:"date_of_receipt_rs"`
 	DateOfEnd          *time.Time `json:"date_of_end"`
@@ -35,6 +36,7 @@ type FixedDepositWillResponseDTO struct {
 	DateOfEnd          *time.Time                            `json:"date_of_end"`
 	Status             string                                `json:"status"`
 	FileID             int                                   `json:"file_id"`
+	Description        string                                `json:"description"`
 	Judges             []FixedDepositJudgeResponseDTO        `json:"judges"`
 	Dispatches         []FixedDepositWillDispatchResponseDTO `json:"dispatches"`
 	CreatedAt          time.Time                             `json:"created_at"`
@@ -62,6 +64,7 @@ func (dto FixedDepositWillDTO) ToFixedDepositWill() *data.FixedDepositWill {
 		DateOfReceiptSI:    dto.DateOfReceiptSI,
 		DateOfReceiptRS:    dto.DateOfReceiptRS,
 		DateOfEnd:          dto.DateOfEnd,
+		Description:        dto.Description,
 		Status:             dto.Status,
 		FileID:             dto.FileID,
 	}
@@ -82,6 +85,7 @@ func ToFixedDepositWillResponseDTO(data data.FixedDepositWill) FixedDepositWillR
 		DateOfEnd:          data.DateOfEnd,
 		Status:             data.Status,
 		FileID:             data.FileID,
+		Description:        data.Description,
 		CreatedAt:          data.CreatedAt,
 		UpdatedAt:          data.UpdatedAt,
 	}

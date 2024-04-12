@@ -20,6 +20,7 @@ type FixedDepositWill struct {
 	DateOfReceiptRS    *time.Time `db:"date_of_receipt_rs"`
 	DateOfEnd          *time.Time `db:"date_of_end"`
 	Status             string     `db:"status"`
+	Description        string     `db:"description"`
 	FileID             int        `db:"file_id"`
 	CreatedAt          time.Time  `db:"created_at,omitempty"`
 	UpdatedAt          time.Time  `db:"updated_at"`
