@@ -25,6 +25,7 @@ type InvoiceDTO struct {
 	PassedToInventory      bool                   `json:"passed_to_inventory"`
 	PassedToAccounting     bool                   `json:"passed_to_accounting"`
 	IsInvoice              bool                   `json:"is_invoice"`
+	Issuer                 string                 `json:"issuer"`
 	Status                 string                 `json:"status"`
 	Type                   string                 `json:"type"`
 	TaxAuthorityCodebookID int                    `json:"tax_authority_codebook_id"`
@@ -66,6 +67,7 @@ type InvoiceResponseDTO struct {
 	TypeOfContract         int                            `json:"type_of_contract"`
 	SourceOfFunding        int                            `json:"source_of_funding"`
 	Supplier               string                         `json:"supplier"`
+	Issuer                 string                         `json:"issuer"`
 	Status                 string                         `json:"status"`
 	GrossPrice             float64                        `json:"gross_price"`
 	TypeOfDecision         string                         `json:"type_of_decision"`
@@ -106,6 +108,7 @@ func (dto InvoiceDTO) ToInvoice() *data.Invoice {
 		ActivityID:             dto.ActivityID,
 		SupplierID:             dto.SupplierID,
 		OrderID:                dto.OrderID,
+		Issuer:                 dto.Issuer,
 		OrganizationUnitID:     dto.OrganizationUnitID,
 		ProFormaInvoiceNumber:  dto.ProFormaInvoiceNumber,
 		ProFormaInvoiceDate:    dto.ProFormaInvoiceDate,
@@ -136,6 +139,7 @@ func ToInvoiceResponseDTO(data data.Invoice) InvoiceResponseDTO {
 		IsInvoice:              data.IsInvoice,
 		InvoiceNumber:          data.InvoiceNumber,
 		Status:                 data.Status,
+		Issuer:                 data.Issuer,
 		GrossPrice:             data.GrossPrice,
 		VATPrice:               data.VATPrice,
 		TaxAuthorityCodebookID: data.TaxAuthorityCodebookID,

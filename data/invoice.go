@@ -16,6 +16,7 @@ type Invoice struct {
 	ProFormaInvoiceNumber  string     `db:"pro_forma_invoice_number"`
 	ProFormaInvoiceDate    *time.Time `db:"pro_forma_invoice_date"`
 	Type                   string     `db:"type"`
+	Issuer                 string     `db:"issuer"`
 	TaxAuthorityCodebookID int        `db:"tax_authority_codebook_id"`
 	TypeOfSubject          int        `db:"type_of_subject"`
 	TypeOfContract         int        `db:"type_of_contract"`

@@ -7,14 +7,15 @@ import (
 )
 
 type DepositPaymentOrderDTO struct {
-	OrganizationUnitID int        `json:"organization_unit_id"`
-	CaseNumber         string     `json:"case_number"`
-	SupplierID         int        `json:"supplier_id"`
-	NetAmount          float64    `json:"net_amount"`
-	BankAccount        string     `json:"bank_account"`
-	DateOfPayment      time.Time  `json:"date_of_payment"`
-	DateOfStatement    *time.Time `json:"date_of_statement"`
-	IDOfStatement      *string    `json:"id_of_statement"`
+	OrganizationUnitID int                           `json:"organization_unit_id"`
+	CaseNumber         string                        `json:"case_number"`
+	SupplierID         int                           `json:"supplier_id"`
+	NetAmount          float64                       `json:"net_amount"`
+	BankAccount        string                        `json:"bank_account"`
+	DateOfPayment      time.Time                     `json:"date_of_payment"`
+	DateOfStatement    *time.Time                    `json:"date_of_statement"`
+	IDOfStatement      *string                       `json:"id_of_statement"`
+	AdditionalExpenses []DepositAdditionalExpenseDTO `json:"additional_expenses"`
 }
 
 type DepositPaymentOrderResponseDTO struct {
