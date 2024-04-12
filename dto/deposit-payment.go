@@ -41,6 +41,7 @@ type DepositPaymentFilterDTO struct {
 	SortByTitle        *string `json:"sort_by_title"`
 	Status             *string `json:"status"`
 	Search             *string `json:"search"`
+	CaseNumber         *string `json:"case_number"`
 	OrganizationUnitID *int    `json:"organization_unit_id"`
 }
 

@@ -105,6 +105,10 @@ func (h *DepositPaymentServiceImpl) GetDepositPaymentList(filter dto.DepositPaym
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"organization_unit_id": *filter.OrganizationUnitID})
 	}
 
+	if filter.CaseNumber != nil {
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"case_number": *filter.CaseNumber})
+	}
+
 	if filter.Status != nil {
 		switch *filter.Status {
 		case "Prolazni račun":
