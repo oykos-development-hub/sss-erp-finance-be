@@ -217,6 +217,12 @@ rt.Get("/deposit-payment-orders/{id}", handlers.DepositPaymentOrderHandler.GetDe
 rt.Get("/deposit-payment-orders", handlers.DepositPaymentOrderHandler.GetDepositPaymentOrderList)
 rt.Put("/deposit-payment-orders/{id}", handlers.DepositPaymentOrderHandler.UpdateDepositPaymentOrder)
 rt.Delete("/deposit-payment-orders/{id}", handlers.DepositPaymentOrderHandler.DeleteDepositPaymentOrder)
+	
+		rt.Post("/deposit-additional-expenses", handlers.DepositAdditionalExpenseHandler.CreateDepositAdditionalExpense)
+rt.Get("/deposit-additional-expenses/{id}", handlers.DepositAdditionalExpenseHandler.GetDepositAdditionalExpenseById)
+rt.Get("/deposit-additional-expenses", handlers.DepositAdditionalExpenseHandler.GetDepositAdditionalExpenseList)
+rt.Put("/deposit-additional-expenses/{id}", handlers.DepositAdditionalExpenseHandler.UpdateDepositAdditionalExpense)
+rt.Delete("/deposit-additional-expenses/{id}", handlers.DepositAdditionalExpenseHandler.DeleteDepositAdditionalExpense)
 	})
 
 	return app.Routes

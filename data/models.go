@@ -55,6 +55,7 @@ type Models struct {
 	FixedDepositWillDispatch FixedDepositWillDispatch
 	DepositPayment           DepositPayment
 	DepositPaymentOrder DepositPaymentOrder
+		DepositAdditionalExpense DepositAdditionalExpense
 	}
 
 func New(databasePool *sql.DB) Models {
@@ -99,6 +100,7 @@ func New(databasePool *sql.DB) Models {
 		FixedDepositWillDispatch: FixedDepositWillDispatch{},
 		DepositPayment:           DepositPayment{},
 		DepositPaymentOrder: DepositPaymentOrder{},
+		DepositAdditionalExpense: DepositAdditionalExpense{},
 	}
 }
 

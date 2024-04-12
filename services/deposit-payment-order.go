@@ -12,14 +12,16 @@ import (
 )
 
 type DepositPaymentOrderServiceImpl struct {
-	App  *celeritas.Celeritas
-	repo data.DepositPaymentOrder
+	App                *celeritas.Celeritas
+	repo               data.DepositPaymentOrder
+	additionalExpenses DepositAdditionalExpenseService
 }
 
-func NewDepositPaymentOrderServiceImpl(app *celeritas.Celeritas, repo data.DepositPaymentOrder) DepositPaymentOrderService {
+func NewDepositPaymentOrderServiceImpl(app *celeritas.Celeritas, repo data.DepositPaymentOrder, additionalExpenses DepositAdditionalExpenseService) DepositPaymentOrderService {
 	return &DepositPaymentOrderServiceImpl{
-		App:  app,
-		repo: repo,
+		App:                app,
+		repo:               repo,
+		additionalExpenses: additionalExpenses,
 	}
 }
 

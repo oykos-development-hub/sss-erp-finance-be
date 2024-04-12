@@ -37,6 +37,7 @@ type Handlers struct {
 	FixedDepositWillDispatchHandler FixedDepositWillDispatchHandler
 	DepositPaymentHandler DepositPaymentHandler
 		DepositPaymentOrderHandler DepositPaymentOrderHandler
+		DepositAdditionalExpenseHandler DepositAdditionalExpenseHandler
 	}
 
 type InvoiceHandler interface {
@@ -314,4 +315,12 @@ type DepositPaymentOrderHandler interface {
 	DeleteDepositPaymentOrder(w http.ResponseWriter, r *http.Request)
 	GetDepositPaymentOrderById(w http.ResponseWriter, r *http.Request)
 	GetDepositPaymentOrderList(w http.ResponseWriter, r *http.Request)
+}
+
+type DepositAdditionalExpenseHandler interface {
+	CreateDepositAdditionalExpense(w http.ResponseWriter, r *http.Request)
+	UpdateDepositAdditionalExpense(w http.ResponseWriter, r *http.Request)
+	DeleteDepositAdditionalExpense(w http.ResponseWriter, r *http.Request)
+	GetDepositAdditionalExpenseById(w http.ResponseWriter, r *http.Request)
+	GetDepositAdditionalExpenseList(w http.ResponseWriter, r *http.Request)
 }

@@ -177,7 +177,11 @@ func (h *InvoiceServiceImpl) GetInvoiceList(input dto.InvoicesFilter) ([]dto.Inv
 	}
 
 	if input.Type != nil {
-		conditionAndExp = up.And(conditionAndExp, &up.Cond{"type": *input.Type})
+		likeCondition := fmt.Sprintf("%%%s%%", *input.Type)
+		search := up.Or(
+			up.Cond{"type ILIKE": likeCondition},
+		)
+		conditionAndExp = up.And(conditionAndExp, search)
 	}
 
 	if input.PassedToInventory != nil {

@@ -141,12 +141,13 @@ func initApplication() *celeritas.Celeritas {
 	FixedDepositWillService := services.NewFixedDepositWillServiceImpl(cel, models.FixedDepositWill, FixedDepositJudgeService, FixedDepositWillDispatchService)
 	FixedDepositWillHandler := handlers.NewFixedDepositWillHandler(cel, FixedDepositWillService)
 
-		
 	DepositPaymentService := services.NewDepositPaymentServiceImpl(cel, models.DepositPayment)
 	DepositPaymentHandler := handlers.NewDepositPaymentHandler(cel, DepositPaymentService)
 
-		
-	DepositPaymentOrderService := services.NewDepositPaymentOrderServiceImpl(cel, models.DepositPaymentOrder)
+	DepositAdditionalExpenseService := services.NewDepositAdditionalExpenseServiceImpl(cel, models.DepositAdditionalExpense)
+	DepositAdditionalExpenseHandler := handlers.NewDepositAdditionalExpenseHandler(cel, DepositAdditionalExpenseService)
+
+	DepositPaymentOrderService := services.NewDepositPaymentOrderServiceImpl(cel, models.DepositPaymentOrder, DepositAdditionalExpenseService)
 	DepositPaymentOrderHandler := handlers.NewDepositPaymentOrderHandler(cel, DepositPaymentOrderService)
 
 	myHandlers := &handlers.Handlers{
@@ -187,8 +188,9 @@ func initApplication() *celeritas.Celeritas {
 		FixedDepositJudgeHandler:        FixedDepositJudgeHandler,
 		FixedDepositWillHandler:         FixedDepositWillHandler,
 		FixedDepositWillDispatchHandler: FixedDepositWillDispatchHandler,
-		DepositPaymentHandler: DepositPaymentHandler,
-		DepositPaymentOrderHandler: DepositPaymentOrderHandler,
+		DepositPaymentHandler:           DepositPaymentHandler,
+		DepositPaymentOrderHandler:      DepositPaymentOrderHandler,
+		DepositAdditionalExpenseHandler: DepositAdditionalExpenseHandler,
 	}
 
 	myMiddleware := &middleware.Middleware{

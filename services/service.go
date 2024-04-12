@@ -302,3 +302,11 @@ type DepositPaymentOrderService interface {
 	GetDepositPaymentOrder(id int) (*dto.DepositPaymentOrderResponseDTO, error)
 	GetDepositPaymentOrderList(filter dto.DepositPaymentOrderFilterDTO) ([]dto.DepositPaymentOrderResponseDTO, *uint64, error)
 }
+
+type DepositAdditionalExpenseService interface {
+	CreateDepositAdditionalExpense(input dto.DepositAdditionalExpenseDTO) (*dto.DepositAdditionalExpenseResponseDTO, error)
+	UpdateDepositAdditionalExpense(id int, input dto.DepositAdditionalExpenseDTO) (*dto.DepositAdditionalExpenseResponseDTO, error)
+	DeleteDepositAdditionalExpense(id int) error
+	GetDepositAdditionalExpense(id int) (*dto.DepositAdditionalExpenseResponseDTO, error)
+	GetDepositAdditionalExpenseList(filter dto.DepositAdditionalExpenseFilterDTO) ([]dto.DepositAdditionalExpenseResponseDTO, *uint64, error)
+}
