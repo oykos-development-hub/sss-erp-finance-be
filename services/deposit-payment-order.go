@@ -48,6 +48,17 @@ func (h *DepositPaymentOrderServiceImpl) CreateDepositPaymentOrder(input dto.Dep
 			}
 		}
 
+		for _, item := range input.AdditionalExpensesForPaying {
+			itemToInsert := item.ToDepositAdditionalExpense()
+			itemToInsert.PayingPaymentOrderID = id
+			itemToInsert.Status = "waiting"
+			itemToInsert.ID = item.ID
+			err = h.additionalExpensesRepo.Update(tx, *itemToInsert)
+			if err != nil {
+				return err
+			}
+		}
+
 		return nil
 	})
 
@@ -82,6 +93,7 @@ func (h *DepositPaymentOrderServiceImpl) UpdateDepositPaymentOrder(id int, input
 			return errors.ErrInternalServer
 		}
 
+		//update vezanih troskova koji su nastali od tog naloga
 		validExpenses := make(map[int]bool)
 
 		for _, item := range oldData.AdditionalExpenses {
@@ -126,6 +138,49 @@ func (h *DepositPaymentOrderServiceImpl) UpdateDepositPaymentOrder(id int, input
 				}
 			}
 		}
+
+		//update vezanih troskova koji se placaju tim nalogom
+		validExpensesPaying := make(map[int]bool)
+
+		for _, item := range oldData.AdditionalExpensesForPaying {
+			validExpensesPaying[item.ID] = false
+		}
+
+		for _, item := range input.AdditionalExpensesForPaying {
+			_, exists := validExpensesPaying[item.ID]
+			if exists {
+				validExpensesPaying[item.ID] = true
+			} else {
+				additionalExpenseData := item.ToDepositAdditionalExpense()
+				additionalExpenseData.PayingPaymentOrderID = id
+				additionalExpenseData.Status = "waiting"
+				err = h.additionalExpensesRepo.Update(tx, *additionalExpenseData)
+
+				if err != nil {
+					return err
+				}
+			}
+		}
+
+		for itemID, exists := range validExpensesPaying {
+			if !exists {
+				additionalExpenseData, err := h.additionalExpensesRepo.Get(itemID)
+
+				if err != nil {
+					return err
+				}
+
+				additionalExpenseData.PayingPaymentOrderID = 0
+				additionalExpenseData.Status = "created"
+
+				err = h.additionalExpensesRepo.Update(tx, *additionalExpenseData)
+
+				if err != nil {
+					return err
+				}
+			}
+		}
+
 		return nil
 	})
 
@@ -162,21 +217,50 @@ func (h *DepositPaymentOrderServiceImpl) PayDepositPaymentOrder(id int, input dt
 		for _, item := range additionalExpenses {
 			if item.Title == "Neto" {
 				itemToUpdate := data.DepositAdditionalExpense{
-					ID:                 item.ID,
-					Title:              item.Title,
-					AccountID:          item.AccountID,
-					SubjectID:          item.SubjectID,
-					BankAccount:        item.BankAccount,
-					PaymentOrderID:     item.PaymentOrderID,
-					OrganizationUnitID: item.OrganizationUnitID,
-					Price:              item.Price,
-					Status:             "paid",
+					ID:                   item.ID,
+					Title:                item.Title,
+					AccountID:            item.AccountID,
+					SubjectID:            item.SubjectID,
+					BankAccount:          item.BankAccount,
+					PaymentOrderID:       item.PaymentOrderID,
+					OrganizationUnitID:   item.OrganizationUnitID,
+					Price:                item.Price,
+					PayingPaymentOrderID: item.PayingPaymentOrderID,
+					Status:               "paid",
 				}
 				err := h.additionalExpensesRepo.Update(tx, itemToUpdate)
 				if err != nil {
 					return err
 				}
 			}
+		}
+
+		additionalExpenses, _, err = h.additionalExpenses.GetDepositAdditionalExpenseList(dto.DepositAdditionalExpenseFilterDTO{
+			PayingPaymentOrderID: &id,
+		})
+
+		if err != nil {
+			return err
+		}
+
+		for _, item := range additionalExpenses {
+			itemToUpdate := data.DepositAdditionalExpense{
+				ID:                   item.ID,
+				Title:                item.Title,
+				AccountID:            item.AccountID,
+				SubjectID:            item.SubjectID,
+				BankAccount:          item.BankAccount,
+				PaymentOrderID:       item.PaymentOrderID,
+				OrganizationUnitID:   item.OrganizationUnitID,
+				Price:                item.Price,
+				PayingPaymentOrderID: item.PayingPaymentOrderID,
+				Status:               "paid",
+			}
+			err := h.additionalExpensesRepo.Update(tx, itemToUpdate)
+			if err != nil {
+				return err
+			}
+
 		}
 
 		return nil
