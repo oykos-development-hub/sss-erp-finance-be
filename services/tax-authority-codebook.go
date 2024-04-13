@@ -96,7 +96,7 @@ func (h *TaxAuthorityCodebookServiceImpl) GetTaxAuthorityCodebookList(filter dto
 	var orders []interface{}
 
 	// example of making conditions
-	if filter.Search != nil {
+	if filter.Search != nil && *filter.Search != "" {
 		likeCondition := fmt.Sprintf("%%%s%%", *filter.Search)
 		search := up.Or(
 			up.Cond{"title ILIKE": likeCondition},

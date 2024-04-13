@@ -360,7 +360,7 @@ func (h *DepositPaymentOrderServiceImpl) GetDepositPaymentOrderList(filter dto.D
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"organization_unit_id": *filter.OrganizationUnitID})
 	}
 
-	if filter.CaseNumber != nil {
+	if filter.CaseNumber != nil && *filter.CaseNumber != "" {
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"case_number": *filter.CaseNumber})
 	}
 
@@ -377,7 +377,7 @@ func (h *DepositPaymentOrderServiceImpl) GetDepositPaymentOrderList(filter dto.D
 		}
 	}
 
-	if filter.Search != nil {
+	if filter.Search != nil && *filter.Search != "" {
 		likeCondition := fmt.Sprintf("%%%s%%", *filter.Search)
 		search := up.Or(
 			up.Cond{"payer ILIKE": likeCondition},

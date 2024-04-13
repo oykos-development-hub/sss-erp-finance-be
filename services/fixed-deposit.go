@@ -156,15 +156,15 @@ func (h *FixedDepositServiceImpl) GetFixedDepositList(filter dto.FixedDepositFil
 		}
 	}
 
-	if filter.Subject != nil {
+	if filter.Subject != nil && *filter.Subject != "" {
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"subject": *filter.Subject})
 	}
 
-	if filter.Type != nil {
+	if filter.Type != nil && *filter.Type != "" {
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"type": *filter.Type})
 	}
 
-	if filter.Search != nil {
+	if filter.Search != nil && *filter.Search != "" {
 		likeCondition := fmt.Sprintf("%%%s%%", *filter.Search)
 		search := up.Or(
 			up.Cond{"case_number ILIKE": likeCondition},

@@ -187,7 +187,7 @@ func (h *SalaryServiceImpl) GetSalaryList(filter dto.SalaryFilterDTO) ([]dto.Sal
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"organization_unit_id": *filter.OrganizationUnitID})
 	}
 
-	if filter.Status != nil {
+	if filter.Status != nil && *filter.Status != "" {
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"status": *filter.Status})
 	}
 

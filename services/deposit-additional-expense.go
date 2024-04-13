@@ -111,7 +111,7 @@ func (h *DepositAdditionalExpenseServiceImpl) GetDepositAdditionalExpenseList(fi
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"paying_payment_order_id": *filter.PayingPaymentOrderID})
 	}
 
-	if filter.Status != nil {
+	if filter.Status != nil && *filter.Status != "" {
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"status": *filter.Status})
 	}
 
@@ -123,7 +123,7 @@ func (h *DepositAdditionalExpenseServiceImpl) GetDepositAdditionalExpenseList(fi
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"organization_unit_id": *filter.OrganizationUnitID})
 	}
 
-	if filter.Search != nil {
+	if filter.Search != nil && *filter.Search != "" {
 		likeCondition := fmt.Sprintf("%%%s%%", *filter.Search)
 		search := up.Or(
 			up.Cond{"title ILIKE": likeCondition},

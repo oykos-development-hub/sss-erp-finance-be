@@ -54,7 +54,7 @@ func (h *AdditionalExpenseServiceImpl) GetAdditionalExpenseList(filter dto.Addit
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"title <> ": "Neto"})
 	}
 
-	if filter.Status != nil {
+	if filter.Status != nil && *filter.Status != 0 {
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"status": *filter.Status})
 	}
 
@@ -66,7 +66,7 @@ func (h *AdditionalExpenseServiceImpl) GetAdditionalExpenseList(filter dto.Addit
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"organization_unit_id": *filter.OrganizationUnitID})
 	}
 
-	if filter.Search != nil {
+	if filter.Search != nil && *filter.Search != "" {
 		likeCondition := fmt.Sprintf("%%%s%%", *filter.Search)
 		search := up.Or(
 			up.Cond{"title ILIKE": likeCondition},

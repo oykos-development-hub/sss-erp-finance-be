@@ -130,11 +130,11 @@ func (h *FixedDepositWillServiceImpl) GetFixedDepositWillList(filter dto.FixedDe
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"organization_unit_id": *filter.OrganizationUnitID})
 	}
 
-	if filter.Status != nil {
+	if filter.Status != nil && *filter.Status != "" {
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"status": *filter.Status})
 	}
 
-	if filter.Search != nil {
+	if filter.Search != nil && *filter.Search != "" {
 		likeCondition := fmt.Sprintf("%%%s%%", *filter.Search)
 		search := up.Or(
 			up.Cond{"subject ILIKE": likeCondition},
