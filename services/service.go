@@ -298,6 +298,7 @@ type DepositPaymentService interface {
 type DepositPaymentOrderService interface {
 	CreateDepositPaymentOrder(input dto.DepositPaymentOrderDTO) (*dto.DepositPaymentOrderResponseDTO, error)
 	UpdateDepositPaymentOrder(id int, input dto.DepositPaymentOrderDTO) (*dto.DepositPaymentOrderResponseDTO, error)
+	PayDepositPaymentOrder(id int, input dto.DepositPaymentOrderDTO) error
 	DeleteDepositPaymentOrder(id int) error
 	GetDepositPaymentOrder(id int) (*dto.DepositPaymentOrderResponseDTO, error)
 	GetDepositPaymentOrderList(filter dto.DepositPaymentOrderFilterDTO) ([]dto.DepositPaymentOrderResponseDTO, *uint64, error)

@@ -104,3 +104,15 @@ func (t *DepositPaymentOrder) Insert(tx up.Session, m DepositPaymentOrder) (int,
 
 	return id, nil
 }
+
+func (t *DepositPaymentOrder) PayDepositPaymentOrder(tx up.Session, id int, IDOfStatement string, DateOfStatement time.Time) error {
+	query := `update deposit_payment_orders set id_of_statement = $1 and date_of_statement = $2 where id = $3`
+
+	rows, err := tx.SQL().Query(query, id, IDOfStatement, DateOfStatement)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	return nil
+}

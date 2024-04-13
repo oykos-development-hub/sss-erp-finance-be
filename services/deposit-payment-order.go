@@ -143,6 +143,52 @@ func (h *DepositPaymentOrderServiceImpl) UpdateDepositPaymentOrder(id int, input
 	return &response, nil
 }
 
+func (h *DepositPaymentOrderServiceImpl) PayDepositPaymentOrder(id int, input dto.DepositPaymentOrderDTO) error {
+	err := data.Upper.Tx(func(tx up.Session) error {
+		var err error
+		err = h.repo.PayDepositPaymentOrder(tx, id, *input.IDOfStatement, *input.DateOfStatement)
+		if err != nil {
+			return errors.ErrInternalServer
+		}
+
+		additionalExpenses, _, err := h.additionalExpenses.GetDepositAdditionalExpenseList(dto.DepositAdditionalExpenseFilterDTO{
+			PaymentOrderID: &id,
+		})
+
+		if err != nil {
+			return err
+		}
+
+		for _, item := range additionalExpenses {
+			if item.Title == "Neto" {
+				itemToUpdate := data.DepositAdditionalExpense{
+					ID:                 item.ID,
+					Title:              item.Title,
+					AccountID:          item.AccountID,
+					SubjectID:          item.SubjectID,
+					BankAccount:        item.BankAccount,
+					PaymentOrderID:     item.PaymentOrderID,
+					OrganizationUnitID: item.OrganizationUnitID,
+					Price:              item.Price,
+					Status:             "paid",
+				}
+				err := h.additionalExpensesRepo.Update(tx, itemToUpdate)
+				if err != nil {
+					return err
+				}
+			}
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return errors.ErrInternalServer
+	}
+
+	return nil
+}
+
 func (h *DepositPaymentOrderServiceImpl) DeleteDepositPaymentOrder(id int) error {
 	err := h.repo.Delete(id)
 	if err != nil {

@@ -8,8 +8,8 @@ import (
 	"gitlab.sudovi.me/erp/finance-api/errors"
 	"gitlab.sudovi.me/erp/finance-api/services"
 
-	"github.com/oykos-development-hub/celeritas"
 	"github.com/go-chi/chi/v5"
+	"github.com/oykos-development-hub/celeritas"
 )
 
 // DepositPaymentOrderHandler is a concrete type that implements DepositPaymentOrderHandler
@@ -72,6 +72,31 @@ func (h *depositpaymentorderHandlerImpl) UpdateDepositPaymentOrder(w http.Respon
 	}
 
 	_ = h.App.WriteDataResponse(w, http.StatusOK, "DepositPaymentOrder updated successfuly", res)
+}
+
+func (h *depositpaymentorderHandlerImpl) PayDepositPaymentOrder(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.Atoi(chi.URLParam(r, "id"))
+
+	var input dto.DepositPaymentOrderDTO
+	err := h.App.ReadJSON(w, r, &input)
+	if err != nil {
+		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
+		return
+	}
+
+	validator := h.App.Validator().ValidateStruct(&input)
+	if !validator.Valid() {
+		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
+		return
+	}
+
+	err = h.service.PayDepositPaymentOrder(id, input)
+	if err != nil {
+		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
+		return
+	}
+
+	_ = h.App.WriteDataResponse(w, http.StatusOK, "DepositPaymentOrder paid successfuly", nil)
 }
 
 func (h *depositpaymentorderHandlerImpl) DeleteDepositPaymentOrder(w http.ResponseWriter, r *http.Request) {

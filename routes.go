@@ -205,24 +205,25 @@ func routes(app *celeritas.Celeritas, middleware *middleware.Middleware, handler
 		rt.Get("/fixed-deposit-will-dispatches", handlers.FixedDepositWillDispatchHandler.GetFixedDepositWillDispatchList)
 		rt.Put("/fixed-deposit-will-dispatches/{id}", handlers.FixedDepositWillDispatchHandler.UpdateFixedDepositWillDispatch)
 		rt.Delete("/fixed-deposit-will-dispatches/{id}", handlers.FixedDepositWillDispatchHandler.DeleteFixedDepositWillDispatch)
-	
+
 		rt.Post("/deposit-payments", handlers.DepositPaymentHandler.CreateDepositPayment)
-rt.Get("/deposit-payments/{id}", handlers.DepositPaymentHandler.GetDepositPaymentById)
-rt.Get("/deposit-payments", handlers.DepositPaymentHandler.GetDepositPaymentList)
-rt.Put("/deposit-payments/{id}", handlers.DepositPaymentHandler.UpdateDepositPayment)
-rt.Delete("/deposit-payments/{id}", handlers.DepositPaymentHandler.DeleteDepositPayment)
-	
+		rt.Get("/deposit-payments/{id}", handlers.DepositPaymentHandler.GetDepositPaymentById)
+		rt.Get("/deposit-payments", handlers.DepositPaymentHandler.GetDepositPaymentList)
+		rt.Put("/deposit-payments/{id}", handlers.DepositPaymentHandler.UpdateDepositPayment)
+		rt.Delete("/deposit-payments/{id}", handlers.DepositPaymentHandler.DeleteDepositPayment)
+
 		rt.Post("/deposit-payment-orders", handlers.DepositPaymentOrderHandler.CreateDepositPaymentOrder)
-rt.Get("/deposit-payment-orders/{id}", handlers.DepositPaymentOrderHandler.GetDepositPaymentOrderById)
-rt.Get("/deposit-payment-orders", handlers.DepositPaymentOrderHandler.GetDepositPaymentOrderList)
-rt.Put("/deposit-payment-orders/{id}", handlers.DepositPaymentOrderHandler.UpdateDepositPaymentOrder)
-rt.Delete("/deposit-payment-orders/{id}", handlers.DepositPaymentOrderHandler.DeleteDepositPaymentOrder)
-	
+		rt.Get("/deposit-payment-orders/{id}", handlers.DepositPaymentOrderHandler.GetDepositPaymentOrderById)
+		rt.Get("/deposit-payment-orders", handlers.DepositPaymentOrderHandler.GetDepositPaymentOrderList)
+		rt.Put("/deposit-payment-orders/{id}", handlers.DepositPaymentOrderHandler.UpdateDepositPaymentOrder)
+		rt.Put("/pay-deposit-payment-order/{id}", handlers.DepositPaymentOrderHandler.PayDepositPaymentOrder)
+		rt.Delete("/deposit-payment-orders/{id}", handlers.DepositPaymentOrderHandler.DeleteDepositPaymentOrder)
+
 		rt.Post("/deposit-additional-expenses", handlers.DepositAdditionalExpenseHandler.CreateDepositAdditionalExpense)
-rt.Get("/deposit-additional-expenses/{id}", handlers.DepositAdditionalExpenseHandler.GetDepositAdditionalExpenseById)
-rt.Get("/deposit-additional-expenses", handlers.DepositAdditionalExpenseHandler.GetDepositAdditionalExpenseList)
-rt.Put("/deposit-additional-expenses/{id}", handlers.DepositAdditionalExpenseHandler.UpdateDepositAdditionalExpense)
-rt.Delete("/deposit-additional-expenses/{id}", handlers.DepositAdditionalExpenseHandler.DeleteDepositAdditionalExpense)
+		rt.Get("/deposit-additional-expenses/{id}", handlers.DepositAdditionalExpenseHandler.GetDepositAdditionalExpenseById)
+		rt.Get("/deposit-additional-expenses", handlers.DepositAdditionalExpenseHandler.GetDepositAdditionalExpenseList)
+		rt.Put("/deposit-additional-expenses/{id}", handlers.DepositAdditionalExpenseHandler.UpdateDepositAdditionalExpense)
+		rt.Delete("/deposit-additional-expenses/{id}", handlers.DepositAdditionalExpenseHandler.DeleteDepositAdditionalExpense)
 	})
 
 	return app.Routes
