@@ -41,6 +41,7 @@ func (h *DepositPaymentOrderServiceImpl) CreateDepositPaymentOrder(input dto.Dep
 		for _, item := range input.AdditionalExpenses {
 			itemToInsert := item.ToDepositAdditionalExpense()
 			itemToInsert.PaymentOrderID = id
+			itemToInsert.Status = "created"
 			_, err = h.additionalExpensesRepo.Insert(tx, *itemToInsert)
 			if err != nil {
 				return err
@@ -94,6 +95,7 @@ func (h *DepositPaymentOrderServiceImpl) UpdateDepositPaymentOrder(id int, input
 			} else {
 				additionalExpenseData := item.ToDepositAdditionalExpense()
 				additionalExpenseData.PaymentOrderID = id
+				additionalExpenseData.Status = "created"
 				_, err = h.additionalExpensesRepo.Insert(tx, *additionalExpenseData)
 
 				if err != nil {
@@ -115,6 +117,7 @@ func (h *DepositPaymentOrderServiceImpl) UpdateDepositPaymentOrder(id int, input
 						additionalExpenseData := item.ToDepositAdditionalExpense()
 						additionalExpenseData.ID = itemID
 						additionalExpenseData.PaymentOrderID = id
+						additionalExpenseData.Status = "created"
 						err := h.additionalExpensesRepo.Update(tx, *additionalExpenseData)
 						if err != nil {
 							return err
