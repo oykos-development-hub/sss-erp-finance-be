@@ -7,6 +7,7 @@ import (
 )
 
 type DepositAdditionalExpenseDTO struct {
+	ID                 int     `json:"id"`
 	Title              string  `json:"title"`
 	AccountID          int     `json:"account_id"`
 	SubjectID          int     `json:"subject_id"`

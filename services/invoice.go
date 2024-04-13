@@ -81,22 +81,62 @@ func (h *InvoiceServiceImpl) UpdateInvoice(id int, input dto.InvoiceDTO) (*dto.I
 		invoice.Status = "created"
 	}
 
-	err := data.Upper.Tx(func(tx up.Session) error {
+	oldData, err := h.GetInvoice(id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	err = data.Upper.Tx(func(tx up.Session) error {
 		var err error
 		err = h.repo.Update(tx, *invoice)
 		if err != nil {
 			return errors.ErrInternalServer
 		}
 
-		for _, additionalExpense := range input.AdditionalExpenses {
-			additionalExpenseData := additionalExpense.ToAdditionalExpense()
-			if err = h.additionalExpensesRepo.Update(tx, *additionalExpenseData); err != nil {
-				return err
+		validExpenses := make(map[int]bool)
+
+		for _, item := range oldData.AdditionalExpenses {
+			validExpenses[item.ID] = false
+		}
+
+		for _, item := range input.AdditionalExpenses {
+			_, exists := validExpenses[item.ID]
+			if exists {
+				validExpenses[item.ID] = true
+			} else {
+				additionalExpenseData := item.ToAdditionalExpense()
+				_, err = h.additionalExpensesRepo.Insert(tx, *additionalExpenseData)
+
+				if err != nil {
+					return err
+				}
 			}
 		}
 
+		for itemID, exists := range validExpenses {
+			if !exists {
+				err := h.additionalExpensesRepo.Delete(itemID)
+
+				if err != nil {
+					return err
+				}
+			} else {
+				for _, item := range input.AdditionalExpenses {
+					if item.ID == itemID {
+						additionalExpenseData := item.ToAdditionalExpense()
+						additionalExpenseData.ID = id
+						err := h.additionalExpensesRepo.Update(tx, *additionalExpenseData)
+						if err != nil {
+							return err
+						}
+					}
+				}
+			}
+		}
 		return nil
 	})
+
 	if err != nil {
 		return nil, errors.ErrInternalServer
 	}

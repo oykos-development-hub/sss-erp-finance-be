@@ -12,16 +12,18 @@ import (
 )
 
 type DepositPaymentOrderServiceImpl struct {
-	App                *celeritas.Celeritas
-	repo               data.DepositPaymentOrder
-	additionalExpenses DepositAdditionalExpenseService
+	App                    *celeritas.Celeritas
+	repo                   data.DepositPaymentOrder
+	additionalExpenses     DepositAdditionalExpenseService
+	additionalExpensesRepo data.DepositAdditionalExpense
 }
 
-func NewDepositPaymentOrderServiceImpl(app *celeritas.Celeritas, repo data.DepositPaymentOrder, additionalExpenses DepositAdditionalExpenseService) DepositPaymentOrderService {
+func NewDepositPaymentOrderServiceImpl(app *celeritas.Celeritas, repo data.DepositPaymentOrder, additionalExpensesRepo data.DepositAdditionalExpense, additionalExpenses DepositAdditionalExpenseService) DepositPaymentOrderService {
 	return &DepositPaymentOrderServiceImpl{
-		App:                app,
-		repo:               repo,
-		additionalExpenses: additionalExpenses,
+		App:                    app,
+		repo:                   repo,
+		additionalExpensesRepo: additionalExpensesRepo,
+		additionalExpenses:     additionalExpenses,
 	}
 }
 
@@ -33,7 +35,16 @@ func (h *DepositPaymentOrderServiceImpl) CreateDepositPaymentOrder(input dto.Dep
 		var err error
 		id, err = h.repo.Insert(tx, *dataToInsert)
 		if err != nil {
-			return errors.ErrInternalServer
+			return err
+		}
+
+		for _, item := range input.AdditionalExpenses {
+			itemToInsert := item.ToDepositAdditionalExpense()
+			itemToInsert.PaymentOrderID = id
+			_, err = h.additionalExpensesRepo.Insert(tx, *itemToInsert)
+			if err != nil {
+				return err
+			}
 		}
 
 		return nil
@@ -57,13 +68,64 @@ func (h *DepositPaymentOrderServiceImpl) UpdateDepositPaymentOrder(id int, input
 	dataToInsert := input.ToDepositPaymentOrder()
 	dataToInsert.ID = id
 
-	err := data.Upper.Tx(func(tx up.Session) error {
-		err := h.repo.Update(tx, *dataToInsert)
+	oldData, err := h.GetDepositPaymentOrder(id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	err = data.Upper.Tx(func(tx up.Session) error {
+		var err error
+		err = h.repo.Update(tx, *dataToInsert)
 		if err != nil {
 			return errors.ErrInternalServer
 		}
+
+		validExpenses := make(map[int]bool)
+
+		for _, item := range oldData.AdditionalExpenses {
+			validExpenses[item.ID] = false
+		}
+
+		for _, item := range input.AdditionalExpenses {
+			_, exists := validExpenses[item.ID]
+			if exists {
+				validExpenses[item.ID] = true
+			} else {
+				additionalExpenseData := item.ToDepositAdditionalExpense()
+				additionalExpenseData.PaymentOrderID = id
+				_, err = h.additionalExpensesRepo.Insert(tx, *additionalExpenseData)
+
+				if err != nil {
+					return err
+				}
+			}
+		}
+
+		for itemID, exists := range validExpenses {
+			if !exists {
+				err := h.additionalExpensesRepo.Delete(itemID)
+
+				if err != nil {
+					return err
+				}
+			} else {
+				for _, item := range input.AdditionalExpenses {
+					if item.ID == itemID {
+						additionalExpenseData := item.ToDepositAdditionalExpense()
+						additionalExpenseData.ID = itemID
+						additionalExpenseData.PaymentOrderID = id
+						err := h.additionalExpensesRepo.Update(tx, *additionalExpenseData)
+						if err != nil {
+							return err
+						}
+					}
+				}
+			}
+		}
 		return nil
 	})
+
 	if err != nil {
 		return nil, errors.ErrInternalServer
 	}
