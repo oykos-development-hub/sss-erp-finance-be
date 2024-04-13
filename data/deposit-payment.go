@@ -18,6 +18,7 @@ type DepositPayment struct {
 	AccountID                 int        `db:"account_id"`
 	Amount                    float64    `db:"amount"`
 	MainBankAccount           bool       `db:"main_bank_account"`
+	CurrentBankAccount        string     `db:"current_bank_account"`
 	DateOfTransferMainAccount *time.Time `db:"date_of_transfer_main_account"`
 	CreatedAt                 time.Time  `db:"created_at,omitempty"`
 	UpdatedAt                 time.Time  `db:"updated_at"`
@@ -105,4 +106,47 @@ func (t *DepositPayment) Insert(tx up.Session, m DepositPayment) (int, error) {
 	id := getInsertId(res.ID())
 
 	return id, nil
+}
+
+func (t *DepositPayment) GetDepositPaymentByCaseNumber(caseNumber string) (DepositPayment, error) {
+	var response DepositPayment
+
+	query1 := `select sum(amount) from deposit_payments where case_number = $1`
+	query2 := `select sum(price) from deposit_additional_expenses a 
+			   left join deposit_payment_orders d on a.payment_order_id = d.id
+			   where d.case_number = $1`
+
+	rows1, err := Upper.SQL().Query(query1, caseNumber)
+	if err != nil {
+		return response, err
+	}
+	defer rows1.Close()
+
+	var amountPayments float64
+	for rows1.Next() {
+		err = rows1.Scan(&amountPayments)
+
+		if err != nil {
+			return response, err
+		}
+	}
+
+	rows2, err := Upper.SQL().Query(query2, caseNumber)
+	if err != nil {
+		return response, err
+	}
+	defer rows2.Close()
+
+	var amountSpending float64
+	for rows2.Next() {
+		err = rows2.Scan(&amountSpending)
+
+		if err != nil {
+			return response, err
+		}
+	}
+
+	response.Amount = amountPayments - amountSpending
+
+	return response, nil
 }

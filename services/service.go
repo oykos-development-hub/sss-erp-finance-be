@@ -293,6 +293,7 @@ type DepositPaymentService interface {
 	DeleteDepositPayment(id int) error
 	GetDepositPayment(id int) (*dto.DepositPaymentResponseDTO, error)
 	GetDepositPaymentList(filter dto.DepositPaymentFilterDTO) ([]dto.DepositPaymentResponseDTO, *uint64, error)
+	GetDepositPaymentByCaseNumber(caseNumber *string) (*dto.DepositPaymentResponseDTO, error)
 }
 
 type DepositPaymentOrderService interface {

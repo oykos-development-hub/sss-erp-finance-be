@@ -8,8 +8,8 @@ import (
 	"gitlab.sudovi.me/erp/finance-api/errors"
 	"gitlab.sudovi.me/erp/finance-api/services"
 
-	"github.com/oykos-development-hub/celeritas"
 	"github.com/go-chi/chi/v5"
+	"github.com/oykos-development-hub/celeritas"
 )
 
 // DepositPaymentHandler is a concrete type that implements DepositPaymentHandler
@@ -90,6 +90,26 @@ func (h *depositpaymentHandlerImpl) GetDepositPaymentById(w http.ResponseWriter,
 	id, _ := strconv.Atoi(chi.URLParam(r, "id"))
 
 	res, err := h.service.GetDepositPayment(id)
+	if err != nil {
+		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
+		return
+	}
+
+	_ = h.App.WriteDataResponse(w, http.StatusOK, "", res)
+}
+
+func (h *depositpaymentHandlerImpl) GetDepositPaymentsByCaseNumber(w http.ResponseWriter, r *http.Request) {
+	var filter dto.DepositPaymentFilterDTO
+
+	_ = h.App.ReadJSON(w, r, &filter)
+
+	validator := h.App.Validator().ValidateStruct(&filter)
+	if !validator.Valid() {
+		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
+		return
+	}
+
+	res, err := h.service.GetDepositPaymentByCaseNumber(filter.CaseNumber)
 	if err != nil {
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return

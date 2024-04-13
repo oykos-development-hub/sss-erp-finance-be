@@ -16,6 +16,7 @@ type DepositPaymentDTO struct {
 	AccountID                 int        `json:"account_id"`
 	Amount                    float64    `json:"amount"`
 	MainBankAccount           bool       `json:"main_bank_account"`
+	CurrentBankAccount        string     `json:"current_bank_account"`
 	DateOfTransferMainAccount *time.Time `json:"date_of_transfer_main_account"`
 }
 
@@ -30,6 +31,7 @@ type DepositPaymentResponseDTO struct {
 	AccountID                 int        `json:"account_id"`
 	Amount                    float64    `json:"amount"`
 	MainBankAccount           bool       `json:"main_bank_account"`
+	CurrentBankAccount        string     `json:"current_bank_account"`
 	DateOfTransferMainAccount *time.Time `json:"date_of_transfer_main_account"`
 	CreatedAt                 time.Time  `json:"created_at"`
 	UpdatedAt                 time.Time  `json:"updated_at"`
@@ -56,6 +58,7 @@ func (dto DepositPaymentDTO) ToDepositPayment() *data.DepositPayment {
 		Amount:                    dto.Amount,
 		MainBankAccount:           dto.MainBankAccount,
 		DateOfTransferMainAccount: dto.DateOfTransferMainAccount,
+		CurrentBankAccount:        dto.CurrentBankAccount,
 		OrganizationUnitID:        dto.OrganizationUnitID,
 	}
 }
@@ -73,6 +76,7 @@ func ToDepositPaymentResponseDTO(data data.DepositPayment) DepositPaymentRespons
 		Amount:                    data.Amount,
 		MainBankAccount:           data.MainBankAccount,
 		DateOfTransferMainAccount: data.DateOfTransferMainAccount,
+		CurrentBankAccount:        data.CurrentBankAccount,
 		CreatedAt:                 data.CreatedAt,
 		UpdatedAt:                 data.UpdatedAt,
 	}

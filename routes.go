@@ -209,6 +209,7 @@ func routes(app *celeritas.Celeritas, middleware *middleware.Middleware, handler
 		rt.Post("/deposit-payments", handlers.DepositPaymentHandler.CreateDepositPayment)
 		rt.Get("/deposit-payments/{id}", handlers.DepositPaymentHandler.GetDepositPaymentById)
 		rt.Get("/deposit-payments", handlers.DepositPaymentHandler.GetDepositPaymentList)
+		rt.Get("/deposit-payments-case-number", handlers.DepositPaymentHandler.GetDepositPaymentsByCaseNumber)
 		rt.Put("/deposit-payments/{id}", handlers.DepositPaymentHandler.UpdateDepositPayment)
 		rt.Delete("/deposit-payments/{id}", handlers.DepositPaymentHandler.DeleteDepositPayment)
 
