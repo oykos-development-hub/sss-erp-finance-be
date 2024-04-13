@@ -151,7 +151,10 @@ func (h *DepositPaymentOrderServiceImpl) UpdateDepositPaymentOrder(id int, input
 			if exists {
 				validExpensesPaying[item.ID] = true
 			} else {
-				additionalExpenseData := item.ToDepositAdditionalExpense()
+				additionalExpenseData, err := h.additionalExpensesRepo.Get(item.ID)
+				if err != nil {
+					return err
+				}
 				additionalExpenseData.PayingPaymentOrderID = &id
 				additionalExpenseData.Status = "waiting"
 				err = h.additionalExpensesRepo.Update(tx, *additionalExpenseData)
@@ -293,8 +296,8 @@ func (h *DepositPaymentOrderServiceImpl) DeleteDepositPaymentOrder(id int) error
 				PaymentOrderID:       item.PaymentOrderID,
 				OrganizationUnitID:   item.OrganizationUnitID,
 				Price:                item.Price,
-				PayingPaymentOrderID: item.PayingPaymentOrderID,
-				Status:               "paid",
+				PayingPaymentOrderID: nil,
+				Status:               "created",
 			}
 			err := h.additionalExpensesRepo.Update(tx, itemToUpdate)
 			if err != nil {
