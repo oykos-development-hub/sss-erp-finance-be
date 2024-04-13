@@ -274,7 +274,43 @@ func (h *DepositPaymentOrderServiceImpl) PayDepositPaymentOrder(id int, input dt
 }
 
 func (h *DepositPaymentOrderServiceImpl) DeleteDepositPaymentOrder(id int) error {
-	err := h.repo.Delete(id)
+	err := data.Upper.Tx(func(tx up.Session) error {
+		additionalExpenses, _, err := h.additionalExpenses.GetDepositAdditionalExpenseList(dto.DepositAdditionalExpenseFilterDTO{
+			PayingPaymentOrderID: &id,
+		})
+
+		if err != nil {
+			return err
+		}
+
+		for _, item := range additionalExpenses {
+			itemToUpdate := data.DepositAdditionalExpense{
+				ID:                   item.ID,
+				Title:                item.Title,
+				AccountID:            item.AccountID,
+				SubjectID:            item.SubjectID,
+				BankAccount:          item.BankAccount,
+				PaymentOrderID:       item.PaymentOrderID,
+				OrganizationUnitID:   item.OrganizationUnitID,
+				Price:                item.Price,
+				PayingPaymentOrderID: item.PayingPaymentOrderID,
+				Status:               "paid",
+			}
+			err := h.additionalExpensesRepo.Update(tx, itemToUpdate)
+			if err != nil {
+				return err
+			}
+
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return err
+	}
+
+	err = h.repo.Delete(id)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return errors.ErrInternalServer
