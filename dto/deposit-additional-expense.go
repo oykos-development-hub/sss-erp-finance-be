@@ -43,7 +43,7 @@ type DepositAdditionalExpenseFilterDTO struct {
 	SubjectID            *int    `json:"subject_id"`
 	OrganizationUnitID   *int    `json:"organization_unit_id"`
 	Year                 *int    `json:"year"`
-	Status               *int    `json:"status"`
+	Status               *string `json:"status"`
 	Search               *string `json:"search"`
 }
 
