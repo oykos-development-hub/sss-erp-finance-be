@@ -107,6 +107,10 @@ func (h *DepositAdditionalExpenseServiceImpl) GetDepositAdditionalExpenseList(fi
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"title <> ": "Neto"})
 	}
 
+	if filter.PayingPaymentOrderID != nil {
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"paying_payment_order_id": *filter.PayingPaymentOrderID})
+	}
+
 	if filter.Status != nil {
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"status": *filter.Status})
 	}
