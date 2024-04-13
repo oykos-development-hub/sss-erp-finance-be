@@ -14,7 +14,7 @@ type DepositAdditionalExpense struct {
 	SubjectID            int       `db:"subject_id"`
 	BankAccount          string    `db:"bank_account"`
 	PaymentOrderID       int       `db:"payment_order_id"`
-	PayingPaymentOrderID int       `db:"paying_payment_order_id"`
+	PayingPaymentOrderID *int      `db:"paying_payment_order_id"`
 	OrganizationUnitID   int       `db:"organization_unit_id"`
 	Price                float32   `db:"price"`
 	Status               string    `db:"status"`

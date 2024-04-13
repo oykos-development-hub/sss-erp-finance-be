@@ -13,7 +13,7 @@ type DepositAdditionalExpenseDTO struct {
 	SubjectID            int     `json:"subject_id"`
 	BankAccount          string  `json:"bank_account"`
 	PaymentOrderID       int     `json:"payment_order_id"`
-	PayingPaymentOrderID int     `json:"paying_payment_order_id"`
+	PayingPaymentOrderID *int    `json:"paying_payment_order_id"`
 	OrganizationUnitID   int     `json:"organization_unit_id"`
 	Price                float32 `json:"price"`
 	Status               string  `json:"status"`
@@ -26,7 +26,7 @@ type DepositAdditionalExpenseResponseDTO struct {
 	SubjectID            int       `json:"subject_id"`
 	BankAccount          string    `json:"bank_account"`
 	PaymentOrderID       int       `json:"payment_order_id"`
-	PayingPaymentOrderID int       `json:"paying_payment_order_id"`
+	PayingPaymentOrderID *int      `json:"paying_payment_order_id"`
 	OrganizationUnitID   int       `json:"organization_unit_id"`
 	Price                float32   `json:"price"`
 	Status               string    `json:"status"`
