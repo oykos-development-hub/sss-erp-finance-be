@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS invoices (
     type_of_subject INTEGER,
     type_of_contract INTEGER,
     status TEXT,
-    source_of_funding INTEGER,
+    source_of_funding TEXT,
     gross_price FLOAT,
     vat_price FLOAT,
     supplier TEXT,

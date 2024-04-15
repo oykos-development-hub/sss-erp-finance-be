@@ -31,7 +31,7 @@ type InvoiceDTO struct {
 	TaxAuthorityCodebookID int                    `json:"tax_authority_codebook_id"`
 	TypeOfSubject          int                    `json:"type_of_subject"`
 	TypeOfContract         int                    `json:"type_of_contract"`
-	SourceOfFunding        int                    `json:"source_of_funding"`
+	SourceOfFunding        string                 `json:"source_of_funding"`
 	Supplier               string                 `json:"supplier"`
 	GrossPrice             float64                `json:"gross_price"`
 	MunicipalityID         int                    `json:"municipality_id"`
@@ -67,7 +67,7 @@ type InvoiceResponseDTO struct {
 	MunicipalityID         int                            `json:"municipality_id"`
 	TypeOfSubject          int                            `json:"type_of_subject"`
 	TypeOfContract         int                            `json:"type_of_contract"`
-	SourceOfFunding        int                            `json:"source_of_funding"`
+	SourceOfFunding        string                         `json:"source_of_funding"`
 	Supplier               string                         `json:"supplier"`
 	Issuer                 string                         `json:"issuer"`
 	Status                 string                         `json:"status"`

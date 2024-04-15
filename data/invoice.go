@@ -20,7 +20,7 @@ type Invoice struct {
 	TaxAuthorityCodebookID int        `db:"tax_authority_codebook_id"`
 	TypeOfSubject          int        `db:"type_of_subject"`
 	TypeOfContract         int        `db:"type_of_contract"`
-	SourceOfFunding        int        `db:"source_of_funding"`
+	SourceOfFunding        string     `db:"source_of_funding"`
 	Supplier               string     `db:"supplier"`
 	Status                 string     `db:"status,omitempty"`
 	GrossPrice             float64    `db:"gross_price"`
