@@ -18,6 +18,7 @@ type DepositPaymentDTO struct {
 	MainBankAccount           bool       `json:"main_bank_account"`
 	CurrentBankAccount        string     `json:"current_bank_account"`
 	DateOfTransferMainAccount *time.Time `json:"date_of_transfer_main_account"`
+	FileID                    *int       `json:"file_id"`
 }
 
 type DepositPaymentResponseDTO struct {
@@ -32,6 +33,8 @@ type DepositPaymentResponseDTO struct {
 	Amount                    float64    `json:"amount"`
 	MainBankAccount           bool       `json:"main_bank_account"`
 	CurrentBankAccount        string     `json:"current_bank_account"`
+	FileID                    *int       `json:"file_id"`
+	Status                    string     `json:"status"`
 	DateOfTransferMainAccount *time.Time `json:"date_of_transfer_main_account"`
 	CreatedAt                 time.Time  `json:"created_at"`
 	UpdatedAt                 time.Time  `json:"updated_at"`
@@ -60,10 +63,20 @@ func (dto DepositPaymentDTO) ToDepositPayment() *data.DepositPayment {
 		DateOfTransferMainAccount: dto.DateOfTransferMainAccount,
 		CurrentBankAccount:        dto.CurrentBankAccount,
 		OrganizationUnitID:        dto.OrganizationUnitID,
+		FileID:                    dto.FileID,
 	}
 }
 
 func ToDepositPaymentResponseDTO(data data.DepositPayment) DepositPaymentResponseDTO {
+
+	var status string
+
+	if data.MainBankAccount {
+		status = "Glavni račun"
+	} else {
+		status = "Prelazni račun"
+	}
+
 	return DepositPaymentResponseDTO{
 		ID:                        data.ID,
 		Payer:                     data.Payer,
@@ -77,6 +90,8 @@ func ToDepositPaymentResponseDTO(data data.DepositPayment) DepositPaymentRespons
 		MainBankAccount:           data.MainBankAccount,
 		DateOfTransferMainAccount: data.DateOfTransferMainAccount,
 		CurrentBankAccount:        data.CurrentBankAccount,
+		Status:                    status,
+		FileID:                    data.FileID,
 		CreatedAt:                 data.CreatedAt,
 		UpdatedAt:                 data.UpdatedAt,
 	}

@@ -111,7 +111,7 @@ func (h *DepositPaymentServiceImpl) GetDepositPaymentList(filter dto.DepositPaym
 
 	if filter.Status != nil {
 		switch *filter.Status {
-		case "Prolazni račun":
+		case "Glavni račun":
 			conditionAndExp = up.And(conditionAndExp, &up.Cond{"main_bank_account": true})
 		case "Prelazni račun":
 			conditionAndExp = up.And(conditionAndExp, &up.Cond{"main_bank_account": false})

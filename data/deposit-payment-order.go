@@ -17,6 +17,7 @@ type DepositPaymentOrder struct {
 	DateOfPayment      time.Time  `db:"date_of_payment"`
 	DateOfStatement    *time.Time `db:"date_of_statement"`
 	IDOfStatement      *string    `db:"id_of_statement"`
+	FileID             *int       `db:"file_id"`
 	CreatedAt          time.Time  `db:"created_at,omitempty"`
 	UpdatedAt          time.Time  `db:"updated_at"`
 }

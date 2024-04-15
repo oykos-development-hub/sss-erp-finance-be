@@ -17,6 +17,7 @@ type DepositPaymentOrderDTO struct {
 	IDOfStatement               *string                       `json:"id_of_statement"`
 	AdditionalExpenses          []DepositAdditionalExpenseDTO `json:"additional_expenses"`
 	AdditionalExpensesForPaying []DepositAdditionalExpenseDTO `json:"additional_expenses_for_paying"`
+	FileID                      *int                          `json:"file_id"`
 }
 
 type DepositPaymentOrderResponseDTO struct {
@@ -32,6 +33,7 @@ type DepositPaymentOrderResponseDTO struct {
 	Status                      string                                `json:"status"`
 	AdditionalExpenses          []DepositAdditionalExpenseResponseDTO `json:"additional_expenses"`
 	AdditionalExpensesForPaying []DepositAdditionalExpenseResponseDTO `json:"additional_expenses_for_paying"`
+	FileID                      *int                                  `json:"file_id"`
 	CreatedAt                   time.Time                             `json:"created_at"`
 	UpdatedAt                   time.Time                             `json:"updated_at"`
 }
@@ -56,6 +58,7 @@ func (dto DepositPaymentOrderDTO) ToDepositPaymentOrder() *data.DepositPaymentOr
 		DateOfPayment:      dto.DateOfPayment,
 		DateOfStatement:    dto.DateOfStatement,
 		IDOfStatement:      dto.IDOfStatement,
+		FileID:             dto.FileID,
 	}
 }
 
@@ -70,6 +73,7 @@ func ToDepositPaymentOrderResponseDTO(data data.DepositPaymentOrder) DepositPaym
 		DateOfPayment:      data.DateOfPayment,
 		DateOfStatement:    data.DateOfStatement,
 		IDOfStatement:      data.IDOfStatement,
+		FileID:             data.FileID,
 		CreatedAt:          data.CreatedAt,
 		UpdatedAt:          data.UpdatedAt,
 	}

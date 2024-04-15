@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS deposit_payments (
     amount FLOAT,
     main_bank_account BOOLEAN,
     date_of_transfer_main_account TIMESTAMP,
+    file_id INTEGER,
     created_at TIMESTAMP,
     updated_at TIMESTAMP
 );

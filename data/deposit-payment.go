@@ -20,6 +20,7 @@ type DepositPayment struct {
 	MainBankAccount           bool       `db:"main_bank_account"`
 	CurrentBankAccount        string     `db:"current_bank_account"`
 	DateOfTransferMainAccount *time.Time `db:"date_of_transfer_main_account"`
+	FileID                    *int       `db:"file_id"`
 	CreatedAt                 time.Time  `db:"created_at,omitempty"`
 	UpdatedAt                 time.Time  `db:"updated_at"`
 }
