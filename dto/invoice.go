@@ -34,6 +34,7 @@ type InvoiceDTO struct {
 	SourceOfFunding        int                    `json:"source_of_funding"`
 	Supplier               string                 `json:"supplier"`
 	GrossPrice             float64                `json:"gross_price"`
+	MunicipalityID         int                    `json:"municipality_id"`
 	VATPrice               float64                `json:"vat_price"`
 	SupplierID             int                    `json:"supplier_id"`
 	TypeOfDecision         int                    `json:"type_of_decision"`
@@ -63,6 +64,7 @@ type InvoiceResponseDTO struct {
 	IsInvoice              bool                           `json:"is_invoice"`
 	Type                   string                         `json:"type"`
 	TaxAuthorityCodebookID int                            `json:"tax_authority_codebook_id"`
+	MunicipalityID         int                            `json:"municipality_id"`
 	TypeOfSubject          int                            `json:"type_of_subject"`
 	TypeOfContract         int                            `json:"type_of_contract"`
 	SourceOfFunding        int                            `json:"source_of_funding"`
@@ -107,6 +109,7 @@ func (dto InvoiceDTO) ToInvoice() *data.Invoice {
 		TaxAuthorityCodebookID: dto.TaxAuthorityCodebookID,
 		ActivityID:             dto.ActivityID,
 		SupplierID:             dto.SupplierID,
+		MunicipalityID:         dto.MunicipalityID,
 		OrderID:                dto.OrderID,
 		Issuer:                 dto.Issuer,
 		OrganizationUnitID:     dto.OrganizationUnitID,
@@ -145,6 +148,7 @@ func ToInvoiceResponseDTO(data data.Invoice) InvoiceResponseDTO {
 		TaxAuthorityCodebookID: data.TaxAuthorityCodebookID,
 		ActivityID:             data.ActivityID,
 		SupplierID:             data.SupplierID,
+		MunicipalityID:         data.MunicipalityID,
 		OrderID:                data.OrderID,
 		OrganizationUnitID:     data.OrganizationUnitID,
 		DateOfInvoice:          data.DateOfInvoice,
