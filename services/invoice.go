@@ -50,6 +50,7 @@ func (h *InvoiceServiceImpl) CreateInvoice(input dto.InvoiceDTO) (*dto.InvoiceRe
 		for _, additionalExpense := range input.AdditionalExpenses {
 			additionalExpenseData := additionalExpense.ToAdditionalExpense()
 			additionalExpenseData.InvoiceID = id
+			additionalExpenseData.OrganizationUnitID = input.OrganizationUnitID
 			if _, err = h.additionalExpensesRepo.Insert(tx, *additionalExpenseData); err != nil {
 				return err
 			}
@@ -107,6 +108,7 @@ func (h *InvoiceServiceImpl) UpdateInvoice(id int, input dto.InvoiceDTO) (*dto.I
 			} else {
 				additionalExpenseData := item.ToAdditionalExpense()
 				additionalExpenseData.InvoiceID = id
+				additionalExpenseData.OrganizationUnitID = input.OrganizationUnitID
 				_, err = h.additionalExpensesRepo.Insert(tx, *additionalExpenseData)
 
 				if err != nil {
@@ -128,6 +130,7 @@ func (h *InvoiceServiceImpl) UpdateInvoice(id int, input dto.InvoiceDTO) (*dto.I
 						additionalExpenseData := item.ToAdditionalExpense()
 						additionalExpenseData.ID = item.ID
 						additionalExpenseData.InvoiceID = id
+						additionalExpenseData.OrganizationUnitID = input.OrganizationUnitID
 						err := h.additionalExpensesRepo.Update(tx, *additionalExpenseData)
 						if err != nil {
 							return err
