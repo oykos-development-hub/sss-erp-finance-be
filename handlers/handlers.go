@@ -38,7 +38,9 @@ type Handlers struct {
 	DepositPaymentHandler           DepositPaymentHandler
 	DepositPaymentOrderHandler      DepositPaymentOrderHandler
 	DepositAdditionalExpenseHandler DepositAdditionalExpenseHandler
-}
+	PaymentOrderHandler PaymentOrderHandler
+		PaymentOrderItemHandler PaymentOrderItemHandler
+	}
 
 type InvoiceHandler interface {
 	CreateInvoice(w http.ResponseWriter, r *http.Request)
@@ -325,4 +327,20 @@ type DepositAdditionalExpenseHandler interface {
 	DeleteDepositAdditionalExpense(w http.ResponseWriter, r *http.Request)
 	GetDepositAdditionalExpenseById(w http.ResponseWriter, r *http.Request)
 	GetDepositAdditionalExpenseList(w http.ResponseWriter, r *http.Request)
+}
+
+type PaymentOrderHandler interface {
+	CreatePaymentOrder(w http.ResponseWriter, r *http.Request)
+	UpdatePaymentOrder(w http.ResponseWriter, r *http.Request)
+	DeletePaymentOrder(w http.ResponseWriter, r *http.Request)
+	GetPaymentOrderById(w http.ResponseWriter, r *http.Request)
+	GetPaymentOrderList(w http.ResponseWriter, r *http.Request)
+}
+
+type PaymentOrderItemHandler interface {
+	CreatePaymentOrderItem(w http.ResponseWriter, r *http.Request)
+	UpdatePaymentOrderItem(w http.ResponseWriter, r *http.Request)
+	DeletePaymentOrderItem(w http.ResponseWriter, r *http.Request)
+	GetPaymentOrderItemById(w http.ResponseWriter, r *http.Request)
+	GetPaymentOrderItemList(w http.ResponseWriter, r *http.Request)
 }

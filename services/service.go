@@ -312,3 +312,19 @@ type DepositAdditionalExpenseService interface {
 	GetDepositAdditionalExpense(id int) (*dto.DepositAdditionalExpenseResponseDTO, error)
 	GetDepositAdditionalExpenseList(filter dto.DepositAdditionalExpenseFilterDTO) ([]dto.DepositAdditionalExpenseResponseDTO, *uint64, error)
 }
+
+type PaymentOrderService interface {
+	CreatePaymentOrder(input dto.PaymentOrderDTO) (*dto.PaymentOrderResponseDTO, error)
+	UpdatePaymentOrder(id int, input dto.PaymentOrderDTO) (*dto.PaymentOrderResponseDTO, error)
+	DeletePaymentOrder(id int) error
+	GetPaymentOrder(id int) (*dto.PaymentOrderResponseDTO, error)
+	GetPaymentOrderList(filter dto.PaymentOrderFilterDTO) ([]dto.PaymentOrderResponseDTO, *uint64, error)
+}
+
+type PaymentOrderItemService interface {
+	CreatePaymentOrderItem(input dto.PaymentOrderItemDTO) (*dto.PaymentOrderItemResponseDTO, error)
+	UpdatePaymentOrderItem(id int, input dto.PaymentOrderItemDTO) (*dto.PaymentOrderItemResponseDTO, error)
+	DeletePaymentOrderItem(id int) error
+	GetPaymentOrderItem(id int) (*dto.PaymentOrderItemResponseDTO, error)
+	GetPaymentOrderItemList(filter dto.PaymentOrderItemFilterDTO) ([]dto.PaymentOrderItemResponseDTO, *uint64, error)
+}
