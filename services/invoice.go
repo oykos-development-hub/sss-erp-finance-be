@@ -106,6 +106,7 @@ func (h *InvoiceServiceImpl) UpdateInvoice(id int, input dto.InvoiceDTO) (*dto.I
 				validExpenses[item.ID] = true
 			} else {
 				additionalExpenseData := item.ToAdditionalExpense()
+				additionalExpenseData.InvoiceID = id
 				_, err = h.additionalExpensesRepo.Insert(tx, *additionalExpenseData)
 
 				if err != nil {
@@ -125,7 +126,8 @@ func (h *InvoiceServiceImpl) UpdateInvoice(id int, input dto.InvoiceDTO) (*dto.I
 				for _, item := range input.AdditionalExpenses {
 					if item.ID == itemID {
 						additionalExpenseData := item.ToAdditionalExpense()
-						additionalExpenseData.ID = id
+						additionalExpenseData.ID = item.ID
+						additionalExpenseData.InvoiceID = id
 						err := h.additionalExpensesRepo.Update(tx, *additionalExpenseData)
 						if err != nil {
 							return err
