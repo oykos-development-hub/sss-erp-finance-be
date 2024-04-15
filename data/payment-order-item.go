@@ -11,8 +11,8 @@ type PaymentOrderItem struct {
 	ID                        int       `db:"id,omitempty"`
 	PaymentOrderID            int       `db:"payment_order_id"`
 	InvoiceID                 *int      `db:"invoice_id"`
-	AdditionalExpenseID       *int      `db:"additional_expense"`
-	SalaryAdditionalExpenseID *int      `db:"salary_additional_expense"`
+	AdditionalExpenseID       *int      `db:"additional_expense_id"`
+	SalaryAdditionalExpenseID *int      `db:"salary_additional_expense_id"`
 	AccountID                 int       `db:"account_id"`
 	CreatedAt                 time.Time `db:"created_at,omitempty"`
 	UpdatedAt                 time.Time `db:"updated_at"`

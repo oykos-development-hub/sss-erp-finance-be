@@ -9,8 +9,8 @@ import (
 type PaymentOrderItemDTO struct {
 	PaymentOrderID            int  `json:"payment_order_id"`
 	InvoiceID                 *int `json:"invoice_id"`
-	AdditionalExpenseID       *int `json:"additional_expense"`
-	SalaryAdditionalExpenseID *int `json:"salary_additional_expense"`
+	AdditionalExpenseID       *int `json:"additional_expense_id"`
+	SalaryAdditionalExpenseID *int `json:"salary_additional_expense_id"`
 	AccountID                 int  `json:"account_id"`
 }
 
@@ -34,8 +34,8 @@ type PaymentOrderItemFilterDTO struct {
 	SortByTitle               *string `json:"sort_by_title"`
 	PaymentOrderID            *int    `json:"payment_order_id"`
 	InvoiceID                 *int    `json:"invoice_id"`
-	AdditionalExpenseID       *int    `json:"additional_expense"`
-	SalaryAdditionalExpenseID *int    `json:"salary_additional_expense"`
+	AdditionalExpenseID       *int    `json:"additional_expense_id"`
+	SalaryAdditionalExpenseID *int    `json:"salary_additional_expense_id"`
 }
 
 func (dto PaymentOrderItemDTO) ToPaymentOrderItem() *data.PaymentOrderItem {
