@@ -18,8 +18,8 @@ type PaymentOrderItemResponseDTO struct {
 	ID                        int       `json:"id"`
 	PaymentOrderID            int       `json:"payment_order_id"`
 	InvoiceID                 *int      `json:"invoice_id"`
-	AdditionalExpenseID       *int      `json:"additional_expense"`
-	SalaryAdditionalExpenseID *int      `json:"salary_additional_expense"`
+	AdditionalExpenseID       *int      `json:"additional_expense_id"`
+	SalaryAdditionalExpenseID *int      `json:"salary_additional_expense_id"`
 	Type                      string    `json:"type"`
 	AccountID                 int       `json:"account_id"`
 	Amount                    float64   `json:"amount"`
