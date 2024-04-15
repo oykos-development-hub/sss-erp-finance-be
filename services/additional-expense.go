@@ -2,6 +2,7 @@ package services
 
 import (
 	"fmt"
+	"time"
 
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
@@ -74,13 +75,13 @@ func (h *AdditionalExpenseServiceImpl) GetAdditionalExpenseList(filter dto.Addit
 		conditionAndExp = up.And(conditionAndExp, search)
 	}
 
-	/*if filter.Year != nil {
+	if filter.Year != nil {
 		year := *filter.Year
 		startOfYear := time.Date(year, time.January, 1, 0, 0, 0, 0, time.UTC)
 		endOfYear := startOfYear.AddDate(1, 0, 0).Add(-time.Nanosecond)
 
-		conditionAndExp = up.And(conditionAndExp, &up.Cond{"date_of_invoice": up.Between(startOfYear, endOfYear)})
-	}*/
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"created_at": up.Between(startOfYear, endOfYear)})
+	}
 
 	if filter.SortByTitle != nil {
 		if *filter.SortByTitle == "asc" {
