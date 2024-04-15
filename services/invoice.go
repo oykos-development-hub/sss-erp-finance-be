@@ -34,9 +34,9 @@ func (h *InvoiceServiceImpl) CreateInvoice(input dto.InvoiceDTO) (*dto.InvoiceRe
 	invoice := input.ToInvoice()
 
 	if invoice.SSSInvoiceReceiptDate != nil {
-		invoice.Status = "waiting"
+		invoice.Status = "Potvrđeno"
 	} else {
-		invoice.Status = "created"
+		invoice.Status = "Kreirano"
 	}
 
 	var id int
@@ -51,6 +51,7 @@ func (h *InvoiceServiceImpl) CreateInvoice(input dto.InvoiceDTO) (*dto.InvoiceRe
 			additionalExpenseData := additionalExpense.ToAdditionalExpense()
 			additionalExpenseData.InvoiceID = id
 			additionalExpenseData.OrganizationUnitID = input.OrganizationUnitID
+			additionalExpenseData.Status = "Kreirano"
 			if _, err = h.additionalExpensesRepo.Insert(tx, *additionalExpenseData); err != nil {
 				return err
 			}
@@ -77,9 +78,9 @@ func (h *InvoiceServiceImpl) UpdateInvoice(id int, input dto.InvoiceDTO) (*dto.I
 	invoice.ID = id
 
 	if invoice.SSSInvoiceReceiptDate != nil {
-		invoice.Status = "waiting"
+		invoice.Status = "Potvrđeno"
 	} else {
-		invoice.Status = "created"
+		invoice.Status = "Kreirano"
 	}
 
 	oldData, err := h.GetInvoice(id)
@@ -109,6 +110,7 @@ func (h *InvoiceServiceImpl) UpdateInvoice(id int, input dto.InvoiceDTO) (*dto.I
 				additionalExpenseData := item.ToAdditionalExpense()
 				additionalExpenseData.InvoiceID = id
 				additionalExpenseData.OrganizationUnitID = input.OrganizationUnitID
+				additionalExpenseData.Status = "Kreirano"
 				_, err = h.additionalExpensesRepo.Insert(tx, *additionalExpenseData)
 
 				if err != nil {
@@ -131,6 +133,7 @@ func (h *InvoiceServiceImpl) UpdateInvoice(id int, input dto.InvoiceDTO) (*dto.I
 						additionalExpenseData.ID = item.ID
 						additionalExpenseData.InvoiceID = id
 						additionalExpenseData.OrganizationUnitID = input.OrganizationUnitID
+						additionalExpenseData.Status = "Kreirano"
 						err := h.additionalExpensesRepo.Update(tx, *additionalExpenseData)
 						if err != nil {
 							return err

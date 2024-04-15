@@ -54,7 +54,7 @@ func (h *AdditionalExpenseServiceImpl) GetAdditionalExpenseList(filter dto.Addit
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"title <> ": "Neto"})
 	}
 
-	if filter.Status != nil && *filter.Status != 0 {
+	if filter.Status != nil && *filter.Status != "" {
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"status": *filter.Status})
 	}
 
