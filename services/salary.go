@@ -40,6 +40,7 @@ func (h *SalaryServiceImpl) CreateSalary(input dto.SalaryDTO) (*dto.SalaryRespon
 	for _, additionalExpense := range input.SalaryAdditionalExpenses {
 		additionalExpenseData := additionalExpense.ToSalaryAdditionalExpense()
 		additionalExpenseData.SalaryID = id
+		additionalExpenseData.Status = "Kreiran"
 		_, err = h.salaryAdditionalExpenseRepo.Insert(data.Upper, *additionalExpenseData)
 		if err != nil {
 			return nil, errors.ErrInternalServer
@@ -88,6 +89,8 @@ func (h *SalaryServiceImpl) UpdateSalary(id int, input dto.SalaryDTO) (*dto.Sala
 				validExpenses[item.ID] = true
 			} else {
 				additionalExpenseData := item.ToSalaryAdditionalExpense()
+				additionalExpenseData.SalaryID = id
+				additionalExpenseData.Status = "Kreiran"
 				_, err = h.salaryAdditionalExpenseRepo.Insert(tx, *additionalExpenseData)
 
 				if err != nil {
