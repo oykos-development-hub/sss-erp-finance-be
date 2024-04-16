@@ -168,7 +168,12 @@ func (t *DepositPayment) GetCaseNumber(orgUnitID int) ([]*DepositPayment, error)
 
 	for rows1.Next() {
 		var item DepositPayment
-		err = rows1.Scan(&item.CaseNumber, &item.Amount)
+		var caseNumber string
+		var amount float64
+		err = rows1.Scan(&caseNumber, &amount)
+
+		item.CaseNumber = caseNumber
+		item.Amount = amount
 
 		if err != nil {
 			return response, err
