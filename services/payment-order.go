@@ -54,19 +54,19 @@ func (h *PaymentOrderServiceImpl) CreatePaymentOrder(input dto.PaymentOrderDTO) 
 			}
 
 			if item.InvoiceID != nil {
-				err = updateInvoiceStatus(*item.InvoiceID, dataToInsert.Amount, tx, h)
+				err = updateInvoiceStatus(*item.InvoiceID, dataToInsert.Amount, len(input.Items), tx, h)
 
 				if err != nil {
 					return err
 				}
 			} else if item.AdditionalExpenseID != nil {
-				err = updateAdditionalExpenseStatus(*item.AdditionalExpenseID, dataToInsert.Amount, tx, h)
+				err = updateAdditionalExpenseStatus(*item.AdditionalExpenseID, dataToInsert.Amount, len(input.Items), tx, h)
 
 				if err != nil {
 					return err
 				}
 			} else if item.SalaryAdditionalExpenseID != nil {
-				err = updateSalaryAdditionalExpenseStatus(*item.SalaryAdditionalExpenseID, dataToInsert.Amount, tx, h)
+				err = updateSalaryAdditionalExpenseStatus(*item.SalaryAdditionalExpenseID, dataToInsert.Amount, len(input.Items), tx, h)
 
 				if err != nil {
 					return err
@@ -128,21 +128,21 @@ func (h *PaymentOrderServiceImpl) DeletePaymentOrder(id int) error {
 
 	for _, item := range input.Items {
 		if item.InvoiceID != nil {
-			err = updateInvoiceStatusOnDelete(*item.InvoiceID, input.Amount, data.Upper, h)
+			err = updateInvoiceStatusOnDelete(*item.InvoiceID, input.Amount, len(input.Items), data.Upper, h)
 
 			if err != nil {
 				h.App.ErrorLog.Println(err)
 				return err
 			}
 		} else if item.AdditionalExpenseID != nil {
-			err = updateAdditionalExpenseStatusOnDelete(*item.AdditionalExpenseID, input.Amount, data.Upper, h)
+			err = updateAdditionalExpenseStatusOnDelete(*item.AdditionalExpenseID, input.Amount, len(input.Items), data.Upper, h)
 
 			if err != nil {
 				h.App.ErrorLog.Println(err)
 				return err
 			}
 		} else if item.SalaryAdditionalExpenseID != nil {
-			err = updateSalaryAdditionalExpenseStatusOnDelete(*item.SalaryAdditionalExpenseID, input.Amount, data.Upper, h)
+			err = updateSalaryAdditionalExpenseStatusOnDelete(*item.SalaryAdditionalExpenseID, input.Amount, len(input.Items), data.Upper, h)
 
 			if err != nil {
 				h.App.ErrorLog.Println(err)
@@ -253,7 +253,7 @@ func (h *PaymentOrderServiceImpl) GetPaymentOrderList(filter dto.PaymentOrderFil
 	return response, total, nil
 }
 
-func updateInvoiceStatus(id int, amount float64, tx up.Session, h *PaymentOrderServiceImpl) error {
+func updateInvoiceStatus(id int, amount float64, lenOfArray int, tx up.Session, h *PaymentOrderServiceImpl) error {
 	invoice, err := h.invoiceRepo.Get(id)
 
 	if err != nil {
@@ -292,7 +292,7 @@ func updateInvoiceStatus(id int, amount float64, tx up.Session, h *PaymentOrderS
 		price += paymentOrder.Amount
 	}
 
-	if amount >= price {
+	if amount >= price || lenOfArray > 1 {
 		invoice.Status = "Na čekanju"
 	} else {
 		invoice.Status = "Dio na čekanju"
@@ -307,7 +307,7 @@ func updateInvoiceStatus(id int, amount float64, tx up.Session, h *PaymentOrderS
 	return nil
 }
 
-func updateAdditionalExpenseStatus(id int, amount float64, tx up.Session, h *PaymentOrderServiceImpl) error {
+func updateAdditionalExpenseStatus(id int, amount float64, lenOfArray int, tx up.Session, h *PaymentOrderServiceImpl) error {
 	item, err := h.additionalExpensesRepo.Get(id)
 
 	if err != nil {
@@ -335,7 +335,7 @@ func updateAdditionalExpenseStatus(id int, amount float64, tx up.Session, h *Pay
 
 	price += float64(item.Price)
 
-	if amount >= price {
+	if amount >= price || lenOfArray > 1 {
 		item.Status = "Na čekanju"
 	} else {
 		item.Status = "Dio na čekanju"
@@ -350,7 +350,7 @@ func updateAdditionalExpenseStatus(id int, amount float64, tx up.Session, h *Pay
 	return nil
 }
 
-func updateSalaryAdditionalExpenseStatus(id int, amount float64, tx up.Session, h *PaymentOrderServiceImpl) error {
+func updateSalaryAdditionalExpenseStatus(id int, amount float64, lenOfArray int, tx up.Session, h *PaymentOrderServiceImpl) error {
 	item, err := h.salaryAdditionalExpensesRepo.Get(id)
 
 	if err != nil {
@@ -378,7 +378,7 @@ func updateSalaryAdditionalExpenseStatus(id int, amount float64, tx up.Session, 
 
 	price += float64(item.Amount)
 
-	if amount >= price {
+	if amount >= price || lenOfArray > 1 {
 		item.Status = "Na čekanju"
 	} else {
 		item.Status = "Dio na čekanju"
@@ -393,7 +393,7 @@ func updateSalaryAdditionalExpenseStatus(id int, amount float64, tx up.Session, 
 	return nil
 }
 
-func updateInvoiceStatusOnDelete(id int, amount float64, tx up.Session, h *PaymentOrderServiceImpl) error {
+func updateInvoiceStatusOnDelete(id int, amount float64, lenOfArray int, tx up.Session, h *PaymentOrderServiceImpl) error {
 	invoice, err := h.invoiceRepo.Get(id)
 
 	if err != nil {
@@ -432,7 +432,7 @@ func updateInvoiceStatusOnDelete(id int, amount float64, tx up.Session, h *Payme
 		price += paymentOrder.Amount
 	}
 
-	if amount-price == 0 {
+	if amount-price == 0 || lenOfArray > 1 {
 		invoice.Status = "Kreiran"
 	} else {
 		invoice.Status = "Dio na čekanju"
@@ -447,7 +447,7 @@ func updateInvoiceStatusOnDelete(id int, amount float64, tx up.Session, h *Payme
 	return nil
 }
 
-func updateAdditionalExpenseStatusOnDelete(id int, amount float64, tx up.Session, h *PaymentOrderServiceImpl) error {
+func updateAdditionalExpenseStatusOnDelete(id int, amount float64, lenOfArray int, tx up.Session, h *PaymentOrderServiceImpl) error {
 	item, err := h.additionalExpensesRepo.Get(id)
 
 	if err != nil {
@@ -475,7 +475,7 @@ func updateAdditionalExpenseStatusOnDelete(id int, amount float64, tx up.Session
 
 	price += float64(item.Price)
 
-	if amount-price == 0 {
+	if amount-price == 0 || lenOfArray > 1 {
 		item.Status = "Kreiran"
 	} else {
 		item.Status = "Dio na čekanju"
@@ -490,7 +490,7 @@ func updateAdditionalExpenseStatusOnDelete(id int, amount float64, tx up.Session
 	return nil
 }
 
-func updateSalaryAdditionalExpenseStatusOnDelete(id int, amount float64, tx up.Session, h *PaymentOrderServiceImpl) error {
+func updateSalaryAdditionalExpenseStatusOnDelete(id int, amount float64, lenOfArray int, tx up.Session, h *PaymentOrderServiceImpl) error {
 	item, err := h.salaryAdditionalExpensesRepo.Get(id)
 
 	if err != nil {
@@ -518,7 +518,7 @@ func updateSalaryAdditionalExpenseStatusOnDelete(id int, amount float64, tx up.S
 
 	price += float64(item.Amount)
 
-	if amount-price == 0 {
+	if amount-price == 0 || lenOfArray > 1 {
 		item.Status = "Kreiran"
 	} else {
 		item.Status = "Dio na čekanju"
