@@ -283,7 +283,7 @@ func updateInvoiceStatus(id int, amount float64, lenOfArray int, tx up.Session, 
 	}
 
 	for _, item := range items {
-		paymentOrder, err := h.repo.Get(item.ID)
+		paymentOrder, err := h.repo.Get(item.PaymentOrderID)
 
 		if err != nil {
 			return err
@@ -324,7 +324,7 @@ func updateAdditionalExpenseStatus(id int, amount float64, lenOfArray int, tx up
 
 	var price float64
 	for _, item := range items {
-		paymentOrder, err := h.repo.Get(item.ID)
+		paymentOrder, err := h.repo.Get(item.PaymentOrderID)
 
 		if err != nil {
 			return err
@@ -367,7 +367,7 @@ func updateSalaryAdditionalExpenseStatus(id int, amount float64, lenOfArray int,
 
 	var price float64
 	for _, item := range items {
-		paymentOrder, err := h.repo.Get(item.ID)
+		paymentOrder, err := h.repo.Get(item.PaymentOrderID)
 
 		if err != nil {
 			return err
