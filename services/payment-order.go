@@ -423,7 +423,7 @@ func updateInvoiceStatusOnDelete(id int, amount float64, tx up.Session, h *Payme
 	}
 
 	for _, item := range items {
-		paymentOrder, err := h.repo.Get(item.ID)
+		paymentOrder, err := h.repo.Get(item.PaymentOrderID)
 
 		if err != nil {
 			return err
