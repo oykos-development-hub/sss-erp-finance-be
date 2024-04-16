@@ -253,6 +253,39 @@ func (h *PaymentOrderServiceImpl) GetPaymentOrderList(filter dto.PaymentOrderFil
 	return response, total, nil
 }
 
+func (h *PaymentOrderServiceImpl) GetAllObligations(filter dto.GetObligationsFilterDTO) ([]dto.ObligationResponse, *uint64, error) {
+
+	dataFilter := data.ObligationsFilter{
+		Page:               filter.Page,
+		Size:               filter.Size,
+		OrganizationUnitID: filter.OrganizationUnitID,
+		SupplierID:         filter.SupplierID,
+		Type:               filter.Type,
+	}
+
+	items, total, err := h.repo.GetAllObligations(dataFilter)
+
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var response []dto.ObligationResponse
+	for _, item := range items {
+		response = append(response, dto.ObligationResponse{
+			InvoiceID:                 item.InvoiceID,
+			AdditionalExpenseID:       item.AdditionalExpenseID,
+			SalaryAdditionalExpenseID: item.AdditionalExpenseID,
+			Type:                      item.Type,
+			Title:                     item.Title,
+			Status:                    item.Status,
+			Price:                     item.Price,
+			CreatedAt:                 item.CreatedAt,
+		})
+	}
+
+	return response, total, nil
+}
+
 func updateInvoiceStatus(id int, amount float64, lenOfArray int, tx up.Session, h *PaymentOrderServiceImpl) error {
 	invoice, err := h.invoiceRepo.Get(id)
 

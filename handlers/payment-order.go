@@ -8,8 +8,8 @@ import (
 	"gitlab.sudovi.me/erp/finance-api/errors"
 	"gitlab.sudovi.me/erp/finance-api/services"
 
-	"github.com/oykos-development-hub/celeritas"
 	"github.com/go-chi/chi/v5"
+	"github.com/oykos-development-hub/celeritas"
 )
 
 // PaymentOrderHandler is a concrete type that implements PaymentOrderHandler
@@ -110,6 +110,26 @@ func (h *paymentorderHandlerImpl) GetPaymentOrderList(w http.ResponseWriter, r *
 	}
 
 	res, total, err := h.service.GetPaymentOrderList(filter)
+	if err != nil {
+		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
+		return
+	}
+
+	_ = h.App.WriteDataResponseWithTotal(w, http.StatusOK, "", res, int(*total))
+}
+
+func (h *paymentorderHandlerImpl) GetAllObligations(w http.ResponseWriter, r *http.Request) {
+	var filter dto.GetObligationsFilterDTO
+
+	_ = h.App.ReadJSON(w, r, &filter)
+
+	validator := h.App.Validator().ValidateStruct(&filter)
+	if !validator.Valid() {
+		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
+		return
+	}
+
+	res, total, err := h.service.GetAllObligations(filter)
 	if err != nil {
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return

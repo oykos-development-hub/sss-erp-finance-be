@@ -22,6 +22,25 @@ type PaymentOrder struct {
 	UpdatedAt          time.Time  `db:"updated_at"`
 }
 
+type ObligationsFilter struct {
+	Page               *int    `json:"page"`
+	Size               *int    `json:"size"`
+	OrganizationUnitID int     `json:"organization_unit_id"`
+	SupplierID         int     `json:"supplier_id"`
+	Type               *string `json:"type"`
+}
+
+type Obligation struct {
+	InvoiceID                 *int      `json:"invoice_id"`
+	AdditionalExpenseID       *int      `json:"additional_expense_id"`
+	SalaryAdditionalExpenseID *int      `json:"salary_additional_expense_id"`
+	Type                      string    `json:"type"`
+	Title                     string    `json:"title"`
+	Price                     float64   `json:"price"`
+	Status                    string    `json:"status"`
+	CreatedAt                 time.Time `json:"created_at"`
+}
+
 // Table returns the table name
 func (t *PaymentOrder) Table() string {
 	return "payment_orders"
@@ -104,4 +123,111 @@ func (t *PaymentOrder) Insert(tx up.Session, m PaymentOrder) (int, error) {
 	id := getInsertId(res.ID())
 
 	return id, nil
+}
+
+func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation, *uint64, error) {
+	var items []Obligation
+
+	queryForInvoices := `select i.id, sum(a.net_price) as sum,  sum(p.amount) as paid, i.invoice_number, i.status, i.created_at
+						from invoices i
+						left join articles a on a.invoice_id = i.id
+						left join payment_order_items pi on pi.invoice_id = i.id
+						left join payment_orders p on p.id = pi.payment_order_id
+						where i.supplier_id = $1 and
+						i.organization_unit_id = $2 and i.type = 'invoice' and i.status <> 'Na čekanju'
+						group by i.id;'`
+
+	queryForAdditionalExpenses := `select a.id, a.price, sum(p.amount) as paid, a.title, i.type, a.status, a.created_at
+	                               from additional_expenses a
+	                               left join invoices i on a.invoice_id = i.id
+	                               left join payment_order_items pi on pi.additional_expense_id = a.id
+	                               left join payment_orders p on p.id = pi.payment_order_id
+	                               where a.invoice_id = i.id and i.supplier_id = $1 and
+	                               i.organization_unit_id = $2 and a.status <> 'Na čekanju'
+	                               group by a.id, a.title, i.type order by a.id;`
+
+	queryForSalaryAdditionalExpenses := `select a.id, a.amount, sum(p.amount) as paid, a.type, a.status, a.created_at
+	                                     from salary_additional_expenses a
+	                                     left join salaries s on s.id = a.salary_id
+                                         left join payment_order_items pi on pi.salary_additional_expense_id = a.id
+	                                     left join payment_orders p on p.id = pi.payment_order_id
+	                                     where  a.subject_id = $1 and
+	                                     s.organization_unit_id = $2 and a.status <> 'Na čekanju'
+	                                     group by a.id, a.title order by a.id;`
+
+	if filter.Type == nil || *filter.Type == "invoices" {
+		rows, err := Upper.SQL().Query(queryForInvoices, filter.SupplierID, filter.OrganizationUnitID)
+		if err != nil {
+			return nil, nil, err
+		}
+		defer rows.Close()
+
+		for rows.Next() {
+			var obligation Obligation
+			var price float64
+			var paid float64
+			err = rows.Scan(&obligation.InvoiceID, &price, &paid, &obligation.Title, &obligation.Status, &obligation.CreatedAt)
+
+			if err != nil {
+				return nil, nil, err
+			}
+
+			obligation.Price = price - paid
+
+			items = append(items, obligation)
+		}
+	}
+
+	if filter.Type == nil || (*filter.Type == "decisions" || *filter.Type == "contracts") {
+		rows, err := Upper.SQL().Query(queryForAdditionalExpenses, filter.SupplierID, filter.OrganizationUnitID)
+		if err != nil {
+			return nil, nil, err
+		}
+		defer rows.Close()
+
+		for rows.Next() {
+			var obligation Obligation
+			var price float64
+			var paid float64
+			err = rows.Scan(&obligation.AdditionalExpenseID, &price, &paid, &obligation.Title, &obligation.Type, &obligation.Status, &obligation.CreatedAt)
+
+			if err != nil {
+				return nil, nil, err
+			}
+
+			obligation.Price = price - paid
+
+			if filter.Type == nil || *filter.Type == obligation.Type {
+				items = append(items, obligation)
+			}
+		}
+	}
+
+	if filter.Type == nil || *filter.Type == "salary" {
+		rows, err := Upper.SQL().Query(queryForSalaryAdditionalExpenses, filter.SupplierID, filter.OrganizationUnitID)
+		if err != nil {
+			return nil, nil, err
+		}
+		defer rows.Close()
+
+		for rows.Next() {
+			var obligation Obligation
+			var price float64
+			var paid float64
+			err = rows.Scan(&obligation.SalaryAdditionalExpenseID, &price, &paid, &obligation.Title, &obligation.Status, &obligation.CreatedAt)
+
+			if err != nil {
+				return nil, nil, err
+			}
+
+			obligation.Price = price - paid
+
+			items = append(items, obligation)
+
+		}
+	}
+
+	total := uint64(len(items))
+
+	return items, &total, nil
 }

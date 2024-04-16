@@ -225,18 +225,19 @@ func routes(app *celeritas.Celeritas, middleware *middleware.Middleware, handler
 		rt.Get("/deposit-additional-expenses", handlers.DepositAdditionalExpenseHandler.GetDepositAdditionalExpenseList)
 		rt.Put("/deposit-additional-expenses/{id}", handlers.DepositAdditionalExpenseHandler.UpdateDepositAdditionalExpense)
 		rt.Delete("/deposit-additional-expenses/{id}", handlers.DepositAdditionalExpenseHandler.DeleteDepositAdditionalExpense)
-	
+
 		rt.Post("/payment-orders", handlers.PaymentOrderHandler.CreatePaymentOrder)
-rt.Get("/payment-orders/{id}", handlers.PaymentOrderHandler.GetPaymentOrderById)
-rt.Get("/payment-orders", handlers.PaymentOrderHandler.GetPaymentOrderList)
-rt.Put("/payment-orders/{id}", handlers.PaymentOrderHandler.UpdatePaymentOrder)
-rt.Delete("/payment-orders/{id}", handlers.PaymentOrderHandler.DeletePaymentOrder)
-	
+		rt.Get("/payment-orders/{id}", handlers.PaymentOrderHandler.GetPaymentOrderById)
+		rt.Get("/payment-orders", handlers.PaymentOrderHandler.GetPaymentOrderList)
+		rt.Get("/get-all-obligations", handlers.PaymentOrderHandler.GetAllObligations)
+		rt.Put("/payment-orders/{id}", handlers.PaymentOrderHandler.UpdatePaymentOrder)
+		rt.Delete("/payment-orders/{id}", handlers.PaymentOrderHandler.DeletePaymentOrder)
+
 		rt.Post("/payment-order-items", handlers.PaymentOrderItemHandler.CreatePaymentOrderItem)
-rt.Get("/payment-order-items/{id}", handlers.PaymentOrderItemHandler.GetPaymentOrderItemById)
-rt.Get("/payment-order-items", handlers.PaymentOrderItemHandler.GetPaymentOrderItemList)
-rt.Put("/payment-order-items/{id}", handlers.PaymentOrderItemHandler.UpdatePaymentOrderItem)
-rt.Delete("/payment-order-items/{id}", handlers.PaymentOrderItemHandler.DeletePaymentOrderItem)
+		rt.Get("/payment-order-items/{id}", handlers.PaymentOrderItemHandler.GetPaymentOrderItemById)
+		rt.Get("/payment-order-items", handlers.PaymentOrderItemHandler.GetPaymentOrderItemList)
+		rt.Put("/payment-order-items/{id}", handlers.PaymentOrderItemHandler.UpdatePaymentOrderItem)
+		rt.Delete("/payment-order-items/{id}", handlers.PaymentOrderItemHandler.DeletePaymentOrderItem)
 	})
 
 	return app.Routes

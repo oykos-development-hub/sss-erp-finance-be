@@ -36,6 +36,17 @@ type PaymentOrderResponseDTO struct {
 	UpdatedAt          time.Time                     `json:"updated_at"`
 }
 
+type ObligationResponse struct {
+	InvoiceID                 *int      `json:"invoice_id"`
+	AdditionalExpenseID       *int      `json:"additional_expense_id"`
+	SalaryAdditionalExpenseID *int      `json:"salary_additional_expense_id"`
+	Type                      string    `json:"type"`
+	Title                     string    `json:"title"`
+	Status                    string    `json:"status"`
+	Price                     float64   `json:"price"`
+	CreatedAt                 time.Time `json:"created_at"`
+}
+
 type PaymentOrderFilterDTO struct {
 	Page               *int    `json:"page"`
 	Size               *int    `json:"size"`
@@ -44,6 +55,14 @@ type PaymentOrderFilterDTO struct {
 	OrganizationUnitID *int    `json:"organization_unit_id"`
 	SupplierID         *int    `json:"supplier_id"`
 	Search             *string `json:"search"`
+}
+
+type GetObligationsFilterDTO struct {
+	Page               *int    `json:"page"`
+	Size               *int    `json:"size"`
+	OrganizationUnitID int     `json:"organization_unit_id"`
+	SupplierID         int     `json:"supplier_id"`
+	Type               *string `json:"type"`
 }
 
 func (dto PaymentOrderDTO) ToPaymentOrder() *data.PaymentOrder {
