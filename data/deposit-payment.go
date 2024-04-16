@@ -151,3 +151,48 @@ func (t *DepositPayment) GetDepositPaymentByCaseNumber(caseNumber string) (Depos
 
 	return response, nil
 }
+
+func (t *DepositPayment) GetCaseNumber(orgUnitID int) ([]*DepositPayment, error) {
+	var response []*DepositPayment
+
+	query1 := ` select case_number, sum(amount) from deposit_payments where organization_unit_id = $1 group by case_number`
+	query2 := `select sum(price) from deposit_additional_expenses a
+			   left join deposit_payment_orders d on a.payment_order_id = d.id
+			   where d.case_number = $1`
+
+	rows1, err := Upper.SQL().Query(query1, orgUnitID)
+	if err != nil {
+		return response, err
+	}
+	defer rows1.Close()
+
+	for rows1.Next() {
+		var item *DepositPayment
+		err = rows1.Scan(&item.CaseNumber, &item.Amount)
+
+		if err != nil {
+			return response, err
+		}
+
+		rows2, err := Upper.SQL().Query(query2, item.CaseNumber)
+		if err != nil {
+			return response, err
+		}
+		defer rows2.Close()
+
+		var amountSpending float64
+		for rows2.Next() {
+			err = rows2.Scan(&amountSpending)
+
+			if err != nil {
+				return response, err
+			}
+		}
+
+		item.Amount -= amountSpending
+
+		response = append(response, item)
+	}
+
+	return response, nil
+}

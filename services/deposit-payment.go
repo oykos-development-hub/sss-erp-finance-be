@@ -161,3 +161,17 @@ func (h *DepositPaymentServiceImpl) GetDepositPaymentByCaseNumber(caseNumber *st
 
 	return &response, nil
 }
+
+func (h *DepositPaymentServiceImpl) GetCaseNumber(orgUnitID *int) ([]dto.DepositPaymentResponseDTO, error) {
+	if orgUnitID == nil {
+		return nil, errors.ErrBadRequest
+	}
+	data, err := h.repo.GetCaseNumber(*orgUnitID)
+	if err != nil {
+		h.App.ErrorLog.Println(err)
+		return nil, errors.ErrInternalServer
+	}
+	response := dto.ToDepositPaymentListResponseDTO(data)
+
+	return response, nil
+}

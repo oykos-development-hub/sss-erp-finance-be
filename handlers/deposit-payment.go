@@ -118,6 +118,26 @@ func (h *depositpaymentHandlerImpl) GetDepositPaymentsByCaseNumber(w http.Respon
 	_ = h.App.WriteDataResponse(w, http.StatusOK, "", res)
 }
 
+func (h *depositpaymentHandlerImpl) GetCaseNumber(w http.ResponseWriter, r *http.Request) {
+	var filter dto.DepositPaymentFilterDTO
+
+	_ = h.App.ReadJSON(w, r, &filter)
+
+	validator := h.App.Validator().ValidateStruct(&filter)
+	if !validator.Valid() {
+		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
+		return
+	}
+
+	res, err := h.service.GetCaseNumber(filter.OrganizationUnitID)
+	if err != nil {
+		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
+		return
+	}
+
+	_ = h.App.WriteDataResponse(w, http.StatusOK, "", res)
+}
+
 func (h *depositpaymentHandlerImpl) GetDepositPaymentList(w http.ResponseWriter, r *http.Request) {
 	var filter dto.DepositPaymentFilterDTO
 
