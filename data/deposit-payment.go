@@ -167,14 +167,14 @@ func (t *DepositPayment) GetCaseNumber(orgUnitID int) ([]*DepositPayment, error)
 	defer rows1.Close()
 
 	for rows1.Next() {
-		var item *DepositPayment
+		var item DepositPayment
 		err = rows1.Scan(&item.CaseNumber, &item.Amount)
 
 		if err != nil {
 			return response, err
 		}
 
-		rows2, err := Upper.SQL().Query(query2, item.CaseNumber)
+		rows2, err := Upper.SQL().Query(query2, &item.CaseNumber)
 		if err != nil {
 			return response, err
 		}
@@ -191,7 +191,7 @@ func (t *DepositPayment) GetCaseNumber(orgUnitID int) ([]*DepositPayment, error)
 
 		item.Amount -= amountSpending
 
-		response = append(response, item)
+		response = append(response, &item)
 	}
 
 	return response, nil
