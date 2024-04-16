@@ -274,7 +274,7 @@ func (h *PaymentOrderServiceImpl) GetAllObligations(filter dto.GetObligationsFil
 		response = append(response, dto.ObligationResponse{
 			InvoiceID:                 item.InvoiceID,
 			AdditionalExpenseID:       item.AdditionalExpenseID,
-			SalaryAdditionalExpenseID: item.AdditionalExpenseID,
+			SalaryAdditionalExpenseID: item.SalaryAdditionalExpenseID,
 			Type:                      item.Type,
 			Title:                     item.Title,
 			Status:                    item.Status,
