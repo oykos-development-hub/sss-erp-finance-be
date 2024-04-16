@@ -131,18 +131,21 @@ func (h *PaymentOrderServiceImpl) DeletePaymentOrder(id int) error {
 			err = updateInvoiceStatusOnDelete(*item.InvoiceID, input.Amount, data.Upper, h)
 
 			if err != nil {
+				h.App.ErrorLog.Println(err)
 				return err
 			}
 		} else if item.AdditionalExpenseID != nil {
 			err = updateAdditionalExpenseStatusOnDelete(*item.AdditionalExpenseID, input.Amount, data.Upper, h)
 
 			if err != nil {
+				h.App.ErrorLog.Println(err)
 				return err
 			}
 		} else if item.SalaryAdditionalExpenseID != nil {
 			err = updateSalaryAdditionalExpenseStatusOnDelete(*item.SalaryAdditionalExpenseID, input.Amount, data.Upper, h)
 
 			if err != nil {
+				h.App.ErrorLog.Println(err)
 				return err
 			}
 		}
