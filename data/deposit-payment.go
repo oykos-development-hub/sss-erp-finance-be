@@ -186,7 +186,7 @@ func (t *DepositPayment) GetCaseNumber(orgUnitID int) ([]*DepositPayment, error)
 		}
 		defer rows2.Close()
 
-		var amountSpending float64
+		var amountSpending *float64
 		for rows2.Next() {
 			err = rows2.Scan(&amountSpending)
 
@@ -195,7 +195,9 @@ func (t *DepositPayment) GetCaseNumber(orgUnitID int) ([]*DepositPayment, error)
 			}
 		}
 
-		item.Amount -= amountSpending
+		if amountSpending != nil {
+			item.Amount -= *amountSpending
+		}
 
 		if item.Amount > 0 {
 			response = append(response, &item)
