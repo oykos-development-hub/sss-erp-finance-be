@@ -134,7 +134,7 @@ func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation
 						left join payment_order_items pi on pi.invoice_id = i.id
 						left join payment_orders p on p.id = pi.payment_order_id
 						where i.supplier_id = $1 and
-						i.organization_unit_id = $2 and i.type = 'invoice' and i.status <> 'Na čekanju'
+						i.organization_unit_id = $2 and i.type = 'invoice' and i.status <> 'Na čekanju' and i.status <> 'Plaćen'
 						group by i.id;`
 
 	queryForAdditionalExpenses := `select a.id, a.price, sum(p.amount) as paid, a.title, i.type, a.status, a.created_at
@@ -143,7 +143,7 @@ func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation
 	                               left join payment_order_items pi on pi.additional_expense_id = a.id
 	                               left join payment_orders p on p.id = pi.payment_order_id
 	                               where a.invoice_id = i.id and a.subject_id = $1 and
-	                               i.organization_unit_id = $2 and a.status <> 'Na čekanju'
+	                               i.organization_unit_id = $2 and a.status <> 'Na čekanju' and a.status <> 'Plaćen'
 	                               group by a.id, a.title, i.type order by a.id;`
 
 	queryForSalaryAdditionalExpenses := `select a.id, a.amount, sum(p.amount) as paid, a.type, a.status, a.created_at
@@ -152,7 +152,7 @@ func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation
                                          left join payment_order_items pi on pi.salary_additional_expense_id = a.id
 	                                     left join payment_orders p on p.id = pi.payment_order_id
 	                                     where  a.subject_id = $1 and
-	                                     s.organization_unit_id = $2 and a.status <> 'Na čekanju'
+	                                     s.organization_unit_id = $2 and a.status <> 'Na čekanju' and a.status <> 'Plaćen'
 	                                     group by a.id, a.title order by a.id;`
 
 	if filter.Type == nil || *filter.Type == "invoices" {
