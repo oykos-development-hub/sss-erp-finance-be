@@ -41,6 +41,7 @@ func (h *PaymentOrderServiceImpl) CreatePaymentOrder(input dto.PaymentOrderDTO) 
 		var err error
 		id, err = h.repo.Insert(tx, *dataToInsert)
 		if err != nil {
+			fmt.Println(err)
 			return errors.ErrInternalServer
 		}
 
@@ -77,11 +78,13 @@ func (h *PaymentOrderServiceImpl) CreatePaymentOrder(input dto.PaymentOrderDTO) 
 	})
 
 	if err != nil {
+		fmt.Println(err)
 		return nil, errors.ErrInternalServer
 	}
 
 	dataToInsert, err = h.repo.Get(id)
 	if err != nil {
+		fmt.Println(err)
 		return nil, errors.ErrInternalServer
 	}
 
