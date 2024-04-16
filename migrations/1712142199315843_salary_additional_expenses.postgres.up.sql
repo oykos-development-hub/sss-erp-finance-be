@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS salary_additional_expenses (
     bank_account TEXT,
     status TEXT NOT NULL,
     title TEXT,
+    debtor_id INTEGER,
     organization_unit_id INTEGER NOT NULL,
     created_at TIMESTAMP,
     updated_at TIMESTAMP

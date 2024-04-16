@@ -33,15 +33,10 @@ func NewInvoiceServiceImpl(app *celeritas.Celeritas, repo data.Invoice, addition
 func (h *InvoiceServiceImpl) CreateInvoice(input dto.InvoiceDTO) (*dto.InvoiceResponseDTO, error) {
 	invoice := input.ToInvoice()
 
-	if invoice.SSSInvoiceReceiptDate != nil {
-		invoice.Status = "Potvrđen"
-	} else {
-		invoice.Status = "Kreiran"
-	}
-
 	var id int
 	err := data.Upper.Tx(func(tx up.Session) error {
 		var err error
+		invoice.Status = "Kreiran"
 		id, err = h.repo.Insert(tx, *invoice)
 		if err != nil {
 			return errors.ErrInternalServer
@@ -76,12 +71,6 @@ func (h *InvoiceServiceImpl) CreateInvoice(input dto.InvoiceDTO) (*dto.InvoiceRe
 func (h *InvoiceServiceImpl) UpdateInvoice(id int, input dto.InvoiceDTO) (*dto.InvoiceResponseDTO, error) {
 	invoice := input.ToInvoice()
 	invoice.ID = id
-
-	if invoice.SSSInvoiceReceiptDate != nil {
-		invoice.Status = "Potvrđen"
-	} else {
-		invoice.Status = "Kreiran"
-	}
 
 	oldData, err := h.GetInvoice(id)
 

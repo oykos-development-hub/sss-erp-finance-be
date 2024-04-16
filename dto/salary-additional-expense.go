@@ -16,6 +16,7 @@ type SalaryAdditionalExpenseDTO struct {
 	BankAccount        string  `json:"bank_account"`
 	Status             string  `json:"status"`
 	OrganizationUnitID int     `json:"organization_unit_id"`
+	DebtorID           int     `json:"debtor_id"`
 	Type               string  `json:"type"`
 }
 
@@ -30,6 +31,7 @@ type SalaryAdditionalExpenseResponseDTO struct {
 	Status             string    `json:"status"`
 	OrganizationUnitID int       `json:"organization_unit_id"`
 	Type               string    `json:"type"`
+	DebtorID           int       `json:"debtor_id"`
 	CreatedAt          time.Time `json:"created_at"`
 	UpdatedAt          time.Time `json:"updated_at"`
 }
@@ -49,6 +51,7 @@ func (dto SalaryAdditionalExpenseDTO) ToSalaryAdditionalExpense() *data.SalaryAd
 		Title:              dto.Title,
 		AccountID:          dto.AccountID,
 		Amount:             dto.Amount,
+		DebtorID:           dto.DebtorID,
 		SubjectID:          dto.SubjectID,
 		BankAccount:        dto.BankAccount,
 		Status:             dto.Status,
@@ -67,6 +70,7 @@ func ToSalaryAdditionalExpenseResponseDTO(data data.SalaryAdditionalExpense) Sal
 		SubjectID:          data.SubjectID,
 		BankAccount:        data.BankAccount,
 		Status:             data.Status,
+		DebtorID:           data.DebtorID,
 		OrganizationUnitID: data.OrganizationUnitID,
 		Type:               data.Type,
 		CreatedAt:          data.CreatedAt,
