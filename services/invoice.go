@@ -34,9 +34,9 @@ func (h *InvoiceServiceImpl) CreateInvoice(input dto.InvoiceDTO) (*dto.InvoiceRe
 	invoice := input.ToInvoice()
 
 	if invoice.SSSInvoiceReceiptDate != nil {
-		invoice.Status = "Potvrđeno"
+		invoice.Status = "Potvrđen"
 	} else {
-		invoice.Status = "Kreirano"
+		invoice.Status = "Kreiran"
 	}
 
 	var id int
@@ -51,7 +51,7 @@ func (h *InvoiceServiceImpl) CreateInvoice(input dto.InvoiceDTO) (*dto.InvoiceRe
 			additionalExpenseData := additionalExpense.ToAdditionalExpense()
 			additionalExpenseData.InvoiceID = id
 			additionalExpenseData.OrganizationUnitID = input.OrganizationUnitID
-			additionalExpenseData.Status = "Kreirano"
+			additionalExpenseData.Status = "Kreiran"
 			if _, err = h.additionalExpensesRepo.Insert(tx, *additionalExpenseData); err != nil {
 				return err
 			}
@@ -78,9 +78,9 @@ func (h *InvoiceServiceImpl) UpdateInvoice(id int, input dto.InvoiceDTO) (*dto.I
 	invoice.ID = id
 
 	if invoice.SSSInvoiceReceiptDate != nil {
-		invoice.Status = "Potvrđeno"
+		invoice.Status = "Potvrđen"
 	} else {
-		invoice.Status = "Kreirano"
+		invoice.Status = "Kreiran"
 	}
 
 	oldData, err := h.GetInvoice(id)
@@ -110,7 +110,7 @@ func (h *InvoiceServiceImpl) UpdateInvoice(id int, input dto.InvoiceDTO) (*dto.I
 				additionalExpenseData := item.ToAdditionalExpense()
 				additionalExpenseData.InvoiceID = id
 				additionalExpenseData.OrganizationUnitID = input.OrganizationUnitID
-				additionalExpenseData.Status = "Kreirano"
+				additionalExpenseData.Status = "Kreiran"
 				_, err = h.additionalExpensesRepo.Insert(tx, *additionalExpenseData)
 
 				if err != nil {
@@ -133,7 +133,7 @@ func (h *InvoiceServiceImpl) UpdateInvoice(id int, input dto.InvoiceDTO) (*dto.I
 						additionalExpenseData.ID = item.ID
 						additionalExpenseData.InvoiceID = id
 						additionalExpenseData.OrganizationUnitID = input.OrganizationUnitID
-						additionalExpenseData.Status = "Kreirano"
+						additionalExpenseData.Status = "Kreiran"
 						err := h.additionalExpensesRepo.Update(tx, *additionalExpenseData)
 						if err != nil {
 							return err
