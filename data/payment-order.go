@@ -128,32 +128,38 @@ func (t *PaymentOrder) Insert(tx up.Session, m PaymentOrder) (int, error) {
 func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation, *uint64, error) {
 	var items []Obligation
 
-	queryForInvoices := `select i.id, sum(a.net_price) as sum,  sum(p.amount) as paid, i.invoice_number, i.status, i.created_at
+	queryForInvoices := `select i.id, sum(a.net_price) as sum, i.invoice_number, i.status, i.created_at
 						from invoices i
 						left join articles a on a.invoice_id = i.id
-						left join payment_order_items pi on pi.invoice_id = i.id
-						left join payment_orders p on p.id = pi.payment_order_id
 						where i.supplier_id = $1 and
 						i.organization_unit_id = $2 and i.type = 'invoice' and i.status <> $3 
 						group by i.id;`
 
-	queryForAdditionalExpenses := `select a.id, a.price, sum(p.amount) as paid, a.title, i.type, a.status, a.created_at
+	queryForPaidInvoices := `select sum(p.amount) from payment_order_items pi 
+							left join payment_orders p on p.id = pi.payment_order_id
+							where pi.invoice_id = $1`
+
+	queryForAdditionalExpenses := `select a.id, a.price, a.title, i.type, a.status, a.created_at
 	                               from additional_expenses a
 	                               left join invoices i on a.invoice_id = i.id
-	                               left join payment_order_items pi on pi.additional_expense_id = a.id
-	                               left join payment_orders p on p.id = pi.payment_order_id
 	                               where a.invoice_id = i.id and a.subject_id = $1 and
 	                               i.organization_unit_id = $2 and a.status <> $3
 	                               group by a.id, a.title, i.type order by a.id;`
 
-	queryForSalaryAdditionalExpenses := `select a.id, a.amount, sum(p.amount) as paid, a.type, a.status, a.created_at
+	queryForPaidAdditionalExpenses := `select sum(p.amount) from payment_order_items pi 
+								   left join payment_orders p on p.id = pi.payment_order_id
+								   where pi.additional_expenses_id = $1`
+
+	queryForSalaryAdditionalExpenses := `select a.id, a.amount, a.type, a.status, a.created_at
 	                                     from salary_additional_expenses a
 	                                     left join salaries s on s.id = a.salary_id
-                                         left join payment_order_items pi on pi.salary_additional_expense_id = a.id
-	                                     left join payment_orders p on p.id = pi.payment_order_id
 	                                     where  a.subject_id = $1 and
 	                                     s.organization_unit_id = $2 and a.status <> $3
 	                                     group by a.id, a.title order by a.id;`
+
+	queryForPaidSalaryAdditionalExpenses := `select sum(p.amount) from payment_order_items pi 
+										 left join payment_orders p on p.id = pi.payment_order_id
+										 where pi.salary_additional_expenses_id = $1`
 
 	if filter.Type == nil || *filter.Type == "invoices" {
 		rows, err := Upper.SQL().Query(queryForInvoices, filter.SupplierID, filter.OrganizationUnitID, InvoiceStatusFull)
@@ -166,17 +172,32 @@ func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation
 			var obligation Obligation
 			var price float64
 			var paid *float64
-			err = rows.Scan(&obligation.InvoiceID, &price, &paid, &obligation.Title, &obligation.Status, &obligation.CreatedAt)
+			err = rows.Scan(&obligation.InvoiceID, &price, &obligation.Title, &obligation.Status, &obligation.CreatedAt)
 
 			if err != nil {
 				return nil, nil, err
 			}
 
-			if paid != nil {
-				obligation.Price = price - *paid
-			} else {
-				obligation.Price = price
+			rows1, err := Upper.SQL().Query(queryForPaidInvoices, obligation.InvoiceID)
+
+			if err != nil {
+				return nil, nil, err
 			}
+
+			for rows1.Next() {
+				err = rows1.Scan(&paid)
+
+				if err != nil {
+					return nil, nil, err
+				}
+
+				if paid != nil {
+					obligation.Price = price - *paid
+				} else {
+					obligation.Price = price
+				}
+			}
+
 			items = append(items, obligation)
 		}
 	}
@@ -192,16 +213,30 @@ func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation
 			var obligation Obligation
 			var price float64
 			var paid *float64
-			err = rows.Scan(&obligation.AdditionalExpenseID, &price, &paid, &obligation.Title, &obligation.Type, &obligation.Status, &obligation.CreatedAt)
+			err = rows.Scan(&obligation.AdditionalExpenseID, &price, &obligation.Title, &obligation.Type, &obligation.Status, &obligation.CreatedAt)
 
 			if err != nil {
 				return nil, nil, err
 			}
 
-			if paid != nil {
-				obligation.Price = price - *paid
-			} else {
-				obligation.Price = price
+			rows1, err := Upper.SQL().Query(queryForPaidAdditionalExpenses, obligation.AdditionalExpenseID)
+
+			if err != nil {
+				return nil, nil, err
+			}
+
+			for rows1.Next() {
+				err = rows1.Scan(&paid)
+
+				if err != nil {
+					return nil, nil, err
+				}
+
+				if paid != nil {
+					obligation.Price = price - *paid
+				} else {
+					obligation.Price = price
+				}
 			}
 
 			if filter.Type == nil || *filter.Type == obligation.Type {
@@ -221,16 +256,30 @@ func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation
 			var obligation Obligation
 			var price float64
 			var paid *float64
-			err = rows.Scan(&obligation.SalaryAdditionalExpenseID, &price, &paid, &obligation.Title, &obligation.Status, &obligation.CreatedAt)
+			err = rows.Scan(&obligation.SalaryAdditionalExpenseID, &price, &obligation.Title, &obligation.Status, &obligation.CreatedAt)
 
 			if err != nil {
 				return nil, nil, err
 			}
 
-			if paid != nil {
-				obligation.Price = price - *paid
-			} else {
-				obligation.Price = price
+			rows1, err := Upper.SQL().Query(queryForPaidSalaryAdditionalExpenses, obligation.AdditionalExpenseID)
+
+			if err != nil {
+				return nil, nil, err
+			}
+
+			for rows1.Next() {
+				err = rows1.Scan(&paid)
+
+				if err != nil {
+					return nil, nil, err
+				}
+
+				if paid != nil {
+					obligation.Price = price - *paid
+				} else {
+					obligation.Price = price
+				}
 			}
 
 			items = append(items, obligation)
