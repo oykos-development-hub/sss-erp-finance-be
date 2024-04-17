@@ -36,7 +36,7 @@ func (h *InvoiceServiceImpl) CreateInvoice(input dto.InvoiceDTO) (*dto.InvoiceRe
 	var id int
 	err := data.Upper.Tx(func(tx up.Session) error {
 		var err error
-		invoice.Status = "Kreiran"
+		invoice.Status = data.InvoiceStatusCreated
 		id, err = h.repo.Insert(tx, *invoice)
 		if err != nil {
 			return errors.ErrInternalServer
@@ -46,7 +46,7 @@ func (h *InvoiceServiceImpl) CreateInvoice(input dto.InvoiceDTO) (*dto.InvoiceRe
 			additionalExpenseData := additionalExpense.ToAdditionalExpense()
 			additionalExpenseData.InvoiceID = id
 			additionalExpenseData.OrganizationUnitID = input.OrganizationUnitID
-			additionalExpenseData.Status = "Kreiran"
+			additionalExpenseData.Status = data.InvoiceStatusCreated
 			if _, err = h.additionalExpensesRepo.Insert(tx, *additionalExpenseData); err != nil {
 				return err
 			}
@@ -99,7 +99,7 @@ func (h *InvoiceServiceImpl) UpdateInvoice(id int, input dto.InvoiceDTO) (*dto.I
 				additionalExpenseData := item.ToAdditionalExpense()
 				additionalExpenseData.InvoiceID = id
 				additionalExpenseData.OrganizationUnitID = input.OrganizationUnitID
-				additionalExpenseData.Status = "Kreiran"
+				additionalExpenseData.Status = data.InvoiceStatusCreated
 				_, err = h.additionalExpensesRepo.Insert(tx, *additionalExpenseData)
 
 				if err != nil {
@@ -122,7 +122,7 @@ func (h *InvoiceServiceImpl) UpdateInvoice(id int, input dto.InvoiceDTO) (*dto.I
 						additionalExpenseData.ID = item.ID
 						additionalExpenseData.InvoiceID = id
 						additionalExpenseData.OrganizationUnitID = input.OrganizationUnitID
-						additionalExpenseData.Status = "Kreiran"
+						additionalExpenseData.Status = data.InvoiceStatusCreated
 						err := h.additionalExpensesRepo.Update(tx, *additionalExpenseData)
 						if err != nil {
 							return err

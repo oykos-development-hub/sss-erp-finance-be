@@ -7,17 +7,17 @@ import (
 )
 
 type InvoicesFilter struct {
-	Search             *string `json:"search"`
-	Page               *int    `json:"page"`
-	Size               *int    `json:"size"`
-	Year               *int    `json:"year"`
-	Status             *string `json:"status"`
-	SupplierID         *int    `json:"supplier_id"`
-	OrganizationUnitID *int    `json:"organization_unit_id"`
-	ActivityID         *int    `json:"activity_id"`
-	OrderID            *int    `json:"order_id"`
-	Type               *string `json:"type"`
-	PassedToInventory  *bool   `json:"passed_to_inventory"`
+	Search             *string             `json:"search"`
+	Page               *int                `json:"page"`
+	Size               *int                `json:"size"`
+	Year               *int                `json:"year"`
+	Status             *data.InvoiceStatus `json:"status"`
+	SupplierID         *int                `json:"supplier_id"`
+	OrganizationUnitID *int                `json:"organization_unit_id"`
+	ActivityID         *int                `json:"activity_id"`
+	OrderID            *int                `json:"order_id"`
+	Type               *string             `json:"type"`
+	PassedToInventory  *bool               `json:"passed_to_inventory"`
 }
 
 type InvoiceDTO struct {
@@ -26,7 +26,7 @@ type InvoiceDTO struct {
 	PassedToAccounting     bool                   `json:"passed_to_accounting"`
 	IsInvoice              bool                   `json:"is_invoice"`
 	Issuer                 string                 `json:"issuer"`
-	Status                 string                 `json:"status"`
+	Status                 data.InvoiceStatus     `json:"status"`
 	Type                   string                 `json:"type"`
 	TaxAuthorityCodebookID int                    `json:"tax_authority_codebook_id"`
 	TypeOfSubject          int                    `json:"type_of_subject"`
@@ -70,7 +70,7 @@ type InvoiceResponseDTO struct {
 	SourceOfFunding        string                         `json:"source_of_funding"`
 	Supplier               string                         `json:"supplier"`
 	Issuer                 string                         `json:"issuer"`
-	Status                 string                         `json:"status"`
+	Status                 data.InvoiceStatus             `json:"status"`
 	GrossPrice             float64                        `json:"gross_price"`
 	TypeOfDecision         int                            `json:"type_of_decision"`
 	VATPrice               float64                        `json:"vat_price"`

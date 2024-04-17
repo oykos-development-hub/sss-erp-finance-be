@@ -6,27 +6,19 @@ import (
 	up "github.com/upper/db/v4"
 )
 
-type AdditionalExpenseStatus int
-
-const (
-	AdditionalExpenseStatusCreated        AdditionalExpenseStatus = 1
-	AdditionalExpenseStatusWaitingPayment AdditionalExpenseStatus = 2
-	AdditionalExpenseStatusPaid           AdditionalExpenseStatus = 3
-)
-
 // AdditionalExpense struct
 type AdditionalExpense struct {
-	ID                 int       `db:"id,omitempty"`
-	Title              string    `db:"title"`
-	AccountID          int       `db:"account_id"`
-	SubjectID          int       `db:"subject_id"`
-	BankAccount        string    `db:"bank_account"`
-	InvoiceID          int       `db:"invoice_id"`
-	OrganizationUnitID int       `db:"organization_unit_id"`
-	Price              float32   `db:"price"`
-	Status             string    `db:"status"`
-	CreatedAt          time.Time `db:"created_at,omitempty"`
-	UpdatedAt          time.Time `db:"updated_at"`
+	ID                 int           `db:"id,omitempty"`
+	Title              string        `db:"title"`
+	AccountID          int           `db:"account_id"`
+	SubjectID          int           `db:"subject_id"`
+	BankAccount        string        `db:"bank_account"`
+	InvoiceID          int           `db:"invoice_id"`
+	OrganizationUnitID int           `db:"organization_unit_id"`
+	Price              float32       `db:"price"`
+	Status             InvoiceStatus `db:"status"`
+	CreatedAt          time.Time     `db:"created_at,omitempty"`
+	UpdatedAt          time.Time     `db:"updated_at"`
 }
 
 // Table returns the table name

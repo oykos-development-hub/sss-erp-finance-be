@@ -342,9 +342,9 @@ func updateInvoiceStatus(id int, amount float64, lenOfArray int, tx up.Session, 
 	}
 
 	if amount >= price || lenOfArray > 1 {
-		invoice.Status = "Na čekanju"
+		invoice.Status = data.InvoiceStatusFull
 	} else {
-		invoice.Status = "Dio na čekanju"
+		invoice.Status = data.InvoiceStatusPart
 	}
 
 	err = h.invoiceRepo.Update(tx, *invoice)
@@ -385,9 +385,9 @@ func updateAdditionalExpenseStatus(id int, amount float64, lenOfArray int, tx up
 	price += float64(item.Price)
 
 	if amount >= price || lenOfArray > 1 {
-		item.Status = "Na čekanju"
+		item.Status = data.InvoiceStatusFull
 	} else {
-		item.Status = "Dio na čekanju"
+		item.Status = data.InvoiceStatusPart
 	}
 
 	err = h.additionalExpensesRepo.Update(tx, *item)
@@ -428,9 +428,9 @@ func updateSalaryAdditionalExpenseStatus(id int, amount float64, lenOfArray int,
 	price += float64(item.Amount)
 
 	if amount >= price || lenOfArray > 1 {
-		item.Status = "Na čekanju"
+		item.Status = data.InvoiceStatusFull
 	} else {
-		item.Status = "Dio na čekanju"
+		item.Status = data.InvoiceStatusPart
 	}
 
 	err = h.salaryAdditionalExpensesRepo.Update(tx, *item)
@@ -482,9 +482,9 @@ func updateInvoiceStatusOnDelete(id int, amount float64, lenOfArray int, tx up.S
 	}
 
 	if amount-price == 0 || lenOfArray > 1 {
-		invoice.Status = "Kreiran"
+		invoice.Status = data.InvoiceStatusFull
 	} else {
-		invoice.Status = "Dio na čekanju"
+		invoice.Status = data.InvoiceStatusPart
 	}
 
 	err = h.invoiceRepo.Update(tx, *invoice)
@@ -525,9 +525,9 @@ func updateAdditionalExpenseStatusOnDelete(id int, amount float64, lenOfArray in
 	price += float64(item.Price)
 
 	if amount-price == 0 || lenOfArray > 1 {
-		item.Status = "Kreiran"
+		item.Status = data.InvoiceStatusFull
 	} else {
-		item.Status = "Dio na čekanju"
+		item.Status = data.InvoiceStatusPart
 	}
 
 	err = h.additionalExpensesRepo.Update(tx, *item)
@@ -568,9 +568,9 @@ func updateSalaryAdditionalExpenseStatusOnDelete(id int, amount float64, lenOfAr
 	price += float64(item.Amount)
 
 	if amount-price == 0 || lenOfArray > 1 {
-		item.Status = "Kreiran"
+		item.Status = data.InvoiceStatusFull
 	} else {
-		item.Status = "Dio na čekanju"
+		item.Status = data.InvoiceStatusPart
 	}
 
 	err = h.salaryAdditionalExpensesRepo.Update(tx, *item)
