@@ -149,7 +149,7 @@ func (h *DepositPaymentServiceImpl) GetDepositPaymentList(filter dto.DepositPaym
 }
 
 func (h *DepositPaymentServiceImpl) GetDepositPaymentByCaseNumber(caseNumber *string, sourceBankAccount *string) (*dto.DepositPaymentResponseDTO, error) {
-	if caseNumber == nil || sourceBankAccount != nil {
+	if caseNumber == nil || sourceBankAccount == nil {
 		return nil, errors.ErrBadRequest
 	}
 	data, err := h.repo.GetDepositPaymentByCaseNumber(*caseNumber, *sourceBankAccount)
