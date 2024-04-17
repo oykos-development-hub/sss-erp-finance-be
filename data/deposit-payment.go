@@ -149,6 +149,8 @@ func (t *DepositPayment) GetDepositPaymentByCaseNumber(caseNumber string, source
 
 	if amountSpending != nil {
 		response.Amount = amountPayments - *amountSpending
+	} else {
+		response.Amount = amountPayments
 	}
 	return response, nil
 }
