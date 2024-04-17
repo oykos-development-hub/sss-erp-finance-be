@@ -138,7 +138,7 @@ func (t *DepositPayment) GetDepositPaymentByCaseNumber(caseNumber string, source
 	}
 	defer rows2.Close()
 
-	var amountSpending float64
+	var amountSpending *float64
 	for rows2.Next() {
 		err = rows2.Scan(&amountSpending)
 
@@ -147,8 +147,9 @@ func (t *DepositPayment) GetDepositPaymentByCaseNumber(caseNumber string, source
 		}
 	}
 
-	response.Amount = amountPayments - amountSpending
-
+	if amountSpending != nil {
+		response.Amount = amountPayments - *amountSpending
+	}
 	return response, nil
 }
 
