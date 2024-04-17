@@ -338,7 +338,7 @@ func updateInvoiceStatus(id int, amount float64, lenOfArray int, tx up.Session, 
 			return err
 		}
 
-		price += paymentOrder.Amount
+		amount += paymentOrder.Amount
 	}
 
 	if amount >= price || lenOfArray > 1 {
@@ -371,7 +371,6 @@ func updateAdditionalExpenseStatus(id int, amount float64, lenOfArray int, tx up
 		return err
 	}
 
-	var price float64
 	for _, item := range items {
 		paymentOrder, err := h.repo.Get(item.PaymentOrderID)
 
@@ -379,12 +378,10 @@ func updateAdditionalExpenseStatus(id int, amount float64, lenOfArray int, tx up
 			return err
 		}
 
-		price += paymentOrder.Amount
+		amount += paymentOrder.Amount
 	}
 
-	price += float64(item.Price)
-
-	if amount >= price || lenOfArray > 1 {
+	if amount >= float64(item.Price) || lenOfArray > 1 {
 		item.Status = data.InvoiceStatusFull
 	} else {
 		item.Status = data.InvoiceStatusPart
@@ -414,7 +411,6 @@ func updateSalaryAdditionalExpenseStatus(id int, amount float64, lenOfArray int,
 		return err
 	}
 
-	var price float64
 	for _, item := range items {
 		paymentOrder, err := h.repo.Get(item.PaymentOrderID)
 
@@ -422,12 +418,10 @@ func updateSalaryAdditionalExpenseStatus(id int, amount float64, lenOfArray int,
 			return err
 		}
 
-		price += paymentOrder.Amount
+		amount += paymentOrder.Amount
 	}
 
-	price += float64(item.Amount)
-
-	if amount >= price || lenOfArray > 1 {
+	if amount >= item.Amount || lenOfArray > 1 {
 		item.Status = data.InvoiceStatusFull
 	} else {
 		item.Status = data.InvoiceStatusPart
@@ -451,38 +445,15 @@ func updateInvoiceStatusOnDelete(id int, amount float64, lenOfArray int, tx up.S
 
 	conditionAndExp := &up.AndExpr{}
 	conditionAndExp = up.And(conditionAndExp, &up.Cond{"invoice_id": id})
-
-	articles, _, err := h.invoiceArticlesRepo.GetAll(nil, nil, conditionAndExp, nil)
-
-	if err != nil {
-		return err
-	}
-
-	var price float64
-	for _, article := range articles {
-		price += float64(article.NetPrice)
-	}
-
-	conditionAndExp = &up.AndExpr{}
-	conditionAndExp = up.And(conditionAndExp, &up.Cond{"invoice_id": id})
 	items, _, err := h.itemsRepo.GetAll(nil, nil, conditionAndExp, nil)
 
 	if err != nil {
 		return err
 	}
 
-	for _, item := range items {
-		paymentOrder, err := h.repo.Get(item.PaymentOrderID)
-
-		if err != nil {
-			return err
-		}
-
-		price += paymentOrder.Amount
-	}
-
-	if amount-price == 0 || lenOfArray > 1 {
-		invoice.Status = data.InvoiceStatusFull
+	//ako smo dobili nazad samo item koji brisemo
+	if len(items) == 1 || lenOfArray > 1 {
+		invoice.Status = data.InvoiceStatusCreated
 	} else {
 		invoice.Status = data.InvoiceStatusPart
 	}
@@ -511,21 +482,8 @@ func updateAdditionalExpenseStatusOnDelete(id int, amount float64, lenOfArray in
 		return err
 	}
 
-	var price float64
-	for _, item := range items {
-		paymentOrder, err := h.repo.Get(item.ID)
-
-		if err != nil {
-			return err
-		}
-
-		price += paymentOrder.Amount
-	}
-
-	price += float64(item.Price)
-
-	if amount-price == 0 || lenOfArray > 1 {
-		item.Status = data.InvoiceStatusFull
+	if len(items) == 1 || lenOfArray > 1 {
+		item.Status = data.InvoiceStatusCreated
 	} else {
 		item.Status = data.InvoiceStatusPart
 	}
@@ -554,21 +512,8 @@ func updateSalaryAdditionalExpenseStatusOnDelete(id int, amount float64, lenOfAr
 		return err
 	}
 
-	var price float64
-	for _, item := range items {
-		paymentOrder, err := h.repo.Get(item.ID)
-
-		if err != nil {
-			return err
-		}
-
-		price += paymentOrder.Amount
-	}
-
-	price += float64(item.Amount)
-
-	if amount-price == 0 || lenOfArray > 1 {
-		item.Status = data.InvoiceStatusFull
+	if len(items) == 1 || lenOfArray > 1 {
+		item.Status = data.InvoiceStatusCreated
 	} else {
 		item.Status = data.InvoiceStatusPart
 	}
