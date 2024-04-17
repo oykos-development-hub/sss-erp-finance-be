@@ -8,18 +8,20 @@ import (
 
 // DepositPaymentOrder struct
 type DepositPaymentOrder struct {
-	ID                 int        `db:"id,omitempty"`
-	OrganizationUnitID int        `db:"organization_unit_id"`
-	CaseNumber         string     `db:"case_number"`
-	SupplierID         int        `db:"supplier_id"`
-	NetAmount          float64    `db:"net_amount"`
-	BankAccount        string     `db:"bank_account"`
-	DateOfPayment      time.Time  `db:"date_of_payment"`
-	DateOfStatement    *time.Time `db:"date_of_statement"`
-	IDOfStatement      *string    `db:"id_of_statement"`
-	FileID             *int       `db:"file_id"`
-	CreatedAt          time.Time  `db:"created_at,omitempty"`
-	UpdatedAt          time.Time  `db:"updated_at"`
+	ID                     int        `db:"id,omitempty"`
+	OrganizationUnitID     int        `db:"organization_unit_id"`
+	CaseNumber             string     `db:"case_number"`
+	SupplierID             int        `db:"supplier_id"`
+	NetAmount              float64    `db:"net_amount"`
+	BankAccount            string     `db:"bank_account"`
+	DateOfPayment          time.Time  `db:"date_of_payment"`
+	DateOfStatement        *time.Time `db:"date_of_statement"`
+	IDOfStatement          *string    `db:"id_of_statement"`
+	MunicipalityID         *int       `db:"municipality_id"`
+	TaxAuthorityCodebookID *int       `db:"tax_authority_codebook_id"`
+	FileID                 *int       `db:"file_id"`
+	CreatedAt              time.Time  `db:"created_at,omitempty"`
+	UpdatedAt              time.Time  `db:"updated_at"`
 }
 
 // Table returns the table name

@@ -15,6 +15,8 @@ type DepositPaymentOrderDTO struct {
 	DateOfPayment               time.Time                     `json:"date_of_payment"`
 	DateOfStatement             *time.Time                    `json:"date_of_statement"`
 	IDOfStatement               *string                       `json:"id_of_statement"`
+	MunicipalityID              *int                          `json:"municipality_id"`
+	TaxAuthorityCodebookID      *int                          `json:"tax_authority_codebook_id"`
 	AdditionalExpenses          []DepositAdditionalExpenseDTO `json:"additional_expenses"`
 	AdditionalExpensesForPaying []DepositAdditionalExpenseDTO `json:"additional_expenses_for_paying"`
 	FileID                      *int                          `json:"file_id"`
@@ -31,6 +33,8 @@ type DepositPaymentOrderResponseDTO struct {
 	DateOfStatement             *time.Time                            `json:"date_of_statement"`
 	IDOfStatement               *string                               `json:"id_of_statement"`
 	Status                      string                                `json:"status"`
+	MunicipalityID              *int                                  `json:"municipality_id"`
+	TaxAuthorityCodebookID      *int                                  `json:"tax_authority_codebook_id"`
 	AdditionalExpenses          []DepositAdditionalExpenseResponseDTO `json:"additional_expenses"`
 	AdditionalExpensesForPaying []DepositAdditionalExpenseResponseDTO `json:"additional_expenses_for_paying"`
 	FileID                      *int                                  `json:"file_id"`
@@ -50,32 +54,36 @@ type DepositPaymentOrderFilterDTO struct {
 
 func (dto DepositPaymentOrderDTO) ToDepositPaymentOrder() *data.DepositPaymentOrder {
 	return &data.DepositPaymentOrder{
-		OrganizationUnitID: dto.OrganizationUnitID,
-		CaseNumber:         dto.CaseNumber,
-		SupplierID:         dto.SupplierID,
-		NetAmount:          dto.NetAmount,
-		BankAccount:        dto.BankAccount,
-		DateOfPayment:      dto.DateOfPayment,
-		DateOfStatement:    dto.DateOfStatement,
-		IDOfStatement:      dto.IDOfStatement,
-		FileID:             dto.FileID,
+		OrganizationUnitID:     dto.OrganizationUnitID,
+		CaseNumber:             dto.CaseNumber,
+		SupplierID:             dto.SupplierID,
+		NetAmount:              dto.NetAmount,
+		BankAccount:            dto.BankAccount,
+		DateOfPayment:          dto.DateOfPayment,
+		DateOfStatement:        dto.DateOfStatement,
+		IDOfStatement:          dto.IDOfStatement,
+		MunicipalityID:         dto.MunicipalityID,
+		TaxAuthorityCodebookID: dto.TaxAuthorityCodebookID,
+		FileID:                 dto.FileID,
 	}
 }
 
 func ToDepositPaymentOrderResponseDTO(data data.DepositPaymentOrder) DepositPaymentOrderResponseDTO {
 	response := DepositPaymentOrderResponseDTO{
-		ID:                 data.ID,
-		OrganizationUnitID: data.OrganizationUnitID,
-		CaseNumber:         data.CaseNumber,
-		SupplierID:         data.SupplierID,
-		NetAmount:          data.NetAmount,
-		BankAccount:        data.BankAccount,
-		DateOfPayment:      data.DateOfPayment,
-		DateOfStatement:    data.DateOfStatement,
-		IDOfStatement:      data.IDOfStatement,
-		FileID:             data.FileID,
-		CreatedAt:          data.CreatedAt,
-		UpdatedAt:          data.UpdatedAt,
+		ID:                     data.ID,
+		OrganizationUnitID:     data.OrganizationUnitID,
+		CaseNumber:             data.CaseNumber,
+		SupplierID:             data.SupplierID,
+		NetAmount:              data.NetAmount,
+		BankAccount:            data.BankAccount,
+		DateOfPayment:          data.DateOfPayment,
+		DateOfStatement:        data.DateOfStatement,
+		IDOfStatement:          data.IDOfStatement,
+		FileID:                 data.FileID,
+		MunicipalityID:         data.MunicipalityID,
+		TaxAuthorityCodebookID: data.TaxAuthorityCodebookID,
+		CreatedAt:              data.CreatedAt,
+		UpdatedAt:              data.UpdatedAt,
 	}
 
 	if data.IDOfStatement != nil {
