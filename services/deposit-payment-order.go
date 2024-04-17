@@ -364,6 +364,10 @@ func (h *DepositPaymentOrderServiceImpl) GetDepositPaymentOrderList(filter dto.D
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"case_number": *filter.CaseNumber})
 	}
 
+	if filter.SourceBankAccount != nil && *filter.SourceBankAccount != "" {
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"source_bank_account": *filter.SourceBankAccount})
+	}
+
 	if filter.SupplierID != nil {
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"supplier_id": *filter.SupplierID})
 	}

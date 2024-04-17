@@ -109,7 +109,7 @@ func (h *depositpaymentHandlerImpl) GetDepositPaymentsByCaseNumber(w http.Respon
 		return
 	}
 
-	res, err := h.service.GetDepositPaymentByCaseNumber(filter.CaseNumber)
+	res, err := h.service.GetDepositPaymentByCaseNumber(filter.CaseNumber, filter.SourceBankAccount)
 	if err != nil {
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -129,7 +129,7 @@ func (h *depositpaymentHandlerImpl) GetCaseNumber(w http.ResponseWriter, r *http
 		return
 	}
 
-	res, err := h.service.GetCaseNumber(filter.OrganizationUnitID)
+	res, err := h.service.GetCaseNumber(filter.OrganizationUnitID, filter.SourceBankAccount)
 	if err != nil {
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return

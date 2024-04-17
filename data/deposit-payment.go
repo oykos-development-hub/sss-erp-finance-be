@@ -109,15 +109,15 @@ func (t *DepositPayment) Insert(tx up.Session, m DepositPayment) (int, error) {
 	return id, nil
 }
 
-func (t *DepositPayment) GetDepositPaymentByCaseNumber(caseNumber string) (DepositPayment, error) {
+func (t *DepositPayment) GetDepositPaymentByCaseNumber(caseNumber string, sourceBankAccount string) (DepositPayment, error) {
 	var response DepositPayment
 
-	query1 := `select sum(amount) from deposit_payments where case_number = $1`
+	query1 := `select sum(amount) from deposit_payments where case_number = $1 and current_bank_account = $2`
 	query2 := `select sum(price) from deposit_additional_expenses a 
 			   left join deposit_payment_orders d on a.payment_order_id = d.id
-			   where d.case_number = $1`
+			   where d.case_number = $1 and d.source_bank_account = $2`
 
-	rows1, err := Upper.SQL().Query(query1, caseNumber)
+	rows1, err := Upper.SQL().Query(query1, caseNumber, sourceBankAccount)
 	if err != nil {
 		return response, err
 	}
@@ -132,7 +132,7 @@ func (t *DepositPayment) GetDepositPaymentByCaseNumber(caseNumber string) (Depos
 		}
 	}
 
-	rows2, err := Upper.SQL().Query(query2, caseNumber)
+	rows2, err := Upper.SQL().Query(query2, caseNumber, sourceBankAccount)
 	if err != nil {
 		return response, err
 	}
@@ -152,15 +152,15 @@ func (t *DepositPayment) GetDepositPaymentByCaseNumber(caseNumber string) (Depos
 	return response, nil
 }
 
-func (t *DepositPayment) GetCaseNumber(orgUnitID int) ([]*DepositPayment, error) {
+func (t *DepositPayment) GetCaseNumber(orgUnitID int, sourceBankAccount string) ([]*DepositPayment, error) {
 	var response []*DepositPayment
 
-	query1 := ` select case_number, sum(amount) from deposit_payments where organization_unit_id = $1 group by case_number`
+	query1 := ` select case_number, sum(amount) from deposit_payments where organization_unit_id = $1 and current_bank_account = $2 group by case_number`
 	query2 := `select sum(price) from deposit_additional_expenses a
 			   left join deposit_payment_orders d on a.payment_order_id = d.id
-			   where d.case_number = $1`
+			   where d.case_number = $1 and d.source_bank_account = $2`
 
-	rows1, err := Upper.SQL().Query(query1, orgUnitID)
+	rows1, err := Upper.SQL().Query(query1, orgUnitID, sourceBankAccount)
 	if err != nil {
 		return response, err
 	}
@@ -180,7 +180,7 @@ func (t *DepositPayment) GetCaseNumber(orgUnitID int) ([]*DepositPayment, error)
 			return response, err
 		}
 
-		rows2, err := Upper.SQL().Query(query2, &item.CaseNumber)
+		rows2, err := Upper.SQL().Query(query2, &item.CaseNumber, sourceBankAccount)
 		if err != nil {
 			return response, err
 		}

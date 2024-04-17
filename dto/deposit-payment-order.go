@@ -12,6 +12,7 @@ type DepositPaymentOrderDTO struct {
 	SupplierID                  int                           `json:"supplier_id"`
 	NetAmount                   float64                       `json:"net_amount"`
 	BankAccount                 string                        `json:"bank_account"`
+	SourceBankAccount           string                        `json:"source_bank_account"`
 	DateOfPayment               time.Time                     `json:"date_of_payment"`
 	DateOfStatement             *time.Time                    `json:"date_of_statement"`
 	IDOfStatement               *string                       `json:"id_of_statement"`
@@ -28,6 +29,7 @@ type DepositPaymentOrderResponseDTO struct {
 	CaseNumber                  string                                `json:"case_number"`
 	SupplierID                  int                                   `json:"supplier_id"`
 	NetAmount                   float64                               `json:"net_amount"`
+	SourceBankAccount           string                                `json:"source_bank_account"`
 	BankAccount                 string                                `json:"bank_account"`
 	DateOfPayment               time.Time                             `json:"date_of_payment"`
 	DateOfStatement             *time.Time                            `json:"date_of_statement"`
@@ -50,6 +52,7 @@ type DepositPaymentOrderFilterDTO struct {
 	SupplierID         *int    `json:"supplier_id"`
 	Search             *string `json:"search"`
 	CaseNumber         *string `json:"case_number"`
+	SourceBankAccount  *string `json:"source_bank_account"`
 }
 
 func (dto DepositPaymentOrderDTO) ToDepositPaymentOrder() *data.DepositPaymentOrder {
@@ -59,6 +62,7 @@ func (dto DepositPaymentOrderDTO) ToDepositPaymentOrder() *data.DepositPaymentOr
 		SupplierID:             dto.SupplierID,
 		NetAmount:              dto.NetAmount,
 		BankAccount:            dto.BankAccount,
+		SourceBankAccount:      dto.SourceBankAccount,
 		DateOfPayment:          dto.DateOfPayment,
 		DateOfStatement:        dto.DateOfStatement,
 		IDOfStatement:          dto.IDOfStatement,
@@ -75,6 +79,7 @@ func ToDepositPaymentOrderResponseDTO(data data.DepositPaymentOrder) DepositPaym
 		CaseNumber:             data.CaseNumber,
 		SupplierID:             data.SupplierID,
 		NetAmount:              data.NetAmount,
+		SourceBankAccount:      data.SourceBankAccount,
 		BankAccount:            data.BankAccount,
 		DateOfPayment:          data.DateOfPayment,
 		DateOfStatement:        data.DateOfStatement,

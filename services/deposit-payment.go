@@ -148,11 +148,11 @@ func (h *DepositPaymentServiceImpl) GetDepositPaymentList(filter dto.DepositPaym
 	return response, total, nil
 }
 
-func (h *DepositPaymentServiceImpl) GetDepositPaymentByCaseNumber(caseNumber *string) (*dto.DepositPaymentResponseDTO, error) {
-	if caseNumber == nil {
+func (h *DepositPaymentServiceImpl) GetDepositPaymentByCaseNumber(caseNumber *string, sourceBankAccount *string) (*dto.DepositPaymentResponseDTO, error) {
+	if caseNumber == nil || sourceBankAccount != nil {
 		return nil, errors.ErrBadRequest
 	}
-	data, err := h.repo.GetDepositPaymentByCaseNumber(*caseNumber)
+	data, err := h.repo.GetDepositPaymentByCaseNumber(*caseNumber, *sourceBankAccount)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return nil, errors.ErrInternalServer
@@ -162,12 +162,12 @@ func (h *DepositPaymentServiceImpl) GetDepositPaymentByCaseNumber(caseNumber *st
 	return &response, nil
 }
 
-func (h *DepositPaymentServiceImpl) GetCaseNumber(orgUnitID *int) ([]dto.DepositPaymentResponseDTO, error) {
-	if orgUnitID == nil || *orgUnitID == 0 {
+func (h *DepositPaymentServiceImpl) GetCaseNumber(orgUnitID *int, sourceBankAccount *string) ([]dto.DepositPaymentResponseDTO, error) {
+	if orgUnitID == nil || *orgUnitID == 0 || sourceBankAccount == nil {
 		return nil, errors.ErrBadRequest
 	}
 
-	data, err := h.repo.GetCaseNumber(*orgUnitID)
+	data, err := h.repo.GetCaseNumber(*orgUnitID, *sourceBankAccount)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return nil, errors.ErrInternalServer

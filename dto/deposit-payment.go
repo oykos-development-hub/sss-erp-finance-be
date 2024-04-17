@@ -48,6 +48,7 @@ type DepositPaymentFilterDTO struct {
 	Search             *string `json:"search"`
 	CaseNumber         *string `json:"case_number"`
 	OrganizationUnitID *int    `json:"organization_unit_id"`
+	SourceBankAccount  *string `json:"source_bank_account"`
 }
 
 func (dto DepositPaymentDTO) ToDepositPayment() *data.DepositPayment {

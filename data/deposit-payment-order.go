@@ -14,6 +14,7 @@ type DepositPaymentOrder struct {
 	SupplierID             int        `db:"supplier_id"`
 	NetAmount              float64    `db:"net_amount"`
 	BankAccount            string     `db:"bank_account"`
+	SourceBankAccount      string     `db:"source_bank_account"`
 	DateOfPayment          time.Time  `db:"date_of_payment"`
 	DateOfStatement        *time.Time `db:"date_of_statement"`
 	IDOfStatement          *string    `db:"id_of_statement"`
