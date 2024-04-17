@@ -286,6 +286,22 @@ func (h *PaymentOrderServiceImpl) GetAllObligations(filter dto.GetObligationsFil
 	return response, total, nil
 }
 
+func (h *PaymentOrderServiceImpl) PayPaymentOrder(id int, input dto.PaymentOrderDTO) error {
+	err := data.Upper.Tx(func(tx up.Session) error {
+		err := h.repo.PayPaymentOrder(tx, id, *input.SAPID, *input.DateOfSAP)
+		if err != nil {
+			return errors.ErrInternalServer
+		}
+		return nil
+	})
+
+	if err != nil {
+		return errors.ErrInternalServer
+	}
+
+	return nil
+}
+
 func updateInvoiceStatus(id int, amount float64, lenOfArray int, tx up.Session, h *PaymentOrderServiceImpl) error {
 	invoice, err := h.invoiceRepo.Get(id)
 

@@ -321,6 +321,7 @@ type PaymentOrderService interface {
 	GetPaymentOrder(id int) (*dto.PaymentOrderResponseDTO, error)
 	GetPaymentOrderList(filter dto.PaymentOrderFilterDTO) ([]dto.PaymentOrderResponseDTO, *uint64, error)
 	GetAllObligations(filter dto.GetObligationsFilterDTO) ([]dto.ObligationResponse, *uint64, error)
+	PayPaymentOrder(id int, input dto.PaymentOrderDTO) error
 }
 
 type PaymentOrderItemService interface {

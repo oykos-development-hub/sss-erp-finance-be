@@ -333,6 +333,7 @@ type DepositAdditionalExpenseHandler interface {
 type PaymentOrderHandler interface {
 	CreatePaymentOrder(w http.ResponseWriter, r *http.Request)
 	UpdatePaymentOrder(w http.ResponseWriter, r *http.Request)
+	PayPaymentOrder(w http.ResponseWriter, r *http.Request)
 	DeletePaymentOrder(w http.ResponseWriter, r *http.Request)
 	GetPaymentOrderById(w http.ResponseWriter, r *http.Request)
 	GetPaymentOrderList(w http.ResponseWriter, r *http.Request)

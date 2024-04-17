@@ -83,7 +83,7 @@ func ToPaymentOrderResponseDTO(data data.PaymentOrder) PaymentOrderResponseDTO {
 
 	var status string
 
-	if data.IDOfStatement != nil {
+	if data.SAPID != nil {
 		status = "Plaćen"
 	} else {
 		status = "Na čekanju"

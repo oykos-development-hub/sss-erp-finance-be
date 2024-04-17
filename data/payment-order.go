@@ -242,3 +242,15 @@ func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation
 
 	return items, &total, nil
 }
+
+func (t *PaymentOrder) PayPaymentOrder(tx up.Session, id int, SAPID string, DateOfSAP time.Time) error {
+	query := `update payment_orders set sap_id = $1, date_of_sap = $2 where id = $3`
+
+	rows, err := tx.SQL().Query(query, SAPID, DateOfSAP, id)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	return nil
+}
