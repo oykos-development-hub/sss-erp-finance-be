@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS payment_orders (
     sap_id TEXT,
     date_of_sap TIMESTAMP,
     date_of_payment TIMESTAMP,
+    date_of_order TIMESTAMP,
     description TEXT,
     file_id INTEGER,
     bank_account TEXT,

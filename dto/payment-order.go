@@ -11,6 +11,7 @@ type PaymentOrderDTO struct {
 	SupplierID         int                   `json:"supplier_id"`
 	BankAccount        string                `json:"bank_account"`
 	DateOfPayment      time.Time             `json:"date_of_payment"`
+	DateOfOrder        *time.Time            `json:"date_of_order"`
 	IDOfStatement      *string               `json:"id_of_statement"`
 	SAPID              *string               `json:"sap_id"`
 	DateOfSAP          *time.Time            `json:"date_of_sap"`
@@ -25,6 +26,7 @@ type PaymentOrderResponseDTO struct {
 	SupplierID         int                           `json:"supplier_id"`
 	BankAccount        string                        `json:"bank_account"`
 	DateOfPayment      time.Time                     `json:"date_of_payment"`
+	DateOfOrder        *time.Time                    `json:"date_of_order"`
 	IDOfStatement      *string                       `json:"id_of_statement"`
 	SAPID              *string                       `json:"sap_id"`
 	DateOfSAP          *time.Time                    `json:"date_of_sap"`
@@ -73,6 +75,7 @@ func (dto PaymentOrderDTO) ToPaymentOrder() *data.PaymentOrder {
 		DateOfPayment:      dto.DateOfPayment,
 		IDOfStatement:      dto.IDOfStatement,
 		SAPID:              dto.SAPID,
+		DateOfOrder:        dto.DateOfOrder,
 		DateOfSAP:          dto.DateOfSAP,
 		FileID:             dto.FileID,
 		Amount:             dto.Amount,
@@ -95,6 +98,7 @@ func ToPaymentOrderResponseDTO(data data.PaymentOrder) PaymentOrderResponseDTO {
 		SupplierID:         data.SupplierID,
 		BankAccount:        data.BankAccount,
 		DateOfPayment:      data.DateOfPayment,
+		DateOfOrder:        data.DateOfOrder,
 		IDOfStatement:      data.IDOfStatement,
 		Status:             status,
 		Amount:             data.Amount,
