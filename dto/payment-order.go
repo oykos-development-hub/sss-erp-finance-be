@@ -57,6 +57,7 @@ type PaymentOrderFilterDTO struct {
 	OrganizationUnitID *int    `json:"organization_unit_id"`
 	SupplierID         *int    `json:"supplier_id"`
 	Search             *string `json:"search"`
+	Year               *int    `json:"year"`
 }
 
 type GetObligationsFilterDTO struct {
