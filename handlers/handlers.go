@@ -311,6 +311,7 @@ type DepositPaymentHandler interface {
 	GetDepositPaymentList(w http.ResponseWriter, r *http.Request)
 	GetDepositPaymentsByCaseNumber(w http.ResponseWriter, r *http.Request)
 	GetCaseNumber(w http.ResponseWriter, r *http.Request)
+	GetInitialState(w http.ResponseWriter, r *http.Request)
 }
 
 type DepositPaymentOrderHandler interface {

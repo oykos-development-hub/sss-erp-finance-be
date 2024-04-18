@@ -157,3 +157,23 @@ func (h *depositpaymentHandlerImpl) GetDepositPaymentList(w http.ResponseWriter,
 
 	_ = h.App.WriteDataResponseWithTotal(w, http.StatusOK, "", res, int(*total))
 }
+
+func (h *depositpaymentHandlerImpl) GetInitialState(w http.ResponseWriter, r *http.Request) {
+	var filter dto.DepositInitialStateFilter
+
+	_ = h.App.ReadJSON(w, r, &filter)
+
+	validator := h.App.Validator().ValidateStruct(&filter)
+	if !validator.Valid() {
+		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
+		return
+	}
+
+	res, err := h.service.GetInitialState(filter)
+	if err != nil {
+		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
+		return
+	}
+
+	_ = h.App.WriteDataResponse(w, http.StatusOK, "", res)
+}

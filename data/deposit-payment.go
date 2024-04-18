@@ -25,6 +25,13 @@ type DepositPayment struct {
 	UpdatedAt                 time.Time  `db:"updated_at"`
 }
 
+type DepositInitialStateFilter struct {
+	BankAccount             *string   `json:"bank_account"`
+	OrganizationUnitID      *int      `json:"organization_unit_id"`
+	Date                    time.Time `json:"date"`
+	TransitionalBankAccount *bool     `json:"transitional_bank_account"`
+}
+
 // Table returns the table name
 func (t *DepositPayment) Table() string {
 	return "deposit_payments"
@@ -208,4 +215,120 @@ func (t *DepositPayment) GetCaseNumber(orgUnitID int, sourceBankAccount string) 
 	}
 
 	return response, nil
+}
+
+func (t *DepositPayment) GetInitialState(filter DepositInitialStateFilter) ([]*DepositPayment, error) {
+	var response []*DepositPayment
+
+	if filter.BankAccount != nil {
+		item, err := getAmountByBankAccount(*filter.BankAccount, filter.Date)
+
+		if err != nil {
+			return nil, err
+		}
+
+		response = append(response, item)
+	} else if filter.TransitionalBankAccount != nil && filter.OrganizationUnitID != nil {
+		item, err := getAmountOnTransitionalBankAccount(*filter.OrganizationUnitID, filter.Date)
+		if err != nil {
+			return nil, err
+		}
+
+		response = append(response, item)
+	}
+
+	return response, nil
+}
+
+func getAmountByBankAccount(bankAccount string, date time.Time) (*DepositPayment, error) {
+	query1 := `select sum(amount) from deposit_payments 
+		where current_bank_account = $1 and date_of_transfer_main_account < $2;`
+
+	query2 := `select sum(p.price) from deposit_additional_expenses p 
+		  left join deposit_payment_orders d on d.id = p.payment_order_id  
+		  where p.title = 'Neto' and d.source_bank_account = $1 and d.date_of_statement < $2`
+
+	query3 := `select sum(p.price) from deposit_additional_expenses p 
+		  left join deposit_payment_orders d on d.id = p.paying_payment_order_id  
+		  where d.source_bank_account = $1 and d.date_of_statement < $2`
+
+	rows1, err := Upper.SQL().Query(query1, bankAccount, date)
+	if err != nil {
+		return nil, err
+	}
+	defer rows1.Close()
+
+	var item DepositPayment
+	item.CurrentBankAccount = bankAccount
+	for rows1.Next() {
+		var amount *float64
+		err = rows1.Scan(&amount)
+
+		if err != nil {
+			return nil, err
+		}
+
+		rows2, err := Upper.SQL().Query(query2, bankAccount, date)
+		if err != nil {
+			return nil, err
+		}
+		defer rows2.Close()
+
+		var amountSpending *float64
+		for rows2.Next() {
+			err = rows2.Scan(&amountSpending)
+
+			if err != nil {
+				return nil, err
+			}
+		}
+
+		if amountSpending != nil {
+			item.Amount -= *amountSpending
+		}
+
+		rows3, err := Upper.SQL().Query(query3, bankAccount, date)
+		if err != nil {
+			return nil, err
+		}
+		defer rows3.Close()
+
+		for rows3.Next() {
+			err = rows3.Scan(&amountSpending)
+
+			if err != nil {
+				return nil, err
+			}
+		}
+
+		if amountSpending != nil {
+			item.Amount -= *amountSpending
+		}
+
+	}
+	return &item, nil
+}
+
+func getAmountOnTransitionalBankAccount(orgUnit int, date time.Time) (*DepositPayment, error) {
+	query1 := `select sum(amount) from deposit_payments
+	where organization_unit_id = $1 and
+	date_of_bank_statement < $2 and (main_bank_account = false 
+	or (main_bank_account = true and  date_of_transfer_main_account > '$2));`
+
+	rows1, err := Upper.SQL().Query(query1, orgUnit, date)
+	if err != nil {
+		return nil, err
+	}
+	defer rows1.Close()
+
+	var item DepositPayment
+	for rows1.Next() {
+		var amount *float64
+		err = rows1.Scan(&amount)
+
+		if err != nil {
+			return nil, err
+		}
+	}
+	return &item, nil
 }

@@ -52,6 +52,13 @@ type DepositPaymentFilterDTO struct {
 	BankAccount        *string `json:"bank_account"`
 }
 
+type DepositInitialStateFilter struct {
+	BankAccount             *string   `json:"bank_account"`
+	OrganizationUnitID      *int      `json:"organization_unit_id"`
+	Date                    time.Time `json:"date"`
+	TransitionalBankAccount *bool     `json:"transitional_bank_account"`
+}
+
 func (dto DepositPaymentDTO) ToDepositPayment() *data.DepositPayment {
 	return &data.DepositPayment{
 		Payer:                     dto.Payer,

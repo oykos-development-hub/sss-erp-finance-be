@@ -176,3 +176,21 @@ func (h *DepositPaymentServiceImpl) GetCaseNumber(orgUnitID *int, sourceBankAcco
 
 	return response, nil
 }
+
+func (h *DepositPaymentServiceImpl) GetInitialState(filter dto.DepositInitialStateFilter) ([]dto.DepositPaymentResponseDTO, error) {
+	dataFilter := data.DepositInitialStateFilter{
+		BankAccount:             filter.BankAccount,
+		Date:                    filter.Date,
+		OrganizationUnitID:      filter.OrganizationUnitID,
+		TransitionalBankAccount: filter.TransitionalBankAccount,
+	}
+
+	data, err := h.repo.GetInitialState(dataFilter)
+	if err != nil {
+		h.App.ErrorLog.Println(err)
+		return nil, errors.ErrInternalServer
+	}
+	response := dto.ToDepositPaymentListResponseDTO(data)
+
+	return response, nil
+}
