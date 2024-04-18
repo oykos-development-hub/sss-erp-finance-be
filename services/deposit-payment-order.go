@@ -408,5 +408,25 @@ func (h *DepositPaymentOrderServiceImpl) GetDepositPaymentOrderList(filter dto.D
 	}
 	response := dto.ToDepositPaymentOrderListResponseDTO(data)
 
+	for i := 0; i < len(response); i++ {
+		additionalExpenses, _, err := h.additionalExpenses.GetDepositAdditionalExpenseList(dto.DepositAdditionalExpenseFilterDTO{PaymentOrderID: &response[i].ID})
+
+		if err != nil {
+			h.App.ErrorLog.Println(err)
+			return nil, nil, errors.ErrInternalServer
+		}
+
+		response[i].AdditionalExpenses = additionalExpenses
+
+		additionalExpenses, _, err = h.additionalExpenses.GetDepositAdditionalExpenseList(dto.DepositAdditionalExpenseFilterDTO{PayingPaymentOrderID: &response[i].ID})
+
+		if err != nil {
+			h.App.ErrorLog.Println(err)
+			return nil, nil, errors.ErrInternalServer
+		}
+
+		response[i].AdditionalExpensesForPaying = additionalExpenses
+	}
+
 	return response, total, nil
 }
