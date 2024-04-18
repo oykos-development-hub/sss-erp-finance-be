@@ -146,7 +146,7 @@ func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation
 	                               left join invoices i on a.invoice_id = i.id
 	                               where a.invoice_id = i.id and a.subject_id = $1 and
 	                               i.organization_unit_id = $2 and a.status <> $3
-	                               group by a.id, a.title, i.type order by a.id;`
+	                               group by a.id, a.title, i.type, i.invoice_number order by a.id;`
 
 	queryForPaidAdditionalExpenses := `select sum(p.amount) from payment_order_items pi 
 								   left join payment_orders p on p.id = pi.payment_order_id
@@ -157,7 +157,7 @@ func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation
 	                                     left join salaries s on s.id = a.salary_id
 	                                     where  a.subject_id = $1 and
 	                                     s.organization_unit_id = $2 and a.status <> $3
-	                                     group by a.id, a.title order by a.id;`
+	                                     group by a.id, a.title, a.month order by a.id;`
 
 	queryForPaidSalaryAdditionalExpenses := `select sum(p.amount) from payment_order_items pi 
 										 left join payment_orders p on p.id = pi.payment_order_id
