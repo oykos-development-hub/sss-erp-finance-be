@@ -80,6 +80,8 @@ func (h *BudgetServiceImpl) GetBudget(id int) (*dto.BudgetResponseDTO, error) {
 }
 
 func (h *BudgetServiceImpl) GetBudgetList(input dto.GetBudgetListInput) ([]dto.BudgetResponseDTO, error) {
+	var orders []any
+
 	cond := db.Cond{}
 	if input.Year != nil {
 		cond["year"] = input.Year
@@ -91,7 +93,9 @@ func (h *BudgetServiceImpl) GetBudgetList(input dto.GetBudgetListInput) ([]dto.B
 		cond["budget_status"] = input.BudgetStatus
 	}
 
-	data, err := h.repo.GetAll(&cond)
+	orders = append(orders, "-created_at")
+
+	data, err := h.repo.GetAll(&cond, orders)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return nil, errors.ErrInternalServer

@@ -37,7 +37,7 @@ func (t *Budget) Table() string {
 }
 
 // GetAll gets all records from the database, using upper
-func (t *Budget) GetAll(condition *up.Cond) ([]*Budget, error) {
+func (t *Budget) GetAll(condition *up.Cond, orders []any) ([]*Budget, error) {
 	collection := Upper.Collection(t.Table())
 	var all []*Budget
 	var res up.Result
@@ -49,6 +49,11 @@ func (t *Budget) GetAll(condition *up.Cond) ([]*Budget, error) {
 	}
 
 	err := res.All(&all)
+	if err != nil {
+		return nil, err
+	}
+
+	err = res.OrderBy(orders...).All(&all)
 	if err != nil {
 		return nil, err
 	}
