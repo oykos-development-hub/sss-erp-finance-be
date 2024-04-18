@@ -45,7 +45,8 @@ type ObligationResponse struct {
 	Type                      string    `json:"type"`
 	Title                     string    `json:"title"`
 	Status                    string    `json:"status"`
-	Price                     float64   `json:"price"`
+	TotalPrice                float64   `json:"total_price"`
+	RemainPrice               float64   `json:"remain_price"`
 	CreatedAt                 time.Time `json:"created_at"`
 }
 

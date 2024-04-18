@@ -37,7 +37,8 @@ type Obligation struct {
 	SalaryAdditionalExpenseID *int      `json:"salary_additional_expense_id"`
 	Type                      string    `json:"type"`
 	Title                     string    `json:"title"`
-	Price                     float64   `json:"price"`
+	TotalPrice                float64   `json:"total_price"`
+	RemainPrice               float64   `json:"remain_price"`
 	Status                    string    `json:"status"`
 	CreatedAt                 time.Time `json:"created_at"`
 }
@@ -140,7 +141,7 @@ func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation
 							left join payment_orders p on p.id = pi.payment_order_id
 							where pi.invoice_id = $1`
 
-	queryForAdditionalExpenses := `select a.id, a.price, a.title, i.type, a.status, a.created_at
+	queryForAdditionalExpenses := `select a.id, a.price, a.title, i.type, i.invoice_number, a.status, a.created_at
 	                               from additional_expenses a
 	                               left join invoices i on a.invoice_id = i.id
 	                               where a.invoice_id = i.id and a.subject_id = $1 and
@@ -151,7 +152,7 @@ func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation
 								   left join payment_orders p on p.id = pi.payment_order_id
 								   where pi.additional_expense_id = $1`
 
-	queryForSalaryAdditionalExpenses := `select a.id, a.amount, a.type, a.status, a.created_at
+	queryForSalaryAdditionalExpenses := `select a.id, a.amount, a.type, a.status, a.created_at, a.month
 	                                     from salary_additional_expenses a
 	                                     left join salaries s on s.id = a.salary_id
 	                                     where  a.subject_id = $1 and
@@ -171,9 +172,8 @@ func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation
 
 		for rows.Next() {
 			var obligation Obligation
-			var price float64
 			var paid *float64
-			err = rows.Scan(&obligation.InvoiceID, &price, &obligation.Title, &obligation.Status, &obligation.CreatedAt)
+			err = rows.Scan(&obligation.InvoiceID, &obligation.TotalPrice, &obligation.Title, &obligation.Status, &obligation.CreatedAt)
 
 			if err != nil {
 				return nil, nil, err
@@ -193,12 +193,13 @@ func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation
 				}
 
 				if paid != nil {
-					obligation.Price = price - *paid
+					obligation.RemainPrice = obligation.TotalPrice - *paid
 				} else {
-					obligation.Price = price
+					obligation.RemainPrice = obligation.TotalPrice
 				}
 			}
-
+			obligation.Type = "invoices"
+			obligation.Title = "Račun broj " + obligation.Title + " Neto"
 			items = append(items, obligation)
 		}
 	}
@@ -212,9 +213,9 @@ func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation
 
 		for rows.Next() {
 			var obligation Obligation
-			var price float64
 			var paid *float64
-			err = rows.Scan(&obligation.AdditionalExpenseID, &price, &obligation.Title, &obligation.Type, &obligation.Status, &obligation.CreatedAt)
+			var title string
+			err = rows.Scan(&obligation.AdditionalExpenseID, &obligation.TotalPrice, &obligation.Title, &obligation.Type, &title, &obligation.Status, &obligation.CreatedAt)
 
 			if err != nil {
 				return nil, nil, err
@@ -234,10 +235,16 @@ func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation
 				}
 
 				if paid != nil {
-					obligation.Price = price - *paid
+					obligation.RemainPrice = obligation.TotalPrice - *paid
 				} else {
-					obligation.Price = price
+					obligation.RemainPrice = obligation.TotalPrice
 				}
+			}
+
+			if obligation.Type == "decisions" {
+				obligation.Title = "Rješenje broj " + title + " " + obligation.Title
+			} else {
+				obligation.Title = "Ugovor broj " + title + " " + obligation.Title
 			}
 
 			if filter.Type == nil || *filter.Type == obligation.Type {
@@ -255,9 +262,8 @@ func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation
 
 		for rows.Next() {
 			var obligation Obligation
-			var price float64
 			var paid *float64
-			err = rows.Scan(&obligation.SalaryAdditionalExpenseID, &price, &obligation.Title, &obligation.Status, &obligation.CreatedAt)
+			err = rows.Scan(&obligation.SalaryAdditionalExpenseID, &obligation.TotalPrice, &obligation.Type, &obligation.Status, &obligation.CreatedAt, &obligation.Title)
 
 			if err != nil {
 				return nil, nil, err
@@ -277,10 +283,12 @@ func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation
 				}
 
 				if paid != nil {
-					obligation.Price = price - *paid
+					obligation.RemainPrice = obligation.TotalPrice - *paid
 				} else {
-					obligation.Price = price
+					obligation.RemainPrice = obligation.TotalPrice
 				}
+
+				obligation.Title = "Zarada " + obligation.Title + " " + obligation.Type
 			}
 
 			items = append(items, obligation)
