@@ -10,6 +10,7 @@ type DepositPaymentOrderDTO struct {
 	OrganizationUnitID          int                           `json:"organization_unit_id"`
 	CaseNumber                  string                        `json:"case_number"`
 	SupplierID                  int                           `json:"supplier_id"`
+	SubjectTypeID               int                           `json:"subject_type_id"`
 	NetAmount                   float64                       `json:"net_amount"`
 	BankAccount                 string                        `json:"bank_account"`
 	SourceBankAccount           string                        `json:"source_bank_account"`
@@ -28,6 +29,7 @@ type DepositPaymentOrderResponseDTO struct {
 	OrganizationUnitID          int                                   `json:"organization_unit_id"`
 	CaseNumber                  string                                `json:"case_number"`
 	SupplierID                  int                                   `json:"supplier_id"`
+	SubjectTypeID               int                                   `json:"subject_type_id"`
 	NetAmount                   float64                               `json:"net_amount"`
 	SourceBankAccount           string                                `json:"source_bank_account"`
 	BankAccount                 string                                `json:"bank_account"`
@@ -60,6 +62,7 @@ func (dto DepositPaymentOrderDTO) ToDepositPaymentOrder() *data.DepositPaymentOr
 		OrganizationUnitID:     dto.OrganizationUnitID,
 		CaseNumber:             dto.CaseNumber,
 		SupplierID:             dto.SupplierID,
+		SubjectTypeID:          dto.SubjectTypeID,
 		NetAmount:              dto.NetAmount,
 		BankAccount:            dto.BankAccount,
 		SourceBankAccount:      dto.SourceBankAccount,
@@ -77,6 +80,7 @@ func ToDepositPaymentOrderResponseDTO(data data.DepositPaymentOrder) DepositPaym
 		ID:                     data.ID,
 		OrganizationUnitID:     data.OrganizationUnitID,
 		CaseNumber:             data.CaseNumber,
+		SubjectTypeID:          data.SubjectTypeID,
 		SupplierID:             data.SupplierID,
 		NetAmount:              data.NetAmount,
 		SourceBankAccount:      data.SourceBankAccount,

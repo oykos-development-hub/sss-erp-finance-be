@@ -12,6 +12,7 @@ type DepositPaymentOrder struct {
 	OrganizationUnitID     int        `db:"organization_unit_id"`
 	CaseNumber             string     `db:"case_number"`
 	SupplierID             int        `db:"supplier_id"`
+	SubjectTypeID          int        `db:"subject_type_id"`
 	NetAmount              float64    `db:"net_amount"`
 	BankAccount            string     `db:"bank_account"`
 	SourceBankAccount      string     `db:"source_bank_account"`

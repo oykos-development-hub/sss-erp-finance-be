@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS deposit_payment_orders (
     case_number TEXT,
     supplier_id INTEGER,
     net_amount FLOAT,
+    subject_type_id INTEGER,
     bank_account TEXT,
     source_bank_account TEXT,
     date_of_payment TIMESTAMP,
