@@ -152,7 +152,7 @@ func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation
 								   left join payment_orders p on p.id = pi.payment_order_id
 								   where pi.additional_expense_id = $1`
 
-	queryForSalaryAdditionalExpenses := `select a.id, a.amount, a.type, a.status, a.created_at, a.month
+	queryForSalaryAdditionalExpenses := `select a.id, a.amount, a.type, a.status, a.created_at, s.month
 	                                     from salary_additional_expenses a
 	                                     left join salaries s on s.id = a.salary_id
 	                                     where  a.subject_id = $1 and
