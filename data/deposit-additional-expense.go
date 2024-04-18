@@ -16,6 +16,7 @@ type DepositAdditionalExpense struct {
 	PaymentOrderID       int       `db:"payment_order_id"`
 	PayingPaymentOrderID *int      `db:"paying_payment_order_id"`
 	OrganizationUnitID   int       `db:"organization_unit_id"`
+	SourceBankAccount    string    `db:"source_bank_account"`
 	Price                float32   `db:"price"`
 	Status               string    `db:"status"`
 	CreatedAt            time.Time `db:"created_at,omitempty"`

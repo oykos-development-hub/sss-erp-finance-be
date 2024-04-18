@@ -41,6 +41,7 @@ func (h *DepositPaymentOrderServiceImpl) CreateDepositPaymentOrder(input dto.Dep
 		for _, item := range input.AdditionalExpenses {
 			itemToInsert := item.ToDepositAdditionalExpense()
 			itemToInsert.PaymentOrderID = id
+			itemToInsert.SourceBankAccount = item.SourceBankAccount
 			itemToInsert.Status = "Kreiran"
 			_, err = h.additionalExpensesRepo.Insert(tx, *itemToInsert)
 			if err != nil {
@@ -52,6 +53,7 @@ func (h *DepositPaymentOrderServiceImpl) CreateDepositPaymentOrder(input dto.Dep
 			itemToInsert := item.ToDepositAdditionalExpense()
 			itemToInsert.PayingPaymentOrderID = &id
 			itemToInsert.Status = "Na čekanju"
+			itemToInsert.SourceBankAccount = item.SourceBankAccount
 			itemToInsert.ID = item.ID
 			err = h.additionalExpensesRepo.Update(tx, *itemToInsert)
 			if err != nil {
@@ -107,6 +109,7 @@ func (h *DepositPaymentOrderServiceImpl) UpdateDepositPaymentOrder(id int, input
 			} else {
 				additionalExpenseData := item.ToDepositAdditionalExpense()
 				additionalExpenseData.PaymentOrderID = id
+				additionalExpenseData.SourceBankAccount = dataToInsert.SourceBankAccount
 				additionalExpenseData.Status = "Kreiran"
 				_, err = h.additionalExpensesRepo.Insert(tx, *additionalExpenseData)
 
@@ -129,6 +132,7 @@ func (h *DepositPaymentOrderServiceImpl) UpdateDepositPaymentOrder(id int, input
 						additionalExpenseData := item.ToDepositAdditionalExpense()
 						additionalExpenseData.ID = itemID
 						additionalExpenseData.PaymentOrderID = id
+						additionalExpenseData.SourceBankAccount = dataToInsert.SourceBankAccount
 						additionalExpenseData.Status = "Kreiran"
 						err := h.additionalExpensesRepo.Update(tx, *additionalExpenseData)
 						if err != nil {
@@ -156,6 +160,7 @@ func (h *DepositPaymentOrderServiceImpl) UpdateDepositPaymentOrder(id int, input
 					return err
 				}
 				additionalExpenseData.PayingPaymentOrderID = &id
+				additionalExpenseData.SourceBankAccount = dataToInsert.SourceBankAccount
 				additionalExpenseData.Status = "Na čekanju"
 				err = h.additionalExpensesRepo.Update(tx, *additionalExpenseData)
 
@@ -174,6 +179,7 @@ func (h *DepositPaymentOrderServiceImpl) UpdateDepositPaymentOrder(id int, input
 				}
 
 				additionalExpenseData.PayingPaymentOrderID = nil
+				additionalExpenseData.SourceBankAccount = dataToInsert.SourceBankAccount
 				additionalExpenseData.Status = "Kreiran"
 
 				err = h.additionalExpensesRepo.Update(tx, *additionalExpenseData)
@@ -229,6 +235,7 @@ func (h *DepositPaymentOrderServiceImpl) PayDepositPaymentOrder(id int, input dt
 					OrganizationUnitID:   item.OrganizationUnitID,
 					Price:                item.Price,
 					PayingPaymentOrderID: item.PayingPaymentOrderID,
+					SourceBankAccount:    item.SourceBankAccount,
 					Status:               "Plaćen",
 				}
 				err := h.additionalExpensesRepo.Update(tx, itemToUpdate)
@@ -257,6 +264,7 @@ func (h *DepositPaymentOrderServiceImpl) PayDepositPaymentOrder(id int, input dt
 				OrganizationUnitID:   item.OrganizationUnitID,
 				Price:                item.Price,
 				PayingPaymentOrderID: item.PayingPaymentOrderID,
+				SourceBankAccount:    item.SourceBankAccount,
 				Status:               "Plaćen",
 			}
 			err := h.additionalExpensesRepo.Update(tx, itemToUpdate)
@@ -297,6 +305,7 @@ func (h *DepositPaymentOrderServiceImpl) DeleteDepositPaymentOrder(id int) error
 				OrganizationUnitID:   item.OrganizationUnitID,
 				Price:                item.Price,
 				PayingPaymentOrderID: nil,
+				SourceBankAccount:    item.SourceBankAccount,
 				Status:               "Kreiran",
 			}
 			err := h.additionalExpensesRepo.Update(tx, itemToUpdate)
@@ -370,6 +379,10 @@ func (h *DepositPaymentOrderServiceImpl) GetDepositPaymentOrderList(filter dto.D
 
 	if filter.SupplierID != nil {
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"supplier_id": *filter.SupplierID})
+	}
+
+	if filter.SourceBankAccount != nil {
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"source_bank_account": *filter.SourceBankAccount})
 	}
 
 	if filter.Status != nil {

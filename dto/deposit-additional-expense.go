@@ -14,6 +14,7 @@ type DepositAdditionalExpenseDTO struct {
 	BankAccount          string  `json:"bank_account"`
 	PaymentOrderID       int     `json:"payment_order_id"`
 	PayingPaymentOrderID *int    `json:"paying_payment_order_id"`
+	SourceBankAccount    string  `json:"source_bank_account"`
 	OrganizationUnitID   int     `json:"organization_unit_id"`
 	Price                float32 `json:"price"`
 	Status               string  `json:"status"`
@@ -28,6 +29,7 @@ type DepositAdditionalExpenseResponseDTO struct {
 	PaymentOrderID       int       `json:"payment_order_id"`
 	PayingPaymentOrderID *int      `json:"paying_payment_order_id"`
 	OrganizationUnitID   int       `json:"organization_unit_id"`
+	SourceBankAccount    string    `json:"source_bank_account"`
 	Price                float32   `json:"price"`
 	Status               string    `json:"status"`
 	CreatedAt            time.Time `json:"created_at"`
@@ -54,6 +56,7 @@ func (dto DepositAdditionalExpenseDTO) ToDepositAdditionalExpense() *data.Deposi
 		SubjectID:            dto.SubjectID,
 		BankAccount:          dto.BankAccount,
 		Price:                dto.Price,
+		SourceBankAccount:    dto.SourceBankAccount,
 		PaymentOrderID:       dto.PaymentOrderID,
 		PayingPaymentOrderID: dto.PayingPaymentOrderID,
 		OrganizationUnitID:   dto.OrganizationUnitID,
@@ -67,6 +70,7 @@ func ToDepositAdditionalExpenseResponseDTO(data data.DepositAdditionalExpense) D
 		Title:                data.Title,
 		AccountID:            data.AccountID,
 		SubjectID:            data.SubjectID,
+		SourceBankAccount:    data.SourceBankAccount,
 		BankAccount:          data.BankAccount,
 		Price:                data.Price,
 		PaymentOrderID:       data.PaymentOrderID,
