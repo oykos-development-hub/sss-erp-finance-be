@@ -1,6 +1,7 @@
 package services
 
 import (
+	"fmt"
 	"time"
 
 	"gitlab.sudovi.me/erp/finance-api/data"
@@ -200,6 +201,14 @@ func (h *SalaryServiceImpl) GetSalaryList(filter dto.SalaryFilterDTO) ([]dto.Sal
 		endOfYear := startOfYear.AddDate(1, 0, 0).Add(-time.Nanosecond)
 
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"date_of_calculation": up.Between(startOfYear, endOfYear)})
+	}
+
+	if filter.Search != nil && *filter.Search != "" {
+		likeCondition := fmt.Sprintf("%%%s%%", *filter.Search)
+		search := up.Or(
+			up.Cond{"month ILIKE": likeCondition},
+		)
+		conditionAndExp = up.And(conditionAndExp, search)
 	}
 
 	/*if filter.SortByTitle != nil {

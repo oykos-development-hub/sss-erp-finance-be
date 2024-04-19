@@ -38,6 +38,7 @@ type SalaryFilterDTO struct {
 	Page               *int    `json:"page"`
 	Size               *int    `json:"size"`
 	SortByTitle        *string `json:"sort_by_title"`
+	Search             *string `json:"search"`
 	Status             *string `json:"status"`
 	Year               *int    `json:"year"`
 	ActivityID         *int    `json:"activity_id"`
