@@ -11,6 +11,7 @@ type BudgetRequestDTO struct {
 	BudgetID           int                      `json:"budget_id" validate:"required"`
 	RequestType        data.RequestType         `json:"request_type" validate:"required,oneof=1 2 3"`
 	Status             data.BudgetRequestStatus `json:"status" validate:"required,oneof=1 2 3"`
+	Comment            string                   `json:"comment"`
 }
 
 type BudgetRequestResponseDTO struct {
@@ -19,6 +20,7 @@ type BudgetRequestResponseDTO struct {
 	BudgetID           int                      `json:"budget_id"`
 	RequestType        data.RequestType         `json:"request_type"`
 	Status             data.BudgetRequestStatus `json:"status"`
+	Comment            string                   `json:"comment"`
 	CreatedAt          time.Time                `json:"created_at"`
 	UpdatedAt          time.Time                `json:"updated_at"`
 }
@@ -38,6 +40,7 @@ func (dto BudgetRequestDTO) ToBudgetRequest() *data.BudgetRequest {
 		BudgetID:           dto.BudgetID,
 		Status:             dto.Status,
 		RequestType:        dto.RequestType,
+		Comment:            dto.Comment,
 	}
 }
 
@@ -48,6 +51,7 @@ func ToBudgetRequestResponseDTO(data data.BudgetRequest) BudgetRequestResponseDT
 		BudgetID:           data.BudgetID,
 		RequestType:        data.RequestType,
 		Status:             data.Status,
+		Comment:            data.Comment,
 		CreatedAt:          data.CreatedAt,
 		UpdatedAt:          data.UpdatedAt,
 	}

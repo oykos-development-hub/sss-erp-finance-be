@@ -29,6 +29,7 @@ type BudgetRequest struct {
 	BudgetID           int                 `db:"budget_id"`
 	RequestType        RequestType         `db:"request_type"`
 	Status             BudgetRequestStatus `db:"status"`
+	Comment            string              `db:"comment"`
 	CreatedAt          time.Time           `db:"created_at,omitempty"`
 	UpdatedAt          time.Time           `db:"updated_at"`
 }

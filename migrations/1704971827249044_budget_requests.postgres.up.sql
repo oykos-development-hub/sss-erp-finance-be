@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS budget_requests (
     organization_unit_id INTEGER NOT NULL,
     request_type INTEGER NOT NULL,
     status INTEGER NOT NULL,
+    comment TEXT NOT NULL,
     created_at TIMESTAMP,
     updated_at TIMESTAMP
 );
