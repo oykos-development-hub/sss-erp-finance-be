@@ -20,9 +20,12 @@ type PaymentOrderServiceImpl struct {
 	invoiceArticlesRepo          data.Article
 	additionalExpensesRepo       data.AdditionalExpense
 	salaryAdditionalExpensesRepo data.SalaryAdditionalExpense
+	salariesRepo                 data.Salary
 }
 
-func NewPaymentOrderServiceImpl(app *celeritas.Celeritas, repo data.PaymentOrder, itemsRepo data.PaymentOrderItem, invoiceRepo data.Invoice, invoiceArticleRepo data.Article, additionalExpensesRepo data.AdditionalExpense, salaryAdditionalExpensesRepo data.SalaryAdditionalExpense) PaymentOrderService {
+func NewPaymentOrderServiceImpl(app *celeritas.Celeritas, repo data.PaymentOrder, itemsRepo data.PaymentOrderItem,
+	invoiceRepo data.Invoice, invoiceArticleRepo data.Article, additionalExpensesRepo data.AdditionalExpense,
+	salaryAdditionalExpensesRepo data.SalaryAdditionalExpense, salariesRepo data.Salary) PaymentOrderService {
 	return &PaymentOrderServiceImpl{
 		App:                          app,
 		repo:                         repo,
@@ -31,6 +34,7 @@ func NewPaymentOrderServiceImpl(app *celeritas.Celeritas, repo data.PaymentOrder
 		invoiceArticlesRepo:          invoiceArticleRepo,
 		additionalExpensesRepo:       additionalExpensesRepo,
 		salaryAdditionalExpensesRepo: salaryAdditionalExpensesRepo,
+		salariesRepo:                 salariesRepo,
 	}
 }
 
@@ -191,10 +195,53 @@ func (h *PaymentOrderServiceImpl) GetPaymentOrder(id int) (*dto.PaymentOrderResp
 
 		if item.InvoiceID != nil {
 			builtItem.Type = "invoice"
+
+			item, err := h.invoiceRepo.Get(*item.InvoiceID)
+
+			if err != nil {
+				return nil, err
+			}
+
+			builtItem.Title = "Račun broj " + item.InvoiceNumber
+
 		} else if item.AdditionalExpenseID != nil {
-			builtItem.Type = "additional_expense"
-		} else {
-			builtItem.Type = "salary_additional_expense"
+
+			additionalItem, err := h.additionalExpensesRepo.Get(*item.AdditionalExpenseID)
+
+			if err != nil {
+				return nil, err
+			}
+
+			item, err := h.invoiceRepo.Get(additionalItem.InvoiceID)
+			if err != nil {
+				return nil, err
+			}
+
+			builtItem.Type = item.Type
+
+			if builtItem.Type == "decisions" {
+				builtItem.Title = "Rješenje broj " + item.InvoiceNumber + " " + additionalItem.Title
+			} else {
+				builtItem.Title = "Ugovor broj " + item.InvoiceNumber + " " + additionalItem.Title
+			}
+
+		} else if item.SalaryAdditionalExpenseID != nil {
+			additionalItem, err := h.salaryAdditionalExpensesRepo.Get(*item.SalaryAdditionalExpenseID)
+
+			if err != nil {
+				return nil, err
+			}
+
+			item, err := h.salariesRepo.Get(additionalItem.SalaryID)
+
+			if err != nil {
+				return nil, err
+			}
+
+			builtItem.Type = "salaries"
+
+			builtItem.Title = "Zarada " + item.Month + " " + additionalItem.Title
+
 		}
 
 		response.Items = append(response.Items, builtItem)
