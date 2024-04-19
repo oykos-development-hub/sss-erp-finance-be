@@ -7,15 +7,17 @@ import (
 )
 
 type BudgetRequestDTO struct {
+	ParentID           *int                     `json:"parent_id"`
 	OrganizationUnitID int                      `json:"organization_unit_id" validate:"required"`
 	BudgetID           int                      `json:"budget_id" validate:"required"`
-	RequestType        data.RequestType         `json:"request_type" validate:"required,oneof=1 2 3"`
+	RequestType        data.RequestType         `json:"request_type" validate:"required,oneof=1 2 3 4"`
 	Status             data.BudgetRequestStatus `json:"status" validate:"required,oneof=1 2 3"`
 	Comment            string                   `json:"comment"`
 }
 
 type BudgetRequestResponseDTO struct {
 	ID                 int                      `json:"id"`
+	ParentID           *int                     `json:"parent_id"`
 	OrganizationUnitID int                      `json:"organization_unit_id"`
 	BudgetID           int                      `json:"budget_id"`
 	RequestType        data.RequestType         `json:"request_type"`
@@ -28,6 +30,7 @@ type BudgetRequestResponseDTO struct {
 type BudgetRequestFilterDTO struct {
 	Page               *int              `json:"page"`
 	Size               *int              `json:"size"`
+	IsParent           *bool             `json:"is_parent"`
 	OrganizationUnitID *int              `json:"organization_unit_id"`
 	BudgetID           int               `json:"budget_id"`
 	RequestType        *data.RequestType `json:"request_type"`
@@ -36,6 +39,7 @@ type BudgetRequestFilterDTO struct {
 
 func (dto BudgetRequestDTO) ToBudgetRequest() *data.BudgetRequest {
 	return &data.BudgetRequest{
+		ParentID:           dto.ParentID,
 		OrganizationUnitID: dto.OrganizationUnitID,
 		BudgetID:           dto.BudgetID,
 		Status:             dto.Status,
@@ -47,6 +51,7 @@ func (dto BudgetRequestDTO) ToBudgetRequest() *data.BudgetRequest {
 func ToBudgetRequestResponseDTO(data data.BudgetRequest) BudgetRequestResponseDTO {
 	return BudgetRequestResponseDTO{
 		ID:                 data.ID,
+		ParentID:           data.ParentID,
 		OrganizationUnitID: data.OrganizationUnitID,
 		BudgetID:           data.BudgetID,
 		RequestType:        data.RequestType,

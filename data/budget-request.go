@@ -20,11 +20,13 @@ const (
 	CurrentFinancialRequestType  RequestType = 1
 	DonationFinancialRequestType RequestType = 2
 	NonFinancialRequestType      RequestType = 3
+	FinancialRequestType         RequestType = 4
 )
 
 // BudgetRequest struct
 type BudgetRequest struct {
 	ID                 int                 `db:"id,omitempty"`
+	ParentID           *int                `db:"parent_id"`
 	OrganizationUnitID int                 `db:"organization_unit_id"`
 	BudgetID           int                 `db:"budget_id"`
 	RequestType        RequestType         `db:"request_type"`
