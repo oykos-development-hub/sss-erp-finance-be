@@ -166,8 +166,10 @@ func (h *SalaryServiceImpl) GetSalary(id int) (*dto.SalaryResponseDTO, error) {
 	response.SalaryAdditionalExpenses = additionalExpenses
 
 	for _, additionalExpense := range additionalExpenses {
-		if additionalExpense.Type == "Banka" {
+		if additionalExpense.Type == "banks" {
 			response.NetPrice += additionalExpense.Amount
+		} else if additionalExpense.Type == "suspensions" {
+			response.ObligationsPrice += additionalExpense.Amount
 		} else {
 			response.VatPrice += additionalExpense.Amount
 		}
