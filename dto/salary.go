@@ -13,6 +13,7 @@ type SalaryDTO struct {
 	Description              string                       `json:"description"`
 	OrganizationUnitID       int                          `json:"organization_unit_id"`
 	Status                   string                       `json:"status"`
+	NumberOfEmployees        int                          `json:"number_of_employees"`
 	SalaryAdditionalExpenses []SalaryAdditionalExpenseDTO `json:"salary_additional_expenses"`
 }
 
@@ -28,6 +29,7 @@ type SalaryResponseDTO struct {
 	GrossPrice               float64                              `json:"gross_price"`
 	VatPrice                 float64                              `json:"vat_price"`
 	NetPrice                 float64                              `json:"net_price"`
+	NumberOfEmployees        int                                  `json:"number_of_employees"`
 	CreatedAt                time.Time                            `json:"created_at"`
 	UpdatedAt                time.Time                            `json:"updated_at"`
 }
@@ -50,6 +52,7 @@ func (dto SalaryDTO) ToSalary() *data.Salary {
 		Description:        dto.Description,
 		Status:             dto.Status,
 		OrganizationUnitID: dto.OrganizationUnitID,
+		NumberOfEmployees:  dto.NumberOfEmployees,
 	}
 }
 
@@ -62,6 +65,7 @@ func ToSalaryResponseDTO(data data.Salary) SalaryResponseDTO {
 		Description:        data.Description,
 		Status:             data.Status,
 		OrganizationUnitID: data.OrganizationUnitID,
+		NumberOfEmployees:  data.NumberOfEmployees,
 		CreatedAt:          data.CreatedAt,
 		UpdatedAt:          data.UpdatedAt,
 	}

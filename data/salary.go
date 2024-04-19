@@ -16,6 +16,7 @@ type Salary struct {
 	Description        string    `db:"description"`
 	Status             string    `db:"status"`
 	OrganizationUnitID int       `db:"organization_unit_id"`
+	NumberOfEmployees  int       `db:"number_of_employees"`
 	CreatedAt          time.Time `db:"created_at,omitempty"`
 	UpdatedAt          time.Time `db:"updated_at"`
 }
