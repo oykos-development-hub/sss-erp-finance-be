@@ -50,7 +50,10 @@ func (h *DepositPaymentOrderServiceImpl) CreateDepositPaymentOrder(input dto.Dep
 		}
 
 		for _, item := range input.AdditionalExpensesForPaying {
-			itemToInsert := item.ToDepositAdditionalExpense()
+			itemToInsert, err := h.additionalExpensesRepo.Get(item.ID)
+			if err != nil {
+				return err
+			}
 			itemToInsert.PayingPaymentOrderID = &id
 			itemToInsert.Status = "Na čekanju"
 			itemToInsert.SourceBankAccount = item.SourceBankAccount
@@ -129,12 +132,15 @@ func (h *DepositPaymentOrderServiceImpl) UpdateDepositPaymentOrder(id int, input
 			} else {
 				for _, item := range input.AdditionalExpenses {
 					if item.ID == itemID {
-						additionalExpenseData := item.ToDepositAdditionalExpense()
+						additionalExpenseData, err := h.additionalExpensesRepo.Get(item.ID)
+						if err != nil {
+							return err
+						}
 						additionalExpenseData.ID = itemID
 						additionalExpenseData.PaymentOrderID = id
 						additionalExpenseData.SourceBankAccount = dataToInsert.SourceBankAccount
 						additionalExpenseData.Status = "Kreiran"
-						err := h.additionalExpensesRepo.Update(tx, *additionalExpenseData)
+						err = h.additionalExpensesRepo.Update(tx, *additionalExpenseData)
 						if err != nil {
 							return err
 						}
@@ -225,20 +231,12 @@ func (h *DepositPaymentOrderServiceImpl) PayDepositPaymentOrder(id int, input dt
 
 		for _, item := range additionalExpenses {
 			if item.Title == "Neto" {
-				itemToUpdate := data.DepositAdditionalExpense{
-					ID:                   item.ID,
-					Title:                item.Title,
-					AccountID:            item.AccountID,
-					SubjectID:            item.SubjectID,
-					BankAccount:          item.BankAccount,
-					PaymentOrderID:       item.PaymentOrderID,
-					OrganizationUnitID:   item.OrganizationUnitID,
-					Price:                item.Price,
-					PayingPaymentOrderID: item.PayingPaymentOrderID,
-					SourceBankAccount:    item.SourceBankAccount,
-					Status:               "Plaćen",
+				itemToUpdate, err := h.additionalExpensesRepo.Get(item.ID)
+				if err != nil {
+					return err
 				}
-				err := h.additionalExpensesRepo.Update(tx, itemToUpdate)
+				itemToUpdate.Status = "Plaćen"
+				err = h.additionalExpensesRepo.Update(tx, *itemToUpdate)
 				if err != nil {
 					return err
 				}
@@ -254,20 +252,12 @@ func (h *DepositPaymentOrderServiceImpl) PayDepositPaymentOrder(id int, input dt
 		}
 
 		for _, item := range additionalExpenses {
-			itemToUpdate := data.DepositAdditionalExpense{
-				ID:                   item.ID,
-				Title:                item.Title,
-				AccountID:            item.AccountID,
-				SubjectID:            item.SubjectID,
-				BankAccount:          item.BankAccount,
-				PaymentOrderID:       item.PaymentOrderID,
-				OrganizationUnitID:   item.OrganizationUnitID,
-				Price:                item.Price,
-				PayingPaymentOrderID: item.PayingPaymentOrderID,
-				SourceBankAccount:    item.SourceBankAccount,
-				Status:               "Plaćen",
+			itemToUpdate, err := h.additionalExpensesRepo.Get(item.ID)
+			if err != nil {
+				return err
 			}
-			err := h.additionalExpensesRepo.Update(tx, itemToUpdate)
+			itemToUpdate.Status = "Plaćen"
+			err = h.additionalExpensesRepo.Update(tx, *itemToUpdate)
 			if err != nil {
 				return err
 			}
@@ -295,20 +285,12 @@ func (h *DepositPaymentOrderServiceImpl) DeleteDepositPaymentOrder(id int) error
 		}
 
 		for _, item := range additionalExpenses {
-			itemToUpdate := data.DepositAdditionalExpense{
-				ID:                   item.ID,
-				Title:                item.Title,
-				AccountID:            item.AccountID,
-				SubjectID:            item.SubjectID,
-				BankAccount:          item.BankAccount,
-				PaymentOrderID:       item.PaymentOrderID,
-				OrganizationUnitID:   item.OrganizationUnitID,
-				Price:                item.Price,
-				PayingPaymentOrderID: nil,
-				SourceBankAccount:    item.SourceBankAccount,
-				Status:               "Kreiran",
+			itemToUpdate, err := h.additionalExpensesRepo.Get(item.ID)
+			if err != nil {
+				return err
 			}
-			err := h.additionalExpensesRepo.Update(tx, itemToUpdate)
+			itemToUpdate.Status = "Kreiran"
+			err = h.additionalExpensesRepo.Update(tx, *itemToUpdate)
 			if err != nil {
 				return err
 			}
