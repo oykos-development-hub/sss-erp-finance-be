@@ -83,7 +83,9 @@ func (h *BudgetRequestServiceImpl) GetBudgetRequestList(filter dto.BudgetRequest
 	conditionAndExp := &up.AndExpr{}
 	var orders []interface{}
 
-	conditionAndExp = up.And(conditionAndExp, &up.Cond{"budget_id": filter.BudgetID})
+	if filter.BudgetID != nil {
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"budget_id": *filter.BudgetID})
+	}
 	if filter.OrganizationUnitID != nil {
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"organization_unit_id": *filter.OrganizationUnitID})
 	}
@@ -92,6 +94,9 @@ func (h *BudgetRequestServiceImpl) GetBudgetRequestList(filter dto.BudgetRequest
 	}
 	if filter.RequestTypes != nil {
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"request_type": up.In(*filter.RequestTypes...)})
+	}
+	if filter.ParentID != nil {
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"parent_id": *filter.ParentID})
 	}
 
 	orders = append(orders, "-created_at")

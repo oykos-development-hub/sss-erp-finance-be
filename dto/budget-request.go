@@ -10,7 +10,7 @@ type BudgetRequestDTO struct {
 	ParentID           *int                     `json:"parent_id"`
 	OrganizationUnitID int                      `json:"organization_unit_id" validate:"required"`
 	BudgetID           int                      `json:"budget_id" validate:"required"`
-	RequestType        data.RequestType         `json:"request_type" validate:"required,oneof=1 2 3 4"`
+	RequestType        data.RequestType         `json:"request_type" validate:"required,oneof=1 2 3 4 5"`
 	Status             data.BudgetRequestStatus `json:"status" validate:"required,oneof=1 2 3 4 5"`
 	Comment            string                   `json:"comment"`
 }
@@ -30,9 +30,9 @@ type BudgetRequestResponseDTO struct {
 type BudgetRequestFilterDTO struct {
 	Page               *int              `json:"page"`
 	Size               *int              `json:"size"`
-	IsParent           *bool             `json:"is_parent"`
+	ParentID           *int              `json:"parent_id"`
 	OrganizationUnitID *int              `json:"organization_unit_id"`
-	BudgetID           int               `json:"budget_id"`
+	BudgetID           *int              `json:"budget_id"`
 	RequestType        *data.RequestType `json:"request_type"`
 	RequestTypes       *[]interface{}    `json:"request_types"`
 }

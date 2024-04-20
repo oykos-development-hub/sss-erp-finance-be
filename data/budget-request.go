@@ -19,10 +19,11 @@ const (
 type RequestType int
 
 const (
-	CurrentFinancialRequestType  RequestType = 1
-	DonationFinancialRequestType RequestType = 2
-	NonFinancialRequestType      RequestType = 3
-	FinancialRequestType         RequestType = 4
+	RequestTypeGeneral           RequestType = 1
+	RequestTypeNonFinancial      RequestType = 2
+	RequestTypeFinancial         RequestType = 3
+	RequestTypeCurrentFinancial  RequestType = 4
+	RequestTypeDonationFinancial RequestType = 5
 )
 
 // BudgetRequest struct
