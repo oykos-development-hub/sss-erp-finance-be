@@ -12,6 +12,8 @@ const (
 	BudgetRequestSentStatus         BudgetRequestStatus = 1
 	BudgetRequestFilledStatus       BudgetRequestStatus = 2
 	BudgetRequestSentOnReviewStatus BudgetRequestStatus = 3
+	BudgetRequestAcceptedStatus     BudgetRequestStatus = 4
+	BudgetRequestRejectedStatus     BudgetRequestStatus = 5
 )
 
 type RequestType int

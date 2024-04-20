@@ -11,7 +11,7 @@ type BudgetRequestDTO struct {
 	OrganizationUnitID int                      `json:"organization_unit_id" validate:"required"`
 	BudgetID           int                      `json:"budget_id" validate:"required"`
 	RequestType        data.RequestType         `json:"request_type" validate:"required,oneof=1 2 3 4"`
-	Status             data.BudgetRequestStatus `json:"status" validate:"required,oneof=1 2 3"`
+	Status             data.BudgetRequestStatus `json:"status" validate:"required,oneof=1 2 3 4 5"`
 	Comment            string                   `json:"comment"`
 }
 
