@@ -126,6 +126,8 @@ type GoalIndicatorHandler interface {
 type FilledFinancialBudgetHandler interface {
 	CreateFilledFinancialBudget(w http.ResponseWriter, r *http.Request)
 	UpdateFilledFinancialBudget(w http.ResponseWriter, r *http.Request)
+	UpdateActualFilledFinancialBudget(w http.ResponseWriter, r *http.Request)
+	GetSummaryFilledFinancialRequests(w http.ResponseWriter, r *http.Request)
 	DeleteFilledFinancialBudget(w http.ResponseWriter, r *http.Request)
 	GetFilledFinancialBudgetById(w http.ResponseWriter, r *http.Request)
 	GetFilledFinancialBudgetList(w http.ResponseWriter, r *http.Request)

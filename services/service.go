@@ -1,6 +1,7 @@
 package services
 
 import (
+	"github.com/shopspring/decimal"
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
 )
@@ -95,9 +96,11 @@ type GoalIndicatorService interface {
 type FilledFinancialBudgetService interface {
 	CreateFilledFinancialBudget(input dto.FilledFinancialBudgetDTO) (*dto.FilledFinancialBudgetResponseDTO, error)
 	UpdateFilledFinancialBudget(id int, input dto.FilledFinancialBudgetDTO) (*dto.FilledFinancialBudgetResponseDTO, error)
+	UpdateActualFilledFinancialBudget(id int, amount decimal.Decimal) (*dto.FilledFinancialBudgetResponseDTO, error)
 	DeleteFilledFinancialBudget(id int) error
 	GetFilledFinancialBudget(id int) (*dto.FilledFinancialBudgetResponseDTO, error)
 	GetFilledFinancialBudgetList(filter dto.FilledFinancialBudgetFilterDTO) ([]dto.FilledFinancialBudgetResponseDTO, *uint64, error)
+	GetSummaryFilledFinancialRequests(budgetID int, requestType data.RequestType) ([]dto.FilledFinancialBudgetResponseDTO, error)
 }
 
 type BudgetRequestService interface {

@@ -3,28 +3,34 @@ package dto
 import (
 	"time"
 
+	"github.com/shopspring/decimal"
 	"gitlab.sudovi.me/erp/finance-api/data"
 )
 
 type FilledFinancialBudgetDTO struct {
-	BudgetRequestID int    `json:"budget_request_id" validate:"required"`
-	AccountID       int    `json:"account_id" validate:"required"`
-	CurrentYear     int    `json:"current_year"`
-	NextYear        int    `json:"next_year"`
-	YearAfterNext   int    `json:"year_after_next"`
-	Description     string `json:"description"`
+	BudgetRequestID int             `json:"budget_request_id" validate:"required"`
+	AccountID       int             `json:"account_id" validate:"required"`
+	CurrentYear     decimal.Decimal `json:"current_year"`
+	NextYear        decimal.Decimal `json:"next_year"`
+	YearAfterNext   decimal.Decimal `json:"year_after_next"`
+	Description     string          `json:"description"`
+}
+
+type FilledActualFinancialBudgetDTO struct {
+	Actual decimal.Decimal `json:"actual" validate:"required"`
 }
 
 type FilledFinancialBudgetResponseDTO struct {
-	ID              int       `json:"id"`
-	BudgetRequestID int       `json:"budget_request_id"`
-	AccountID       int       `json:"account_id"`
-	CurrentYear     int       `json:"current_year"`
-	NextYear        int       `json:"next_year"`
-	YearAfterNext   int       `json:"year_after_next"`
-	Description     string    `json:"description"`
-	CreatedAt       time.Time `json:"created_at"`
-	UpdatedAt       time.Time `json:"updated_at"`
+	ID              int                 `json:"id,omitempty"`
+	BudgetRequestID int                 `json:"budget_request_id,omitempty"`
+	AccountID       int                 `json:"account_id"`
+	CurrentYear     decimal.Decimal     `json:"current_year"`
+	NextYear        decimal.Decimal     `json:"next_year"`
+	YearAfterNext   decimal.Decimal     `json:"year_after_next"`
+	Actual          decimal.NullDecimal `json:"actual"`
+	Description     string              `json:"description,omitempty"`
+	CreatedAt       time.Time           `json:"created_at,omitempty"`
+	UpdatedAt       time.Time           `json:"updated_at,omitempty"`
 }
 
 type FilledFinancialBudgetFilterDTO struct {
@@ -45,7 +51,7 @@ func (dto FilledFinancialBudgetDTO) ToFilledFinancialBudget() *data.FilledFinanc
 	}
 }
 
-func ToFilledFinancialBudgetResponseDTO(data data.FilledFinancialBudget) FilledFinancialBudgetResponseDTO {
+func ToFilledFinancialBudgetResponseDTO(data *data.FilledFinancialBudget) FilledFinancialBudgetResponseDTO {
 	return FilledFinancialBudgetResponseDTO{
 		ID:              data.ID,
 		BudgetRequestID: data.BudgetRequestID,
@@ -53,16 +59,17 @@ func ToFilledFinancialBudgetResponseDTO(data data.FilledFinancialBudget) FilledF
 		CurrentYear:     data.CurrentYear,
 		NextYear:        data.NextYear,
 		YearAfterNext:   data.YearAfterNext,
+		Actual:          data.Actual,
 		Description:     data.Description,
 		CreatedAt:       data.CreatedAt,
 		UpdatedAt:       data.UpdatedAt,
 	}
 }
 
-func ToFilledFinancialBudgetListResponseDTO(filledfinancialbudgets []*data.FilledFinancialBudget) []FilledFinancialBudgetResponseDTO {
+func ToFilledFinancialBudgetListResponseDTO(filledfinancialbudgets []data.FilledFinancialBudget) []FilledFinancialBudgetResponseDTO {
 	dtoList := make([]FilledFinancialBudgetResponseDTO, len(filledfinancialbudgets))
 	for i, x := range filledfinancialbudgets {
-		dtoList[i] = ToFilledFinancialBudgetResponseDTO(*x)
+		dtoList[i] = ToFilledFinancialBudgetResponseDTO(&x)
 	}
 	return dtoList
 }

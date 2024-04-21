@@ -9,11 +9,13 @@ import (
 type BudgetRequestStatus int
 
 const (
-	BudgetRequestSentStatus         BudgetRequestStatus = 1
-	BudgetRequestFilledStatus       BudgetRequestStatus = 2
-	BudgetRequestSentOnReviewStatus BudgetRequestStatus = 3
-	BudgetRequestAcceptedStatus     BudgetRequestStatus = 4
-	BudgetRequestRejectedStatus     BudgetRequestStatus = 5
+	BudgetRequestSentStatus            BudgetRequestStatus = 1
+	BudgetRequestFilledStatus          BudgetRequestStatus = 2
+	BudgetRequestSentOnReviewStatus    BudgetRequestStatus = 3
+	BudgetRequestAcceptedStatus        BudgetRequestStatus = 4
+	BudgetRequestRejectedStatus        BudgetRequestStatus = 5
+	BudgetRequestWaitingForActual      BudgetRequestStatus = 6
+	BudgetRequestCompletedActualStatus BudgetRequestStatus = 7
 )
 
 type RequestType int

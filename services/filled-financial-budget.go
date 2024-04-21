@@ -6,6 +6,7 @@ import (
 	"gitlab.sudovi.me/erp/finance-api/errors"
 
 	"github.com/oykos-development-hub/celeritas"
+	"github.com/shopspring/decimal"
 	up "github.com/upper/db/v4"
 )
 
@@ -34,7 +35,7 @@ func (h *FilledFinancialBudgetServiceImpl) CreateFilledFinancialBudget(input dto
 		return nil, errors.ErrInternalServer
 	}
 
-	res := dto.ToFilledFinancialBudgetResponseDTO(*data)
+	res := dto.ToFilledFinancialBudgetResponseDTO(data)
 
 	return &res, nil
 }
@@ -53,7 +54,23 @@ func (h *FilledFinancialBudgetServiceImpl) UpdateFilledFinancialBudget(id int, i
 		return nil, errors.ErrInternalServer
 	}
 
-	response := dto.ToFilledFinancialBudgetResponseDTO(*data)
+	response := dto.ToFilledFinancialBudgetResponseDTO(data)
+
+	return &response, nil
+}
+
+func (h *FilledFinancialBudgetServiceImpl) UpdateActualFilledFinancialBudget(id int, actual decimal.Decimal) (*dto.FilledFinancialBudgetResponseDTO, error) {
+	err := h.repo.UpdateActual(id, actual)
+	if err != nil {
+		return nil, err
+	}
+
+	item, err := h.repo.Get(id)
+	if err != nil {
+		return nil, err
+	}
+
+	response := dto.ToFilledFinancialBudgetResponseDTO(item)
 
 	return &response, nil
 }
@@ -74,7 +91,7 @@ func (h *FilledFinancialBudgetServiceImpl) GetFilledFinancialBudget(id int) (*dt
 		h.App.ErrorLog.Println(err)
 		return nil, errors.ErrNotFound
 	}
-	response := dto.ToFilledFinancialBudgetResponseDTO(*data)
+	response := dto.ToFilledFinancialBudgetResponseDTO(data)
 
 	return &response, nil
 }
@@ -103,4 +120,15 @@ func (h *FilledFinancialBudgetServiceImpl) GetFilledFinancialBudgetList(filter d
 	response := dto.ToFilledFinancialBudgetListResponseDTO(data)
 
 	return response, total, nil
+}
+
+func (h *FilledFinancialBudgetServiceImpl) GetSummaryFilledFinancialRequests(budgetID int, requestType data.RequestType) ([]dto.FilledFinancialBudgetResponseDTO, error) {
+	data, err := h.repo.GetSummaryFilledFinancialRequests(budgetID, requestType)
+	if err != nil {
+		h.App.ErrorLog.Println(err)
+		return nil, errors.ErrInternalServer
+	}
+	response := dto.ToFilledFinancialBudgetListResponseDTO(data)
+
+	return response, nil
 }

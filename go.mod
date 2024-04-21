@@ -6,6 +6,7 @@ require (
 	github.com/go-chi/chi/v5 v5.0.8
 	github.com/lib/pq v1.10.9
 	github.com/oykos-development-hub/celeritas v1.2.8
+	github.com/shopspring/decimal v1.4.0
 	github.com/upper/db/v4 v4.6.0
 )
 
