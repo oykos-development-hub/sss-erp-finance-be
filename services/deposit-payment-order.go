@@ -337,6 +337,18 @@ func (h *DepositPaymentOrderServiceImpl) GetDepositPaymentOrder(id int) (*dto.De
 		return nil, err
 	}
 
+	for i := 0; i < len(additionalExpenses); i++ {
+		order, err := h.repo.Get(additionalExpenses[i].PaymentOrderID)
+
+		if err != nil {
+			h.App.ErrorLog.Println(err)
+			return nil, err
+		}
+
+		additionalExpenses[i].CaseNumber = order.CaseNumber
+
+	}
+
 	response.AdditionalExpensesForPaying = additionalExpenses
 
 	return &response, nil

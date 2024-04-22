@@ -12,14 +12,16 @@ import (
 )
 
 type DepositAdditionalExpenseServiceImpl struct {
-	App  *celeritas.Celeritas
-	repo data.DepositAdditionalExpense
+	App    *celeritas.Celeritas
+	repo   data.DepositAdditionalExpense
+	orders data.DepositPaymentOrder
 }
 
-func NewDepositAdditionalExpenseServiceImpl(app *celeritas.Celeritas, repo data.DepositAdditionalExpense) DepositAdditionalExpenseService {
+func NewDepositAdditionalExpenseServiceImpl(app *celeritas.Celeritas, repo data.DepositAdditionalExpense, orders data.DepositPaymentOrder) DepositAdditionalExpenseService {
 	return &DepositAdditionalExpenseServiceImpl{
-		App:  app,
-		repo: repo,
+		App:    app,
+		repo:   repo,
+		orders: orders,
 	}
 }
 
@@ -147,6 +149,16 @@ func (h *DepositAdditionalExpenseServiceImpl) GetDepositAdditionalExpenseList(fi
 		return nil, nil, errors.ErrInternalServer
 	}
 	response := dto.ToDepositAdditionalExpenseListResponseDTO(data)
+
+	for i := 0; i < len(response); i++ {
+		item, err := h.orders.Get(response[i].PaymentOrderID)
+		if err != nil {
+			h.App.ErrorLog.Println(err)
+			return nil, nil, errors.ErrInternalServer
+		}
+
+		response[i].CaseNumber = item.CaseNumber
+	}
 
 	return response, total, nil
 }

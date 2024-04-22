@@ -144,7 +144,7 @@ func initApplication() *celeritas.Celeritas {
 	DepositPaymentService := services.NewDepositPaymentServiceImpl(cel, models.DepositPayment)
 	DepositPaymentHandler := handlers.NewDepositPaymentHandler(cel, DepositPaymentService)
 
-	DepositAdditionalExpenseService := services.NewDepositAdditionalExpenseServiceImpl(cel, models.DepositAdditionalExpense)
+	DepositAdditionalExpenseService := services.NewDepositAdditionalExpenseServiceImpl(cel, models.DepositAdditionalExpense, models.DepositPaymentOrder)
 	DepositAdditionalExpenseHandler := handlers.NewDepositAdditionalExpenseHandler(cel, DepositAdditionalExpenseService)
 
 	DepositPaymentOrderService := services.NewDepositPaymentOrderServiceImpl(cel, models.DepositPaymentOrder, models.DepositAdditionalExpense, DepositAdditionalExpenseService)

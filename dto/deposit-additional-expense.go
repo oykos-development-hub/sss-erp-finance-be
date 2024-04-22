@@ -23,6 +23,7 @@ type DepositAdditionalExpenseDTO struct {
 type DepositAdditionalExpenseResponseDTO struct {
 	ID                   int       `json:"id"`
 	Title                string    `json:"title"`
+	CaseNumber           string    `json:"case_number"`
 	AccountID            int       `json:"account_id"`
 	SubjectID            int       `json:"subject_id"`
 	BankAccount          string    `json:"bank_account"`
