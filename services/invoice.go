@@ -47,8 +47,10 @@ func (h *InvoiceServiceImpl) CreateInvoice(input dto.InvoiceDTO) (*dto.InvoiceRe
 			additionalExpenseData.InvoiceID = id
 			additionalExpenseData.OrganizationUnitID = input.OrganizationUnitID
 			additionalExpenseData.Status = data.InvoiceStatusCreated
-			if _, err = h.additionalExpensesRepo.Insert(tx, *additionalExpenseData); err != nil {
-				return err
+			if additionalExpenseData.Price > 0 {
+				if _, err = h.additionalExpensesRepo.Insert(tx, *additionalExpenseData); err != nil {
+					return err
+				}
 			}
 		}
 
@@ -100,10 +102,12 @@ func (h *InvoiceServiceImpl) UpdateInvoice(id int, input dto.InvoiceDTO) (*dto.I
 				additionalExpenseData.InvoiceID = id
 				additionalExpenseData.OrganizationUnitID = input.OrganizationUnitID
 				additionalExpenseData.Status = data.InvoiceStatusCreated
-				_, err = h.additionalExpensesRepo.Insert(tx, *additionalExpenseData)
+				if additionalExpenseData.Price > 0 {
+					_, err = h.additionalExpensesRepo.Insert(tx, *additionalExpenseData)
 
-				if err != nil {
-					return err
+					if err != nil {
+						return err
+					}
 				}
 			}
 		}

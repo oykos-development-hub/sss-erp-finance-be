@@ -43,9 +43,11 @@ func (h *DepositPaymentOrderServiceImpl) CreateDepositPaymentOrder(input dto.Dep
 			itemToInsert.PaymentOrderID = id
 			itemToInsert.SourceBankAccount = item.SourceBankAccount
 			itemToInsert.Status = "Kreiran"
-			_, err = h.additionalExpensesRepo.Insert(tx, *itemToInsert)
-			if err != nil {
-				return err
+			if itemToInsert.Price > 0 {
+				_, err = h.additionalExpensesRepo.Insert(tx, *itemToInsert)
+				if err != nil {
+					return err
+				}
 			}
 		}
 
