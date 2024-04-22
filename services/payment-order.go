@@ -204,6 +204,17 @@ func (h *PaymentOrderServiceImpl) GetPaymentOrder(id int) (*dto.PaymentOrderResp
 
 			builtItem.Title = "Račun broj " + item.InvoiceNumber
 
+			conditionAndExp = up.And(conditionAndExp, &up.Cond{"invoice_id": item.ID})
+			articles, _, err := h.invoiceArticlesRepo.GetAll(nil, nil, conditionAndExp, nil)
+
+			if err != nil {
+				return nil, err
+			}
+
+			for _, article := range articles {
+				builtItem.Amount += article.NetPrice + article.VatPrice
+			}
+
 		} else if item.AdditionalExpenseID != nil {
 
 			additionalItem, err := h.additionalExpensesRepo.Get(*item.AdditionalExpenseID)
@@ -218,6 +229,7 @@ func (h *PaymentOrderServiceImpl) GetPaymentOrder(id int) (*dto.PaymentOrderResp
 			}
 
 			builtItem.Type = item.Type
+			builtItem.Amount = item.GrossPrice
 
 			if builtItem.Type == "decisions" {
 				builtItem.Title = "Rješenje broj " + item.InvoiceNumber + " " + additionalItem.Title
@@ -239,9 +251,13 @@ func (h *PaymentOrderServiceImpl) GetPaymentOrder(id int) (*dto.PaymentOrderResp
 			}
 
 			builtItem.Type = "salaries"
-
+			builtItem.Amount = additionalItem.Amount
 			builtItem.Title = "Zarada " + item.Month + " " + additionalItem.Title
 
+		}
+
+		if len(items) == 1 {
+			builtItem.Amount = response.Amount
 		}
 
 		response.Items = append(response.Items, builtItem)
