@@ -243,6 +243,19 @@ func routes(app *celeritas.Celeritas, middleware *middleware.Middleware, handler
 		rt.Get("/payment-order-items", handlers.PaymentOrderItemHandler.GetPaymentOrderItemList)
 		rt.Put("/payment-order-items/{id}", handlers.PaymentOrderItemHandler.UpdatePaymentOrderItem)
 		rt.Delete("/payment-order-items/{id}", handlers.PaymentOrderItemHandler.DeletePaymentOrderItem)
+
+		rt.Post("/enforced-payments", handlers.EnforcedPaymentHandler.CreateEnforcedPayment)
+		rt.Get("/enforced-payments/{id}", handlers.EnforcedPaymentHandler.GetEnforcedPaymentById)
+		rt.Get("/enforced-payments", handlers.EnforcedPaymentHandler.GetEnforcedPaymentList)
+		rt.Put("/enforced-payments/{id}", handlers.EnforcedPaymentHandler.UpdateEnforcedPayment)
+		rt.Put("/return-enforced-payment/{id}", handlers.EnforcedPaymentHandler.ReturnEnforcedPayment)
+		rt.Delete("/enforced-payments/{id}", handlers.EnforcedPaymentHandler.DeleteEnforcedPayment)
+
+		rt.Post("/enforced-payment-items", handlers.EnforcedPaymentItemHandler.CreateEnforcedPaymentItem)
+		rt.Get("/enforced-payment-items/{id}", handlers.EnforcedPaymentItemHandler.GetEnforcedPaymentItemById)
+		rt.Get("/enforced-payment-items", handlers.EnforcedPaymentItemHandler.GetEnforcedPaymentItemList)
+		rt.Put("/enforced-payment-items/{id}", handlers.EnforcedPaymentItemHandler.UpdateEnforcedPaymentItem)
+		rt.Delete("/enforced-payment-items/{id}", handlers.EnforcedPaymentItemHandler.DeleteEnforcedPaymentItem)
 	})
 
 	return app.Routes

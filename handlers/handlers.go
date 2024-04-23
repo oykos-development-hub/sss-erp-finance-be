@@ -40,6 +40,8 @@ type Handlers struct {
 	DepositAdditionalExpenseHandler DepositAdditionalExpenseHandler
 	PaymentOrderHandler             PaymentOrderHandler
 	PaymentOrderItemHandler         PaymentOrderItemHandler
+	EnforcedPaymentHandler          EnforcedPaymentHandler
+	EnforcedPaymentItemHandler      EnforcedPaymentItemHandler
 }
 
 type InvoiceHandler interface {
@@ -349,4 +351,21 @@ type PaymentOrderItemHandler interface {
 	DeletePaymentOrderItem(w http.ResponseWriter, r *http.Request)
 	GetPaymentOrderItemById(w http.ResponseWriter, r *http.Request)
 	GetPaymentOrderItemList(w http.ResponseWriter, r *http.Request)
+}
+
+type EnforcedPaymentHandler interface {
+	CreateEnforcedPayment(w http.ResponseWriter, r *http.Request)
+	UpdateEnforcedPayment(w http.ResponseWriter, r *http.Request)
+	ReturnEnforcedPayment(w http.ResponseWriter, r *http.Request)
+	DeleteEnforcedPayment(w http.ResponseWriter, r *http.Request)
+	GetEnforcedPaymentById(w http.ResponseWriter, r *http.Request)
+	GetEnforcedPaymentList(w http.ResponseWriter, r *http.Request)
+}
+
+type EnforcedPaymentItemHandler interface {
+	CreateEnforcedPaymentItem(w http.ResponseWriter, r *http.Request)
+	UpdateEnforcedPaymentItem(w http.ResponseWriter, r *http.Request)
+	DeleteEnforcedPaymentItem(w http.ResponseWriter, r *http.Request)
+	GetEnforcedPaymentItemById(w http.ResponseWriter, r *http.Request)
+	GetEnforcedPaymentItemList(w http.ResponseWriter, r *http.Request)
 }

@@ -1,0 +1,19 @@
+CREATE TABLE IF NOT EXISTS enforced_payments (
+    id serial PRIMARY KEY,
+    organization_unit_id INTEGER NOT NULL,
+    supplier_id INTEGER NOT NULL,
+    id_of_statement TEXT,
+    sap_id TEXT,
+    date_of_sap TIMESTAMP,
+    date_of_payment TIMESTAMP,
+    date_of_order TIMESTAMP,
+    description TEXT,
+    file_id INTEGER,
+    bank_account TEXT,
+    amount FLOAT,
+    return_date TIMESTAMP,
+    return_file_id INTEGER,
+    status TEXT,
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP
+);

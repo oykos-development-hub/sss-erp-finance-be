@@ -335,3 +335,20 @@ type PaymentOrderItemService interface {
 	GetPaymentOrderItem(id int) (*dto.PaymentOrderItemResponseDTO, error)
 	GetPaymentOrderItemList(filter dto.PaymentOrderItemFilterDTO) ([]dto.PaymentOrderItemResponseDTO, *uint64, error)
 }
+
+type EnforcedPaymentService interface {
+	CreateEnforcedPayment(input dto.EnforcedPaymentDTO) (*dto.EnforcedPaymentResponseDTO, error)
+	UpdateEnforcedPayment(id int, input dto.EnforcedPaymentDTO) (*dto.EnforcedPaymentResponseDTO, error)
+	ReturnEnforcedPayment(id int, input dto.EnforcedPaymentDTO) error
+	DeleteEnforcedPayment(id int) error
+	GetEnforcedPayment(id int) (*dto.EnforcedPaymentResponseDTO, error)
+	GetEnforcedPaymentList(filter dto.EnforcedPaymentFilterDTO) ([]dto.EnforcedPaymentResponseDTO, *uint64, error)
+}
+
+type EnforcedPaymentItemService interface {
+	CreateEnforcedPaymentItem(input dto.EnforcedPaymentItemDTO) (*dto.EnforcedPaymentItemResponseDTO, error)
+	UpdateEnforcedPaymentItem(id int, input dto.EnforcedPaymentItemDTO) (*dto.EnforcedPaymentItemResponseDTO, error)
+	DeleteEnforcedPaymentItem(id int) error
+	GetEnforcedPaymentItem(id int) (*dto.EnforcedPaymentItemResponseDTO, error)
+	GetEnforcedPaymentItemList(filter dto.EnforcedPaymentItemFilterDTO) ([]dto.EnforcedPaymentItemResponseDTO, *uint64, error)
+}

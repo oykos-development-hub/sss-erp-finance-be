@@ -156,6 +156,12 @@ func initApplication() *celeritas.Celeritas {
 	PaymentOrderService := services.NewPaymentOrderServiceImpl(cel, models.PaymentOrder, models.PaymentOrderItem, models.Invoice, models.Article, models.AdditionalExpense, models.SalaryAdditionalExpense, models.Salary)
 	PaymentOrderHandler := handlers.NewPaymentOrderHandler(cel, PaymentOrderService)
 
+	EnforcedPaymentService := services.NewEnforcedPaymentServiceImpl(cel, models.EnforcedPayment, models.EnforcedPaymentItem, models.Invoice, models.Article, models.AdditionalExpense)
+	EnforcedPaymentHandler := handlers.NewEnforcedPaymentHandler(cel, EnforcedPaymentService)
+
+	EnforcedPaymentItemService := services.NewEnforcedPaymentItemServiceImpl(cel, models.EnforcedPaymentItem)
+	EnforcedPaymentItemHandler := handlers.NewEnforcedPaymentItemHandler(cel, EnforcedPaymentItemService)
+
 	myHandlers := &handlers.Handlers{
 		InvoiceHandler: InvoiceHandler,
 		ArticleHandler: ArticleHandler,
@@ -199,6 +205,8 @@ func initApplication() *celeritas.Celeritas {
 		DepositAdditionalExpenseHandler: DepositAdditionalExpenseHandler,
 		PaymentOrderHandler:             PaymentOrderHandler,
 		PaymentOrderItemHandler:         PaymentOrderItemHandler,
+		EnforcedPaymentHandler:          EnforcedPaymentHandler,
+		EnforcedPaymentItemHandler:      EnforcedPaymentItemHandler,
 	}
 
 	myMiddleware := &middleware.Middleware{

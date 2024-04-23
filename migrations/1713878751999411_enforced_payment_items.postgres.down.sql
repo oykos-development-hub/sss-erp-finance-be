@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS enforced_payment_items;

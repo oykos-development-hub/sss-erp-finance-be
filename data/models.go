@@ -58,6 +58,8 @@ type Models struct {
 		DepositAdditionalExpense DepositAdditionalExpense
 		PaymentOrder PaymentOrder
 		PaymentOrderItem PaymentOrderItem
+		EnforcedPayment EnforcedPayment
+		EnforcedPaymentItem EnforcedPaymentItem
 	}
 
 func New(databasePool *sql.DB) Models {
@@ -105,6 +107,8 @@ func New(databasePool *sql.DB) Models {
 		DepositAdditionalExpense: DepositAdditionalExpense{},
 		PaymentOrder: PaymentOrder{},
 		PaymentOrderItem: PaymentOrderItem{},
+		EnforcedPayment: EnforcedPayment{},
+		EnforcedPaymentItem: EnforcedPaymentItem{},
 	}
 }
 
