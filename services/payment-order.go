@@ -204,6 +204,7 @@ func (h *PaymentOrderServiceImpl) GetPaymentOrder(id int) (*dto.PaymentOrderResp
 
 			builtItem.Title = "Račun broj " + item.InvoiceNumber
 
+			conditionAndExp = &up.AndExpr{}
 			conditionAndExp = up.And(conditionAndExp, &up.Cond{"invoice_id": item.ID})
 			articles, _, err := h.invoiceArticlesRepo.GetAll(nil, nil, conditionAndExp, nil)
 
