@@ -243,15 +243,15 @@ func (t *DepositPayment) GetInitialState(filter DepositInitialStateFilter) ([]*D
 func getAmountByBankAccount(bankAccount string, date time.Time) (*DepositPayment, error) {
 	formattedDate := date.Format("2006-01-02 15:04:05")
 	query1 := `select sum(amount) from deposit_payments 
-		where current_bank_account = $1 and date_of_transfer_main_account < $2::timestamp;`
+		where current_bank_account = $1 and date_of_transfer_main_account <= $2::timestamp;`
 
 	query2 := `select sum(p.price) from deposit_additional_expenses p 
 		  left join deposit_payment_orders d on d.id = p.payment_order_id  
-		  where p.title = 'Neto' and d.source_bank_account = $1 and d.date_of_statement < $2::timestamp`
+		  where p.title = 'Neto' and d.source_bank_account = $1 and d.date_of_statement <= $2::timestamp`
 
 	query3 := `select sum(p.price) from deposit_additional_expenses p 
 		  left join deposit_payment_orders d on d.id = p.paying_payment_order_id  
-		  where d.source_bank_account = $1 and d.date_of_statement < $2::timestamp`
+		  where d.source_bank_account = $1 and d.date_of_statement <= $2::timestamp`
 
 	rows1, err := Upper.SQL().Query(query1, bankAccount, formattedDate)
 	if err != nil {
@@ -319,7 +319,7 @@ func getAmountOnTransitionalBankAccount(orgUnit int, date time.Time) (*DepositPa
 
 	query1 := `select sum(amount) from deposit_payments
 	where organization_unit_id = $1 and
-	date_of_bank_statement < $2 and (main_bank_account = false 
+	date_of_bank_statement <= $2 and (main_bank_account = false 
 	or (main_bank_account = true and  date_of_transfer_main_account > $2::timestamp));`
 
 	rows1, err := Upper.SQL().Query(query1, orgUnit, formattedDate)
