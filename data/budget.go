@@ -16,9 +16,10 @@ const (
 type BudgetStatus int
 
 const (
-	BudgetCreatedStatus  BudgetStatus = 1
-	BudgetSentStatus     BudgetStatus = 2
-	BudgetAcceptedStatus BudgetStatus = 3
+	BudgetCreatedStatus   BudgetStatus = 1
+	BudgetSentStatus      BudgetStatus = 2
+	BudgetAcceptedStatus  BudgetStatus = 3
+	BudgetCompletedStatus BudgetStatus = 4
 )
 
 // Budget struct

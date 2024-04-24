@@ -15,7 +15,7 @@ type GetBudgetListInput struct {
 type BudgetDTO struct {
 	Year         int               `json:"year" validate:"required,gte=2024"`
 	BudgetType   data.BudgetType   `json:"budget_type" validate:"required,oneof=1 2"`
-	BudgetStatus data.BudgetStatus `json:"budget_status" validate:"required,oneof=1 2 3 4 5"`
+	BudgetStatus data.BudgetStatus `json:"budget_status" validate:"required,oneof=1 2 3 4"`
 }
 
 type BudgetResponseDTO struct {
