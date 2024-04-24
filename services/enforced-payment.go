@@ -162,12 +162,12 @@ func (h *EnforcedPaymentServiceImpl) GetEnforcedPayment(id int) (*dto.EnforcedPa
 			if invoice.Type == "invoice" {
 				conditionAndExp := &up.AndExpr{}
 				conditionAndExp = up.And(conditionAndExp, &up.Cond{"invoice_id": item.InvoiceID})
-				articles, _, err := h.invoicesRepo.GetAll(nil, nil, conditionAndExp)
+				articles, _, err := h.invoiceArticlesRepo.GetAll(nil, nil, conditionAndExp, nil)
 				if err != nil {
 					return nil, err
 				}
 				for _, article := range articles {
-					item.Amount += float32(article.GrossPrice)
+					item.Amount += float32(article.Amount)
 				}
 				item.Title = "Faktura broj " + invoice.InvoiceNumber
 			} else {
