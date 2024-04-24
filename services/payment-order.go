@@ -194,7 +194,7 @@ func (h *PaymentOrderServiceImpl) GetPaymentOrder(id int) (*dto.PaymentOrderResp
 		}
 
 		if item.InvoiceID != nil {
-			builtItem.Type = "invoice"
+			builtItem.Type = "invoices"
 
 			item, err := h.invoiceRepo.Get(*item.InvoiceID)
 
