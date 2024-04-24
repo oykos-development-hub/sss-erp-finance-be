@@ -17,6 +17,7 @@ type PaymentOrder struct {
 	IDOfStatement      *string    `db:"id_of_statement"`
 	SAPID              *string    `db:"sap_id"`
 	DateOfSAP          *time.Time `db:"date_of_sap"`
+	SourceOfFunding    string     `db:"source_of_funding"`
 	FileID             *int       `db:"file_id"`
 	Amount             float64    `db:"amount"`
 	Description        string     `db:"description"`

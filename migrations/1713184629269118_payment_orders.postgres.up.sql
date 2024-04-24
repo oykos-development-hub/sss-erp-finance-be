@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS payment_orders (
     supplier_id INTEGER NOT NULL,
     id_of_statement TEXT,
     sap_id TEXT,
+    source_of_funding TEXT,
     date_of_sap TIMESTAMP,
     date_of_payment TIMESTAMP,
     date_of_order TIMESTAMP,
