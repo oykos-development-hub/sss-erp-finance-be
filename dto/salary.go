@@ -15,6 +15,7 @@ type SalaryDTO struct {
 	Status                   string                       `json:"status"`
 	NumberOfEmployees        int                          `json:"number_of_employees"`
 	SalaryAdditionalExpenses []SalaryAdditionalExpenseDTO `json:"salary_additional_expenses"`
+	Registred                *bool                        `json:"registred"`
 }
 
 type SalaryResponseDTO struct {
@@ -27,6 +28,7 @@ type SalaryResponseDTO struct {
 	OrganizationUnitID       int                                  `json:"organization_unit_id"`
 	SalaryAdditionalExpenses []SalaryAdditionalExpenseResponseDTO `json:"salary_additional_expenses"`
 	GrossPrice               float64                              `json:"gross_price"`
+	Registred                *bool                                `json:"registred"`
 	VatPrice                 float64                              `json:"vat_price"`
 	ObligationsPrice         float64                              `json:"obligations_price"`
 	NetPrice                 float64                              `json:"net_price"`
@@ -43,6 +45,7 @@ type SalaryFilterDTO struct {
 	Status             *string `json:"status"`
 	Year               *int    `json:"year"`
 	ActivityID         *int    `json:"activity_id"`
+	Registred          *bool   `json:"registred"`
 	OrganizationUnitID *int    `json:"organization_unit_id"`
 }
 
@@ -53,6 +56,7 @@ func (dto SalaryDTO) ToSalary() *data.Salary {
 		DateOfCalculation:  dto.DateOfCalculation,
 		Description:        dto.Description,
 		Status:             dto.Status,
+		Registred:          dto.Registred,
 		OrganizationUnitID: dto.OrganizationUnitID,
 		NumberOfEmployees:  dto.NumberOfEmployees,
 	}
@@ -68,6 +72,7 @@ func ToSalaryResponseDTO(data data.Salary) SalaryResponseDTO {
 		Status:             data.Status,
 		OrganizationUnitID: data.OrganizationUnitID,
 		NumberOfEmployees:  data.NumberOfEmployees,
+		Registred:          data.Registred,
 		CreatedAt:          data.CreatedAt,
 		UpdatedAt:          data.UpdatedAt,
 	}

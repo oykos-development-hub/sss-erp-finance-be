@@ -14,6 +14,7 @@ type PaymentOrderDTO struct {
 	DateOfOrder        *time.Time            `json:"date_of_order"`
 	IDOfStatement      *string               `json:"id_of_statement"`
 	SAPID              *string               `json:"sap_id"`
+	Registred          *bool                 `json:"registred"`
 	SourceOfFunding    string                `json:"source_of_funding"`
 	Description        string                `json:"description"`
 	DateOfSAP          *time.Time            `json:"date_of_sap"`
@@ -31,6 +32,7 @@ type PaymentOrderResponseDTO struct {
 	DateOfOrder        *time.Time                    `json:"date_of_order"`
 	IDOfStatement      *string                       `json:"id_of_statement"`
 	SAPID              *string                       `json:"sap_id"`
+	Registred          *bool                         `json:"registred"`
 	SourceOfFunding    string                        `json:"source_of_funding"`
 	Description        string                        `json:"description"`
 	DateOfSAP          *time.Time                    `json:"date_of_sap"`
@@ -63,6 +65,7 @@ type PaymentOrderFilterDTO struct {
 	SupplierID         *int    `json:"supplier_id"`
 	Search             *string `json:"search"`
 	Year               *int    `json:"year"`
+	Registred          *bool   `json:"registred"`
 }
 
 type GetObligationsFilterDTO struct {
@@ -87,6 +90,7 @@ func (dto PaymentOrderDTO) ToPaymentOrder() *data.PaymentOrder {
 		FileID:             dto.FileID,
 		Description:        dto.Description,
 		Amount:             dto.Amount,
+		Registred:          dto.Registred,
 	}
 }
 
@@ -109,6 +113,7 @@ func ToPaymentOrderResponseDTO(data data.PaymentOrder) PaymentOrderResponseDTO {
 		DateOfOrder:        data.DateOfOrder,
 		IDOfStatement:      data.IDOfStatement,
 		Status:             status,
+		Registred:          data.Registred,
 		SourceOfFunding:    data.SourceOfFunding,
 		Description:        data.Description,
 		Amount:             data.Amount,

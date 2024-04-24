@@ -288,6 +288,10 @@ func (h *PaymentOrderServiceImpl) GetPaymentOrderList(filter dto.PaymentOrderFil
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"supplier_id": *filter.SupplierID})
 	}
 
+	if filter.Registred != nil {
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"registred": *filter.Registred})
+	}
+
 	if filter.Status != nil {
 		switch *filter.Status {
 		case "Plaćen":

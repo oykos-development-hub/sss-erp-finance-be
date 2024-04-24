@@ -196,6 +196,10 @@ func (h *SalaryServiceImpl) GetSalaryList(filter dto.SalaryFilterDTO) ([]dto.Sal
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"status": *filter.Status})
 	}
 
+	if filter.Registred != nil {
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"registred": *filter.Registred})
+	}
+
 	if filter.Year != nil {
 		year := *filter.Year
 		startOfYear := time.Date(year, time.January, 1, 0, 0, 0, 0, time.UTC)

@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS salaries (
     date_of_calculation TIMESTAMP,
     description TEXT,
     status TEXT,
+    registred BOOLEAN default false,
     organization_unit_id INTEGER NOT NULL,
     created_at TIMESTAMP,
     updated_at TIMESTAMP

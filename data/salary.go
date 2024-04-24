@@ -15,6 +15,7 @@ type Salary struct {
 	DateOfCalculation  time.Time `db:"date_of_calculation"`
 	Description        string    `db:"description"`
 	Status             string    `db:"status"`
+	Registred          *bool     `db:"registred,omitempty"`
 	OrganizationUnitID int       `db:"organization_unit_id"`
 	NumberOfEmployees  int       `db:"number_of_employees"`
 	CreatedAt          time.Time `db:"created_at,omitempty"`

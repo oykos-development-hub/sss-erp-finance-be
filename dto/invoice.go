@@ -18,6 +18,7 @@ type InvoicesFilter struct {
 	OrderID            *int                `json:"order_id"`
 	Type               *string             `json:"type"`
 	PassedToInventory  *bool               `json:"passed_to_inventory"`
+	Registred          *bool               `json:"registred"`
 }
 
 type InvoiceDTO struct {
@@ -36,6 +37,7 @@ type InvoiceDTO struct {
 	GrossPrice             float64                `json:"gross_price"`
 	MunicipalityID         int                    `json:"municipality_id"`
 	VATPrice               float64                `json:"vat_price"`
+	Registred              *bool                  `json:"registred"`
 	SupplierID             int                    `json:"supplier_id"`
 	TypeOfDecision         int                    `json:"type_of_decision"`
 	OrderID                int                    `json:"order_id"`
@@ -63,6 +65,7 @@ type InvoiceResponseDTO struct {
 	PassedToAccounting     bool                           `json:"passed_to_accounting"`
 	IsInvoice              bool                           `json:"is_invoice"`
 	Type                   string                         `json:"type"`
+	Registred              *bool                          `json:"registred"`
 	TaxAuthorityCodebookID int                            `json:"tax_authority_codebook_id"`
 	MunicipalityID         int                            `json:"municipality_id"`
 	TypeOfSubject          int                            `json:"type_of_subject"`
@@ -102,6 +105,7 @@ func (dto InvoiceDTO) ToInvoice() *data.Invoice {
 		InvoiceNumber:          dto.InvoiceNumber,
 		PassedToInventory:      dto.PassedToInventory,
 		PassedToAccounting:     dto.PassedToAccounting,
+		Registred:              dto.Registred,
 		IsInvoice:              dto.IsInvoice,
 		Status:                 dto.Status,
 		GrossPrice:             dto.GrossPrice,
@@ -139,6 +143,7 @@ func ToInvoiceResponseDTO(data data.Invoice) InvoiceResponseDTO {
 		ID:                     data.ID,
 		PassedToInventory:      data.PassedToInventory,
 		PassedToAccounting:     data.PassedToAccounting,
+		Registred:              data.Registred,
 		IsInvoice:              data.IsInvoice,
 		InvoiceNumber:          data.InvoiceNumber,
 		Status:                 data.Status,

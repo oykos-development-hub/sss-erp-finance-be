@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS payment_orders (
     date_of_order TIMESTAMP,
     description TEXT,
     file_id INTEGER,
+    registred BOOLEAN default false,
     bank_account TEXT,
     amount FLOAT,
     created_at TIMESTAMP,

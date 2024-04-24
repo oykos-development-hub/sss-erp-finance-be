@@ -31,6 +31,7 @@ type Invoice struct {
 	SourceOfFunding        string        `db:"source_of_funding"`
 	Supplier               string        `db:"supplier"`
 	Status                 InvoiceStatus `db:"status,omitempty"`
+	Registred              *bool         `db:"registred,omitempty"`
 	GrossPrice             float64       `db:"gross_price"`
 	VATPrice               float64       `db:"vat_price"`
 	SupplierID             int           `db:"supplier_id"`

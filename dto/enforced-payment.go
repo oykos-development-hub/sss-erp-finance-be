@@ -14,6 +14,7 @@ type EnforcedPaymentDTO struct {
 	DateOfOrder        *time.Time                 `json:"date_of_order"`
 	IDOfStatement      *string                    `json:"id_of_statement"`
 	SAPID              *string                    `json:"sap_id"`
+	Registred          *bool                      `json:"registred"`
 	Status             data.EnforcedPaymentStatus `json:"status"`
 	ReturnFileID       *int                       `json:"return_file_id"`
 	Description        string                     `json:"description"`
@@ -35,6 +36,7 @@ type EnforcedPaymentResponseDTO struct {
 	SAPID              *string                          `json:"sap_id"`
 	Description        string                           `json:"description"`
 	Status             data.EnforcedPaymentStatus       `json:"status"`
+	Registred          *bool                            `json:"registred"`
 	ReturnFileID       *int                             `json:"return_file_id"`
 	DateOfSAP          *time.Time                       `json:"date_of_sap"`
 	ReturnDate         *time.Time                       `json:"return_date"`
@@ -54,6 +56,7 @@ type EnforcedPaymentFilterDTO struct {
 	SupplierID         *int    `json:"supplier_id"`
 	Search             *string `json:"search"`
 	Year               *int    `json:"year"`
+	Registred          *bool   `json:"registred"`
 }
 
 func (dto EnforcedPaymentDTO) ToEnforcedPayment() *data.EnforcedPayment {
@@ -67,6 +70,7 @@ func (dto EnforcedPaymentDTO) ToEnforcedPayment() *data.EnforcedPayment {
 		DateOfOrder:        dto.DateOfOrder,
 		DateOfSAP:          dto.DateOfSAP,
 		FileID:             dto.FileID,
+		Registred:          dto.Registred,
 		Description:        dto.Description,
 		Amount:             dto.Amount,
 		ReturnDate:         dto.ReturnDate,
@@ -84,6 +88,7 @@ func ToEnforcedPaymentResponseDTO(data data.EnforcedPayment) EnforcedPaymentResp
 		DateOfPayment:      data.DateOfPayment,
 		IDOfStatement:      data.IDOfStatement,
 		SAPID:              data.SAPID,
+		Registred:          data.Registred,
 		DateOfOrder:        data.DateOfOrder,
 		DateOfSAP:          data.DateOfSAP,
 		FileID:             data.FileID,

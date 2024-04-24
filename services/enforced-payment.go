@@ -223,6 +223,10 @@ func (h *EnforcedPaymentServiceImpl) GetEnforcedPaymentList(filter dto.EnforcedP
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"supplier_id": *filter.SupplierID})
 	}
 
+	if filter.Registred != nil {
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"registred": *filter.Registred})
+	}
+
 	if filter.Status != nil {
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"status": *filter.Status})
 	}
