@@ -213,7 +213,8 @@ func (h *PaymentOrderServiceImpl) GetPaymentOrder(id int) (*dto.PaymentOrderResp
 			}
 
 			for _, article := range articles {
-				builtItem.Amount += article.NetPrice + article.VatPrice
+				price := article.NetPrice + article.NetPrice*float64(article.VatPercentage)/100
+				builtItem.Amount += price
 			}
 
 		} else if item.AdditionalExpenseID != nil {

@@ -167,7 +167,8 @@ func (h *EnforcedPaymentServiceImpl) GetEnforcedPayment(id int) (*dto.EnforcedPa
 					return nil, err
 				}
 				for _, article := range articles {
-					item.Amount += float32(article.Amount)
+					price := article.NetPrice + article.NetPrice*float64(article.VatPercentage)/100
+					item.Amount += float32(price)
 				}
 				item.Title = "Faktura broj " + invoice.InvoiceNumber
 			} else {
