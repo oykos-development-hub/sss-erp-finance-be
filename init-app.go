@@ -162,6 +162,10 @@ func initApplication() *celeritas.Celeritas {
 	EnforcedPaymentItemService := services.NewEnforcedPaymentItemServiceImpl(cel, models.EnforcedPaymentItem)
 	EnforcedPaymentItemHandler := handlers.NewEnforcedPaymentItemHandler(cel, EnforcedPaymentItemService)
 
+		
+	AccountingEntryService := services.NewAccountingEntryServiceImpl(cel, models.AccountingEntry)
+	AccountingEntryHandler := handlers.NewAccountingEntryHandler(cel, AccountingEntryService)
+
 	myHandlers := &handlers.Handlers{
 		InvoiceHandler: InvoiceHandler,
 		ArticleHandler: ArticleHandler,
@@ -207,6 +211,7 @@ func initApplication() *celeritas.Celeritas {
 		PaymentOrderItemHandler:         PaymentOrderItemHandler,
 		EnforcedPaymentHandler:          EnforcedPaymentHandler,
 		EnforcedPaymentItemHandler:      EnforcedPaymentItemHandler,
+		AccountingEntryHandler: AccountingEntryHandler,
 	}
 
 	myMiddleware := &middleware.Middleware{

@@ -256,6 +256,13 @@ func routes(app *celeritas.Celeritas, middleware *middleware.Middleware, handler
 		rt.Get("/enforced-payment-items", handlers.EnforcedPaymentItemHandler.GetEnforcedPaymentItemList)
 		rt.Put("/enforced-payment-items/{id}", handlers.EnforcedPaymentItemHandler.UpdateEnforcedPaymentItem)
 		rt.Delete("/enforced-payment-items/{id}", handlers.EnforcedPaymentItemHandler.DeleteEnforcedPaymentItem)
+
+		rt.Post("/accounting-entries", handlers.AccountingEntryHandler.CreateAccountingEntry)
+		rt.Get("/accounting-entries/{id}", handlers.AccountingEntryHandler.GetAccountingEntryById)
+		rt.Get("/accounting-entries", handlers.AccountingEntryHandler.GetAccountingEntryList)
+		rt.Get("/get-obligations-for-accounting", handlers.AccountingEntryHandler.GetObligationsForAccounting)
+		rt.Put("/accounting-entries/{id}", handlers.AccountingEntryHandler.UpdateAccountingEntry)
+		rt.Delete("/accounting-entries/{id}", handlers.AccountingEntryHandler.DeleteAccountingEntry)
 	})
 
 	return app.Routes

@@ -42,6 +42,7 @@ type Handlers struct {
 	PaymentOrderItemHandler         PaymentOrderItemHandler
 	EnforcedPaymentHandler          EnforcedPaymentHandler
 	EnforcedPaymentItemHandler      EnforcedPaymentItemHandler
+	AccountingEntryHandler          AccountingEntryHandler
 }
 
 type InvoiceHandler interface {
@@ -368,4 +369,13 @@ type EnforcedPaymentItemHandler interface {
 	DeleteEnforcedPaymentItem(w http.ResponseWriter, r *http.Request)
 	GetEnforcedPaymentItemById(w http.ResponseWriter, r *http.Request)
 	GetEnforcedPaymentItemList(w http.ResponseWriter, r *http.Request)
+}
+
+type AccountingEntryHandler interface {
+	CreateAccountingEntry(w http.ResponseWriter, r *http.Request)
+	UpdateAccountingEntry(w http.ResponseWriter, r *http.Request)
+	DeleteAccountingEntry(w http.ResponseWriter, r *http.Request)
+	GetAccountingEntryById(w http.ResponseWriter, r *http.Request)
+	GetAccountingEntryList(w http.ResponseWriter, r *http.Request)
+	GetObligationsForAccounting(w http.ResponseWriter, r *http.Request)
 }

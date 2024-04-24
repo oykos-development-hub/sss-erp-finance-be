@@ -352,3 +352,12 @@ type EnforcedPaymentItemService interface {
 	GetEnforcedPaymentItem(id int) (*dto.EnforcedPaymentItemResponseDTO, error)
 	GetEnforcedPaymentItemList(filter dto.EnforcedPaymentItemFilterDTO) ([]dto.EnforcedPaymentItemResponseDTO, *uint64, error)
 }
+
+type AccountingEntryService interface {
+	CreateAccountingEntry(input dto.AccountingEntryDTO) (*dto.AccountingEntryResponseDTO, error)
+	UpdateAccountingEntry(id int, input dto.AccountingEntryDTO) (*dto.AccountingEntryResponseDTO, error)
+	DeleteAccountingEntry(id int) error
+	GetAccountingEntry(id int) (*dto.AccountingEntryResponseDTO, error)
+	GetAccountingEntryList(filter dto.AccountingEntryFilterDTO) ([]dto.AccountingEntryResponseDTO, *uint64, error)
+	GetObligationsForAccounting(filter dto.GetObligationsFilterDTO) ([]dto.ObligationForAccounting, *uint64, error)
+}
