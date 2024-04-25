@@ -384,6 +384,7 @@ type AccountingEntryHandler interface {
 
 type ModelsOfAccountingHandler interface {
 	CreateModelsOfAccounting(w http.ResponseWriter, r *http.Request)
+	UpdateModelsOfAccounting(w http.ResponseWriter, r *http.Request)
 	GetModelsOfAccountingById(w http.ResponseWriter, r *http.Request)
 	GetModelsOfAccountingList(w http.ResponseWriter, r *http.Request)
 }
