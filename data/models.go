@@ -61,6 +61,8 @@ type Models struct {
 		EnforcedPayment EnforcedPayment
 		EnforcedPaymentItem EnforcedPaymentItem
 		AccountingEntry AccountingEntry
+		ModelsOfAccounting ModelsOfAccounting
+		ModelOfAccountingItem ModelOfAccountingItem
 	}
 
 func New(databasePool *sql.DB) Models {
@@ -111,6 +113,8 @@ func New(databasePool *sql.DB) Models {
 		EnforcedPayment: EnforcedPayment{},
 		EnforcedPaymentItem: EnforcedPaymentItem{},
 		AccountingEntry: AccountingEntry{},
+		ModelsOfAccounting: ModelsOfAccounting{},
+		ModelOfAccountingItem: ModelOfAccountingItem{},
 	}
 }
 

@@ -361,3 +361,17 @@ type AccountingEntryService interface {
 	GetAccountingEntryList(filter dto.AccountingEntryFilterDTO) ([]dto.AccountingEntryResponseDTO, *uint64, error)
 	GetObligationsForAccounting(filter dto.GetObligationsFilterDTO) ([]dto.ObligationForAccounting, *uint64, error)
 }
+
+type ModelsOfAccountingService interface {
+	CreateModelsOfAccounting(input dto.ModelsOfAccountingDTO) (*dto.ModelsOfAccountingResponseDTO, error)
+	UpdateModelsOfAccounting(id int, input dto.ModelsOfAccountingDTO) (*dto.ModelsOfAccountingResponseDTO, error)
+	GetModelsOfAccounting(id int) (*dto.ModelsOfAccountingResponseDTO, error)
+	GetModelsOfAccountingList(filter dto.ModelsOfAccountingFilterDTO) ([]dto.ModelsOfAccountingResponseDTO, *uint64, error)
+}
+
+type ModelOfAccountingItemService interface {
+	CreateModelOfAccountingItem(input dto.ModelOfAccountingItemDTO) (*dto.ModelOfAccountingItemResponseDTO, error)
+	UpdateModelOfAccountingItem(id int, input dto.ModelOfAccountingItemDTO) (*dto.ModelOfAccountingItemResponseDTO, error)
+	GetModelOfAccountingItem(id int) (*dto.ModelOfAccountingItemResponseDTO, error)
+	GetModelOfAccountingItemList(filter dto.ModelOfAccountingItemFilterDTO) ([]dto.ModelOfAccountingItemResponseDTO, *uint64, error)
+}
