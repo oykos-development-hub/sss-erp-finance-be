@@ -26,7 +26,7 @@ type ModelsOfAccounting struct {
 
 // Table returns the table name
 func (t *ModelsOfAccounting) Table() string {
-	return "models_of_accountings"
+	return "models_of_accounting"
 }
 
 // GetAll gets all records from the database, using upper
