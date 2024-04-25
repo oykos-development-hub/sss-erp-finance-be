@@ -63,7 +63,7 @@ func (t *FilledFinancialBudget) GetSummaryFilledFinancialRequests(budgetID int, 
 	const query = `SELECT f.account_id, SUM(f.current_year) AS current_year, SUM(f.next_year) AS next_year, SUM(f.year_after_next) AS year_after_next, SUM(f.actual) AS actual
 						FROM filled_financial_budgets f
 						JOIN budget_requests r ON f.budget_request_id = r.id
-						WHERE r.budget_id = $1 AND r.request_type = $2
+						WHERE r.budget_id = $1 AND r.request_type = $2 AND r.status = 7
 						GROUP BY f.account_id;`
 
 	rows, err := Upper.SQL().Query(query, budgetID, requestType)
