@@ -6,7 +6,15 @@ import (
 	up "github.com/upper/db/v4"
 )
 
-// AccountingEntry struct
+type AccountingOrderItemsTitle string
+
+var (
+	MainBillTitle AccountingOrderItemsTitle = "Korektivni račun"
+	SupplierTitle AccountingOrderItemsTitle = "Dobavljač"
+	TaxTitle      AccountingOrderItemsTitle = "Porez"
+	SubTaxTitle   AccountingOrderItemsTitle = "Prirez"
+)
+
 type AccountingEntry struct {
 	ID        int       `db:"id,omitempty"`
 	Title     string    `db:"title"`
@@ -15,13 +23,13 @@ type AccountingEntry struct {
 }
 
 type ObligationForAccounting struct {
-	InvoiceID *int      `json:"invoice_id"`
-	SalaryID  *int      `json:"salary_id"`
-	Type      string    `json:"type"`
-	Title     string    `json:"title"`
-	Price     float64   `json:"price"`
-	Status    string    `json:"status"`
-	CreatedAt time.Time `json:"created_at"`
+	InvoiceID *int              `json:"invoice_id"`
+	SalaryID  *int              `json:"salary_id"`
+	Type      TypesOfObligation `json:"type"`
+	Title     string            `json:"title"`
+	Price     float64           `json:"price"`
+	Status    string            `json:"status"`
+	CreatedAt time.Time         `json:"created_at"`
 }
 
 // Table returns the table name
@@ -145,7 +153,7 @@ func (t *AccountingEntry) GetObligationsForAccounting(filter ObligationsFilter) 
 			return nil, nil, err
 		}
 
-		obligation.Type = "invoices"
+		obligation.Type = TypeInvoice
 		obligation.Title = "Račun broj " + obligation.Title
 		items = append(items, obligation)
 	}
@@ -164,7 +172,7 @@ func (t *AccountingEntry) GetObligationsForAccounting(filter ObligationsFilter) 
 			return nil, nil, err
 		}
 
-		if obligation.Type == "decisions" {
+		if obligation.Type == TypeDecision {
 			obligation.Title = "Rješenje broj " + obligation.Title
 		} else {
 			obligation.Title = "Ugovor broj " + obligation.Title
@@ -190,7 +198,7 @@ func (t *AccountingEntry) GetObligationsForAccounting(filter ObligationsFilter) 
 		}
 
 		obligation.Title = "Zarada " + obligation.Title
-		obligation.Type = "salaries"
+		obligation.Type = TypeSalary
 
 		items = append(items, obligation)
 

@@ -6,22 +6,22 @@ import (
 	up "github.com/upper/db/v4"
 )
 
-type TypesOfModels string
+type TypesOfObligation string
 
 var (
-	TypeInvoice  TypesOfModels = "invoices"
-	TypeContract TypesOfModels = "contracts"
-	TypeDecision TypesOfModels = "decisions"
-	TypeSalary   TypesOfModels = "salaries"
+	TypeInvoice  TypesOfObligation = "invoices"
+	TypeContract TypesOfObligation = "contracts"
+	TypeDecision TypesOfObligation = "decisions"
+	TypeSalary   TypesOfObligation = "salaries"
 )
 
 // ModelsOfAccounting struct
 type ModelsOfAccounting struct {
-	ID        int           `db:"id,omitempty"`
-	Title     string        `db:"title"`
-	Type      TypesOfModels `db:"type"`
-	CreatedAt time.Time     `db:"created_at,omitempty"`
-	UpdatedAt time.Time     `db:"updated_at"`
+	ID        int               `db:"id,omitempty"`
+	Title     string            `db:"title"`
+	Type      TypesOfObligation `db:"type"`
+	CreatedAt time.Time         `db:"created_at,omitempty"`
+	UpdatedAt time.Time         `db:"updated_at"`
 }
 
 // Table returns the table name

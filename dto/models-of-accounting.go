@@ -9,22 +9,23 @@ import (
 type ModelsOfAccountingDTO struct {
 	Items []ModelOfAccountingItemDTO `json:"items"`
 	Title string                     `json:"title"`
-	Type  data.TypesOfModels         `json:"type"`
+	Type  data.TypesOfObligation     `json:"type"`
 }
 
 type ModelsOfAccountingResponseDTO struct {
 	ID        int                                `json:"id"`
 	Title     string                             `json:"title"`
-	Type      data.TypesOfModels                 `json:"type"`
+	Type      data.TypesOfObligation             `json:"type"`
 	Items     []ModelOfAccountingItemResponseDTO `json:"items"`
 	CreatedAt time.Time                          `json:"created_at"`
 	UpdatedAt time.Time                          `json:"updated_at"`
 }
 
 type ModelsOfAccountingFilterDTO struct {
-	Page        *int    `json:"page"`
-	Size        *int    `json:"size"`
-	SortByTitle *string `json:"sort_by_title"`
+	Page        *int                    `json:"page"`
+	Size        *int                    `json:"size"`
+	Type        *data.TypesOfObligation `json:"type"`
+	SortByTitle *string                 `json:"sort_by_title"`
 }
 
 func (dto ModelsOfAccountingDTO) ToModelsOfAccounting() *data.ModelsOfAccounting {

@@ -24,13 +24,43 @@ type AccountingEntryFilterDTO struct {
 }
 
 type ObligationForAccounting struct {
-	InvoiceID *int      `json:"invoice_id"`
-	SalaryID  *int      `json:"salary_id"`
-	Type      string    `json:"type"`
-	Title     string    `json:"title"`
-	Price     float64   `json:"price"`
-	Status    string    `json:"status"`
-	CreatedAt time.Time `json:"created_at"`
+	InvoiceID *int                   `json:"invoice_id"`
+	SalaryID  *int                   `json:"salary_id"`
+	Type      data.TypesOfObligation `json:"type"`
+	Title     string                 `json:"title"`
+	Price     float64                `json:"price"`
+	Status    string                 `json:"status"`
+	CreatedAt time.Time              `json:"created_at"`
+}
+
+type AccountingOrderForObligationsData struct {
+	InvoiceID     []int     `json:"invoice_id"`
+	SalaryID      []int     `json:"salary_id"`
+	DateOfBooking time.Time `json:"date_of_booking"`
+}
+
+type AccountingOrderForObligations struct {
+	OrganizationUnitID int                                  `json:"organization_unit_id"`
+	DateOfBooking      time.Time                            `json:"date_of_booking"`
+	CreditAmount       float32                              `json:"credit_amount"`
+	DebitAmount        float32                              `json:"debit_amount"`
+	Items              []AccountingOrderItemsForObligations `json:"items"`
+}
+
+type AccountingOrderItemsForObligations struct {
+	AccountID    int                    `json:"account_id"`
+	Title        string                 `json:"title"`
+	CreditAmount float32                `json:"credit_amount"`
+	DebitAmount  float32                `json:"debit_amount"`
+	Type         data.TypesOfObligation `json:"type"`
+	SupplierID   int                    `json:"supplier_id"`
+	Invoice      DropdownSimple         `json:"invoice"`
+	Salary       DropdownSimple         `json:"salary"`
+}
+
+type DropdownSimple struct {
+	ID    int    `json:"id"`
+	Title string `json:"title"`
 }
 
 func (dto AccountingEntryDTO) ToAccountingEntry() *data.AccountingEntry {

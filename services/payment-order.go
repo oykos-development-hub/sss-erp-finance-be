@@ -166,12 +166,12 @@ func (h *PaymentOrderServiceImpl) DeletePaymentOrder(id int) error {
 }
 
 func (h *PaymentOrderServiceImpl) GetPaymentOrder(id int) (*dto.PaymentOrderResponseDTO, error) {
-	data, err := h.repo.Get(id)
+	paymentData, err := h.repo.Get(id)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return nil, errors.ErrNotFound
 	}
-	response := dto.ToPaymentOrderResponseDTO(*data)
+	response := dto.ToPaymentOrderResponseDTO(*paymentData)
 
 	conditionAndExp := &up.AndExpr{}
 	conditionAndExp = up.And(conditionAndExp, &up.Cond{"payment_order_id": id})
@@ -194,7 +194,7 @@ func (h *PaymentOrderServiceImpl) GetPaymentOrder(id int) (*dto.PaymentOrderResp
 		}
 
 		if item.InvoiceID != nil {
-			builtItem.Type = "invoices"
+			builtItem.Type = data.TypeInvoice
 
 			item, err := h.invoiceRepo.Get(*item.InvoiceID)
 
@@ -233,7 +233,7 @@ func (h *PaymentOrderServiceImpl) GetPaymentOrder(id int) (*dto.PaymentOrderResp
 			builtItem.Type = item.Type
 			builtItem.Amount = item.GrossPrice
 
-			if builtItem.Type == "decisions" {
+			if builtItem.Type == data.TypeDecision {
 				builtItem.Title = "Rješenje broj " + item.InvoiceNumber + " " + additionalItem.Title
 			} else {
 				builtItem.Title = "Ugovor broj " + item.InvoiceNumber + " " + additionalItem.Title
@@ -252,7 +252,7 @@ func (h *PaymentOrderServiceImpl) GetPaymentOrder(id int) (*dto.PaymentOrderResp
 				return nil, err
 			}
 
-			builtItem.Type = "salaries"
+			builtItem.Type = data.TypeSalary
 			builtItem.Amount = additionalItem.Amount
 			builtItem.Title = "Zarada " + item.Month + " " + additionalItem.Title
 

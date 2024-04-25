@@ -131,10 +131,9 @@ func (h *ModelsOfAccountingServiceImpl) GetModelsOfAccountingList(filter dto.Mod
 	conditionAndExp := &up.AndExpr{}
 	var orders []interface{}
 
-	// example of making conditions
-	// if filter.Year != nil {
-	// 	conditionAndExp = up.And(conditionAndExp, &up.Cond{"year": *filter.Year})
-	// }
+	if filter.Type != nil {
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"type": *filter.Type})
+	}
 
 	if filter.SortByTitle != nil {
 		if *filter.SortByTitle == "asc" {
@@ -152,6 +151,27 @@ func (h *ModelsOfAccountingServiceImpl) GetModelsOfAccountingList(filter dto.Mod
 		return nil, nil, errors.ErrInternalServer
 	}
 	response := dto.ToModelsOfAccountingListResponseDTO(data)
+
+	for i := 0; i < len(response); i++ {
+		conditionAndExp := &up.AndExpr{}
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"model_id": &response[i].ID})
+
+		items, _, err := h.itemsRepo.GetAll(nil, nil, conditionAndExp, nil)
+		if err != nil {
+			h.App.ErrorLog.Println(err)
+			return nil, nil, errors.ErrInternalServer
+		}
+
+		for _, item := range items {
+			builtItem := dto.ModelOfAccountingItemResponseDTO{
+				ID:              item.ID,
+				Title:           item.Title,
+				DebitAccountID:  item.DebitAccountID,
+				CreditAccountID: item.CreditAccountID,
+			}
+			response[i].Items = append(response[i].Items, builtItem)
+		}
+	}
 
 	return response, total, nil
 }

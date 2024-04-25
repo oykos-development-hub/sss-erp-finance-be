@@ -379,7 +379,9 @@ type AccountingEntryHandler interface {
 	DeleteAccountingEntry(w http.ResponseWriter, r *http.Request)
 	GetAccountingEntryById(w http.ResponseWriter, r *http.Request)
 	GetAccountingEntryList(w http.ResponseWriter, r *http.Request)
+
 	GetObligationsForAccounting(w http.ResponseWriter, r *http.Request)
+	BuildAccountingOrderForObligations(w http.ResponseWriter, r *http.Request)
 }
 
 type ModelsOfAccountingHandler interface {

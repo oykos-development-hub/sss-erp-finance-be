@@ -10,14 +10,26 @@ import (
 )
 
 type AccountingEntryServiceImpl struct {
-	App  *celeritas.Celeritas
-	repo data.AccountingEntry
+	App                          *celeritas.Celeritas
+	repo                         data.AccountingEntry
+	invoiceRepo                  data.Invoice
+	articlesRepo                 data.Article
+	additionalExpensesRepo       data.AdditionalExpense
+	salaryRepo                   data.Salary
+	salaryAdditionalExpensesRepo data.SalaryAdditionalExpense
+	modelOfAccountingRepo        ModelsOfAccountingService
 }
 
-func NewAccountingEntryServiceImpl(app *celeritas.Celeritas, repo data.AccountingEntry) AccountingEntryService {
+func NewAccountingEntryServiceImpl(app *celeritas.Celeritas, repo data.AccountingEntry, invoiceRepo data.Invoice, articlesRepo data.Article, additionalExpensesRepo data.AdditionalExpense, salaryRepo data.Salary, salaryAdditionalExpensesRepo data.SalaryAdditionalExpense, modelOfAccountingRepo ModelsOfAccountingService) AccountingEntryService {
 	return &AccountingEntryServiceImpl{
-		App:  app,
-		repo: repo,
+		App:                          app,
+		repo:                         repo,
+		invoiceRepo:                  invoiceRepo,
+		articlesRepo:                 articlesRepo,
+		additionalExpensesRepo:       additionalExpensesRepo,
+		salaryRepo:                   salaryRepo,
+		salaryAdditionalExpensesRepo: salaryAdditionalExpensesRepo,
+		modelOfAccountingRepo:        modelOfAccountingRepo,
 	}
 }
 
@@ -152,4 +164,98 @@ func (h *AccountingEntryServiceImpl) GetObligationsForAccounting(filter dto.GetO
 	}
 
 	return response, total, nil
+}
+
+func (h *AccountingEntryServiceImpl) BuildAccountingOrderForObligations(orderData dto.AccountingOrderForObligationsData) (*dto.AccountingOrderForObligations, error) {
+
+	response := dto.AccountingOrderForObligations{}
+
+	for _, id := range orderData.InvoiceID {
+		invoice, err := h.invoiceRepo.Get(id)
+
+		if err != nil {
+			return nil, err
+		}
+
+		switch invoice.Type {
+		case data.TypeInvoice:
+			item, err := buildAccountingOrderForInvoice(id, h)
+
+			if err != nil {
+				return nil, err
+			}
+
+			response.Items = append(response.Items, item...)
+		case data.TypeDecision:
+		case data.TypeContract:
+		}
+	}
+
+	return &response, nil
+}
+
+func buildAccountingOrderForInvoice(id int, h *AccountingEntryServiceImpl) ([]dto.AccountingOrderItemsForObligations, error) {
+	response := []dto.AccountingOrderItemsForObligations{}
+
+	invoice, err := h.invoiceRepo.Get(id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	conditionAndExp := &up.AndExpr{}
+	conditionAndExp = up.And(conditionAndExp, &up.Cond{"invoice_id": id})
+	articles, _, err := h.articlesRepo.GetAll(nil, nil, conditionAndExp, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var price float64
+	for _, article := range articles {
+		price += article.NetPrice + article.VatPrice/100*article.NetPrice
+	}
+
+	model, _, err := h.modelOfAccountingRepo.GetModelsOfAccountingList(dto.ModelsOfAccountingFilterDTO{
+		Type: &data.TypeInvoice,
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	if len(model) != 1 {
+		return nil, errors.ErrInvalidInput
+	}
+
+	for _, modelItem := range model[0].Items {
+		switch modelItem.Title {
+		case data.MainBillTitle:
+			response = append(response, dto.AccountingOrderItemsForObligations{
+				AccountID:   modelItem.DebitAccountID,
+				DebitAmount: float32(price),
+				Title:       string(modelItem.Title),
+				Type:        data.TypeInvoice,
+				Invoice: dto.DropdownSimple{
+					ID:    invoice.ID,
+					Title: invoice.InvoiceNumber,
+				},
+			})
+		case data.SupplierTitle:
+			response = append(response, dto.AccountingOrderItemsForObligations{
+				AccountID:    modelItem.CreditAccountID,
+				CreditAmount: float32(price),
+				Title:        string(modelItem.Title),
+				Type:         data.TypeInvoice,
+				Invoice: dto.DropdownSimple{
+					ID:    invoice.ID,
+					Title: invoice.InvoiceNumber,
+				},
+				SupplierID: invoice.SupplierID,
+			})
+		}
+
+	}
+
+	return response, nil
 }
