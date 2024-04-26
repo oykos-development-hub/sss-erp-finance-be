@@ -237,7 +237,7 @@ func (h *AccountingEntryServiceImpl) GetAccountingEntryList(filter dto.Accountin
 	var orders []interface{}
 
 	if filter.OrganizationUnitID != nil {
-		conditionAndExp = up.And(conditionAndExp, &up.Cond{"year": *filter.OrganizationUnitID})
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"organization_unit_id": *filter.OrganizationUnitID})
 	}
 
 	if filter.SortByTitle != nil {
