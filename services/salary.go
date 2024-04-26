@@ -41,9 +41,11 @@ func (h *SalaryServiceImpl) CreateSalary(input dto.SalaryDTO) (*dto.SalaryRespon
 		additionalExpenseData := additionalExpense.ToSalaryAdditionalExpense()
 		additionalExpenseData.SalaryID = id
 		additionalExpenseData.Status = "Kreiran"
-		_, err = h.salaryAdditionalExpenseRepo.Insert(data.Upper, *additionalExpenseData)
-		if err != nil {
-			return nil, errors.ErrInternalServer
+		if additionalExpenseData.Amount > 0 {
+			_, err = h.salaryAdditionalExpenseRepo.Insert(data.Upper, *additionalExpenseData)
+			if err != nil {
+				return nil, errors.ErrInternalServer
+			}
 		}
 	}
 
@@ -91,10 +93,12 @@ func (h *SalaryServiceImpl) UpdateSalary(id int, input dto.SalaryDTO) (*dto.Sala
 				additionalExpenseData := item.ToSalaryAdditionalExpense()
 				additionalExpenseData.SalaryID = id
 				additionalExpenseData.Status = "Kreiran"
-				_, err = h.salaryAdditionalExpenseRepo.Insert(tx, *additionalExpenseData)
+				if additionalExpenseData.Amount > 0 {
+					_, err = h.salaryAdditionalExpenseRepo.Insert(tx, *additionalExpenseData)
 
-				if err != nil {
-					return err
+					if err != nil {
+						return err
+					}
 				}
 			}
 		}
@@ -111,9 +115,16 @@ func (h *SalaryServiceImpl) UpdateSalary(id int, input dto.SalaryDTO) (*dto.Sala
 					if item.ID == itemID {
 						additionalExpenseData := item.ToSalaryAdditionalExpense()
 						additionalExpenseData.ID = id
-						err := h.salaryAdditionalExpenseRepo.Update(tx, *additionalExpenseData)
-						if err != nil {
-							return err
+						if additionalExpenseData.Amount > 0 {
+							err := h.salaryAdditionalExpenseRepo.Update(tx, *additionalExpenseData)
+							if err != nil {
+								return err
+							}
+						} else {
+							err := h.salaryAdditionalExpenseRepo.Delete(additionalExpenseData.ID)
+							if err != nil {
+								return err
+							}
 						}
 					}
 				}

@@ -201,17 +201,17 @@ func (h *AccountingEntryServiceImpl) BuildAccountingOrderForObligations(orderDat
 			if err != nil {
 				return nil, err
 			}
-
-			response.Items = append(response.Items, item...)
-		case data.TypeSalary:
-			item, err := buildAccountingOrderForSalaries(id, h)
-
-			if err != nil {
-				return nil, err
-			}
-
 			response.Items = append(response.Items, item...)
 		}
+	}
+
+	for _, id := range orderData.SalaryID {
+		item, err := buildAccountingOrderForSalaries(id, h)
+
+		if err != nil {
+			return nil, err
+		}
+		response.Items = append(response.Items, item...)
 	}
 
 	for _, item := range response.Items {
@@ -507,7 +507,7 @@ func buildAccountingOrderForSalaries(id int, h *AccountingEntryServiceImpl) ([]d
 	}
 
 	model, _, err := h.modelOfAccountingRepo.GetModelsOfAccountingList(dto.ModelsOfAccountingFilterDTO{
-		Type: &data.TypeContract,
+		Type: &data.TypeSalary,
 	})
 
 	if err != nil {
@@ -554,6 +554,28 @@ func buildAccountingOrderForSalaries(id int, h *AccountingEntryServiceImpl) ([]d
 			}
 			response = append(response, *bookedItem)
 		}
+	}
+
+	for _, model := range model[0].Items {
+		if model.Title == data.MainBillTitle {
+
+			newSlice := make([]dto.AccountingOrderItemsForObligations, 0)
+
+			newSlice = append(newSlice, dto.AccountingOrderItemsForObligations{
+				AccountID:   model.DebitAccountID,
+				DebitAmount: float32(price),
+				Title:       string(model.Title),
+				Type:        data.TypeSalary,
+				Salary: dto.DropdownSimple{
+					ID:    salary.ID,
+					Title: salary.Month,
+				},
+			})
+
+			response = append(newSlice, response...)
+
+		}
+
 	}
 
 	return response, nil
