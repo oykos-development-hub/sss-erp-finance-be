@@ -377,3 +377,11 @@ type ModelOfAccountingItemService interface {
 	GetModelOfAccountingItem(id int) (*dto.ModelOfAccountingItemResponseDTO, error)
 	GetModelOfAccountingItemList(filter dto.ModelOfAccountingItemFilterDTO) ([]dto.ModelOfAccountingItemResponseDTO, *uint64, error)
 }
+
+type AccountingEntryItemService interface {
+	CreateAccountingEntryItem(input dto.AccountingEntryItemDTO) (*dto.AccountingEntryItemResponseDTO, error)
+	UpdateAccountingEntryItem(id int, input dto.AccountingEntryItemDTO) (*dto.AccountingEntryItemResponseDTO, error)
+	DeleteAccountingEntryItem(id int) error
+	GetAccountingEntryItem(id int) (*dto.AccountingEntryItemResponseDTO, error)
+	GetAccountingEntryItemList(filter dto.AccountingEntryItemFilterDTO) ([]dto.AccountingEntryItemResponseDTO, *uint64, error)
+}

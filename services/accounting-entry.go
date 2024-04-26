@@ -18,9 +18,10 @@ type AccountingEntryServiceImpl struct {
 	salaryRepo                   data.Salary
 	salaryAdditionalExpensesRepo data.SalaryAdditionalExpense
 	modelOfAccountingRepo        ModelsOfAccountingService
+	items                        data.AccountingEntryItem
 }
 
-func NewAccountingEntryServiceImpl(app *celeritas.Celeritas, repo data.AccountingEntry, invoiceRepo data.Invoice, articlesRepo data.Article, additionalExpensesRepo data.AdditionalExpense, salaryRepo data.Salary, salaryAdditionalExpensesRepo data.SalaryAdditionalExpense, modelOfAccountingRepo ModelsOfAccountingService) AccountingEntryService {
+func NewAccountingEntryServiceImpl(app *celeritas.Celeritas, repo data.AccountingEntry, invoiceRepo data.Invoice, articlesRepo data.Article, additionalExpensesRepo data.AdditionalExpense, salaryRepo data.Salary, salaryAdditionalExpensesRepo data.SalaryAdditionalExpense, modelOfAccountingRepo ModelsOfAccountingService, items data.AccountingEntryItem) AccountingEntryService {
 	return &AccountingEntryServiceImpl{
 		App:                          app,
 		repo:                         repo,
@@ -30,6 +31,7 @@ func NewAccountingEntryServiceImpl(app *celeritas.Celeritas, repo data.Accountin
 		salaryRepo:                   salaryRepo,
 		salaryAdditionalExpensesRepo: salaryAdditionalExpensesRepo,
 		modelOfAccountingRepo:        modelOfAccountingRepo,
+		items:                        items,
 	}
 }
 
@@ -42,6 +44,48 @@ func (h *AccountingEntryServiceImpl) CreateAccountingEntry(input dto.AccountingE
 		id, err = h.repo.Insert(tx, *dataToInsert)
 		if err != nil {
 			return errors.ErrInternalServer
+		}
+
+		for _, item := range input.Items {
+			itemToInsert := item.ToAccountingEntryItem()
+			itemToInsert.EntryID = id
+
+			_, err = h.items.Insert(tx, *itemToInsert)
+			if err != nil {
+				return err
+			}
+
+			boolTrue := true
+			if item.Title == string(data.MainBillTitle) && item.InvoiceID != 0 {
+				invoice, err := h.invoiceRepo.Get(item.InvoiceID)
+
+				if err != nil {
+					return err
+				}
+
+				invoice.Registred = &boolTrue
+
+				err = h.invoiceRepo.Update(tx, *invoice)
+
+				if err != nil {
+					return err
+				}
+			} else if item.Title == string(data.MainBillTitle) && item.SalaryID != 0 {
+				salary, err := h.salaryRepo.Get(item.SalaryID)
+
+				if err != nil {
+					return err
+				}
+
+				salary.Registred = &boolTrue
+
+				err = h.salaryRepo.Update(tx, *salary)
+
+				if err != nil {
+					return err
+				}
+			}
+
 		}
 
 		return nil
@@ -87,7 +131,56 @@ func (h *AccountingEntryServiceImpl) UpdateAccountingEntry(id int, input dto.Acc
 }
 
 func (h *AccountingEntryServiceImpl) DeleteAccountingEntry(id int) error {
-	err := h.repo.Delete(id)
+	err := data.Upper.Tx(func(tx up.Session) error {
+		conditionAndExp := &up.AndExpr{}
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"entry_id": id})
+		items, _, err := h.items.GetAll(nil, nil, conditionAndExp, nil)
+		if err != nil {
+			return errors.ErrInternalServer
+		}
+
+		for _, item := range items {
+			boolFalse := false
+			if item.Title == string(data.MainBillTitle) && item.InvoiceID != 0 {
+				invoice, err := h.invoiceRepo.Get(item.InvoiceID)
+
+				if err != nil {
+					return err
+				}
+
+				invoice.Registred = &boolFalse
+
+				err = h.invoiceRepo.Update(tx, *invoice)
+
+				if err != nil {
+					return err
+				}
+			} else if item.Title == string(data.MainBillTitle) && item.SalaryID != 0 {
+				salary, err := h.salaryRepo.Get(item.SalaryID)
+
+				if err != nil {
+					return err
+				}
+
+				salary.Registred = &boolFalse
+
+				err = h.salaryRepo.Update(tx, *salary)
+
+				if err != nil {
+					return err
+				}
+			}
+		}
+
+		err = h.repo.Delete(id)
+		if err != nil {
+			h.App.ErrorLog.Println(err)
+			return errors.ErrInternalServer
+		}
+
+		return nil
+	})
+
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return errors.ErrInternalServer
@@ -104,6 +197,38 @@ func (h *AccountingEntryServiceImpl) GetAccountingEntry(id int) (*dto.Accounting
 	}
 	response := dto.ToAccountingEntryResponseDTO(*data)
 
+	conditionAndExp := &up.AndExpr{}
+	conditionAndExp = up.And(conditionAndExp, &up.Cond{"entry_id": id})
+	items, _, err := h.items.GetAll(nil, nil, conditionAndExp, nil)
+
+	if err != nil {
+		h.App.ErrorLog.Println(err)
+		return nil, errors.ErrNotFound
+	}
+
+	var debitAmount float64
+	var creditAmount float64
+	for _, item := range items {
+		responseItem := dto.AccountingEntryItemResponseDTO{
+			ID:           item.ID,
+			Title:        item.Title,
+			EntryID:      item.EntryID,
+			AccountID:    item.AccountID,
+			CreditAmount: item.CreditAmount,
+			DebitAmount:  item.DebitAmount,
+			InvoiceID:    item.InvoiceID,
+			SalaryID:     item.SalaryID,
+			Type:         item.Type,
+		}
+
+		debitAmount += item.DebitAmount
+		creditAmount += item.CreditAmount
+
+		response.Items = append(response.Items, responseItem)
+	}
+	response.CreditAmount = creditAmount
+	response.DebitAmount = debitAmount
+
 	return &response, nil
 }
 
@@ -111,10 +236,9 @@ func (h *AccountingEntryServiceImpl) GetAccountingEntryList(filter dto.Accountin
 	conditionAndExp := &up.AndExpr{}
 	var orders []interface{}
 
-	// example of making conditions
-	// if filter.Year != nil {
-	// 	conditionAndExp = up.And(conditionAndExp, &up.Cond{"year": *filter.Year})
-	// }
+	if filter.OrganizationUnitID != nil {
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"year": *filter.OrganizationUnitID})
+	}
 
 	if filter.SortByTitle != nil {
 		if *filter.SortByTitle == "asc" {
@@ -132,6 +256,40 @@ func (h *AccountingEntryServiceImpl) GetAccountingEntryList(filter dto.Accountin
 		return nil, nil, errors.ErrInternalServer
 	}
 	response := dto.ToAccountingEntryListResponseDTO(data)
+
+	for i := 0; i < len(response); i++ {
+		conditionAndExp := &up.AndExpr{}
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"entry_id": response[i].ID})
+		items, _, err := h.items.GetAll(nil, nil, conditionAndExp, nil)
+
+		if err != nil {
+			h.App.ErrorLog.Println(err)
+			return nil, nil, errors.ErrNotFound
+		}
+
+		var debitAmount float64
+		var creditAmount float64
+		for _, item := range items {
+			responseItem := dto.AccountingEntryItemResponseDTO{
+				ID:           item.ID,
+				Title:        item.Title,
+				EntryID:      item.EntryID,
+				AccountID:    item.AccountID,
+				CreditAmount: item.CreditAmount,
+				DebitAmount:  item.DebitAmount,
+				InvoiceID:    item.InvoiceID,
+				SalaryID:     item.SalaryID,
+				Type:         item.Type,
+			}
+
+			debitAmount += item.DebitAmount
+			creditAmount += item.CreditAmount
+
+			response[i].Items = append(response[i].Items, responseItem)
+		}
+		response[i].CreditAmount = creditAmount
+		response[i].DebitAmount = debitAmount
+	}
 
 	return response, total, nil
 }

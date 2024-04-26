@@ -16,10 +16,12 @@ var (
 )
 
 type AccountingEntry struct {
-	ID        int       `db:"id,omitempty"`
-	Title     string    `db:"title"`
-	CreatedAt time.Time `db:"created_at,omitempty"`
-	UpdatedAt time.Time `db:"updated_at"`
+	ID                 int       `db:"id,omitempty"`
+	Title              string    `db:"title"`
+	OrganizationUnitID int       `db:"organization_unit_id"`
+	DateOfBooking      time.Time `db:"date_of_booking"`
+	CreatedAt          time.Time `db:"created_at,omitempty"`
+	UpdatedAt          time.Time `db:"updated_at"`
 }
 
 type ObligationForAccounting struct {

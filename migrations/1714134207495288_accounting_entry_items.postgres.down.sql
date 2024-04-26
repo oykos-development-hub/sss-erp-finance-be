@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS accounting_entry_items;

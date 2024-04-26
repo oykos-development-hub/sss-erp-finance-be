@@ -275,6 +275,12 @@ func routes(app *celeritas.Celeritas, middleware *middleware.Middleware, handler
 		rt.Get("/model-of-accounting-items/{id}", handlers.ModelOfAccountingItemHandler.GetModelOfAccountingItemById)
 		rt.Get("/model-of-accounting-items", handlers.ModelOfAccountingItemHandler.GetModelOfAccountingItemList)
 		rt.Put("/model-of-accounting-items/{id}", handlers.ModelOfAccountingItemHandler.UpdateModelOfAccountingItem)
+	
+		rt.Post("/accounting-entry-items", handlers.AccountingEntryItemHandler.CreateAccountingEntryItem)
+rt.Get("/accounting-entry-items/{id}", handlers.AccountingEntryItemHandler.GetAccountingEntryItemById)
+rt.Get("/accounting-entry-items", handlers.AccountingEntryItemHandler.GetAccountingEntryItemList)
+rt.Put("/accounting-entry-items/{id}", handlers.AccountingEntryItemHandler.UpdateAccountingEntryItem)
+rt.Delete("/accounting-entry-items/{id}", handlers.AccountingEntryItemHandler.DeleteAccountingEntryItem)
 	})
 
 	return app.Routes

@@ -7,20 +7,29 @@ import (
 )
 
 type AccountingEntryDTO struct {
-	Title string `json:"title" validate:"required,min=2"`
+	Title              string                   `json:"title"`
+	OrganizationUnitID int                      `json:"organization_unit_id"`
+	DateOfBooking      time.Time                `json:"date_of_booking"`
+	Items              []AccountingEntryItemDTO `json:"items"`
 }
 
 type AccountingEntryResponseDTO struct {
-	ID        int       `json:"id"`
-	Title     string    `json:"title"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID                 int                              `json:"id"`
+	Title              string                           `json:"title"`
+	OrganizationUnitID int                              `json:"organization_unit_id"`
+	DateOfBooking      time.Time                        `json:"date_of_booking"`
+	CreditAmount       float64                          `json:"credit_amount"`
+	DebitAmount        float64                          `json:"debit_amount"`
+	Items              []AccountingEntryItemResponseDTO `json:"items"`
+	CreatedAt          time.Time                        `json:"created_at"`
+	UpdatedAt          time.Time                        `json:"updated_at"`
 }
 
 type AccountingEntryFilterDTO struct {
-	Page        *int    `json:"page"`
-	Size        *int    `json:"size"`
-	SortByTitle *string `json:"sort_by_title"`
+	Page               *int    `json:"page"`
+	Size               *int    `json:"size"`
+	SortByTitle        *string `json:"sort_by_title"`
+	OrganizationUnitID *int    `json:"organization_unit_id"`
 }
 
 type ObligationForAccounting struct {
@@ -66,16 +75,20 @@ type DropdownSimple struct {
 
 func (dto AccountingEntryDTO) ToAccountingEntry() *data.AccountingEntry {
 	return &data.AccountingEntry{
-		Title: dto.Title,
+		Title:              dto.Title,
+		OrganizationUnitID: dto.OrganizationUnitID,
+		DateOfBooking:      dto.DateOfBooking,
 	}
 }
 
 func ToAccountingEntryResponseDTO(data data.AccountingEntry) AccountingEntryResponseDTO {
 	return AccountingEntryResponseDTO{
-		ID:        data.ID,
-		Title:     data.Title,
-		CreatedAt: data.CreatedAt,
-		UpdatedAt: data.UpdatedAt,
+		ID:                 data.ID,
+		Title:              data.Title,
+		OrganizationUnitID: data.OrganizationUnitID,
+		DateOfBooking:      data.DateOfBooking,
+		CreatedAt:          data.CreatedAt,
+		UpdatedAt:          data.UpdatedAt,
 	}
 }
 
