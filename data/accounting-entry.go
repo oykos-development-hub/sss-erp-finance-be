@@ -119,7 +119,7 @@ func (t *AccountingEntry) Insert(tx up.Session, m AccountingEntry) (int, error) 
 func (t *AccountingEntry) GetObligationsForAccounting(filter ObligationsFilter) ([]ObligationForAccounting, *uint64, error) {
 	var items []ObligationForAccounting
 
-	queryForInvoices := `select i.id, sum(a.net_price +a.net_price*a.vat_percentage/100) as sum, i.invoice_number
+	queryForInvoices := `select i.id, sum((a.net_price +a.net_price*a.vat_percentage/100)*a.amount) as sum, i.invoice_number
 						from invoices i
 						left join articles a on a.invoice_id = i.id
 						where 

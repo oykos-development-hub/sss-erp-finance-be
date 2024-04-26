@@ -132,7 +132,8 @@ func (t *PaymentOrder) Insert(tx up.Session, m PaymentOrder) (int, error) {
 func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation, *uint64, error) {
 	var items []Obligation
 
-	queryForInvoices := `select i.id, sum(a.net_price +a.net_price*a.vat_percentage/100) as sum, i.invoice_number, i.status, i.created_at
+	queryForInvoices := `select i.id, sum((a.net_price +a.net_price*a.vat_percentage/100)*a.amount) as sum, 
+						i.invoice_number, i.status, i.created_at
 						from invoices i
 						left join articles a on a.invoice_id = i.id
 						where i.supplier_id = $1 and

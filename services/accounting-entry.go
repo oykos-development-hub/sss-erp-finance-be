@@ -169,6 +169,7 @@ func (h *AccountingEntryServiceImpl) GetObligationsForAccounting(filter dto.GetO
 func (h *AccountingEntryServiceImpl) BuildAccountingOrderForObligations(orderData dto.AccountingOrderForObligationsData) (*dto.AccountingOrderForObligations, error) {
 
 	response := dto.AccountingOrderForObligations{}
+	response.DateOfBooking = orderData.DateOfBooking
 
 	for _, id := range orderData.InvoiceID {
 		invoice, err := h.invoiceRepo.Get(id)
@@ -189,6 +190,11 @@ func (h *AccountingEntryServiceImpl) BuildAccountingOrderForObligations(orderDat
 		case data.TypeDecision:
 		case data.TypeContract:
 		}
+	}
+
+	for _, item := range response.Items {
+		response.CreditAmount += item.CreditAmount
+		response.DebitAmount += item.DebitAmount
 	}
 
 	return &response, nil
@@ -213,7 +219,7 @@ func buildAccountingOrderForInvoice(id int, h *AccountingEntryServiceImpl) ([]dt
 
 	var price float64
 	for _, article := range articles {
-		price += article.NetPrice + article.VatPrice/100*article.NetPrice
+		price += (article.NetPrice + float64(article.VatPercentage)/100*article.NetPrice) * float64(article.Amount)
 	}
 
 	model, _, err := h.modelOfAccountingRepo.GetModelsOfAccountingList(dto.ModelsOfAccountingFilterDTO{
