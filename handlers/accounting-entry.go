@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -145,6 +146,7 @@ func (h *accountingentryHandlerImpl) BuildAccountingOrderForObligations(w http.R
 
 	validator := h.App.Validator().ValidateStruct(&data)
 	if !validator.Valid() {
+		fmt.Println(validator.Errors)
 		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
 		return
 	}
