@@ -123,7 +123,7 @@ func (t *AccountingEntry) GetObligationsForAccounting(filter ObligationsFilter) 
 						from invoices i
 						left join articles a on a.invoice_id = i.id
 						where 
-						i.organization_unit_id = $1 and i.type = 'invoice' and i.registred = false 
+						i.organization_unit_id = $1 and i.type = $2 and i.registred = false 
 						group by i.id;`
 
 	queryForAdditionalExpenses := `select i.id, sum(a.price), i.type, i.invoice_number
@@ -139,7 +139,7 @@ func (t *AccountingEntry) GetObligationsForAccounting(filter ObligationsFilter) 
 	                                     where s.organization_unit_id = $1 and s.registred = false
 	                                     group by s.id, s.month order by s.id;`
 
-	rows, err := Upper.SQL().Query(queryForInvoices, filter.OrganizationUnitID)
+	rows, err := Upper.SQL().Query(queryForInvoices, filter.OrganizationUnitID, TypeInvoice)
 	if err != nil {
 		return nil, nil, err
 	}
