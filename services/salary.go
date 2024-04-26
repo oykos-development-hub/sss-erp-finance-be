@@ -251,7 +251,7 @@ func (h *SalaryServiceImpl) GetSalaryList(filter dto.SalaryFilterDTO) ([]dto.Sal
 		}
 
 		response[i].SalaryAdditionalExpenses = additionalExpenses
-
+		response[i].Deletable = true
 		for _, additionalExpense := range additionalExpenses {
 
 			if additionalExpense.Status != data.InvoiceStatusCreated {
