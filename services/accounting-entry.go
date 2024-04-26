@@ -188,7 +188,23 @@ func (h *AccountingEntryServiceImpl) BuildAccountingOrderForObligations(orderDat
 
 			response.Items = append(response.Items, item...)
 		case data.TypeDecision:
+			item, err := buildAccountingOrderForDecisions(id, h)
+
+			if err != nil {
+				return nil, err
+			}
+
+			response.Items = append(response.Items, item...)
 		case data.TypeContract:
+			item, err := buildAccountingOrderForContracts(id, h)
+
+			if err != nil {
+				return nil, err
+			}
+
+			response.Items = append(response.Items, item...)
+		case data.TypeSalary:
+
 		}
 	}
 
@@ -230,6 +246,7 @@ func buildAccountingOrderForInvoice(id int, h *AccountingEntryServiceImpl) ([]dt
 		return nil, err
 	}
 
+	//ako ne postoji u bazi odgovarajuci model za taj tip obaveze/naloga vraca se invalid input
 	if len(model) != 1 {
 		return nil, errors.ErrInvalidInput
 	}
@@ -258,6 +275,206 @@ func buildAccountingOrderForInvoice(id int, h *AccountingEntryServiceImpl) ([]dt
 					Title: invoice.InvoiceNumber,
 				},
 				SupplierID: invoice.SupplierID,
+			})
+		}
+
+	}
+
+	return response, nil
+}
+
+func buildAccountingOrderForDecisions(id int, h *AccountingEntryServiceImpl) ([]dto.AccountingOrderItemsForObligations, error) {
+	response := []dto.AccountingOrderItemsForObligations{}
+
+	invoice, err := h.invoiceRepo.Get(id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	conditionAndExp := &up.AndExpr{}
+	conditionAndExp = up.And(conditionAndExp, &up.Cond{"invoice_id": id})
+	additionalExpenses, _, err := h.additionalExpensesRepo.GetAll(nil, nil, conditionAndExp, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var price float64
+	var netPrice float64
+	var taxPrice float64
+	var subTaxPrice float64
+	for _, item := range additionalExpenses {
+		price += float64(item.Price)
+		switch item.Title {
+		case "Neto":
+			netPrice += float64(item.Price)
+		case "Porez":
+			taxPrice += float64(item.Price)
+		case "Prirez":
+			subTaxPrice += float64(item.Price)
+		}
+	}
+
+	model, _, err := h.modelOfAccountingRepo.GetModelsOfAccountingList(dto.ModelsOfAccountingFilterDTO{
+		Type: &data.TypeDecision,
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	//ako ne postoji u bazi odgovarajuci model za taj tip obaveze/naloga vraca se invalid input
+	if len(model) != 1 {
+		return nil, errors.ErrInvalidInput
+	}
+
+	for _, modelItem := range model[0].Items {
+		switch modelItem.Title {
+		case data.MainBillTitle:
+			response = append(response, dto.AccountingOrderItemsForObligations{
+				AccountID:   modelItem.DebitAccountID,
+				DebitAmount: float32(price),
+				Title:       string(modelItem.Title),
+				Type:        data.TypeDecision,
+				Invoice: dto.DropdownSimple{
+					ID:    invoice.ID,
+					Title: invoice.InvoiceNumber,
+				},
+			})
+		case data.SupplierTitle:
+			response = append(response, dto.AccountingOrderItemsForObligations{
+				AccountID:    modelItem.CreditAccountID,
+				CreditAmount: float32(netPrice),
+				Title:        string(modelItem.Title),
+				Type:         data.TypeDecision,
+				Invoice: dto.DropdownSimple{
+					ID:    invoice.ID,
+					Title: invoice.InvoiceNumber,
+				},
+				SupplierID: invoice.SupplierID,
+			})
+		case data.TaxTitle:
+			response = append(response, dto.AccountingOrderItemsForObligations{
+				AccountID:    modelItem.CreditAccountID,
+				CreditAmount: float32(taxPrice),
+				Title:        string(modelItem.Title),
+				Type:         data.TypeDecision,
+				Invoice: dto.DropdownSimple{
+					ID:    invoice.ID,
+					Title: invoice.InvoiceNumber,
+				},
+			})
+		case data.SubTaxTitle:
+			response = append(response, dto.AccountingOrderItemsForObligations{
+				AccountID:    modelItem.CreditAccountID,
+				CreditAmount: float32(subTaxPrice),
+				Title:        string(modelItem.Title),
+				Type:         data.TypeDecision,
+				Invoice: dto.DropdownSimple{
+					ID:    invoice.ID,
+					Title: invoice.InvoiceNumber,
+				},
+			})
+		}
+
+	}
+
+	return response, nil
+}
+
+func buildAccountingOrderForContracts(id int, h *AccountingEntryServiceImpl) ([]dto.AccountingOrderItemsForObligations, error) {
+	response := []dto.AccountingOrderItemsForObligations{}
+
+	invoice, err := h.invoiceRepo.Get(id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	conditionAndExp := &up.AndExpr{}
+	conditionAndExp = up.And(conditionAndExp, &up.Cond{"invoice_id": id})
+	additionalExpenses, _, err := h.additionalExpensesRepo.GetAll(nil, nil, conditionAndExp, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var price float64
+	var netPrice float64
+	var taxPrice float64
+	var subTaxPrice float64
+	for _, item := range additionalExpenses {
+		price += float64(item.Price)
+		switch item.Title {
+		case "Neto":
+			netPrice += float64(item.Price)
+		case "Porez":
+			taxPrice += float64(item.Price)
+		case "Prirez":
+			subTaxPrice += float64(item.Price)
+		}
+	}
+
+	model, _, err := h.modelOfAccountingRepo.GetModelsOfAccountingList(dto.ModelsOfAccountingFilterDTO{
+		Type: &data.TypeContract,
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	//ako ne postoji u bazi odgovarajuci model za taj tip obaveze/naloga vraca se invalid input
+	if len(model) != 1 {
+		return nil, errors.ErrInvalidInput
+	}
+
+	for _, modelItem := range model[0].Items {
+		switch modelItem.Title {
+		case data.MainBillTitle:
+			response = append(response, dto.AccountingOrderItemsForObligations{
+				AccountID:   modelItem.DebitAccountID,
+				DebitAmount: float32(price),
+				Title:       string(modelItem.Title),
+				Type:        data.TypeContract,
+				Invoice: dto.DropdownSimple{
+					ID:    invoice.ID,
+					Title: invoice.InvoiceNumber,
+				},
+			})
+		case data.SupplierTitle:
+			response = append(response, dto.AccountingOrderItemsForObligations{
+				AccountID:    modelItem.CreditAccountID,
+				CreditAmount: float32(netPrice),
+				Title:        string(modelItem.Title),
+				Type:         data.TypeContract,
+				Invoice: dto.DropdownSimple{
+					ID:    invoice.ID,
+					Title: invoice.InvoiceNumber,
+				},
+				SupplierID: invoice.SupplierID,
+			})
+		case data.TaxTitle:
+			response = append(response, dto.AccountingOrderItemsForObligations{
+				AccountID:    modelItem.CreditAccountID,
+				CreditAmount: float32(taxPrice),
+				Title:        string(modelItem.Title),
+				Type:         data.TypeContract,
+				Invoice: dto.DropdownSimple{
+					ID:    invoice.ID,
+					Title: invoice.InvoiceNumber,
+				},
+			})
+		case data.SubTaxTitle:
+			response = append(response, dto.AccountingOrderItemsForObligations{
+				AccountID:    modelItem.CreditAccountID,
+				CreditAmount: float32(subTaxPrice),
+				Title:        string(modelItem.Title),
+				Type:         data.TypeContract,
+				Invoice: dto.DropdownSimple{
+					ID:    invoice.ID,
+					Title: invoice.InvoiceNumber,
+				},
 			})
 		}
 
