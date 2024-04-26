@@ -204,7 +204,13 @@ func (h *AccountingEntryServiceImpl) BuildAccountingOrderForObligations(orderDat
 
 			response.Items = append(response.Items, item...)
 		case data.TypeSalary:
+			item, err := buildAccountingOrderForSalaries(id, h)
 
+			if err != nil {
+				return nil, err
+			}
+
+			response.Items = append(response.Items, item...)
 		}
 	}
 
@@ -481,4 +487,109 @@ func buildAccountingOrderForContracts(id int, h *AccountingEntryServiceImpl) ([]
 	}
 
 	return response, nil
+}
+
+func buildAccountingOrderForSalaries(id int, h *AccountingEntryServiceImpl) ([]dto.AccountingOrderItemsForObligations, error) {
+	response := []dto.AccountingOrderItemsForObligations{}
+
+	salary, err := h.salaryRepo.Get(id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	conditionAndExp := &up.AndExpr{}
+	conditionAndExp = up.And(conditionAndExp, &up.Cond{"salary_id": id})
+	additionalExpenses, _, err := h.salaryAdditionalExpensesRepo.GetAll(nil, nil, conditionAndExp, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	model, _, err := h.modelOfAccountingRepo.GetModelsOfAccountingList(dto.ModelsOfAccountingFilterDTO{
+		Type: &data.TypeContract,
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	//ako ne postoji u bazi odgovarajuci model za taj tip obaveze/naloga vraca se invalid input
+	if len(model) != 1 {
+		return nil, errors.ErrInvalidInput
+	}
+
+	var price float64
+
+	for _, item := range additionalExpenses {
+		price += float64(item.Amount)
+		bookedItem := &dto.AccountingOrderItemsForObligations{}
+		switch item.Type {
+		case data.SalaryAdditionalExpenseType(data.ContributionsSalaryExpenseType):
+			switch item.Title {
+			case data.PIOEmployeeContributionsSalaryTitle:
+				bookedItem = buildBookedItemForSalary(item, model[0].Items, data.PIOEmployeeContributionsSalaryTitle)
+			case data.PIOEmployerContributionsSalaryTitle:
+				bookedItem = buildBookedItemForSalary(item, model[0].Items, data.PIOEmployerContributionsSalaryTitle)
+			case data.UnemployementEmployeeContributionsSalaryTitle:
+				bookedItem = buildBookedItemForSalary(item, model[0].Items, data.UnemployementEmployeeContributionsSalaryTitle)
+			case data.UnemployementEmployerContributionsSalaryTitle:
+				bookedItem = buildBookedItemForSalary(item, model[0].Items, data.UnemployementEmployerContributionsSalaryTitle)
+			case data.LaborContributionsSalaryTitle:
+				bookedItem = buildBookedItemForSalary(item, model[0].Items, data.LaborContributionsSalaryTitle)
+			}
+		case data.SalaryAdditionalExpenseType(data.TaxesSalaryExpenseType):
+			bookedItem = buildBookedItemForSalary(item, model[0].Items, "Porez")
+		case data.SalaryAdditionalExpenseType(data.SubTaxesSalaryExpenseType):
+			bookedItem = buildBookedItemForSalary(item, model[0].Items, "Prirez")
+		case data.SalaryAdditionalExpenseType(data.BanksSalaryExpenseType):
+			bookedItem = buildBookedItemForSalaryForBanks(item, model[0].Items, "Banka")
+		case data.SalaryAdditionalExpenseType(data.SuspensionsSalaryExpenseType):
+			bookedItem = buildBookedItemForSalaryForBanks(item, model[0].Items, "Obustave")
+		}
+		if bookedItem != nil {
+			bookedItem.Salary = dto.DropdownSimple{
+				ID:    salary.ID,
+				Title: salary.Month,
+			}
+			response = append(response, *bookedItem)
+		}
+	}
+
+	return response, nil
+}
+
+func buildBookedItemForSalary(item *data.SalaryAdditionalExpense, models []dto.ModelOfAccountingItemResponseDTO, title string) *dto.AccountingOrderItemsForObligations {
+
+	for _, model := range models {
+		if string(model.Title) == title {
+			response := dto.AccountingOrderItemsForObligations{
+				AccountID:    model.CreditAccountID,
+				CreditAmount: float32(item.Amount),
+				Title:        item.Title,
+				Type:         data.TypeSalary,
+			}
+			return &response
+		}
+	}
+
+	return nil
+}
+
+func buildBookedItemForSalaryForBanks(item *data.SalaryAdditionalExpense, models []dto.ModelOfAccountingItemResponseDTO, title string) *dto.AccountingOrderItemsForObligations {
+
+	for _, model := range models {
+		if string(model.Title) == title {
+			response := dto.AccountingOrderItemsForObligations{
+				AccountID:    model.CreditAccountID,
+				CreditAmount: float32(item.Amount),
+				Title:        item.Title,
+				Type:         data.TypeSalary,
+				SupplierID:   item.SubjectID,
+			}
+			return &response
+		}
+	}
+
+	return nil
 }

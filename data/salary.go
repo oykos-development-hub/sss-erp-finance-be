@@ -8,6 +8,26 @@ import (
 
 // Salary struct
 
+type SalaryAdditionalExpenseType string
+
+var (
+	ContributionsSalaryExpenseType = "contributions"
+	TaxesSalaryExpenseType         = "taxes"
+	SuspensionsSalaryExpenseType   = "suspensions"
+	SubTaxesSalaryExpenseType      = "subtaxes"
+	BanksSalaryExpenseType         = "banks"
+)
+
+type ContributionsSalaryExpenseTitle string
+
+var (
+	PIOEmployeeContributionsSalaryTitle           = "Doprinos za PIO (zaposleni)"
+	UnemployementEmployeeContributionsSalaryTitle = "Doprinos za nezaposlenost (zaposleni)"
+	PIOEmployerContributionsSalaryTitle           = "Doprinos za PIO (poslodavac)"
+	UnemployementEmployerContributionsSalaryTitle = "Doprinos za nezaposlenost (poslodavac)"
+	LaborContributionsSalaryTitle                 = "Doprinos za Fond rada"
+)
+
 type Salary struct {
 	ID                 int       `db:"id,omitempty"`
 	ActivityID         int       `db:"activity_id"`
