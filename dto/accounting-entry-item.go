@@ -40,16 +40,30 @@ type AccountingEntryItemFilterDTO struct {
 
 func (dto AccountingEntryItemDTO) ToAccountingEntryItem() *data.AccountingEntryItem {
 	return &data.AccountingEntryItem{
-		Title: dto.Title,
+		Title:        dto.Title,
+		EntryID:      dto.EntryID,
+		AccountID:    dto.AccountID,
+		CreditAmount: dto.CreditAmount,
+		DebitAmount:  dto.DebitAmount,
+		InvoiceID:    dto.InvoiceID,
+		SalaryID:     dto.SalaryID,
+		Type:         dto.Type,
 	}
 }
 
 func ToAccountingEntryItemResponseDTO(data data.AccountingEntryItem) AccountingEntryItemResponseDTO {
 	return AccountingEntryItemResponseDTO{
-		ID:        data.ID,
-		Title:     data.Title,
-		CreatedAt: data.CreatedAt,
-		UpdatedAt: data.UpdatedAt,
+		ID:           data.ID,
+		Title:        data.Title,
+		EntryID:      data.EntryID,
+		AccountID:    data.AccountID,
+		CreditAmount: data.CreditAmount,
+		DebitAmount:  data.DebitAmount,
+		InvoiceID:    data.InvoiceID,
+		SalaryID:     data.SalaryID,
+		Type:         data.Type,
+		CreatedAt:    data.CreatedAt,
+		UpdatedAt:    data.UpdatedAt,
 	}
 }
 
