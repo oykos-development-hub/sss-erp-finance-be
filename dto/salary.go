@@ -33,7 +33,7 @@ type SalaryResponseDTO struct {
 	ObligationsPrice         float64                              `json:"obligations_price"`
 	NetPrice                 float64                              `json:"net_price"`
 	NumberOfEmployees        int                                  `json:"number_of_employees"`
-	Deletable                bool                                 `json:"deletable"`
+	Deletable                bool                                 `json:"is_deletable"`
 	CreatedAt                time.Time                            `json:"created_at"`
 	UpdatedAt                time.Time                            `json:"updated_at"`
 }
