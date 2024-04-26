@@ -56,8 +56,8 @@ func (h *AccountingEntryServiceImpl) CreateAccountingEntry(input dto.AccountingE
 			}
 
 			boolTrue := true
-			if item.Title == string(data.MainBillTitle) && item.InvoiceID != 0 {
-				invoice, err := h.invoiceRepo.Get(item.InvoiceID)
+			if item.Title == string(data.MainBillTitle) && item.InvoiceID != nil && *item.InvoiceID != 0 {
+				invoice, err := h.invoiceRepo.Get(*item.InvoiceID)
 
 				if err != nil {
 					return err
@@ -70,8 +70,8 @@ func (h *AccountingEntryServiceImpl) CreateAccountingEntry(input dto.AccountingE
 				if err != nil {
 					return err
 				}
-			} else if item.Title == string(data.MainBillTitle) && item.SalaryID != 0 {
-				salary, err := h.salaryRepo.Get(item.SalaryID)
+			} else if item.Title == string(data.MainBillTitle) && item.SalaryID != nil && *item.SalaryID != 0 {
+				salary, err := h.salaryRepo.Get(*item.SalaryID)
 
 				if err != nil {
 					return err
@@ -141,8 +141,8 @@ func (h *AccountingEntryServiceImpl) DeleteAccountingEntry(id int) error {
 
 		for _, item := range items {
 			boolFalse := false
-			if item.Title == string(data.MainBillTitle) && item.InvoiceID != 0 {
-				invoice, err := h.invoiceRepo.Get(item.InvoiceID)
+			if item.Title == string(data.MainBillTitle) && item.InvoiceID != nil && *item.InvoiceID != 0 {
+				invoice, err := h.invoiceRepo.Get(*item.InvoiceID)
 
 				if err != nil {
 					return err
@@ -155,8 +155,8 @@ func (h *AccountingEntryServiceImpl) DeleteAccountingEntry(id int) error {
 				if err != nil {
 					return err
 				}
-			} else if item.Title == string(data.MainBillTitle) && item.SalaryID != 0 {
-				salary, err := h.salaryRepo.Get(item.SalaryID)
+			} else if item.Title == string(data.MainBillTitle) && item.SalaryID != nil && *item.SalaryID != 0 {
+				salary, err := h.salaryRepo.Get(*item.SalaryID)
 
 				if err != nil {
 					return err

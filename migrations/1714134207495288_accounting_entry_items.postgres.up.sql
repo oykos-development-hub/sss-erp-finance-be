@@ -7,7 +7,6 @@ CREATE TABLE IF NOT EXISTS accounting_entry_items (
     debit_amount FLOAT,
     invoice_id INTEGER REFERENCES invoices(id),
     salary_id INTEGER REFERENCES salaries(id), 
-    title TEXT,
     type TEXT,
     created_at TIMESTAMP,
     updated_at TIMESTAMP

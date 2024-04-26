@@ -14,8 +14,8 @@ type AccountingEntryItem struct {
 	AccountID    int       `db:"account_id"`
 	CreditAmount float64   `db:"credit_amount"`
 	DebitAmount  float64   `db:"debit_amount"`
-	InvoiceID    int       `db:"invoice_id"`
-	SalaryID     int       `db:"salary_id"`
+	InvoiceID    *int      `db:"invoice_id"`
+	SalaryID     *int      `db:"salary_id"`
 	Type         string    `db:"type"`
 	CreatedAt    time.Time `db:"created_at,omitempty"`
 	UpdatedAt    time.Time `db:"updated_at"`
