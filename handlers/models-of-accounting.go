@@ -80,28 +80,3 @@ func (h *modelsofaccountingHandlerImpl) GetModelsOfAccountingList(w http.Respons
 
 	_ = h.App.WriteDataResponseWithTotal(w, http.StatusOK, "", res, int(*total))
 }
-
-func (h *modelsofaccountingHandlerImpl) UpdateModelsOfAccounting(w http.ResponseWriter, r *http.Request) {
-	id, _ := strconv.Atoi(chi.URLParam(r, "id"))
-
-	var input dto.ModelsOfAccountingDTO
-	err := h.App.ReadJSON(w, r, &input)
-	if err != nil {
-		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
-		return
-	}
-
-	validator := h.App.Validator().ValidateStruct(&input)
-	if !validator.Valid() {
-		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
-		return
-	}
-
-	res, err := h.service.UpdateModelsOfAccounting(id, input)
-	if err != nil {
-		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
-		return
-	}
-
-	_ = h.App.WriteDataResponse(w, http.StatusOK, "ModelOfAccounting updated successfuly", res)
-}

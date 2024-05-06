@@ -41,11 +41,9 @@ func (h *SalaryServiceImpl) CreateSalary(input dto.SalaryDTO) (*dto.SalaryRespon
 		additionalExpenseData := additionalExpense.ToSalaryAdditionalExpense()
 		additionalExpenseData.SalaryID = id
 		additionalExpenseData.Status = "Kreiran"
-		if additionalExpenseData.Amount > 0 {
-			_, err = h.salaryAdditionalExpenseRepo.Insert(data.Upper, *additionalExpenseData)
-			if err != nil {
-				return nil, errors.ErrInternalServer
-			}
+		_, err = h.salaryAdditionalExpenseRepo.Insert(data.Upper, *additionalExpenseData)
+		if err != nil {
+			return nil, errors.ErrInternalServer
 		}
 	}
 
@@ -93,12 +91,10 @@ func (h *SalaryServiceImpl) UpdateSalary(id int, input dto.SalaryDTO) (*dto.Sala
 				additionalExpenseData := item.ToSalaryAdditionalExpense()
 				additionalExpenseData.SalaryID = id
 				additionalExpenseData.Status = "Kreiran"
-				if additionalExpenseData.Amount > 0 {
-					_, err = h.salaryAdditionalExpenseRepo.Insert(tx, *additionalExpenseData)
+				_, err = h.salaryAdditionalExpenseRepo.Insert(tx, *additionalExpenseData)
 
-					if err != nil {
-						return err
-					}
+				if err != nil {
+					return err
 				}
 			}
 		}
@@ -115,16 +111,9 @@ func (h *SalaryServiceImpl) UpdateSalary(id int, input dto.SalaryDTO) (*dto.Sala
 					if item.ID == itemID {
 						additionalExpenseData := item.ToSalaryAdditionalExpense()
 						additionalExpenseData.ID = id
-						if additionalExpenseData.Amount > 0 {
-							err := h.salaryAdditionalExpenseRepo.Update(tx, *additionalExpenseData)
-							if err != nil {
-								return err
-							}
-						} else {
-							err := h.salaryAdditionalExpenseRepo.Delete(additionalExpenseData.ID)
-							if err != nil {
-								return err
-							}
+						err := h.salaryAdditionalExpenseRepo.Update(tx, *additionalExpenseData)
+						if err != nil {
+							return err
 						}
 					}
 				}
@@ -233,46 +222,12 @@ func (h *SalaryServiceImpl) GetSalaryList(filter dto.SalaryFilterDTO) ([]dto.Sal
 
 	orders = append(orders, "-created_at")
 
-	salaryData, total, err := h.repo.GetAll(filter.Page, filter.Size, conditionAndExp, orders)
+	data, total, err := h.repo.GetAll(filter.Page, filter.Size, conditionAndExp, orders)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return nil, nil, errors.ErrInternalServer
 	}
-	response := dto.ToSalaryListResponseDTO(salaryData)
-
-	for i := 0; i < len(response); i++ {
-		additionalExpenses, _, err := h.salaryAdditionalService.GetSalaryAdditionalExpenseList(dto.SalaryAdditionalExpenseFilterDTO{
-			SalaryID: &response[i].ID,
-		})
-
-		if err != nil {
-			h.App.ErrorLog.Println(err)
-			return nil, nil, errors.ErrInternalServer
-		}
-
-		response[i].SalaryAdditionalExpenses = additionalExpenses
-		response[i].Deletable = true
-		for _, additionalExpense := range additionalExpenses {
-
-			if additionalExpense.Status != data.InvoiceStatusCreated {
-				response[i].Deletable = false
-			}
-
-			if additionalExpense.Type == "banks" {
-				response[i].NetPrice += additionalExpense.Amount
-			} else if additionalExpense.Type == "suspensions" {
-				response[i].ObligationsPrice += additionalExpense.Amount
-			} else {
-				response[i].VatPrice += additionalExpense.Amount
-			}
-		}
-
-		if response[i].Registred != nil && *response[i].Registred {
-			response[i].Deletable = false
-		}
-
-		response[i].GrossPrice = response[i].VatPrice + response[i].NetPrice
-	}
+	response := dto.ToSalaryListResponseDTO(data)
 
 	return response, total, nil
 }

@@ -260,14 +260,11 @@ func routes(app *celeritas.Celeritas, middleware *middleware.Middleware, handler
 		rt.Post("/accounting-entries", handlers.AccountingEntryHandler.CreateAccountingEntry)
 		rt.Get("/accounting-entries/{id}", handlers.AccountingEntryHandler.GetAccountingEntryById)
 		rt.Get("/accounting-entries", handlers.AccountingEntryHandler.GetAccountingEntryList)
+		rt.Get("/get-obligations-for-accounting", handlers.AccountingEntryHandler.GetObligationsForAccounting)
 		rt.Put("/accounting-entries/{id}", handlers.AccountingEntryHandler.UpdateAccountingEntry)
 		rt.Delete("/accounting-entries/{id}", handlers.AccountingEntryHandler.DeleteAccountingEntry)
 
-		rt.Get("/get-obligations-for-accounting", handlers.AccountingEntryHandler.GetObligationsForAccounting)
-		rt.Get("/build-accounting-order-for-obligations", handlers.AccountingEntryHandler.BuildAccountingOrderForObligations)
-
 		rt.Post("/models-of-accountings", handlers.ModelsOfAccountingHandler.CreateModelsOfAccounting)
-		rt.Put("/models-of-accountings/{id}", handlers.ModelsOfAccountingHandler.UpdateModelsOfAccounting)
 		rt.Get("/models-of-accountings/{id}", handlers.ModelsOfAccountingHandler.GetModelsOfAccountingById)
 		rt.Get("/models-of-accountings", handlers.ModelsOfAccountingHandler.GetModelsOfAccountingList)
 
@@ -275,12 +272,6 @@ func routes(app *celeritas.Celeritas, middleware *middleware.Middleware, handler
 		rt.Get("/model-of-accounting-items/{id}", handlers.ModelOfAccountingItemHandler.GetModelOfAccountingItemById)
 		rt.Get("/model-of-accounting-items", handlers.ModelOfAccountingItemHandler.GetModelOfAccountingItemList)
 		rt.Put("/model-of-accounting-items/{id}", handlers.ModelOfAccountingItemHandler.UpdateModelOfAccountingItem)
-
-		rt.Post("/accounting-entry-items", handlers.AccountingEntryItemHandler.CreateAccountingEntryItem)
-		rt.Get("/accounting-entry-items/{id}", handlers.AccountingEntryItemHandler.GetAccountingEntryItemById)
-		rt.Get("/accounting-entry-items", handlers.AccountingEntryItemHandler.GetAccountingEntryItemList)
-		rt.Put("/accounting-entry-items/{id}", handlers.AccountingEntryItemHandler.UpdateAccountingEntryItem)
-		rt.Delete("/accounting-entry-items/{id}", handlers.AccountingEntryItemHandler.DeleteAccountingEntryItem)
 	})
 
 	return app.Routes

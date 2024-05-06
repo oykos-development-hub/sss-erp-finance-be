@@ -135,12 +135,12 @@ func (h *EnforcedPaymentServiceImpl) DeleteEnforcedPayment(id int) error {
 }
 
 func (h *EnforcedPaymentServiceImpl) GetEnforcedPayment(id int) (*dto.EnforcedPaymentResponseDTO, error) {
-	paymentData, err := h.repo.Get(id)
+	data, err := h.repo.Get(id)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return nil, errors.ErrNotFound
 	}
-	response := dto.ToEnforcedPaymentResponseDTO(*paymentData)
+	response := dto.ToEnforcedPaymentResponseDTO(*data)
 
 	conditionAndExp := &up.AndExpr{}
 	conditionAndExp = up.And(conditionAndExp, &up.Cond{"payment_order_id": id})
@@ -182,7 +182,7 @@ func (h *EnforcedPaymentServiceImpl) GetEnforcedPayment(id int) (*dto.EnforcedPa
 					item.Amount += float32(article.Price)
 				}
 				item.Amount += float32(invoice.GrossPrice)
-				if invoice.Type == data.TypeDecision {
+				if invoice.Type == "decisions" {
 					item.Title = "Rješenje broj " + invoice.InvoiceNumber
 				} else {
 					item.Title = "Ugovor broj " + invoice.InvoiceNumber

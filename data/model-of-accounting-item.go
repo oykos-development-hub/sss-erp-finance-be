@@ -8,13 +8,13 @@ import (
 
 // ModelOfAccountingItem struct
 type ModelOfAccountingItem struct {
-	ID              int                       `db:"id,omitempty"`
-	Title           AccountingOrderItemsTitle `db:"title"`
-	ModelID         int                       `db:"model_id"`
-	DebitAccountID  int                       `db:"debit_account_id"`
-	CreditAccountID int                       `db:"credit_account_id"`
-	CreatedAt       time.Time                 `db:"created_at,omitempty"`
-	UpdatedAt       time.Time                 `db:"updated_at"`
+	ID              int       `db:"id,omitempty"`
+	Title           string    `db:"title"`
+	ModelID         int       `db:"model_id"`
+	DebitAccountID  int       `db:"debit_account_id"`
+	CreditAccountID int       `db:"credit_account_id"`
+	CreatedAt       time.Time `db:"created_at,omitempty"`
+	UpdatedAt       time.Time `db:"updated_at"`
 }
 
 // Table returns the table name

@@ -45,15 +45,15 @@ type PaymentOrderResponseDTO struct {
 }
 
 type ObligationResponse struct {
-	InvoiceID                 *int                   `json:"invoice_id"`
-	AdditionalExpenseID       *int                   `json:"additional_expense_id"`
-	SalaryAdditionalExpenseID *int                   `json:"salary_additional_expense_id"`
-	Type                      data.TypesOfObligation `json:"type"`
-	Title                     string                 `json:"title"`
-	Status                    string                 `json:"status"`
-	TotalPrice                float64                `json:"total_price"`
-	RemainPrice               float64                `json:"remain_price"`
-	CreatedAt                 time.Time              `json:"created_at"`
+	InvoiceID                 *int      `json:"invoice_id"`
+	AdditionalExpenseID       *int      `json:"additional_expense_id"`
+	SalaryAdditionalExpenseID *int      `json:"salary_additional_expense_id"`
+	Type                      string    `json:"type"`
+	Title                     string    `json:"title"`
+	Status                    string    `json:"status"`
+	TotalPrice                float64   `json:"total_price"`
+	RemainPrice               float64   `json:"remain_price"`
+	CreatedAt                 time.Time `json:"created_at"`
 }
 
 type PaymentOrderFilterDTO struct {
@@ -69,11 +69,11 @@ type PaymentOrderFilterDTO struct {
 }
 
 type GetObligationsFilterDTO struct {
-	Page               *int                    `json:"page"`
-	Size               *int                    `json:"size"`
-	OrganizationUnitID int                     `json:"organization_unit_id"`
-	SupplierID         int                     `json:"supplier_id"`
-	Type               *data.TypesOfObligation `json:"type"`
+	Page               *int    `json:"page"`
+	Size               *int    `json:"size"`
+	OrganizationUnitID int     `json:"organization_unit_id"`
+	SupplierID         int     `json:"supplier_id"`
+	Type               *string `json:"type"`
 }
 
 func (dto PaymentOrderDTO) ToPaymentOrder() *data.PaymentOrder {

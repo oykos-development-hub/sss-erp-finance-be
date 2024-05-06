@@ -63,7 +63,6 @@ type Models struct {
 		AccountingEntry AccountingEntry
 		ModelsOfAccounting ModelsOfAccounting
 		ModelOfAccountingItem ModelOfAccountingItem
-		AccountingEntryItem AccountingEntryItem
 	}
 
 func New(databasePool *sql.DB) Models {
@@ -116,7 +115,6 @@ func New(databasePool *sql.DB) Models {
 		AccountingEntry: AccountingEntry{},
 		ModelsOfAccounting: ModelsOfAccounting{},
 		ModelOfAccountingItem: ModelOfAccountingItem{},
-		AccountingEntryItem: AccountingEntryItem{},
 	}
 }
 
