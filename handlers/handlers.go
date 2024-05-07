@@ -45,8 +45,8 @@ type Handlers struct {
 	AccountingEntryHandler          AccountingEntryHandler
 	ModelsOfAccountingHandler       ModelsOfAccountingHandler
 	ModelOfAccountingItemHandler    ModelOfAccountingItemHandler
-	AccountingEntryItemHandler AccountingEntryItemHandler
-	}
+	AccountingEntryItemHandler      AccountingEntryItemHandler
+}
 
 type InvoiceHandler interface {
 	CreateInvoice(w http.ResponseWriter, r *http.Request)
@@ -382,6 +382,7 @@ type AccountingEntryHandler interface {
 	GetAccountingEntryList(w http.ResponseWriter, r *http.Request)
 
 	GetObligationsForAccounting(w http.ResponseWriter, r *http.Request)
+	GetPaymentOrdersForAccounting(w http.ResponseWriter, r *http.Request)
 	BuildAccountingOrderForObligations(w http.ResponseWriter, r *http.Request)
 }
 

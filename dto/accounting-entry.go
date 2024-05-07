@@ -46,6 +46,15 @@ type ObligationForAccounting struct {
 	CreatedAt  time.Time              `json:"created_at"`
 }
 
+type PaymentOrdersForAccounting struct {
+	PaymentOrderID int       `json:"payment_order_id"`
+	SupplierID     *int      `json:"supplier_id"`
+	Date           time.Time `json:"date"`
+	Title          string    `json:"title"`
+	Price          float64   `json:"price"`
+	CreatedAt      time.Time `json:"created_at"`
+}
+
 type AccountingOrderForObligationsData struct {
 	InvoiceID          []int     `json:"invoice_id"`
 	SalaryID           []int     `json:"salary_id"`

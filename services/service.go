@@ -361,6 +361,7 @@ type AccountingEntryService interface {
 	GetAccountingEntryList(filter dto.AccountingEntryFilterDTO) ([]dto.AccountingEntryResponseDTO, *uint64, error)
 
 	GetObligationsForAccounting(filter dto.GetObligationsFilterDTO) ([]dto.ObligationForAccounting, *uint64, error)
+	GetPaymentOrdersForAccounting(filter dto.GetObligationsFilterDTO) ([]dto.PaymentOrdersForAccounting, *uint64, error)
 	BuildAccountingOrderForObligations(data dto.AccountingOrderForObligationsData) (*dto.AccountingOrderForObligations, error)
 }
 

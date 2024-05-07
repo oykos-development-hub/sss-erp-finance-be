@@ -37,6 +37,15 @@ type ObligationForAccounting struct {
 	CreatedAt  time.Time         `json:"created_at"`
 }
 
+type PaymentOrdersForAccounting struct {
+	PaymentOrderID int       `json:"payment_order_id"`
+	SupplierID     *int      `json:"supplier_id"`
+	Date           time.Time `json:"date"`
+	Title          string    `json:"title"`
+	Price          float64   `json:"price"`
+	CreatedAt      time.Time `json:"created_at"`
+}
+
 // Table returns the table name
 func (t *AccountingEntry) Table() string {
 	return "accounting_entries"
@@ -207,6 +216,37 @@ func (t *AccountingEntry) GetObligationsForAccounting(filter ObligationsFilter) 
 
 		items = append(items, obligation)
 
+	}
+
+	total := uint64(len(items))
+
+	return items, &total, nil
+}
+
+func (t *AccountingEntry) GetPaymentOrdersForAccounting(filter ObligationsFilter) ([]PaymentOrdersForAccounting, *uint64, error) {
+	var items []PaymentOrdersForAccounting
+
+	query := `select id, supplier_id, sap_id, date_of_sap, amount
+			  from payment_orders 
+			  where registred = false and sap_id is not null and date_of_sap is not null and sap_id <> '' and date_of_sap <> '0001-01-01'
+			  and organization_unit_id = $1;`
+
+	rows, err := Upper.SQL().Query(query, filter.OrganizationUnitID)
+
+	if err != nil {
+		return nil, nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var paymentOrder PaymentOrdersForAccounting
+		err = rows.Scan(&paymentOrder.PaymentOrderID, &paymentOrder.SupplierID, &paymentOrder.Title, &paymentOrder.Date, &paymentOrder.Price)
+
+		if err != nil {
+			return nil, nil, err
+		}
+
+		items = append(items, paymentOrder)
 	}
 
 	total := uint64(len(items))
