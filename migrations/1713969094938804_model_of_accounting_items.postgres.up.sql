@@ -42,8 +42,8 @@ INSERT INTO model_of_accounting_items(title, model_id, debit_account_id, credit_
 ('Banka', 4, 0, 1175, NOW(), NOW()),
 ('Obustave', 4, 0, 1175, NOW(), NOW()),
 --knjizenje naloga za placanje
-('Korektivni račun', 5, 1175, 0, NOW(), NOW()),
-('Dobavljač', 5, 0, 1175, NOW(), NOW()),
+('Dobavljač', 5, 1175, 0, NOW(), NOW()),
+('Korektivni račun', 5, 0, 1175, NOW(), NOW()),
 ('Izdatak', 5, 1175, 0, NOW(), NOW()),
 ('Rezervisana sredstva', 5, 0, 1175, NOW(), NOW());
 

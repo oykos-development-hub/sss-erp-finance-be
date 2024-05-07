@@ -86,6 +86,20 @@ func (h *AccountingEntryServiceImpl) CreateAccountingEntry(input dto.AccountingE
 				if err != nil {
 					return err
 				}
+			} else if item.Title == string(data.MainBillTitle) && item.PaymentOrderID != nil && *item.PaymentOrderID != 0 {
+				paymentOrder, err := h.paymentOrderRepo.Get(*item.PaymentOrderID)
+
+				if err != nil {
+					return err
+				}
+
+				paymentOrder.Registred = &boolTrue
+
+				err = h.paymentOrderRepo.Update(tx, *paymentOrder)
+
+				if err != nil {
+					return err
+				}
 			}
 
 		}
@@ -167,6 +181,20 @@ func (h *AccountingEntryServiceImpl) DeleteAccountingEntry(id int) error {
 				salary.Registred = &boolFalse
 
 				err = h.salaryRepo.Update(tx, *salary)
+
+				if err != nil {
+					return err
+				}
+			} else if item.Title == string(data.MainBillTitle) && item.PaymentOrderID != nil && *item.PaymentOrderID != 0 {
+				paymentOrder, err := h.paymentOrderRepo.Get(*item.PaymentOrderID)
+
+				if err != nil {
+					return err
+				}
+
+				paymentOrder.Registred = &boolFalse
+
+				err = h.paymentOrderRepo.Update(tx, *paymentOrder)
 
 				if err != nil {
 					return err
@@ -840,17 +868,6 @@ func buildAccountingOrderForPaymentOrder(id int, h *AccountingEntryServiceImpl) 
 
 	for _, modelItem := range model[0].Items {
 		switch modelItem.Title {
-		case data.MainBillTitle:
-			response = append(response, dto.AccountingOrderItemsForObligations{
-				AccountID:    modelItem.CreditAccountID,
-				CreditAmount: float32(paymentOrder.Amount),
-				Title:        string(modelItem.Title),
-				Type:         data.TypePaymentOrder,
-				PaymentOrder: dto.DropdownSimple{
-					ID:    paymentOrder.ID,
-					Title: *paymentOrder.SAPID,
-				},
-			})
 		case data.SupplierTitle:
 			response = append(response, dto.AccountingOrderItemsForObligations{
 				AccountID:   modelItem.DebitAccountID,
@@ -863,7 +880,7 @@ func buildAccountingOrderForPaymentOrder(id int, h *AccountingEntryServiceImpl) 
 				},
 				SupplierID: paymentOrder.SupplierID,
 			})
-		case data.CostTitle:
+		case data.MainBillTitle:
 			response = append(response, dto.AccountingOrderItemsForObligations{
 				AccountID:    modelItem.CreditAccountID,
 				CreditAmount: float32(paymentOrder.Amount),
@@ -874,12 +891,23 @@ func buildAccountingOrderForPaymentOrder(id int, h *AccountingEntryServiceImpl) 
 					Title: *paymentOrder.SAPID,
 				},
 			})
-		case data.AllocatedAmountTitle:
+		case data.CostTitle:
 			response = append(response, dto.AccountingOrderItemsForObligations{
 				AccountID:   modelItem.DebitAccountID,
 				DebitAmount: float32(paymentOrder.Amount),
 				Title:       string(modelItem.Title),
 				Type:        data.TypePaymentOrder,
+				PaymentOrder: dto.DropdownSimple{
+					ID:    paymentOrder.ID,
+					Title: *paymentOrder.SAPID,
+				},
+			})
+		case data.AllocatedAmountTitle:
+			response = append(response, dto.AccountingOrderItemsForObligations{
+				AccountID:    modelItem.CreditAccountID,
+				CreditAmount: float32(paymentOrder.Amount),
+				Title:        string(modelItem.Title),
+				Type:         data.TypePaymentOrder,
 				PaymentOrder: dto.DropdownSimple{
 					ID:    paymentOrder.ID,
 					Title: *paymentOrder.SAPID,
