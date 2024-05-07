@@ -46,10 +46,14 @@ func (h *AccountingEntryServiceImpl) CreateAccountingEntry(input dto.AccountingE
 
 		if len(input.Items) > 0 {
 			if (input.Items[0].InvoiceID != nil && *input.Items[0].InvoiceID != 0) || (input.Items[0].SalaryID != nil && *input.Items[0].SalaryID != 0) {
-				input.Type = data.TypeObligations
+				dataToInsert.Type = data.TypeObligations
 			} else if input.Items[0].PaymentOrderID != nil && *input.Items[0].PaymentOrderID != 0 {
-				input.Type = data.TypePaymentOrder
+				dataToInsert.Type = data.TypePaymentOrder
 			}
+		}
+
+		if dataToInsert.Type == "" {
+			return errors.ErrInvalidInput
 		}
 
 		id, err = h.repo.Insert(tx, *dataToInsert)
