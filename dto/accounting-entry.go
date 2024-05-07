@@ -10,12 +10,14 @@ type AccountingEntryDTO struct {
 	Title              string                   `json:"title"`
 	OrganizationUnitID int                      `json:"organization_unit_id"`
 	DateOfBooking      time.Time                `json:"date_of_booking"`
+	IDOfEntry          int                      `json:"id_of_entry"`
 	Items              []AccountingEntryItemDTO `json:"items"`
 }
 
 type AccountingEntryResponseDTO struct {
 	ID                 int                              `json:"id"`
 	Title              string                           `json:"title"`
+	IDOfEntry          int                              `json:"id_of_entry"`
 	OrganizationUnitID int                              `json:"organization_unit_id"`
 	DateOfBooking      time.Time                        `json:"date_of_booking"`
 	CreditAmount       float64                          `json:"credit_amount"`
@@ -80,12 +82,14 @@ func (dto AccountingEntryDTO) ToAccountingEntry() *data.AccountingEntry {
 		Title:              dto.Title,
 		OrganizationUnitID: dto.OrganizationUnitID,
 		DateOfBooking:      dto.DateOfBooking,
+		IDOfEntry:          dto.IDOfEntry,
 	}
 }
 
 func ToAccountingEntryResponseDTO(data data.AccountingEntry) AccountingEntryResponseDTO {
 	return AccountingEntryResponseDTO{
 		ID:                 data.ID,
+		IDOfEntry:          data.IDOfEntry,
 		Title:              data.Title,
 		OrganizationUnitID: data.OrganizationUnitID,
 		DateOfBooking:      data.DateOfBooking,
