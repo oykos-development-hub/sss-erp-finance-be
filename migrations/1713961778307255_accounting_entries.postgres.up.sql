@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS accounting_entries (
     title VARCHAR ( 255 ) NOT NULL,
     organization_unit_id INTEGER NOT NULL,
     id_of_entry INTEGER NOT NULL,
+    type TEXT NOT NULL,
     date_of_booking TIMESTAMP,
     created_at TIMESTAMP,
     updated_at TIMESTAMP
@@ -14,7 +15,7 @@ BEGIN
     -- Pronalazi poslednji id_of_entry za organization_unit_id
     SELECT COALESCE(MAX(id_of_entry), 0) + 1 INTO NEW.id_of_entry
     FROM accounting_entries
-    WHERE organization_unit_id = NEW.organization_unit_id;
+    WHERE organization_unit_id = NEW.organization_unit_id and type = NEW.type;
 
     RETURN NEW;
 END;

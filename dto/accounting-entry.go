@@ -10,6 +10,7 @@ type AccountingEntryDTO struct {
 	Title              string                   `json:"title"`
 	OrganizationUnitID int                      `json:"organization_unit_id"`
 	DateOfBooking      time.Time                `json:"date_of_booking"`
+	Type               data.TypesOfObligation   `json:"type"`
 	IDOfEntry          int                      `json:"id_of_entry"`
 	Items              []AccountingEntryItemDTO `json:"items"`
 }
@@ -20,6 +21,7 @@ type AccountingEntryResponseDTO struct {
 	IDOfEntry          int                              `json:"id_of_entry"`
 	OrganizationUnitID int                              `json:"organization_unit_id"`
 	DateOfBooking      time.Time                        `json:"date_of_booking"`
+	Type               data.TypesOfObligation           `json:"type"`
 	CreditAmount       float64                          `json:"credit_amount"`
 	DebitAmount        float64                          `json:"debit_amount"`
 	Items              []AccountingEntryItemResponseDTO `json:"items"`
@@ -28,10 +30,11 @@ type AccountingEntryResponseDTO struct {
 }
 
 type AccountingEntryFilterDTO struct {
-	Page               *int    `json:"page"`
-	Size               *int    `json:"size"`
-	SortByTitle        *string `json:"sort_by_title"`
-	OrganizationUnitID *int    `json:"organization_unit_id"`
+	Page               *int                    `json:"page"`
+	Size               *int                    `json:"size"`
+	SortByTitle        *string                 `json:"sort_by_title"`
+	OrganizationUnitID *int                    `json:"organization_unit_id"`
+	Type               *data.TypesOfObligation `json:"type"`
 }
 
 type ObligationForAccounting struct {
@@ -94,6 +97,7 @@ func (dto AccountingEntryDTO) ToAccountingEntry() *data.AccountingEntry {
 		OrganizationUnitID: dto.OrganizationUnitID,
 		DateOfBooking:      dto.DateOfBooking,
 		IDOfEntry:          dto.IDOfEntry,
+		Type:               dto.Type,
 	}
 }
 
@@ -102,6 +106,7 @@ func ToAccountingEntryResponseDTO(data data.AccountingEntry) AccountingEntryResp
 		ID:                 data.ID,
 		IDOfEntry:          data.IDOfEntry,
 		Title:              data.Title,
+		Type:               data.Type,
 		OrganizationUnitID: data.OrganizationUnitID,
 		DateOfBooking:      data.DateOfBooking,
 		CreatedAt:          data.CreatedAt,

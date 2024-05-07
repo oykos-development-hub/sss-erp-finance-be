@@ -13,6 +13,7 @@ var (
 	TypeContract     TypesOfObligation = "contracts"
 	TypeDecision     TypesOfObligation = "decisions"
 	TypeSalary       TypesOfObligation = "salaries"
+	TypeObligations  TypesOfObligation = "obligations"
 	TypePaymentOrder TypesOfObligation = "payment_orders"
 )
 

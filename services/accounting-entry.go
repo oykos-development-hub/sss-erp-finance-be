@@ -43,6 +43,15 @@ func (h *AccountingEntryServiceImpl) CreateAccountingEntry(input dto.AccountingE
 	var id int
 	err := data.Upper.Tx(func(tx up.Session) error {
 		var err error
+
+		if len(input.Items) > 0 {
+			if (input.Items[0].InvoiceID != nil && *input.Items[0].InvoiceID != 0) || (input.Items[0].SalaryID != nil && *input.Items[0].SalaryID != 0) {
+				input.Type = data.TypeObligations
+			} else if input.Items[0].PaymentOrderID != nil && *input.Items[0].PaymentOrderID != 0 {
+				input.Type = data.TypePaymentOrder
+			}
+		}
+
 		id, err = h.repo.Insert(tx, *dataToInsert)
 		if err != nil {
 			return errors.ErrInternalServer
@@ -269,6 +278,10 @@ func (h *AccountingEntryServiceImpl) GetAccountingEntryList(filter dto.Accountin
 
 	if filter.OrganizationUnitID != nil {
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"organization_unit_id": *filter.OrganizationUnitID})
+	}
+
+	if filter.Type != nil {
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"type": *filter.Type})
 	}
 
 	if filter.SortByTitle != nil {
