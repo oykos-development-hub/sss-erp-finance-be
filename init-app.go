@@ -168,7 +168,7 @@ func initApplication() *celeritas.Celeritas {
 	ModelOfAccountingItemService := services.NewModelOfAccountingItemServiceImpl(cel, models.ModelOfAccountingItem)
 	ModelOfAccountingItemHandler := handlers.NewModelOfAccountingItemHandler(cel, ModelOfAccountingItemService)
 
-	AccountingEntryService := services.NewAccountingEntryServiceImpl(cel, models.AccountingEntry, models.Invoice, models.Article, models.AdditionalExpense, models.Salary, models.SalaryAdditionalExpense, ModelsOfAccountingService, models.AccountingEntryItem)
+	AccountingEntryService := services.NewAccountingEntryServiceImpl(cel, models.AccountingEntry, models.Invoice, models.Article, models.AdditionalExpense, models.Salary, models.SalaryAdditionalExpense, ModelsOfAccountingService, models.AccountingEntryItem, models.PaymentOrder)
 	AccountingEntryHandler := handlers.NewAccountingEntryHandler(cel, AccountingEntryService)
 
 	AccountingEntryItemService := services.NewAccountingEntryItemServiceImpl(cel, models.AccountingEntryItem)

@@ -58,6 +58,7 @@ type PaymentOrdersForAccounting struct {
 type AccountingOrderForObligationsData struct {
 	InvoiceID          []int     `json:"invoice_id"`
 	SalaryID           []int     `json:"salary_id"`
+	PaymentOrderID     []int     `json:"payment_order_id"`
 	DateOfBooking      time.Time `json:"date_of_booking"`
 	OrganizationUnitID int       `json:"organization_unit_id"`
 }
@@ -79,6 +80,7 @@ type AccountingOrderItemsForObligations struct {
 	SupplierID   int                    `json:"supplier_id"`
 	Invoice      DropdownSimple         `json:"invoice"`
 	Salary       DropdownSimple         `json:"salary"`
+	PaymentOrder DropdownSimple         `json:"payment_order"`
 }
 
 type DropdownSimple struct {

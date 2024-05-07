@@ -19,9 +19,10 @@ type AccountingEntryServiceImpl struct {
 	salaryAdditionalExpensesRepo data.SalaryAdditionalExpense
 	modelOfAccountingRepo        ModelsOfAccountingService
 	items                        data.AccountingEntryItem
+	paymentOrderRepo             data.PaymentOrder
 }
 
-func NewAccountingEntryServiceImpl(app *celeritas.Celeritas, repo data.AccountingEntry, invoiceRepo data.Invoice, articlesRepo data.Article, additionalExpensesRepo data.AdditionalExpense, salaryRepo data.Salary, salaryAdditionalExpensesRepo data.SalaryAdditionalExpense, modelOfAccountingRepo ModelsOfAccountingService, items data.AccountingEntryItem) AccountingEntryService {
+func NewAccountingEntryServiceImpl(app *celeritas.Celeritas, repo data.AccountingEntry, invoiceRepo data.Invoice, articlesRepo data.Article, additionalExpensesRepo data.AdditionalExpense, salaryRepo data.Salary, salaryAdditionalExpensesRepo data.SalaryAdditionalExpense, modelOfAccountingRepo ModelsOfAccountingService, items data.AccountingEntryItem, paymentOrderRepo data.PaymentOrder) AccountingEntryService {
 	return &AccountingEntryServiceImpl{
 		App:                          app,
 		repo:                         repo,
@@ -32,6 +33,7 @@ func NewAccountingEntryServiceImpl(app *celeritas.Celeritas, repo data.Accountin
 		salaryAdditionalExpensesRepo: salaryAdditionalExpensesRepo,
 		modelOfAccountingRepo:        modelOfAccountingRepo,
 		items:                        items,
+		paymentOrderRepo:             paymentOrderRepo,
 	}
 }
 
@@ -396,6 +398,15 @@ func (h *AccountingEntryServiceImpl) BuildAccountingOrderForObligations(orderDat
 
 	for _, id := range orderData.SalaryID {
 		item, err := buildAccountingOrderForSalaries(id, h)
+
+		if err != nil {
+			return nil, err
+		}
+		response.Items = append(response.Items, item...)
+	}
+
+	for _, id := range orderData.PaymentOrderID {
+		item, err := buildAccountingOrderForPaymentOrder(id, h)
 
 		if err != nil {
 			return nil, err
@@ -803,4 +814,81 @@ func buildBookedItemForSalaryForBanks(item *data.SalaryAdditionalExpense, models
 	}
 
 	return nil
+}
+
+func buildAccountingOrderForPaymentOrder(id int, h *AccountingEntryServiceImpl) ([]dto.AccountingOrderItemsForObligations, error) {
+	response := []dto.AccountingOrderItemsForObligations{}
+
+	paymentOrder, err := h.paymentOrderRepo.Get(id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	model, _, err := h.modelOfAccountingRepo.GetModelsOfAccountingList(dto.ModelsOfAccountingFilterDTO{
+		Type: &data.TypePaymentOrder,
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	//ako ne postoji u bazi odgovarajuci model za taj tip obaveze/naloga vraca se invalid input
+	if len(model) != 1 {
+		return nil, errors.ErrInvalidInput
+	}
+
+	for _, modelItem := range model[0].Items {
+		switch modelItem.Title {
+		case data.MainBillTitle:
+			response = append(response, dto.AccountingOrderItemsForObligations{
+				AccountID:   modelItem.DebitAccountID,
+				DebitAmount: float32(paymentOrder.Amount),
+				Title:       string(modelItem.Title),
+				Type:        data.TypePaymentOrder,
+				PaymentOrder: dto.DropdownSimple{
+					ID:    paymentOrder.ID,
+					Title: *paymentOrder.SAPID,
+				},
+			})
+		case data.SupplierTitle:
+			response = append(response, dto.AccountingOrderItemsForObligations{
+				AccountID:    modelItem.CreditAccountID,
+				CreditAmount: float32(paymentOrder.Amount),
+				Title:        string(modelItem.Title),
+				Type:         data.TypePaymentOrder,
+				PaymentOrder: dto.DropdownSimple{
+					ID:    paymentOrder.ID,
+					Title: *paymentOrder.SAPID,
+				},
+				SupplierID: paymentOrder.SupplierID,
+			})
+		case data.CostTitle:
+			response = append(response, dto.AccountingOrderItemsForObligations{
+				AccountID:   modelItem.DebitAccountID,
+				DebitAmount: float32(paymentOrder.Amount),
+				Title:       string(modelItem.Title),
+				Type:        data.TypePaymentOrder,
+				PaymentOrder: dto.DropdownSimple{
+					ID:    paymentOrder.ID,
+					Title: *paymentOrder.SAPID,
+				},
+			})
+		case data.AllocatedAmountTitle:
+			response = append(response, dto.AccountingOrderItemsForObligations{
+				AccountID:   modelItem.CreditAccountID,
+				DebitAmount: float32(paymentOrder.Amount),
+				Title:       string(modelItem.Title),
+				Type:        data.TypePaymentOrder,
+				PaymentOrder: dto.DropdownSimple{
+					ID:    paymentOrder.ID,
+					Title: *paymentOrder.SAPID,
+				},
+				SupplierID: paymentOrder.SupplierID,
+			})
+		}
+
+	}
+
+	return response, nil
 }

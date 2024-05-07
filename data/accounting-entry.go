@@ -9,10 +9,12 @@ import (
 type AccountingOrderItemsTitle string
 
 var (
-	MainBillTitle AccountingOrderItemsTitle = "Korektivni račun"
-	SupplierTitle AccountingOrderItemsTitle = "Dobavljač"
-	TaxTitle      AccountingOrderItemsTitle = "Porez"
-	SubTaxTitle   AccountingOrderItemsTitle = "Prirez"
+	MainBillTitle        AccountingOrderItemsTitle = "Korektivni račun"
+	SupplierTitle        AccountingOrderItemsTitle = "Dobavljač"
+	TaxTitle             AccountingOrderItemsTitle = "Porez"
+	SubTaxTitle          AccountingOrderItemsTitle = "Prirez"
+	CostTitle            AccountingOrderItemsTitle = "Izdatak"
+	AllocatedAmountTitle AccountingOrderItemsTitle = "Rezervisana sredstva"
 )
 
 type AccountingEntry struct {
