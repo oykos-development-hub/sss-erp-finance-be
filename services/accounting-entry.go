@@ -240,15 +240,16 @@ func (h *AccountingEntryServiceImpl) GetAccountingEntry(id int) (*dto.Accounting
 	var creditAmount float64
 	for _, item := range items {
 		responseItem := dto.AccountingEntryItemResponseDTO{
-			ID:           item.ID,
-			Title:        item.Title,
-			EntryID:      item.EntryID,
-			AccountID:    item.AccountID,
-			CreditAmount: item.CreditAmount,
-			DebitAmount:  item.DebitAmount,
-			InvoiceID:    item.InvoiceID,
-			SalaryID:     item.SalaryID,
-			Type:         item.Type,
+			ID:             item.ID,
+			Title:          item.Title,
+			EntryID:        item.EntryID,
+			AccountID:      item.AccountID,
+			CreditAmount:   item.CreditAmount,
+			DebitAmount:    item.DebitAmount,
+			InvoiceID:      item.InvoiceID,
+			SalaryID:       item.SalaryID,
+			PaymentOrderID: item.PaymentOrderID,
+			Type:           item.Type,
 		}
 
 		debitAmount += item.DebitAmount
@@ -301,15 +302,16 @@ func (h *AccountingEntryServiceImpl) GetAccountingEntryList(filter dto.Accountin
 		var creditAmount float64
 		for _, item := range items {
 			responseItem := dto.AccountingEntryItemResponseDTO{
-				ID:           item.ID,
-				Title:        item.Title,
-				EntryID:      item.EntryID,
-				AccountID:    item.AccountID,
-				CreditAmount: item.CreditAmount,
-				DebitAmount:  item.DebitAmount,
-				InvoiceID:    item.InvoiceID,
-				SalaryID:     item.SalaryID,
-				Type:         item.Type,
+				ID:             item.ID,
+				Title:          item.Title,
+				EntryID:        item.EntryID,
+				AccountID:      item.AccountID,
+				CreditAmount:   item.CreditAmount,
+				DebitAmount:    item.DebitAmount,
+				InvoiceID:      item.InvoiceID,
+				SalaryID:       item.SalaryID,
+				PaymentOrderID: item.PaymentOrderID,
+				Type:           item.Type,
 			}
 
 			debitAmount += item.DebitAmount
