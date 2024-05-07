@@ -842,6 +842,17 @@ func buildAccountingOrderForPaymentOrder(id int, h *AccountingEntryServiceImpl) 
 		switch modelItem.Title {
 		case data.MainBillTitle:
 			response = append(response, dto.AccountingOrderItemsForObligations{
+				AccountID:    modelItem.CreditAccountID,
+				CreditAmount: float32(paymentOrder.Amount),
+				Title:        string(modelItem.Title),
+				Type:         data.TypePaymentOrder,
+				PaymentOrder: dto.DropdownSimple{
+					ID:    paymentOrder.ID,
+					Title: *paymentOrder.SAPID,
+				},
+			})
+		case data.SupplierTitle:
+			response = append(response, dto.AccountingOrderItemsForObligations{
 				AccountID:   modelItem.DebitAccountID,
 				DebitAmount: float32(paymentOrder.Amount),
 				Title:       string(modelItem.Title),
@@ -850,8 +861,9 @@ func buildAccountingOrderForPaymentOrder(id int, h *AccountingEntryServiceImpl) 
 					ID:    paymentOrder.ID,
 					Title: *paymentOrder.SAPID,
 				},
+				SupplierID: paymentOrder.SupplierID,
 			})
-		case data.SupplierTitle:
+		case data.CostTitle:
 			response = append(response, dto.AccountingOrderItemsForObligations{
 				AccountID:    modelItem.CreditAccountID,
 				CreditAmount: float32(paymentOrder.Amount),
@@ -861,9 +873,8 @@ func buildAccountingOrderForPaymentOrder(id int, h *AccountingEntryServiceImpl) 
 					ID:    paymentOrder.ID,
 					Title: *paymentOrder.SAPID,
 				},
-				SupplierID: paymentOrder.SupplierID,
 			})
-		case data.CostTitle:
+		case data.AllocatedAmountTitle:
 			response = append(response, dto.AccountingOrderItemsForObligations{
 				AccountID:   modelItem.DebitAccountID,
 				DebitAmount: float32(paymentOrder.Amount),
@@ -873,18 +884,6 @@ func buildAccountingOrderForPaymentOrder(id int, h *AccountingEntryServiceImpl) 
 					ID:    paymentOrder.ID,
 					Title: *paymentOrder.SAPID,
 				},
-			})
-		case data.AllocatedAmountTitle:
-			response = append(response, dto.AccountingOrderItemsForObligations{
-				AccountID:   modelItem.CreditAccountID,
-				DebitAmount: float32(paymentOrder.Amount),
-				Title:       string(modelItem.Title),
-				Type:        data.TypePaymentOrder,
-				PaymentOrder: dto.DropdownSimple{
-					ID:    paymentOrder.ID,
-					Title: *paymentOrder.SAPID,
-				},
-				SupplierID: paymentOrder.SupplierID,
 			})
 		}
 
