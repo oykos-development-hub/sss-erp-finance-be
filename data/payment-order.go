@@ -6,7 +6,6 @@ import (
 	up "github.com/upper/db/v4"
 )
 
-// PaymentOrder struct
 type PaymentOrder struct {
 	ID                 int        `db:"id,omitempty"`
 	OrganizationUnitID int        `db:"organization_unit_id"`
@@ -27,23 +26,23 @@ type PaymentOrder struct {
 }
 
 type ObligationsFilter struct {
-	Page               *int    `json:"page"`
-	Size               *int    `json:"size"`
-	OrganizationUnitID int     `json:"organization_unit_id"`
-	SupplierID         int     `json:"supplier_id"`
-	Type               *string `json:"type"`
+	Page               *int               `json:"page"`
+	Size               *int               `json:"size"`
+	OrganizationUnitID int                `json:"organization_unit_id"`
+	SupplierID         int                `json:"supplier_id"`
+	Type               *TypesOfObligation `json:"type"`
 }
 
 type Obligation struct {
-	InvoiceID                 *int      `json:"invoice_id"`
-	AdditionalExpenseID       *int      `json:"additional_expense_id"`
-	SalaryAdditionalExpenseID *int      `json:"salary_additional_expense_id"`
-	Type                      string    `json:"type"`
-	Title                     string    `json:"title"`
-	TotalPrice                float64   `json:"total_price"`
-	RemainPrice               float64   `json:"remain_price"`
-	Status                    string    `json:"status"`
-	CreatedAt                 time.Time `json:"created_at"`
+	InvoiceID                 *int              `json:"invoice_id"`
+	AdditionalExpenseID       *int              `json:"additional_expense_id"`
+	SalaryAdditionalExpenseID *int              `json:"salary_additional_expense_id"`
+	Type                      TypesOfObligation `json:"type"`
+	Title                     string            `json:"title"`
+	TotalPrice                float64           `json:"total_price"`
+	RemainPrice               float64           `json:"remain_price"`
+	Status                    string            `json:"status"`
+	CreatedAt                 time.Time         `json:"created_at"`
 }
 
 // Table returns the table name
@@ -133,11 +132,12 @@ func (t *PaymentOrder) Insert(tx up.Session, m PaymentOrder) (int, error) {
 func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation, *uint64, error) {
 	var items []Obligation
 
-	queryForInvoices := `select i.id, sum(a.net_price +a.net_price*a.vat_percentage/100) as sum, i.invoice_number, i.status, i.created_at
+	queryForInvoices := `select i.id, sum((a.net_price +a.net_price*a.vat_percentage/100)*a.amount) as sum, 
+						i.invoice_number, i.status, i.created_at
 						from invoices i
 						left join articles a on a.invoice_id = i.id
 						where i.supplier_id = $1 and
-						i.organization_unit_id = $2 and i.type = 'invoice' and i.status <> $3 
+						i.organization_unit_id = $2 and i.type = $4 and i.status <> $3 
 						group by i.id;`
 
 	queryForPaidInvoices := `select sum(p.amount) from payment_order_items pi 
@@ -166,8 +166,8 @@ func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation
 										 left join payment_orders p on p.id = pi.payment_order_id
 										 where pi.salary_additional_expense_id = $1`
 
-	if filter.Type == nil || *filter.Type == "invoices" {
-		rows, err := Upper.SQL().Query(queryForInvoices, filter.SupplierID, filter.OrganizationUnitID, InvoiceStatusFull)
+	if filter.Type == nil || *filter.Type == TypeInvoice {
+		rows, err := Upper.SQL().Query(queryForInvoices, filter.SupplierID, filter.OrganizationUnitID, InvoiceStatusFull, TypeInvoice)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -201,13 +201,13 @@ func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation
 					obligation.RemainPrice = obligation.TotalPrice
 				}
 			}
-			obligation.Type = "invoices"
+			obligation.Type = TypeInvoice
 			obligation.Title = "Račun broj " + obligation.Title + " Neto"
 			items = append(items, obligation)
 		}
 	}
 
-	if filter.Type == nil || (*filter.Type == "decisions" || *filter.Type == "contracts") {
+	if filter.Type == nil || (*filter.Type == TypeDecision || *filter.Type == TypeContract) {
 		rows, err := Upper.SQL().Query(queryForAdditionalExpenses, filter.SupplierID, filter.OrganizationUnitID, InvoiceStatusFull)
 		if err != nil {
 			return nil, nil, err
@@ -244,7 +244,7 @@ func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation
 				}
 			}
 
-			if obligation.Type == "decisions" {
+			if obligation.Type == TypeDecision {
 				obligation.Title = "Rješenje broj " + title + " " + obligation.Title
 			} else {
 				obligation.Title = "Ugovor broj " + title + " " + obligation.Title
@@ -256,7 +256,7 @@ func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation
 		}
 	}
 
-	if filter.Type == nil || *filter.Type == "salaries" {
+	if filter.Type == nil || *filter.Type == TypeSalary {
 		rows, err := Upper.SQL().Query(queryForSalaryAdditionalExpenses, filter.SupplierID, filter.OrganizationUnitID, InvoiceStatusFull)
 		if err != nil {
 			return nil, nil, err
@@ -266,7 +266,8 @@ func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation
 		for rows.Next() {
 			var obligation Obligation
 			var paid *float64
-			err = rows.Scan(&obligation.SalaryAdditionalExpenseID, &obligation.TotalPrice, &obligation.Type, &obligation.Status, &obligation.CreatedAt, &obligation.Title)
+			var title string
+			err = rows.Scan(&obligation.SalaryAdditionalExpenseID, &obligation.TotalPrice, &title, &obligation.Status, &obligation.CreatedAt, &obligation.Title)
 
 			if err != nil {
 				return nil, nil, err
@@ -291,8 +292,8 @@ func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation
 					obligation.RemainPrice = obligation.TotalPrice
 				}
 
-				obligation.Title = "Zarada " + obligation.Title + " " + obligation.Type
-				obligation.Type = "salaries"
+				obligation.Title = "Zarada " + obligation.Title + " " + title
+				obligation.Type = TypeSalary
 			}
 
 			items = append(items, obligation)

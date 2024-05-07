@@ -7,20 +7,20 @@ import (
 )
 
 type ModelOfAccountingItemDTO struct {
-	Title           string `json:"title"`
-	ModelID         int    `json:"model_id"`
-	DebitAccountID  int    `json:"debit_account_id"`
-	CreditAccountID int    `json:"credit_account_id"`
+	Title           data.AccountingOrderItemsTitle `json:"title"`
+	ModelID         int                            `json:"model_id"`
+	DebitAccountID  int                            `json:"debit_account_id"`
+	CreditAccountID int                            `json:"credit_account_id"`
 }
 
 type ModelOfAccountingItemResponseDTO struct {
-	ID              int       `json:"id"`
-	Title           string    `json:"title"`
-	ModelID         int       `json:"model_id"`
-	DebitAccountID  int       `json:"debit_account_id"`
-	CreditAccountID int       `json:"credit_account_id"`
-	CreatedAt       time.Time `json:"created_at"`
-	UpdatedAt       time.Time `json:"updated_at"`
+	ID              int                            `json:"id"`
+	Title           data.AccountingOrderItemsTitle `json:"title"`
+	ModelID         int                            `json:"model_id"`
+	DebitAccountID  int                            `json:"debit_account_id"`
+	CreditAccountID int                            `json:"credit_account_id"`
+	CreatedAt       time.Time                      `json:"created_at"`
+	UpdatedAt       time.Time                      `json:"updated_at"`
 }
 
 type ModelOfAccountingItemFilterDTO struct {

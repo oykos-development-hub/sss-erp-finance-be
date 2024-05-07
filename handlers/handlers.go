@@ -45,7 +45,8 @@ type Handlers struct {
 	AccountingEntryHandler          AccountingEntryHandler
 	ModelsOfAccountingHandler       ModelsOfAccountingHandler
 	ModelOfAccountingItemHandler    ModelOfAccountingItemHandler
-}
+	AccountingEntryItemHandler AccountingEntryItemHandler
+	}
 
 type InvoiceHandler interface {
 	CreateInvoice(w http.ResponseWriter, r *http.Request)
@@ -379,11 +380,14 @@ type AccountingEntryHandler interface {
 	DeleteAccountingEntry(w http.ResponseWriter, r *http.Request)
 	GetAccountingEntryById(w http.ResponseWriter, r *http.Request)
 	GetAccountingEntryList(w http.ResponseWriter, r *http.Request)
+
 	GetObligationsForAccounting(w http.ResponseWriter, r *http.Request)
+	BuildAccountingOrderForObligations(w http.ResponseWriter, r *http.Request)
 }
 
 type ModelsOfAccountingHandler interface {
 	CreateModelsOfAccounting(w http.ResponseWriter, r *http.Request)
+	UpdateModelsOfAccounting(w http.ResponseWriter, r *http.Request)
 	GetModelsOfAccountingById(w http.ResponseWriter, r *http.Request)
 	GetModelsOfAccountingList(w http.ResponseWriter, r *http.Request)
 }
@@ -393,4 +397,12 @@ type ModelOfAccountingItemHandler interface {
 	UpdateModelOfAccountingItem(w http.ResponseWriter, r *http.Request)
 	GetModelOfAccountingItemById(w http.ResponseWriter, r *http.Request)
 	GetModelOfAccountingItemList(w http.ResponseWriter, r *http.Request)
+}
+
+type AccountingEntryItemHandler interface {
+	CreateAccountingEntryItem(w http.ResponseWriter, r *http.Request)
+	UpdateAccountingEntryItem(w http.ResponseWriter, r *http.Request)
+	DeleteAccountingEntryItem(w http.ResponseWriter, r *http.Request)
+	GetAccountingEntryItemById(w http.ResponseWriter, r *http.Request)
+	GetAccountingEntryItemList(w http.ResponseWriter, r *http.Request)
 }

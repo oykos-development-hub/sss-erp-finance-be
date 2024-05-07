@@ -6,22 +6,34 @@ import (
 	up "github.com/upper/db/v4"
 )
 
-// AccountingEntry struct
+type AccountingOrderItemsTitle string
+
+var (
+	MainBillTitle AccountingOrderItemsTitle = "Korektivni račun"
+	SupplierTitle AccountingOrderItemsTitle = "Dobavljač"
+	TaxTitle      AccountingOrderItemsTitle = "Porez"
+	SubTaxTitle   AccountingOrderItemsTitle = "Prirez"
+)
+
 type AccountingEntry struct {
-	ID        int       `db:"id,omitempty"`
-	Title     string    `db:"title"`
-	CreatedAt time.Time `db:"created_at,omitempty"`
-	UpdatedAt time.Time `db:"updated_at"`
+	ID                 int       `db:"id,omitempty"`
+	Title              string    `db:"title"`
+	OrganizationUnitID int       `db:"organization_unit_id"`
+	DateOfBooking      time.Time `db:"date_of_booking"`
+	CreatedAt          time.Time `db:"created_at,omitempty"`
+	UpdatedAt          time.Time `db:"updated_at"`
 }
 
 type ObligationForAccounting struct {
-	InvoiceID *int      `json:"invoice_id"`
-	SalaryID  *int      `json:"salary_id"`
-	Type      string    `json:"type"`
-	Title     string    `json:"title"`
-	Price     float64   `json:"price"`
-	Status    string    `json:"status"`
-	CreatedAt time.Time `json:"created_at"`
+	InvoiceID  *int              `json:"invoice_id"`
+	SalaryID   *int              `json:"salary_id"`
+	SupplierID *int              `json:"supplier_id"`
+	Date       time.Time         `json:"date"`
+	Type       TypesOfObligation `json:"type"`
+	Title      string            `json:"title"`
+	Price      float64           `json:"price"`
+	Status     string            `json:"status"`
+	CreatedAt  time.Time         `json:"created_at"`
 }
 
 // Table returns the table name
@@ -111,27 +123,27 @@ func (t *AccountingEntry) Insert(tx up.Session, m AccountingEntry) (int, error) 
 func (t *AccountingEntry) GetObligationsForAccounting(filter ObligationsFilter) ([]ObligationForAccounting, *uint64, error) {
 	var items []ObligationForAccounting
 
-	queryForInvoices := `select i.id, sum(a.net_price +a.net_price*a.vat_percentage/100) as sum, i.invoice_number
+	queryForInvoices := `select i.id, sum((a.net_price +a.net_price*a.vat_percentage/100)*a.amount) as sum, i.invoice_number, i.supplier_id, i.date_of_invoice
 						from invoices i
 						left join articles a on a.invoice_id = i.id
 						where 
-						i.organization_unit_id = $1 and i.type = 'invoice' and i.registred = false 
+						i.organization_unit_id = $1 and i.type = $2 and i.registred = false 
 						group by i.id;`
 
-	queryForAdditionalExpenses := `select i.id, sum(a.price), i.type, i.invoice_number
+	queryForAdditionalExpenses := `select i.id, sum(a.price), i.type, i.invoice_number, i.supplier_id, i.date_of_invoice
 	                               from additional_expenses a
 	                               left join invoices i on a.invoice_id = i.id
 	                               where a.invoice_id = i.id and
 	                               i.organization_unit_id = $1 and i.registred = false
 	                               group by i.id, i.invoice_number order by i.id;`
 
-	queryForSalaryAdditionalExpenses := `select s.id, sum(a.amount), s.month
+	queryForSalaryAdditionalExpenses := `select s.id, sum(a.amount), s.month, s.date_of_calculation
 	                                     from salary_additional_expenses a
 	                                     left join salaries s on s.id = a.salary_id
 	                                     where s.organization_unit_id = $1 and s.registred = false
 	                                     group by s.id, s.month order by s.id;`
 
-	rows, err := Upper.SQL().Query(queryForInvoices, filter.OrganizationUnitID)
+	rows, err := Upper.SQL().Query(queryForInvoices, filter.OrganizationUnitID, TypeInvoice)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -139,13 +151,13 @@ func (t *AccountingEntry) GetObligationsForAccounting(filter ObligationsFilter) 
 
 	for rows.Next() {
 		var obligation ObligationForAccounting
-		err = rows.Scan(&obligation.InvoiceID, &obligation.Price, &obligation.Title)
+		err = rows.Scan(&obligation.InvoiceID, &obligation.Price, &obligation.Title, &obligation.SupplierID, &obligation.Date)
 
 		if err != nil {
 			return nil, nil, err
 		}
 
-		obligation.Type = "invoices"
+		obligation.Type = TypeInvoice
 		obligation.Title = "Račun broj " + obligation.Title
 		items = append(items, obligation)
 	}
@@ -158,13 +170,13 @@ func (t *AccountingEntry) GetObligationsForAccounting(filter ObligationsFilter) 
 
 	for rows.Next() {
 		var obligation ObligationForAccounting
-		err = rows.Scan(&obligation.InvoiceID, &obligation.Price, &obligation.Type, &obligation.Title)
+		err = rows.Scan(&obligation.InvoiceID, &obligation.Price, &obligation.Type, &obligation.Title, &obligation.SupplierID, &obligation.Date)
 
 		if err != nil {
 			return nil, nil, err
 		}
 
-		if obligation.Type == "decisions" {
+		if obligation.Type == TypeDecision {
 			obligation.Title = "Rješenje broj " + obligation.Title
 		} else {
 			obligation.Title = "Ugovor broj " + obligation.Title
@@ -183,14 +195,14 @@ func (t *AccountingEntry) GetObligationsForAccounting(filter ObligationsFilter) 
 
 	for rows.Next() {
 		var obligation ObligationForAccounting
-		err = rows.Scan(&obligation.SalaryID, &obligation.Price, &obligation.Title)
+		err = rows.Scan(&obligation.SalaryID, &obligation.Price, &obligation.Title, &obligation.Date)
 
 		if err != nil {
 			return nil, nil, err
 		}
 
 		obligation.Title = "Zarada " + obligation.Title
-		obligation.Type = "salaries"
+		obligation.Type = TypeSalary
 
 		items = append(items, obligation)
 

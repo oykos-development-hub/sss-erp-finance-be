@@ -359,7 +359,9 @@ type AccountingEntryService interface {
 	DeleteAccountingEntry(id int) error
 	GetAccountingEntry(id int) (*dto.AccountingEntryResponseDTO, error)
 	GetAccountingEntryList(filter dto.AccountingEntryFilterDTO) ([]dto.AccountingEntryResponseDTO, *uint64, error)
+
 	GetObligationsForAccounting(filter dto.GetObligationsFilterDTO) ([]dto.ObligationForAccounting, *uint64, error)
+	BuildAccountingOrderForObligations(data dto.AccountingOrderForObligationsData) (*dto.AccountingOrderForObligations, error)
 }
 
 type ModelsOfAccountingService interface {
@@ -374,4 +376,12 @@ type ModelOfAccountingItemService interface {
 	UpdateModelOfAccountingItem(id int, input dto.ModelOfAccountingItemDTO) (*dto.ModelOfAccountingItemResponseDTO, error)
 	GetModelOfAccountingItem(id int) (*dto.ModelOfAccountingItemResponseDTO, error)
 	GetModelOfAccountingItemList(filter dto.ModelOfAccountingItemFilterDTO) ([]dto.ModelOfAccountingItemResponseDTO, *uint64, error)
+}
+
+type AccountingEntryItemService interface {
+	CreateAccountingEntryItem(input dto.AccountingEntryItemDTO) (*dto.AccountingEntryItemResponseDTO, error)
+	UpdateAccountingEntryItem(id int, input dto.AccountingEntryItemDTO) (*dto.AccountingEntryItemResponseDTO, error)
+	DeleteAccountingEntryItem(id int) error
+	GetAccountingEntryItem(id int) (*dto.AccountingEntryItemResponseDTO, error)
+	GetAccountingEntryItemList(filter dto.AccountingEntryItemFilterDTO) ([]dto.AccountingEntryItemResponseDTO, *uint64, error)
 }

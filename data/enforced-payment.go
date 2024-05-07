@@ -30,6 +30,8 @@ type EnforcedPayment struct {
 	ReturnFileID       *int                  `db:"return_file_id"`
 	ReturnDate         *time.Time            `db:"return_date"`
 	Amount             float64               `db:"amount"`
+	AmountForLawyer    float64               `db:"amount_for_lawyer"`
+	AmountForAgent     float64               `db:"amount_for_agent"`
 	Description        string                `db:"description"`
 	CreatedAt          time.Time             `db:"created_at,omitempty"`
 	UpdatedAt          time.Time             `db:"updated_at"`

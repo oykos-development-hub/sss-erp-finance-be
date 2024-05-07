@@ -8,19 +8,19 @@ import (
 
 // SalaryAdditionalExpense struct
 type SalaryAdditionalExpense struct {
-	ID                 int           `db:"id,omitempty"`
-	SalaryID           int           `db:"salary_id"`
-	AccountID          int           `db:"account_id"`
-	Amount             float64       `db:"amount"`
-	SubjectID          int           `db:"subject_id"`
-	BankAccount        string        `db:"bank_account"`
-	Status             InvoiceStatus `db:"status"`
-	OrganizationUnitID int           `db:"organization_unit_id"`
-	DebtorID           int           `db:"debtor_id"`
-	Type               string        `db:"type"`
-	Title              string        `db:"title"`
-	CreatedAt          time.Time     `db:"created_at,omitempty"`
-	UpdatedAt          time.Time     `db:"updated_at"`
+	ID                 int                         `db:"id,omitempty"`
+	SalaryID           int                         `db:"salary_id"`
+	AccountID          int                         `db:"account_id"`
+	Amount             float64                     `db:"amount"`
+	SubjectID          int                         `db:"subject_id"`
+	BankAccount        string                      `db:"bank_account"`
+	Status             InvoiceStatus               `db:"status"`
+	OrganizationUnitID int                         `db:"organization_unit_id"`
+	DebtorID           int                         `db:"debtor_id"`
+	Type               SalaryAdditionalExpenseType `db:"type"`
+	Title              string                      `db:"title"`
+	CreatedAt          time.Time                   `db:"created_at,omitempty"`
+	UpdatedAt          time.Time                   `db:"updated_at"`
 }
 
 // Table returns the table name

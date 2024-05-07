@@ -22,6 +22,8 @@ type EnforcedPaymentDTO struct {
 	ReturnDate         *time.Time                 `json:"return_date"`
 	Items              []EnforcedPaymentItemDTO   `json:"items"`
 	Amount             float64                    `json:"amount"`
+	AmountForLawyer    float64                    `json:"amount_for_lawyer"`
+	AmountForAgent     float64                    `json:"amount_for_agent"`
 	FileID             *int                       `json:"file_id"`
 }
 
@@ -42,6 +44,8 @@ type EnforcedPaymentResponseDTO struct {
 	ReturnDate         *time.Time                       `json:"return_date"`
 	Items              []EnforcedPaymentItemResponseDTO `json:"items"`
 	Amount             float64                          `json:"amount"`
+	AmountForLawyer    float64                          `json:"amount_for_lawyer"`
+	AmountForAgent     float64                          `json:"amount_for_agent"`
 	FileID             *int                             `json:"file_id"`
 	CreatedAt          time.Time                        `json:"created_at"`
 	UpdatedAt          time.Time                        `json:"updated_at"`
@@ -73,6 +77,8 @@ func (dto EnforcedPaymentDTO) ToEnforcedPayment() *data.EnforcedPayment {
 		Registred:          dto.Registred,
 		Description:        dto.Description,
 		Amount:             dto.Amount,
+		AmountForLawyer:    dto.AmountForLawyer,
+		AmountForAgent:     dto.AmountForAgent,
 		ReturnDate:         dto.ReturnDate,
 		Status:             dto.Status,
 		ReturnFileID:       dto.ReturnFileID,
@@ -94,6 +100,8 @@ func ToEnforcedPaymentResponseDTO(data data.EnforcedPayment) EnforcedPaymentResp
 		FileID:             data.FileID,
 		Description:        data.Description,
 		Amount:             data.Amount,
+		AmountForLawyer:    data.AmountForLawyer,
+		AmountForAgent:     data.AmountForAgent,
 		ReturnDate:         data.ReturnDate,
 		Status:             data.Status,
 		ReturnFileID:       data.ReturnFileID,

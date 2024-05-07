@@ -7,18 +7,18 @@ import (
 )
 
 type InvoicesFilter struct {
-	Search             *string             `json:"search"`
-	Page               *int                `json:"page"`
-	Size               *int                `json:"size"`
-	Year               *int                `json:"year"`
-	Status             *data.InvoiceStatus `json:"status"`
-	SupplierID         *int                `json:"supplier_id"`
-	OrganizationUnitID *int                `json:"organization_unit_id"`
-	ActivityID         *int                `json:"activity_id"`
-	OrderID            *int                `json:"order_id"`
-	Type               *string             `json:"type"`
-	PassedToInventory  *bool               `json:"passed_to_inventory"`
-	Registred          *bool               `json:"registred"`
+	Search             *string                 `json:"search"`
+	Page               *int                    `json:"page"`
+	Size               *int                    `json:"size"`
+	Year               *int                    `json:"year"`
+	Status             *data.InvoiceStatus     `json:"status"`
+	SupplierID         *int                    `json:"supplier_id"`
+	OrganizationUnitID *int                    `json:"organization_unit_id"`
+	ActivityID         *int                    `json:"activity_id"`
+	OrderID            *int                    `json:"order_id"`
+	Type               *data.TypesOfObligation `json:"type"`
+	PassedToInventory  *bool                   `json:"passed_to_inventory"`
+	Registred          *bool                   `json:"registred"`
 }
 
 type InvoiceDTO struct {
@@ -28,7 +28,7 @@ type InvoiceDTO struct {
 	IsInvoice              bool                   `json:"is_invoice"`
 	Issuer                 string                 `json:"issuer"`
 	Status                 data.InvoiceStatus     `json:"status"`
-	Type                   string                 `json:"type"`
+	Type                   data.TypesOfObligation `json:"type"`
 	TaxAuthorityCodebookID int                    `json:"tax_authority_codebook_id"`
 	TypeOfSubject          int                    `json:"type_of_subject"`
 	TypeOfContract         int                    `json:"type_of_contract"`
@@ -64,7 +64,7 @@ type InvoiceResponseDTO struct {
 	PassedToInventory      bool                           `json:"passed_to_inventory"`
 	PassedToAccounting     bool                           `json:"passed_to_accounting"`
 	IsInvoice              bool                           `json:"is_invoice"`
-	Type                   string                         `json:"type"`
+	Type                   data.TypesOfObligation         `json:"type"`
 	Registred              *bool                          `json:"registred"`
 	TaxAuthorityCodebookID int                            `json:"tax_authority_codebook_id"`
 	MunicipalityID         int                            `json:"municipality_id"`
