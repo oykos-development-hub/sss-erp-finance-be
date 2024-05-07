@@ -42,6 +42,7 @@ func (t *ModelOfAccountingItem) GetAll(page *int, size *int, condition *up.AndEx
 		res = paginateResult(res, *page, *size)
 	}
 
+	orders = append(orders, "id asc")
 	err = res.OrderBy(orders...).All(&all)
 	if err != nil {
 		return nil, nil, err
