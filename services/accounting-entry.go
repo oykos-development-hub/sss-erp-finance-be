@@ -490,6 +490,10 @@ func (h *AccountingEntryServiceImpl) BuildAccountingOrderForObligations(orderDat
 		response.Items = append(response.Items, item...)
 	}
 
+	/*for _, id := range orderData.EnforcedPaymentID{
+
+	}*/
+
 	for _, item := range response.Items {
 		response.CreditAmount += item.CreditAmount
 		response.DebitAmount += item.DebitAmount

@@ -131,8 +131,8 @@ func (h *ModelsOfAccountingServiceImpl) GetModelsOfAccountingList(filter dto.Mod
 	conditionAndExp := &up.AndExpr{}
 	var orders []interface{}
 
-	if filter.Type != nil {
-		conditionAndExp = up.And(conditionAndExp, &up.Cond{"type": *filter.Type})
+	if filter.Search != nil {
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"search": *filter.Search})
 	}
 
 	if filter.SortByTitle != nil {

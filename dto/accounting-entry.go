@@ -59,11 +59,13 @@ type PaymentOrdersForAccounting struct {
 }
 
 type AccountingOrderForObligationsData struct {
-	InvoiceID          []int     `json:"invoice_id"`
-	SalaryID           []int     `json:"salary_id"`
-	PaymentOrderID     []int     `json:"payment_order_id"`
-	DateOfBooking      time.Time `json:"date_of_booking"`
-	OrganizationUnitID int       `json:"organization_unit_id"`
+	InvoiceID               []int     `json:"invoice_id"`
+	SalaryID                []int     `json:"salary_id"`
+	PaymentOrderID          []int     `json:"payment_order_id"`
+	EnforcedPaymentID       []int     `json:"enforced_payment_id"`
+	ReturnEnforcedPaymentID []int     `json:"return_enforced_payment_id"`
+	DateOfBooking           time.Time `json:"date_of_booking"`
+	OrganizationUnitID      int       `json:"organization_unit_id"`
 }
 
 type AccountingOrderForObligations struct {
@@ -75,15 +77,17 @@ type AccountingOrderForObligations struct {
 }
 
 type AccountingOrderItemsForObligations struct {
-	AccountID    int                    `json:"account_id"`
-	Title        string                 `json:"title"`
-	CreditAmount float32                `json:"credit_amount"`
-	DebitAmount  float32                `json:"debit_amount"`
-	Type         data.TypesOfObligation `json:"type"`
-	SupplierID   int                    `json:"supplier_id"`
-	Invoice      DropdownSimple         `json:"invoice"`
-	Salary       DropdownSimple         `json:"salary"`
-	PaymentOrder DropdownSimple         `json:"payment_order"`
+	AccountID             int                    `json:"account_id"`
+	Title                 string                 `json:"title"`
+	CreditAmount          float32                `json:"credit_amount"`
+	DebitAmount           float32                `json:"debit_amount"`
+	Type                  data.TypesOfObligation `json:"type"`
+	SupplierID            int                    `json:"supplier_id"`
+	Invoice               DropdownSimple         `json:"invoice"`
+	Salary                DropdownSimple         `json:"salary"`
+	PaymentOrder          DropdownSimple         `json:"payment_order"`
+	EnforcedPayment       DropdownSimple         `json:"enforced_payment"`
+	ReturnEnforcedPayment DropdownSimple         `json:"return_enforced_payment"`
 }
 
 type DropdownSimple struct {

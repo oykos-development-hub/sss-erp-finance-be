@@ -8,18 +8,20 @@ import (
 
 // AccountingEntryItem struct
 type AccountingEntryItem struct {
-	ID             int       `db:"id,omitempty"`
-	Title          string    `db:"title"`
-	EntryID        int       `db:"entry_id"`
-	AccountID      int       `db:"account_id"`
-	CreditAmount   float64   `db:"credit_amount"`
-	DebitAmount    float64   `db:"debit_amount"`
-	InvoiceID      *int      `db:"invoice_id"`
-	SalaryID       *int      `db:"salary_id"`
-	PaymentOrderID *int      `db:"payment_order_id"`
-	Type           string    `db:"type"`
-	CreatedAt      time.Time `db:"created_at,omitempty"`
-	UpdatedAt      time.Time `db:"updated_at"`
+	ID                      int       `db:"id,omitempty"`
+	Title                   string    `db:"title"`
+	EntryID                 int       `db:"entry_id"`
+	AccountID               int       `db:"account_id"`
+	CreditAmount            float64   `db:"credit_amount"`
+	DebitAmount             float64   `db:"debit_amount"`
+	InvoiceID               *int      `db:"invoice_id"`
+	SalaryID                *int      `db:"salary_id"`
+	PaymentOrderID          *int      `db:"payment_order_id"`
+	EnforcedPaymentID       *int      `db:"enforced_payment_id"`
+	ReturnEnforcedPaymentID *int      `db:"return_enforced_payment_id"`
+	Type                    string    `db:"type"`
+	CreatedAt               time.Time `db:"created_at,omitempty"`
+	UpdatedAt               time.Time `db:"updated_at"`
 }
 
 // Table returns the table name

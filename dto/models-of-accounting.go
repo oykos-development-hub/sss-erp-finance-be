@@ -25,6 +25,7 @@ type ModelsOfAccountingFilterDTO struct {
 	Page        *int                    `json:"page"`
 	Size        *int                    `json:"size"`
 	Type        *data.TypesOfObligation `json:"type"`
+	Search      *string                 `json:"search"`
 	SortByTitle *string                 `json:"sort_by_title"`
 }
 

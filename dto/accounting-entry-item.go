@@ -7,30 +7,34 @@ import (
 )
 
 type AccountingEntryItemDTO struct {
-	Title          string  `json:"title"`
-	EntryID        int     `json:"entry_id"`
-	AccountID      int     `json:"account_id"`
-	CreditAmount   float64 `json:"credit_amount"`
-	DebitAmount    float64 `json:"debit_amount"`
-	InvoiceID      *int    `json:"invoice_id"`
-	SalaryID       *int    `json:"salary_id"`
-	PaymentOrderID *int    `json:"payment_order_id"`
-	Type           string  `json:"type"`
+	Title                   string  `json:"title"`
+	EntryID                 int     `json:"entry_id"`
+	AccountID               int     `json:"account_id"`
+	CreditAmount            float64 `json:"credit_amount"`
+	DebitAmount             float64 `json:"debit_amount"`
+	InvoiceID               *int    `json:"invoice_id"`
+	SalaryID                *int    `json:"salary_id"`
+	PaymentOrderID          *int    `json:"payment_order_id"`
+	EnforcedPaymentID       *int    `json:"enforced_payment_id"`
+	ReturnEnforcedPaymentID *int    `json:"return_enforced_payment_id"`
+	Type                    string  `json:"type"`
 }
 
 type AccountingEntryItemResponseDTO struct {
-	ID             int       `json:"id"`
-	Title          string    `json:"title"`
-	EntryID        int       `json:"entry_id"`
-	AccountID      int       `json:"account_id"`
-	CreditAmount   float64   `json:"credit_amount"`
-	DebitAmount    float64   `json:"debit_amount"`
-	InvoiceID      *int      `json:"invoice_id"`
-	SalaryID       *int      `json:"salary_id"`
-	PaymentOrderID *int      `json:"payment_order_id"`
-	Type           string    `json:"type"`
-	CreatedAt      time.Time `json:"created_at"`
-	UpdatedAt      time.Time `json:"updated_at"`
+	ID                      int       `json:"id"`
+	Title                   string    `json:"title"`
+	EntryID                 int       `json:"entry_id"`
+	AccountID               int       `json:"account_id"`
+	CreditAmount            float64   `json:"credit_amount"`
+	DebitAmount             float64   `json:"debit_amount"`
+	InvoiceID               *int      `json:"invoice_id"`
+	SalaryID                *int      `json:"salary_id"`
+	PaymentOrderID          *int      `json:"payment_order_id"`
+	EnforcedPaymentID       *int      `json:"enforced_payment_id"`
+	ReturnEnforcedPaymentID *int      `json:"return_enforced_payment_id"`
+	Type                    string    `json:"type"`
+	CreatedAt               time.Time `json:"created_at"`
+	UpdatedAt               time.Time `json:"updated_at"`
 }
 
 type AccountingEntryItemFilterDTO struct {
@@ -42,31 +46,35 @@ type AccountingEntryItemFilterDTO struct {
 
 func (dto AccountingEntryItemDTO) ToAccountingEntryItem() *data.AccountingEntryItem {
 	return &data.AccountingEntryItem{
-		Title:          dto.Title,
-		EntryID:        dto.EntryID,
-		AccountID:      dto.AccountID,
-		CreditAmount:   dto.CreditAmount,
-		DebitAmount:    dto.DebitAmount,
-		InvoiceID:      dto.InvoiceID,
-		SalaryID:       dto.SalaryID,
-		PaymentOrderID: dto.PaymentOrderID,
-		Type:           dto.Type,
+		Title:                   dto.Title,
+		EntryID:                 dto.EntryID,
+		AccountID:               dto.AccountID,
+		CreditAmount:            dto.CreditAmount,
+		DebitAmount:             dto.DebitAmount,
+		InvoiceID:               dto.InvoiceID,
+		SalaryID:                dto.SalaryID,
+		PaymentOrderID:          dto.PaymentOrderID,
+		EnforcedPaymentID:       dto.EnforcedPaymentID,
+		ReturnEnforcedPaymentID: dto.ReturnEnforcedPaymentID,
+		Type:                    dto.Type,
 	}
 }
 
 func ToAccountingEntryItemResponseDTO(data data.AccountingEntryItem) AccountingEntryItemResponseDTO {
 	return AccountingEntryItemResponseDTO{
-		ID:           data.ID,
-		Title:        data.Title,
-		EntryID:      data.EntryID,
-		AccountID:    data.AccountID,
-		CreditAmount: data.CreditAmount,
-		DebitAmount:  data.DebitAmount,
-		InvoiceID:    data.InvoiceID,
-		SalaryID:     data.SalaryID,
-		Type:         data.Type,
-		CreatedAt:    data.CreatedAt,
-		UpdatedAt:    data.UpdatedAt,
+		ID:                      data.ID,
+		Title:                   data.Title,
+		EntryID:                 data.EntryID,
+		AccountID:               data.AccountID,
+		CreditAmount:            data.CreditAmount,
+		DebitAmount:             data.DebitAmount,
+		InvoiceID:               data.InvoiceID,
+		SalaryID:                data.SalaryID,
+		EnforcedPaymentID:       data.EnforcedPaymentID,
+		ReturnEnforcedPaymentID: data.ReturnEnforcedPaymentID,
+		Type:                    data.Type,
+		CreatedAt:               data.CreatedAt,
+		UpdatedAt:               data.UpdatedAt,
 	}
 }
 
