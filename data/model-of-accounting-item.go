@@ -67,12 +67,23 @@ func (t *ModelOfAccountingItem) Get(id int) (*ModelOfAccountingItem, error) {
 // Update updates a record in the database, using upper
 func (t *ModelOfAccountingItem) Update(tx up.Session, m ModelOfAccountingItem) error {
 	m.UpdatedAt = time.Now()
-	collection := tx.Collection(t.Table())
-	res := collection.Find(m.ID)
-	err := res.Update(&m)
-	if err != nil {
-		return err
+	query1 := `update model_of_accounting_items set debit_account_id = $1, updated_at = $2 where id = $3`
+	query2 := `update model_of_accounting_items set credit_account_id = $1, updated_at = $2 where id = $3`
+
+	if m.DebitAccountID != 0 {
+		rows, err := Upper.SQL().Query(query1, m.DebitAccountID, m.UpdatedAt, m.ID)
+		if err != nil {
+			return err
+		}
+		defer rows.Close()
+	} else {
+		rows, err := Upper.SQL().Query(query2, m.CreditAccountID, m.UpdatedAt, m.ID)
+		if err != nil {
+			return err
+		}
+		defer rows.Close()
 	}
+
 	return nil
 }
 

@@ -66,6 +66,7 @@ func (h *ModelsOfAccountingServiceImpl) UpdateModelsOfAccounting(id int, input d
 		for _, item := range input.Items {
 			itemToInsert := item.ToModelOfAccountingItem()
 			itemToInsert.ModelID = id
+			itemToInsert.ID = item.ID
 			err := h.itemsRepo.Update(tx, *itemToInsert)
 
 			if err != nil {

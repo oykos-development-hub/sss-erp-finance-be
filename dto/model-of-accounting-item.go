@@ -7,6 +7,7 @@ import (
 )
 
 type ModelOfAccountingItemDTO struct {
+	ID              int                            `json:"id"`
 	Title           data.AccountingOrderItemsTitle `json:"title"`
 	ModelID         int                            `json:"model_id"`
 	DebitAccountID  int                            `json:"debit_account_id"`
