@@ -1,6 +1,8 @@
 package services
 
 import (
+	"fmt"
+
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
 	"gitlab.sudovi.me/erp/finance-api/errors"
@@ -125,7 +127,8 @@ func (h *ModelsOfAccountingServiceImpl) GetModelsOfAccountingList(filter dto.Mod
 	var orders []interface{}
 
 	if filter.Search != nil {
-		conditionAndExp = up.And(conditionAndExp, &up.Cond{"search": *filter.Search})
+		likeCondition := fmt.Sprintf("%%%s%%", *filter.Search)
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"title like ": likeCondition})
 	}
 
 	if filter.SortByTitle != nil {
