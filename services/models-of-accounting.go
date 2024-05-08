@@ -131,6 +131,10 @@ func (h *ModelsOfAccountingServiceImpl) GetModelsOfAccountingList(filter dto.Mod
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"title like ": likeCondition})
 	}
 
+	if filter.Type != nil {
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"type": *filter.Type})
+	}
+
 	if filter.SortByTitle != nil {
 		if *filter.SortByTitle == "asc" {
 			orders = append(orders, "-title")
