@@ -62,19 +62,11 @@ func (h *ModelsOfAccountingServiceImpl) CreateModelsOfAccounting(input dto.Model
 }
 
 func (h *ModelsOfAccountingServiceImpl) UpdateModelsOfAccounting(id int, input dto.ModelsOfAccountingDTO) (*dto.ModelsOfAccountingResponseDTO, error) {
-	dataToInsert := input.ToModelsOfAccounting()
-	dataToInsert.ID = id
-
 	err := data.Upper.Tx(func(tx up.Session) error {
-		err := h.repo.Update(tx, *dataToInsert)
-		if err != nil {
-			return errors.ErrInternalServer
-		}
-
 		for _, item := range input.Items {
 			itemToInsert := item.ToModelOfAccountingItem()
 			itemToInsert.ModelID = id
-			err = h.itemsRepo.Update(tx, *itemToInsert)
+			err := h.itemsRepo.Update(tx, *itemToInsert)
 
 			if err != nil {
 				return err
@@ -87,7 +79,7 @@ func (h *ModelsOfAccountingServiceImpl) UpdateModelsOfAccounting(id int, input d
 		return nil, errors.ErrInternalServer
 	}
 
-	dataToInsert, err = h.repo.Get(id)
+	dataToInsert, err := h.repo.Get(id)
 	if err != nil {
 		return nil, errors.ErrInternalServer
 	}

@@ -54,17 +54,17 @@ type Models struct {
 	FixedDepositWill         FixedDepositWill
 	FixedDepositWillDispatch FixedDepositWillDispatch
 	DepositPayment           DepositPayment
-	DepositPaymentOrder DepositPaymentOrder
-		DepositAdditionalExpense DepositAdditionalExpense
-		PaymentOrder PaymentOrder
-		PaymentOrderItem PaymentOrderItem
-		EnforcedPayment EnforcedPayment
-		EnforcedPaymentItem EnforcedPaymentItem
-		AccountingEntry AccountingEntry
-		ModelsOfAccounting ModelsOfAccounting
-		ModelOfAccountingItem ModelOfAccountingItem
-		AccountingEntryItem AccountingEntryItem
-	}
+	DepositPaymentOrder      DepositPaymentOrder
+	DepositAdditionalExpense DepositAdditionalExpense
+	PaymentOrder             PaymentOrder
+	PaymentOrderItem         PaymentOrderItem
+	EnforcedPayment          EnforcedPayment
+	EnforcedPaymentItem      EnforcedPaymentItem
+	AccountingEntry          AccountingEntry
+	ModelsOfAccounting       ModelsOfAccounting
+	ModelOfAccountingItem    ModelOfAccountingItem
+	AccountingEntryItem      AccountingEntryItem
+}
 
 func New(databasePool *sql.DB) Models {
 	//db = databasePool
@@ -107,16 +107,16 @@ func New(databasePool *sql.DB) Models {
 		FixedDepositWill:         FixedDepositWill{},
 		FixedDepositWillDispatch: FixedDepositWillDispatch{},
 		DepositPayment:           DepositPayment{},
-		DepositPaymentOrder: DepositPaymentOrder{},
+		DepositPaymentOrder:      DepositPaymentOrder{},
 		DepositAdditionalExpense: DepositAdditionalExpense{},
-		PaymentOrder: PaymentOrder{},
-		PaymentOrderItem: PaymentOrderItem{},
-		EnforcedPayment: EnforcedPayment{},
-		EnforcedPaymentItem: EnforcedPaymentItem{},
-		AccountingEntry: AccountingEntry{},
-		ModelsOfAccounting: ModelsOfAccounting{},
-		ModelOfAccountingItem: ModelOfAccountingItem{},
-		AccountingEntryItem: AccountingEntryItem{},
+		PaymentOrder:             PaymentOrder{},
+		PaymentOrderItem:         PaymentOrderItem{},
+		EnforcedPayment:          EnforcedPayment{},
+		EnforcedPaymentItem:      EnforcedPaymentItem{},
+		AccountingEntry:          AccountingEntry{},
+		ModelsOfAccounting:       ModelsOfAccounting{},
+		ModelOfAccountingItem:    ModelOfAccountingItem{},
+		AccountingEntryItem:      AccountingEntryItem{},
 	}
 }
 

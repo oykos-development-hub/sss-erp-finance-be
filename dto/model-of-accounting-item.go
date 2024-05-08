@@ -31,16 +31,22 @@ type ModelOfAccountingItemFilterDTO struct {
 
 func (dto ModelOfAccountingItemDTO) ToModelOfAccountingItem() *data.ModelOfAccountingItem {
 	return &data.ModelOfAccountingItem{
-		Title: dto.Title,
+		Title:           dto.Title,
+		DebitAccountID:  dto.DebitAccountID,
+		CreditAccountID: dto.CreditAccountID,
+		ModelID:         dto.ModelID,
 	}
 }
 
 func ToModelOfAccountingItemResponseDTO(data data.ModelOfAccountingItem) ModelOfAccountingItemResponseDTO {
 	return ModelOfAccountingItemResponseDTO{
-		ID:        data.ID,
-		Title:     data.Title,
-		CreatedAt: data.CreatedAt,
-		UpdatedAt: data.UpdatedAt,
+		ID:              data.ID,
+		Title:           data.Title,
+		ModelID:         data.ModelID,
+		DebitAccountID:  data.DebitAccountID,
+		CreditAccountID: data.CreditAccountID,
+		CreatedAt:       data.CreatedAt,
+		UpdatedAt:       data.UpdatedAt,
 	}
 }
 
