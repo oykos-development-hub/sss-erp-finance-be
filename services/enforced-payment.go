@@ -159,7 +159,7 @@ func (h *EnforcedPaymentServiceImpl) GetEnforcedPayment(id int) (*dto.EnforcedPa
 				return nil, err
 			}
 
-			if invoice.Type == "invoice" {
+			if invoice.Type == data.TypeInvoice {
 				conditionAndExp := &up.AndExpr{}
 				conditionAndExp = up.And(conditionAndExp, &up.Cond{"invoice_id": item.InvoiceID})
 				articles, _, err := h.invoiceArticlesRepo.GetAll(nil, nil, conditionAndExp, nil)
@@ -179,9 +179,11 @@ func (h *EnforcedPaymentServiceImpl) GetEnforcedPayment(id int) (*dto.EnforcedPa
 					return nil, err
 				}
 				for _, article := range articles {
-					item.Amount += float32(article.Price)
+					if article.Title == "Neto" {
+						item.Amount += float32(article.Price)
+					}
 				}
-				item.Amount += float32(invoice.GrossPrice)
+
 				if invoice.Type == data.TypeDecision {
 					item.Title = "Rješenje broj " + invoice.InvoiceNumber
 				} else {
