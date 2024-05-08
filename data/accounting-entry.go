@@ -243,9 +243,9 @@ func (t *AccountingEntry) GetPaymentOrdersForAccounting(filter ObligationsFilter
 	query := `select id, supplier_id, sap_id, date_of_sap, amount
 			  from payment_orders 
 			  where registred = false and sap_id is not null and date_of_sap is not null and sap_id <> '' and date_of_sap <> '0001-01-01'
-			  and organization_unit_id = $1 and ;`
+			  and organization_unit_id = $1 and (COALESCE($2, '') = '' OR sap_id like %$2%);`
 
-	rows, err := Upper.SQL().Query(query, filter.OrganizationUnitID)
+	rows, err := Upper.SQL().Query(query, filter.OrganizationUnitID, filter.Search)
 
 	if err != nil {
 		return nil, nil, err
@@ -274,9 +274,9 @@ func (t *AccountingEntry) GetEnforcedPaymentsForAccounting(filter ObligationsFil
 	query := `select id, supplier_id, sap_id, date_of_sap, amount + amount_for_lawyer + amount_for_agent
 			  from enforced_payments 
 			  where registred = false 
-			  and organization_unit_id = $1;`
+			  and organization_unit_id = $1 and (COALESCE($2, '') = '' OR sap_id like %$2%);`
 
-	rows, err := Upper.SQL().Query(query, filter.OrganizationUnitID)
+	rows, err := Upper.SQL().Query(query, filter.OrganizationUnitID, filter.Search)
 
 	if err != nil {
 		return nil, nil, err
