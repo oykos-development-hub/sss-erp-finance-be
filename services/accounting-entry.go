@@ -20,9 +20,10 @@ type AccountingEntryServiceImpl struct {
 	modelOfAccountingRepo        ModelsOfAccountingService
 	items                        data.AccountingEntryItem
 	paymentOrderRepo             data.PaymentOrder
+	enforcedPaymentRepo          data.EnforcedPayment
 }
 
-func NewAccountingEntryServiceImpl(app *celeritas.Celeritas, repo data.AccountingEntry, invoiceRepo data.Invoice, articlesRepo data.Article, additionalExpensesRepo data.AdditionalExpense, salaryRepo data.Salary, salaryAdditionalExpensesRepo data.SalaryAdditionalExpense, modelOfAccountingRepo ModelsOfAccountingService, items data.AccountingEntryItem, paymentOrderRepo data.PaymentOrder) AccountingEntryService {
+func NewAccountingEntryServiceImpl(app *celeritas.Celeritas, repo data.AccountingEntry, invoiceRepo data.Invoice, articlesRepo data.Article, additionalExpensesRepo data.AdditionalExpense, salaryRepo data.Salary, salaryAdditionalExpensesRepo data.SalaryAdditionalExpense, modelOfAccountingRepo ModelsOfAccountingService, items data.AccountingEntryItem, paymentOrderRepo data.PaymentOrder, enforcedPaymentRepo data.EnforcedPayment) AccountingEntryService {
 	return &AccountingEntryServiceImpl{
 		App:                          app,
 		repo:                         repo,
@@ -34,6 +35,7 @@ func NewAccountingEntryServiceImpl(app *celeritas.Celeritas, repo data.Accountin
 		modelOfAccountingRepo:        modelOfAccountingRepo,
 		items:                        items,
 		paymentOrderRepo:             paymentOrderRepo,
+		enforcedPaymentRepo:          enforcedPaymentRepo,
 	}
 }
 
@@ -490,9 +492,14 @@ func (h *AccountingEntryServiceImpl) BuildAccountingOrderForObligations(orderDat
 		response.Items = append(response.Items, item...)
 	}
 
-	/*for _, id := range orderData.EnforcedPaymentID{
+	for _, id := range orderData.EnforcedPaymentID {
+		item, err := buildAccountingOrderForEnforcedPayment(id, h)
 
-	}*/
+		if err != nil {
+			return nil, err
+		}
+		response.Items = append(response.Items, item...)
+	}
 
 	for _, item := range response.Items {
 		response.CreditAmount += item.CreditAmount
@@ -963,6 +970,86 @@ func buildAccountingOrderForPaymentOrder(id int, h *AccountingEntryServiceImpl) 
 				PaymentOrder: dto.DropdownSimple{
 					ID:    paymentOrder.ID,
 					Title: *paymentOrder.SAPID,
+				},
+			})
+		}
+
+	}
+
+	return response, nil
+}
+
+func buildAccountingOrderForEnforcedPayment(id int, h *AccountingEntryServiceImpl) ([]dto.AccountingOrderItemsForObligations, error) {
+	response := []dto.AccountingOrderItemsForObligations{}
+
+	enforcedPayment, err := h.enforcedPaymentRepo.Get(id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	model, _, err := h.modelOfAccountingRepo.GetModelsOfAccountingList(dto.ModelsOfAccountingFilterDTO{
+		Type: &data.TypeEnforcedPayment,
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	//ako ne postoji u bazi odgovarajuci model za taj tip obaveze/naloga vraca se invalid input
+	if len(model) != 1 {
+		return nil, errors.ErrInvalidInput
+	}
+
+	for _, modelItem := range model[0].Items {
+		switch modelItem.Title {
+		case data.SupplierTitle:
+			response = append(response, dto.AccountingOrderItemsForObligations{
+				AccountID:   modelItem.DebitAccountID,
+				DebitAmount: float32(enforcedPayment.Amount),
+				Title:       string(modelItem.Title),
+				Type:        data.TypeEnforcedPayment,
+				EnforcedPayment: dto.DropdownSimple{
+					ID:    enforcedPayment.ID,
+					Title: *enforcedPayment.SAPID,
+				},
+				SupplierID: enforcedPayment.SupplierID,
+			})
+		case data.ProcessCostTitle:
+			if enforcedPayment.AmountForAgent > 0 {
+				response = append(response, dto.AccountingOrderItemsForObligations{
+					AccountID:   modelItem.DebitAccountID,
+					DebitAmount: float32(enforcedPayment.AmountForAgent),
+					Title:       string(modelItem.Title),
+					Type:        data.TypeEnforcedPayment,
+					EnforcedPayment: dto.DropdownSimple{
+						ID:    enforcedPayment.ID,
+						Title: *enforcedPayment.SAPID,
+					},
+				})
+			}
+		case data.LawyerCostTitle:
+			if enforcedPayment.AmountForLawyer > 0 {
+				response = append(response, dto.AccountingOrderItemsForObligations{
+					AccountID:   modelItem.DebitAccountID,
+					DebitAmount: float32(enforcedPayment.AmountForLawyer),
+					Title:       string(modelItem.Title),
+					Type:        data.TypeEnforcedPayment,
+					EnforcedPayment: dto.DropdownSimple{
+						ID:    enforcedPayment.ID,
+						Title: *enforcedPayment.SAPID,
+					},
+				})
+			}
+		case data.EnforcedPaymentTitle:
+			response = append(response, dto.AccountingOrderItemsForObligations{
+				AccountID:    modelItem.CreditAccountID,
+				CreditAmount: float32(enforcedPayment.Amount + enforcedPayment.AmountForAgent + enforcedPayment.AmountForLawyer),
+				Title:        string(modelItem.Title),
+				Type:         data.TypeEnforcedPayment,
+				EnforcedPayment: dto.DropdownSimple{
+					ID:    enforcedPayment.ID,
+					Title: *enforcedPayment.SAPID,
 				},
 			})
 		}

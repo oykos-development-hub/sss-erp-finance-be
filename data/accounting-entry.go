@@ -15,6 +15,9 @@ var (
 	SubTaxTitle          AccountingOrderItemsTitle = "Prirez"
 	CostTitle            AccountingOrderItemsTitle = "Izdatak"
 	AllocatedAmountTitle AccountingOrderItemsTitle = "Rezervisana sredstva"
+	ProcessCostTitle     AccountingOrderItemsTitle = "Trošak izvršenja"
+	LawyerCostTitle      AccountingOrderItemsTitle = "Trošak advokata"
+	EnforcedPaymentTitle AccountingOrderItemsTitle = "Prinudna naplata"
 )
 
 type AccountingEntry struct {

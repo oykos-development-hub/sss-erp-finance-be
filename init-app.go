@@ -168,39 +168,34 @@ func initApplication() *celeritas.Celeritas {
 	ModelOfAccountingItemService := services.NewModelOfAccountingItemServiceImpl(cel, models.ModelOfAccountingItem)
 	ModelOfAccountingItemHandler := handlers.NewModelOfAccountingItemHandler(cel, ModelOfAccountingItemService)
 
-	AccountingEntryService := services.NewAccountingEntryServiceImpl(cel, models.AccountingEntry, models.Invoice, models.Article, models.AdditionalExpense, models.Salary, models.SalaryAdditionalExpense, ModelsOfAccountingService, models.AccountingEntryItem, models.PaymentOrder)
+	AccountingEntryService := services.NewAccountingEntryServiceImpl(cel, models.AccountingEntry, models.Invoice, models.Article, models.AdditionalExpense, models.Salary, models.SalaryAdditionalExpense, ModelsOfAccountingService, models.AccountingEntryItem, models.PaymentOrder, models.EnforcedPayment)
 	AccountingEntryHandler := handlers.NewAccountingEntryHandler(cel, AccountingEntryService)
 
 	AccountingEntryItemService := services.NewAccountingEntryItemServiceImpl(cel, models.AccountingEntryItem)
 	AccountingEntryItemHandler := handlers.NewAccountingEntryItemHandler(cel, AccountingEntryItemService)
 
 	myHandlers := &handlers.Handlers{
-		InvoiceHandler: InvoiceHandler,
-		ArticleHandler: ArticleHandler,
-
-		BudgetHandler:                 BudgetHandler,
-		FinancialBudgetHandler:        FinancialBudgetHandler,
-		FinancialBudgetLimitHandler:   FinancialBudgetLimitHandler,
-		NonFinancialBudgetHandler:     NonFinancialBudgetHandler,
-		NonFinancialBudgetGoalHandler: NonFinancialBudgetGoalHandler,
-		ProgramHandler:                ProgramHandler,
-		ActivityHandler:               ActivityHandler,
-		GoalIndicatorHandler:          GoalIndicatorHandler,
-		FilledFinancialBudgetHandler:  FilledFinancialBudgetHandler,
-		BudgetRequestHandler:          BudgetRequestHandler,
-
-		FeeHandler:        FeeHandler,
-		FeePaymentHandler: FeePaymentHandler,
-
-		FineHandler:        FineHandler,
-		FinePaymentHandler: FinePaymentHandler,
-
-		ProcedureCostHandler:        ProcedureCostHandler,
-		ProcedureCostPaymentHandler: ProcedureCostPaymentHandler,
-		FlatRateHandler:             FlatRateHandler,
-		FlatRatePaymentHandler:      FlatRatePaymentHandler,
-		AdditionalExpenseHandler:    AdditionalExpenseHandler,
-
+		InvoiceHandler:                  InvoiceHandler,
+		ArticleHandler:                  ArticleHandler,
+		BudgetHandler:                   BudgetHandler,
+		FinancialBudgetHandler:          FinancialBudgetHandler,
+		FinancialBudgetLimitHandler:     FinancialBudgetLimitHandler,
+		NonFinancialBudgetHandler:       NonFinancialBudgetHandler,
+		NonFinancialBudgetGoalHandler:   NonFinancialBudgetGoalHandler,
+		ProgramHandler:                  ProgramHandler,
+		ActivityHandler:                 ActivityHandler,
+		GoalIndicatorHandler:            GoalIndicatorHandler,
+		FilledFinancialBudgetHandler:    FilledFinancialBudgetHandler,
+		BudgetRequestHandler:            BudgetRequestHandler,
+		FeeHandler:                      FeeHandler,
+		FeePaymentHandler:               FeePaymentHandler,
+		FineHandler:                     FineHandler,
+		FinePaymentHandler:              FinePaymentHandler,
+		ProcedureCostHandler:            ProcedureCostHandler,
+		ProcedureCostPaymentHandler:     ProcedureCostPaymentHandler,
+		FlatRateHandler:                 FlatRateHandler,
+		FlatRatePaymentHandler:          FlatRatePaymentHandler,
+		AdditionalExpenseHandler:        AdditionalExpenseHandler,
 		PropBenConfHandler:              PropBenConfHandler,
 		PropBenConfPaymentHandler:       PropBenConfPaymentHandler,
 		TaxAuthorityCodebookHandler:     TaxAuthorityCodebookHandler,
