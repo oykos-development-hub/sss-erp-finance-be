@@ -404,6 +404,35 @@ func (h *AccountingEntryServiceImpl) GetPaymentOrdersForAccounting(filter dto.Ge
 	return response, total, nil
 }
 
+func (h *AccountingEntryServiceImpl) GetEnforcedPaymentsForAccounting(filter dto.GetObligationsFilterDTO) ([]dto.PaymentOrdersForAccounting, *uint64, error) {
+
+	dataFilter := data.ObligationsFilter{
+		Page:               filter.Page,
+		Size:               filter.Size,
+		OrganizationUnitID: filter.OrganizationUnitID,
+	}
+
+	items, total, err := h.repo.GetEnforcedPaymentsForAccounting(dataFilter)
+
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var response []dto.PaymentOrdersForAccounting
+	for _, item := range items {
+		response = append(response, dto.PaymentOrdersForAccounting{
+			PaymentOrderID: item.PaymentOrderID,
+			Title:          item.Title,
+			Price:          item.Price,
+			SupplierID:     item.SupplierID,
+			Date:           item.Date,
+			CreatedAt:      item.CreatedAt,
+		})
+	}
+
+	return response, total, nil
+}
+
 func (h *AccountingEntryServiceImpl) BuildAccountingOrderForObligations(orderData dto.AccountingOrderForObligationsData) (*dto.AccountingOrderForObligations, error) {
 
 	response := dto.AccountingOrderForObligations{}

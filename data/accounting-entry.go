@@ -256,3 +256,34 @@ func (t *AccountingEntry) GetPaymentOrdersForAccounting(filter ObligationsFilter
 
 	return items, &total, nil
 }
+
+func (t *AccountingEntry) GetEnforcedPaymentsForAccounting(filter ObligationsFilter) ([]PaymentOrdersForAccounting, *uint64, error) {
+	var items []PaymentOrdersForAccounting
+
+	query := `select id, supplier_id, sap_id, date_of_sap, amount
+			  from enforced_payments 
+			  where registred = false 
+			  and organization_unit_id = $1;`
+
+	rows, err := Upper.SQL().Query(query, filter.OrganizationUnitID)
+
+	if err != nil {
+		return nil, nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var paymentOrder PaymentOrdersForAccounting
+		err = rows.Scan(&paymentOrder.PaymentOrderID, &paymentOrder.SupplierID, &paymentOrder.Title, &paymentOrder.Date, &paymentOrder.Price)
+
+		if err != nil {
+			return nil, nil, err
+		}
+
+		items = append(items, paymentOrder)
+	}
+
+	total := uint64(len(items))
+
+	return items, &total, nil
+}

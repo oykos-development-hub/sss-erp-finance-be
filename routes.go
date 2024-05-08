@@ -265,6 +265,7 @@ func routes(app *celeritas.Celeritas, middleware *middleware.Middleware, handler
 
 		rt.Get("/get-obligations-for-accounting", handlers.AccountingEntryHandler.GetObligationsForAccounting)
 		rt.Get("/get-payment-orders-for-accounting", handlers.AccountingEntryHandler.GetPaymentOrdersForAccounting)
+		rt.Get("/get-enforced-payments-for-accounting", handlers.AccountingEntryHandler.GetEnforcedPaymentsForAccounting)
 		rt.Get("/build-accounting-order-for-obligations", handlers.AccountingEntryHandler.BuildAccountingOrderForObligations)
 
 		rt.Post("/models-of-accountings", handlers.ModelsOfAccountingHandler.CreateModelsOfAccounting)
