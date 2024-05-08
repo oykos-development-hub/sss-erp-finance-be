@@ -178,6 +178,26 @@ func (h *accountingentryHandlerImpl) GetEnforcedPaymentsForAccounting(w http.Res
 	_ = h.App.WriteDataResponseWithTotal(w, http.StatusOK, "", res, int(*total))
 }
 
+func (h *accountingentryHandlerImpl) GetReturnedEnforcedPaymentsForAccounting(w http.ResponseWriter, r *http.Request) {
+	var filter dto.GetObligationsFilterDTO
+
+	_ = h.App.ReadJSON(w, r, &filter)
+
+	validator := h.App.Validator().ValidateStruct(&filter)
+	if !validator.Valid() {
+		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
+		return
+	}
+
+	res, total, err := h.service.GetReturnedEnforcedPaymentsForAccounting(filter)
+	if err != nil {
+		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
+		return
+	}
+
+	_ = h.App.WriteDataResponseWithTotal(w, http.StatusOK, "", res, int(*total))
+}
+
 func (h *accountingentryHandlerImpl) BuildAccountingOrderForObligations(w http.ResponseWriter, r *http.Request) {
 	var data dto.AccountingOrderForObligationsData
 

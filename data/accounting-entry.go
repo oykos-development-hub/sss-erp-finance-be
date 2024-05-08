@@ -298,3 +298,36 @@ func (t *AccountingEntry) GetEnforcedPaymentsForAccounting(filter ObligationsFil
 
 	return items, &total, nil
 }
+
+func (t *AccountingEntry) GetReturnedEnforcedPaymentsForAccounting(filter ObligationsFilter) ([]PaymentOrdersForAccounting, *uint64, error) {
+	var items []PaymentOrdersForAccounting
+
+	query := `select id, supplier_id, sap_id, date_of_sap, amount
+			  from enforced_payments 
+			  where registred_return = false 
+			  and return_date is not null and return_date <> '0001-01-01' 
+			  and return_file_id is not null and return_file_id <> 0 
+			  and organization_unit_id = $1 and (COALESCE($2, '') = '' OR sap_id LIKE '%' || $2 || '%');`
+
+	rows, err := Upper.SQL().Query(query, filter.OrganizationUnitID, filter.Search)
+
+	if err != nil {
+		return nil, nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var paymentOrder PaymentOrdersForAccounting
+		err = rows.Scan(&paymentOrder.PaymentOrderID, &paymentOrder.SupplierID, &paymentOrder.Title, &paymentOrder.Date, &paymentOrder.Price)
+
+		if err != nil {
+			return nil, nil, err
+		}
+
+		items = append(items, paymentOrder)
+	}
+
+	total := uint64(len(items))
+
+	return items, &total, nil
+}

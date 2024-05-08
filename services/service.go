@@ -363,6 +363,7 @@ type AccountingEntryService interface {
 	GetObligationsForAccounting(filter dto.GetObligationsFilterDTO) ([]dto.ObligationForAccounting, *uint64, error)
 	GetPaymentOrdersForAccounting(filter dto.GetObligationsFilterDTO) ([]dto.PaymentOrdersForAccounting, *uint64, error)
 	GetEnforcedPaymentsForAccounting(filter dto.GetObligationsFilterDTO) ([]dto.PaymentOrdersForAccounting, *uint64, error)
+	GetReturnedEnforcedPaymentsForAccounting(filter dto.GetObligationsFilterDTO) ([]dto.PaymentOrdersForAccounting, *uint64, error)
 	BuildAccountingOrderForObligations(data dto.AccountingOrderForObligationsData) (*dto.AccountingOrderForObligations, error)
 }
 

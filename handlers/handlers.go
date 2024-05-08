@@ -384,6 +384,7 @@ type AccountingEntryHandler interface {
 	GetObligationsForAccounting(w http.ResponseWriter, r *http.Request)
 	GetPaymentOrdersForAccounting(w http.ResponseWriter, r *http.Request)
 	GetEnforcedPaymentsForAccounting(w http.ResponseWriter, r *http.Request)
+	GetReturnedEnforcedPaymentsForAccounting(w http.ResponseWriter, r *http.Request)
 	BuildAccountingOrderForObligations(w http.ResponseWriter, r *http.Request)
 }
 
