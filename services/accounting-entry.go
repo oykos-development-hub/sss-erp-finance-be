@@ -51,6 +51,8 @@ func (h *AccountingEntryServiceImpl) CreateAccountingEntry(input dto.AccountingE
 				dataToInsert.Type = data.TypeObligations
 			} else if input.Items[0].PaymentOrderID != nil && *input.Items[0].PaymentOrderID != 0 {
 				dataToInsert.Type = data.TypePaymentOrder
+			} else if input.Items[0].EnforcedPaymentID != nil && *input.Items[0].EnforcedPaymentID != 0 {
+				dataToInsert.Type = data.TypeEnforcedPayment
 			}
 		}
 
@@ -111,6 +113,20 @@ func (h *AccountingEntryServiceImpl) CreateAccountingEntry(input dto.AccountingE
 				paymentOrder.Registred = &boolTrue
 
 				err = h.paymentOrderRepo.Update(tx, *paymentOrder)
+
+				if err != nil {
+					return err
+				}
+			} else if item.Title == string(data.LawyerCostTitle) && item.EnforcedPaymentID != nil && *item.EnforcedPaymentID != 0 {
+				enforcedPayment, err := h.enforcedPaymentRepo.Get(*item.EnforcedPaymentID)
+
+				if err != nil {
+					return err
+				}
+
+				enforcedPayment.Registred = &boolTrue
+
+				err = h.enforcedPaymentRepo.Update(tx, *enforcedPayment)
 
 				if err != nil {
 					return err
@@ -210,6 +226,20 @@ func (h *AccountingEntryServiceImpl) DeleteAccountingEntry(id int) error {
 				paymentOrder.Registred = &boolFalse
 
 				err = h.paymentOrderRepo.Update(tx, *paymentOrder)
+
+				if err != nil {
+					return err
+				}
+			} else if item.Title == string(data.LawyerCostTitle) && item.EnforcedPaymentID != nil && *item.EnforcedPaymentID != 0 {
+				enforcedPayment, err := h.enforcedPaymentRepo.Get(*item.EnforcedPaymentID)
+
+				if err != nil {
+					return err
+				}
+
+				enforcedPayment.Registred = &boolFalse
+
+				err = h.enforcedPaymentRepo.Update(tx, *enforcedPayment)
 
 				if err != nil {
 					return err
