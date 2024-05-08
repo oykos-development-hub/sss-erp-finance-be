@@ -260,7 +260,7 @@ func (t *AccountingEntry) GetPaymentOrdersForAccounting(filter ObligationsFilter
 func (t *AccountingEntry) GetEnforcedPaymentsForAccounting(filter ObligationsFilter) ([]PaymentOrdersForAccounting, *uint64, error) {
 	var items []PaymentOrdersForAccounting
 
-	query := `select id, supplier_id, sap_id, date_of_sap, amount
+	query := `select id, supplier_id, sap_id, date_of_sap, amount + amount_for_lawyer + amount_for_agent
 			  from enforced_payments 
 			  where registred = false 
 			  and organization_unit_id = $1;`
