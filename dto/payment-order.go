@@ -74,6 +74,7 @@ type GetObligationsFilterDTO struct {
 	OrganizationUnitID int                     `json:"organization_unit_id"`
 	SupplierID         int                     `json:"supplier_id"`
 	Type               *data.TypesOfObligation `json:"type"`
+	Search             *string                 `json:"search"`
 }
 
 func (dto PaymentOrderDTO) ToPaymentOrder() *data.PaymentOrder {

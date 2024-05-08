@@ -144,41 +144,47 @@ func (t *AccountingEntry) GetObligationsForAccounting(filter ObligationsFilter) 
 						left join articles a on a.invoice_id = i.id
 						where 
 						i.organization_unit_id = $1 and i.type = $2 and i.registred = false 
+						and (COALESCE($3, '') = '' OR i.invoice_number like %$3%)
 						group by i.id;`
 
 	queryForAdditionalExpenses := `select i.id, sum(a.price), i.type, i.invoice_number, i.supplier_id, i.date_of_invoice
 	                               from additional_expenses a
 	                               left join invoices i on a.invoice_id = i.id
 	                               where a.invoice_id = i.id and
-	                               i.organization_unit_id = $1 and i.registred = false
+	                               i.organization_unit_id = $1 and i.registred = false 
+								   and (COALESCE($2, '') = '' OR i.type = $2)
+								   and (COALESCE($3, '') = '' OR i.invoice_number like %$3%)
 	                               group by i.id, i.invoice_number order by i.id;`
 
 	queryForSalaryAdditionalExpenses := `select s.id, sum(a.amount), s.month, s.date_of_calculation
 	                                     from salary_additional_expenses a
 	                                     left join salaries s on s.id = a.salary_id
 	                                     where s.organization_unit_id = $1 and s.registred = false
+										 and (COALESCE($2, '') = '' OR s.month like %$2%)
 	                                     group by s.id, s.month order by s.id;`
 
-	rows, err := Upper.SQL().Query(queryForInvoices, filter.OrganizationUnitID, TypeInvoice)
-	if err != nil {
-		return nil, nil, err
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var obligation ObligationForAccounting
-		err = rows.Scan(&obligation.InvoiceID, &obligation.Price, &obligation.Title, &obligation.SupplierID, &obligation.Date)
-
+	if filter.Type == nil || *filter.Type == TypeInvoice {
+		rows, err := Upper.SQL().Query(queryForInvoices, filter.OrganizationUnitID, TypeInvoice, filter.Search)
 		if err != nil {
 			return nil, nil, err
 		}
+		defer rows.Close()
 
-		obligation.Type = TypeInvoice
-		obligation.Title = "Račun broj " + obligation.Title
-		items = append(items, obligation)
+		for rows.Next() {
+			var obligation ObligationForAccounting
+			err = rows.Scan(&obligation.InvoiceID, &obligation.Price, &obligation.Title, &obligation.SupplierID, &obligation.Date)
+
+			if err != nil {
+				return nil, nil, err
+			}
+
+			obligation.Type = TypeInvoice
+			obligation.Title = "Račun broj " + obligation.Title
+			items = append(items, obligation)
+		}
 	}
 
-	rows, err = Upper.SQL().Query(queryForAdditionalExpenses, filter.OrganizationUnitID)
+	rows, err := Upper.SQL().Query(queryForAdditionalExpenses, filter.OrganizationUnitID, filter.Type, filter.Search)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -203,25 +209,27 @@ func (t *AccountingEntry) GetObligationsForAccounting(filter ObligationsFilter) 
 		}
 	}
 
-	rows, err = Upper.SQL().Query(queryForSalaryAdditionalExpenses, filter.OrganizationUnitID)
-	if err != nil {
-		return nil, nil, err
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var obligation ObligationForAccounting
-		err = rows.Scan(&obligation.SalaryID, &obligation.Price, &obligation.Title, &obligation.Date)
-
+	if filter.Type == nil || *filter.Type == TypeSalary {
+		rows, err = Upper.SQL().Query(queryForSalaryAdditionalExpenses, filter.OrganizationUnitID, filter.Search)
 		if err != nil {
 			return nil, nil, err
 		}
+		defer rows.Close()
 
-		obligation.Title = "Zarada " + obligation.Title
-		obligation.Type = TypeSalary
+		for rows.Next() {
+			var obligation ObligationForAccounting
+			err = rows.Scan(&obligation.SalaryID, &obligation.Price, &obligation.Title, &obligation.Date)
 
-		items = append(items, obligation)
+			if err != nil {
+				return nil, nil, err
+			}
 
+			obligation.Title = "Zarada " + obligation.Title
+			obligation.Type = TypeSalary
+
+			items = append(items, obligation)
+
+		}
 	}
 
 	total := uint64(len(items))
@@ -235,7 +243,7 @@ func (t *AccountingEntry) GetPaymentOrdersForAccounting(filter ObligationsFilter
 	query := `select id, supplier_id, sap_id, date_of_sap, amount
 			  from payment_orders 
 			  where registred = false and sap_id is not null and date_of_sap is not null and sap_id <> '' and date_of_sap <> '0001-01-01'
-			  and organization_unit_id = $1;`
+			  and organization_unit_id = $1 and ;`
 
 	rows, err := Upper.SQL().Query(query, filter.OrganizationUnitID)
 

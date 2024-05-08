@@ -381,6 +381,8 @@ func (h *AccountingEntryServiceImpl) GetObligationsForAccounting(filter dto.GetO
 		Page:               filter.Page,
 		Size:               filter.Size,
 		OrganizationUnitID: filter.OrganizationUnitID,
+		Type:               filter.Type,
+		Search:             filter.Search,
 	}
 
 	items, total, err := h.repo.GetObligationsForAccounting(dataFilter)
@@ -413,6 +415,7 @@ func (h *AccountingEntryServiceImpl) GetPaymentOrdersForAccounting(filter dto.Ge
 		Page:               filter.Page,
 		Size:               filter.Size,
 		OrganizationUnitID: filter.OrganizationUnitID,
+		Search:             filter.Search,
 	}
 
 	items, total, err := h.repo.GetPaymentOrdersForAccounting(dataFilter)
@@ -442,6 +445,7 @@ func (h *AccountingEntryServiceImpl) GetEnforcedPaymentsForAccounting(filter dto
 		Page:               filter.Page,
 		Size:               filter.Size,
 		OrganizationUnitID: filter.OrganizationUnitID,
+		Search:             filter.Search,
 	}
 
 	items, total, err := h.repo.GetEnforcedPaymentsForAccounting(dataFilter)
