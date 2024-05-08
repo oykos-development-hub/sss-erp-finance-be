@@ -268,10 +268,12 @@ func updateInvoiceStatusForEnforcedPayment(id int, amount float64, lenOfArray in
 	}
 
 	for _, item := range additionalExpenses {
-		item.Status = data.InvoiceStatusFull
-		err = h.additionalExpensesRepo.Update(tx, *item)
-		if err != nil {
-			return err
+		if item.Title == "Neto" {
+			item.Status = data.InvoiceStatusFull
+			err = h.additionalExpensesRepo.Update(tx, *item)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
