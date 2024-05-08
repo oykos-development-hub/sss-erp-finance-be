@@ -144,7 +144,7 @@ func (t *AccountingEntry) GetObligationsForAccounting(filter ObligationsFilter) 
 						left join articles a on a.invoice_id = i.id
 						where 
 						i.organization_unit_id = $1 and i.type = $2 and i.registred = false 
-						and (COALESCE($3, '') = '' OR i.invoice_number like %$3%)
+						and (COALESCE($3, '') = '' OR i.invoice_number LIKE '%' || $3 || '%')
 						group by i.id;`
 
 	queryForAdditionalExpenses := `select i.id, sum(a.price), i.type, i.invoice_number, i.supplier_id, i.date_of_invoice
@@ -153,14 +153,14 @@ func (t *AccountingEntry) GetObligationsForAccounting(filter ObligationsFilter) 
 	                               where a.invoice_id = i.id and
 	                               i.organization_unit_id = $1 and i.registred = false 
 								   and (COALESCE($2, '') = '' OR i.type = $2)
-								   and (COALESCE($3, '') = '' OR i.invoice_number like %$3%)
+								   and (COALESCE($3, '') = '' OR i.invoice_number LIKE '%' || $3 || '%')
 	                               group by i.id, i.invoice_number order by i.id;`
 
 	queryForSalaryAdditionalExpenses := `select s.id, sum(a.amount), s.month, s.date_of_calculation
 	                                     from salary_additional_expenses a
 	                                     left join salaries s on s.id = a.salary_id
 	                                     where s.organization_unit_id = $1 and s.registred = false
-										 and (COALESCE($2, '') = '' OR s.month like %$2%)
+										 and (COALESCE($2, '') = '' OR s.month LIKE '%' || $2 || '%')
 	                                     group by s.id, s.month order by s.id;`
 
 	if filter.Type == nil || *filter.Type == TypeInvoice {
@@ -243,7 +243,7 @@ func (t *AccountingEntry) GetPaymentOrdersForAccounting(filter ObligationsFilter
 	query := `select id, supplier_id, sap_id, date_of_sap, amount
 			  from payment_orders 
 			  where registred = false and sap_id is not null and date_of_sap is not null and sap_id <> '' and date_of_sap <> '0001-01-01'
-			  and organization_unit_id = $1 and (COALESCE($2, '') = '' OR sap_id like %$2%);`
+			  and organization_unit_id = $1 and (COALESCE($2, '') = '' OR sap_id LIKE '%' || $2 || '%');`
 
 	rows, err := Upper.SQL().Query(query, filter.OrganizationUnitID, filter.Search)
 
@@ -274,7 +274,7 @@ func (t *AccountingEntry) GetEnforcedPaymentsForAccounting(filter ObligationsFil
 	query := `select id, supplier_id, sap_id, date_of_sap, amount + amount_for_lawyer + amount_for_agent
 			  from enforced_payments 
 			  where registred = false 
-			  and organization_unit_id = $1 and (COALESCE($2, '') = '' OR sap_id like %$2%);`
+			  and organization_unit_id = $1 and (COALESCE($2, '') = '' OR sap_id LIKE '%' || $2 || '%');`
 
 	rows, err := Upper.SQL().Query(query, filter.OrganizationUnitID, filter.Search)
 
