@@ -25,6 +25,7 @@ type EnforcedPayment struct {
 	SAPID              *string               `db:"sap_id"`
 	Status             EnforcedPaymentStatus `db:"status"`
 	Registred          *bool                 `db:"registred,omitempty"`
+	RegistredReturn    *bool                 `db:"registred_return,omitempty"`
 	DateOfSAP          *time.Time            `db:"date_of_sap"`
 	FileID             *int                  `db:"file_id"`
 	ReturnFileID       *int                  `db:"return_file_id"`

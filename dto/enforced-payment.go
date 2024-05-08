@@ -15,6 +15,7 @@ type EnforcedPaymentDTO struct {
 	IDOfStatement      *string                    `json:"id_of_statement"`
 	SAPID              *string                    `json:"sap_id"`
 	Registred          *bool                      `json:"registred"`
+	RegistredReturn    *bool                      `json:"registred_return"`
 	Status             data.EnforcedPaymentStatus `json:"status"`
 	ReturnFileID       *int                       `json:"return_file_id"`
 	Description        string                     `json:"description"`
@@ -39,6 +40,7 @@ type EnforcedPaymentResponseDTO struct {
 	Description        string                           `json:"description"`
 	Status             data.EnforcedPaymentStatus       `json:"status"`
 	Registred          *bool                            `json:"registred"`
+	RegistredReturn    *bool                            `json:"registred_return"`
 	ReturnFileID       *int                             `json:"return_file_id"`
 	DateOfSAP          *time.Time                       `json:"date_of_sap"`
 	ReturnDate         *time.Time                       `json:"return_date"`
@@ -75,6 +77,7 @@ func (dto EnforcedPaymentDTO) ToEnforcedPayment() *data.EnforcedPayment {
 		DateOfSAP:          dto.DateOfSAP,
 		FileID:             dto.FileID,
 		Registred:          dto.Registred,
+		RegistredReturn:    dto.RegistredReturn,
 		Description:        dto.Description,
 		Amount:             dto.Amount,
 		AmountForLawyer:    dto.AmountForLawyer,
@@ -95,6 +98,7 @@ func ToEnforcedPaymentResponseDTO(data data.EnforcedPayment) EnforcedPaymentResp
 		IDOfStatement:      data.IDOfStatement,
 		SAPID:              data.SAPID,
 		Registred:          data.Registred,
+		RegistredReturn:    data.RegistredReturn,
 		DateOfOrder:        data.DateOfOrder,
 		DateOfSAP:          data.DateOfSAP,
 		FileID:             data.FileID,

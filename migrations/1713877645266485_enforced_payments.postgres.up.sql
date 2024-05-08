@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS enforced_payments (
     amount_for_lawyer FLOAT,
     amount_for_agent FLOAT,
     registred BOOLEAN default false,
+    registred_return BOOLEAN default false,
     return_date TIMESTAMP,
     return_file_id INTEGER,
     status TEXT,
