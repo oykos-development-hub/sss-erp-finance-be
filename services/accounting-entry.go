@@ -1186,10 +1186,14 @@ func buildBookedItemForSalary(item *data.SalaryAdditionalExpense, models []dto.M
 
 	for _, model := range models {
 		if string(model.Title) == string(title) {
+			title := model.Title
+			if model.Title == data.SubTaxTitle {
+				title = title + " - " + item.Title
+			}
 			response := dto.AccountingOrderItemsForObligations{
 				AccountID:    model.CreditAccountID,
 				CreditAmount: float32(item.Amount),
-				Title:        model.Title + " " + item.Title,
+				Title:        title,
 				Type:         data.TypeSalary,
 			}
 			return &response
@@ -1206,7 +1210,7 @@ func buildBookedItemForSalaryForBanks(item *data.SalaryAdditionalExpense, models
 			response := dto.AccountingOrderItemsForObligations{
 				AccountID:    model.CreditAccountID,
 				CreditAmount: float32(item.Amount),
-				Title:        item.Title,
+				Title:        model.Title + " - " + item.Title,
 				Type:         data.TypeSalary,
 				SupplierID:   item.SubjectID,
 			}
