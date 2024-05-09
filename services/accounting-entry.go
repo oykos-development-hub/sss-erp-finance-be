@@ -668,6 +668,7 @@ func buildAccountingOrderForDecisions(id int, h *AccountingEntryServiceImpl) ([]
 	var contributionForUnemploymentEmployee float64
 	var contributionForUnemploymentEmployer float64
 	var contributionForLaborFund float64
+
 	for _, item := range additionalExpenses {
 		price += float64(item.Price)
 		switch item.Title {
@@ -884,6 +885,7 @@ func buildAccountingOrderForContracts(id int, h *AccountingEntryServiceImpl) ([]
 	var contributionForUnemploymentEmployee float64
 	var contributionForUnemploymentEmployer float64
 	var contributionForLaborFund float64
+
 	for _, item := range additionalExpenses {
 		price += float64(item.Price)
 		switch item.Title {
@@ -1158,10 +1160,20 @@ func buildAccountingOrderForSalaries(id int, h *AccountingEntryServiceImpl) ([]d
 
 			response = append(newSlice, response...)
 
-		} else if model.Title == data.TaxTitle {
+		}
+
+		if model.Title == data.TaxTitle {
 			if taxPrice > 0 {
-				bookedItem := buildBookedItemForSalary(&data.SalaryAdditionalExpense{Amount: taxPrice}, models[0].Items, "Porez")
-				response = append(response, *bookedItem)
+				bookedItem := buildBookedItemForSalary(&data.SalaryAdditionalExpense{Amount: taxPrice}, models[0].Items, data.TaxTitle)
+
+				index := 0
+				if len(response) > 0 {
+					if response[0].Title == data.MainBillTitle {
+						index++
+					}
+				}
+
+				response = append(response[:index], append([]dto.AccountingOrderItemsForObligations{*bookedItem}, response[index:]...)...)
 			}
 		}
 
