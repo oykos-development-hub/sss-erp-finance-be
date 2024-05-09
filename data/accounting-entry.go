@@ -13,6 +13,8 @@ var (
 	SupplierTitle                           AccountingOrderItemsTitle = "Dobavljač"
 	TaxTitle                                AccountingOrderItemsTitle = "Porez"
 	SubTaxTitle                             AccountingOrderItemsTitle = "Prirez"
+	BankTitle                               AccountingOrderItemsTitle = "Banka"
+	SuspensionsTitle                        AccountingOrderItemsTitle = "Obustave"
 	PIOContributionsTitle                   AccountingOrderItemsTitle = "Doprinos za PIO"
 	UnemployementContributionsTitle         AccountingOrderItemsTitle = "Doprinos za nezaposlenost"
 	PIOEmployeeContributionsTitle           AccountingOrderItemsTitle = "Doprinos za PIO (zaposleni)"

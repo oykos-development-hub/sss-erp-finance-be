@@ -1125,13 +1125,13 @@ func buildAccountingOrderForSalaries(id int, h *AccountingEntryServiceImpl) ([]d
 		case data.SalaryAdditionalExpenseType(data.TaxesSalaryExpenseType):
 			taxPrice += item.Amount
 		case data.SalaryAdditionalExpenseType(data.SubTaxesSalaryExpenseType):
-			bookedItem = buildBookedItemForSalary(item, models[0].Items, "Prirez")
+			bookedItem = buildBookedItemForSalary(item, models[0].Items, data.SubTaxTitle)
 		case data.SalaryAdditionalExpenseType(data.BanksSalaryExpenseType):
-			bookedItem = buildBookedItemForSalaryForBanks(item, models[0].Items, "Banka")
+			bookedItem = buildBookedItemForSalaryForBanks(item, models[0].Items, data.BankTitle)
 		case data.SalaryAdditionalExpenseType(data.SuspensionsSalaryExpenseType):
-			bookedItem = buildBookedItemForSalaryForBanks(item, models[0].Items, "Obustave")
+			bookedItem = buildBookedItemForSalaryForBanks(item, models[0].Items, data.SuspensionsTitle)
 		}
-		if bookedItem != nil {
+		if bookedItem != nil && bookedItem.Title != "" {
 			bookedItem.Salary = dto.DropdownSimple{
 				ID:    salary.ID,
 				Title: salary.Month,
@@ -1187,10 +1187,10 @@ func buildBookedItemForSalary(item *data.SalaryAdditionalExpense, models []dto.M
 	return nil
 }
 
-func buildBookedItemForSalaryForBanks(item *data.SalaryAdditionalExpense, models []dto.ModelOfAccountingItemResponseDTO, title string) *dto.AccountingOrderItemsForObligations {
+func buildBookedItemForSalaryForBanks(item *data.SalaryAdditionalExpense, models []dto.ModelOfAccountingItemResponseDTO, title data.AccountingOrderItemsTitle) *dto.AccountingOrderItemsForObligations {
 
 	for _, model := range models {
-		if string(model.Title) == title {
+		if string(model.Title) == string(title) {
 			response := dto.AccountingOrderItemsForObligations{
 				AccountID:    model.CreditAccountID,
 				CreditAmount: float32(item.Amount),
