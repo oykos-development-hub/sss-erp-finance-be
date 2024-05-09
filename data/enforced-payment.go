@@ -101,9 +101,9 @@ func (t *EnforcedPayment) ReturnEnforcedPayment(tx up.Session, m EnforcedPayment
 	m.UpdatedAt = time.Now()
 	m.Status = EnforcedPaymentStatusStatusReturn
 
-	query := `update enforced_payments set status = $2, return_date = $3, return_file_id = $4 where id = $1`
+	query := `update enforced_payments set status = $2, return_date = $3, return_file_id = $4, return_amount = $5 where id = $1`
 
-	_, err := Upper.SQL().Query(query, m.ID, m.Status, m.ReturnDate, m.ReturnFileID)
+	_, err := Upper.SQL().Query(query, m.ID, m.Status, m.ReturnDate, m.ReturnFileID, m.ReturnAmount)
 
 	if err != nil {
 		return err
