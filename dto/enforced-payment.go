@@ -16,6 +16,7 @@ type EnforcedPaymentDTO struct {
 	SAPID              *string                    `json:"sap_id"`
 	Registred          *bool                      `json:"registred"`
 	RegistredReturn    *bool                      `json:"registred_return"`
+	ReturnAmount       *float64                   `json:"return_amount"`
 	Status             data.EnforcedPaymentStatus `json:"status"`
 	ReturnFileID       *int                       `json:"return_file_id"`
 	Description        string                     `json:"description"`
@@ -44,6 +45,7 @@ type EnforcedPaymentResponseDTO struct {
 	ReturnFileID       *int                             `json:"return_file_id"`
 	DateOfSAP          *time.Time                       `json:"date_of_sap"`
 	ReturnDate         *time.Time                       `json:"return_date"`
+	ReturnAmount       *float64                         `json:"return_amount"`
 	Items              []EnforcedPaymentItemResponseDTO `json:"items"`
 	Amount             float64                          `json:"amount"`
 	AmountForLawyer    float64                          `json:"amount_for_lawyer"`
@@ -83,6 +85,7 @@ func (dto EnforcedPaymentDTO) ToEnforcedPayment() *data.EnforcedPayment {
 		AmountForLawyer:    dto.AmountForLawyer,
 		AmountForAgent:     dto.AmountForAgent,
 		ReturnDate:         dto.ReturnDate,
+		ReturnAmount:       dto.ReturnAmount,
 		Status:             dto.Status,
 		ReturnFileID:       dto.ReturnFileID,
 	}
@@ -107,6 +110,7 @@ func ToEnforcedPaymentResponseDTO(data data.EnforcedPayment) EnforcedPaymentResp
 		AmountForLawyer:    data.AmountForLawyer,
 		AmountForAgent:     data.AmountForAgent,
 		ReturnDate:         data.ReturnDate,
+		ReturnAmount:       data.ReturnAmount,
 		Status:             data.Status,
 		ReturnFileID:       data.ReturnFileID,
 		CreatedAt:          data.CreatedAt,

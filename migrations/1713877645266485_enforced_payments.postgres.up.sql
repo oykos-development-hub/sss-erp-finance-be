@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS enforced_payments (
     registred_return BOOLEAN default false,
     return_date TIMESTAMP,
     return_file_id INTEGER,
+    return_amount FLOAT,
     status TEXT,
     created_at TIMESTAMP,
     updated_at TIMESTAMP

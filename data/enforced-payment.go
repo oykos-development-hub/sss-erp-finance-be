@@ -26,6 +26,7 @@ type EnforcedPayment struct {
 	Status             EnforcedPaymentStatus `db:"status"`
 	Registred          *bool                 `db:"registred,omitempty"`
 	RegistredReturn    *bool                 `db:"registred_return,omitempty"`
+	ReturnAmount       *float64              `db:"return_amount"`
 	DateOfSAP          *time.Time            `db:"date_of_sap"`
 	FileID             *int                  `db:"file_id"`
 	ReturnFileID       *int                  `db:"return_file_id"`
