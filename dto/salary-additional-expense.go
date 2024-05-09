@@ -8,7 +8,7 @@ import (
 
 type SalaryAdditionalExpenseDTO struct {
 	ID                 int                              `json:"id"`
-	Title              string                           `json:"title"`
+	Title              data.AccountingOrderItemsTitle   `json:"title"`
 	SalaryID           int                              `json:"salary_id"`
 	AccountID          int                              `json:"account_id"`
 	Amount             float64                          `json:"amount"`
@@ -22,7 +22,7 @@ type SalaryAdditionalExpenseDTO struct {
 
 type SalaryAdditionalExpenseResponseDTO struct {
 	ID                 int                              `json:"id"`
-	Title              string                           `json:"title"`
+	Title              data.AccountingOrderItemsTitle   `json:"title"`
 	SalaryID           int                              `json:"salary_id"`
 	AccountID          int                              `json:"account_id"`
 	Amount             float64                          `json:"amount"`

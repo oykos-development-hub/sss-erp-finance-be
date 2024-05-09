@@ -9,15 +9,33 @@ import (
 type AccountingOrderItemsTitle string
 
 var (
-	MainBillTitle        AccountingOrderItemsTitle = "Korektivni račun"
-	SupplierTitle        AccountingOrderItemsTitle = "Dobavljač"
-	TaxTitle             AccountingOrderItemsTitle = "Porez"
-	SubTaxTitle          AccountingOrderItemsTitle = "Prirez"
-	CostTitle            AccountingOrderItemsTitle = "Izdatak"
-	AllocatedAmountTitle AccountingOrderItemsTitle = "Rezervisana sredstva"
-	ProcessCostTitle     AccountingOrderItemsTitle = "Trošak izvršenja"
-	LawyerCostTitle      AccountingOrderItemsTitle = "Trošak advokata"
-	EnforcedPaymentTitle AccountingOrderItemsTitle = "Prinudna naplata"
+	MainBillTitle                           AccountingOrderItemsTitle = "Korektivni račun"
+	SupplierTitle                           AccountingOrderItemsTitle = "Dobavljač"
+	TaxTitle                                AccountingOrderItemsTitle = "Porez"
+	SubTaxTitle                             AccountingOrderItemsTitle = "Prirez"
+	PIOEmployeeContributionsTitle           AccountingOrderItemsTitle = "Doprinos za PIO (zaposleni)"
+	UnemployementEmployeeContributionsTitle AccountingOrderItemsTitle = "Doprinos za nezaposlenost (zaposleni)"
+	PIOEmployerContributionsTitle           AccountingOrderItemsTitle = "Doprinos za PIO (poslodavac)"
+	UnemployementEmployerContributionsTitle AccountingOrderItemsTitle = "Doprinos za nezaposlenost (poslodavac)"
+	LaborContributionsTitle                 AccountingOrderItemsTitle = "Doprinos za Fond rada"
+	CostTitle                               AccountingOrderItemsTitle = "Izdatak"
+	AllocatedAmountTitle                    AccountingOrderItemsTitle = "Rezervisana sredstva"
+	ProcessCostTitle                        AccountingOrderItemsTitle = "Trošak izvršenja"
+	LawyerCostTitle                         AccountingOrderItemsTitle = "Trošak advokata"
+	EnforcedPaymentTitle                    AccountingOrderItemsTitle = "Prinudna naplata"
+)
+
+type ObligationTitles string
+
+var (
+	NetTitle                                 ObligationTitles = "Neto"
+	ObligationTaxTitle                       ObligationTitles = "Porez"
+	ObligationSubTaxTitle                    ObligationTitles = "Prirez"
+	LaborFundTitle                           ObligationTitles = "Fond rada"
+	ContributionForPIOEmployeeTitle          ObligationTitles = "PIO na teret zaposlenog"
+	ContributionForPIOEmployerTitle          ObligationTitles = "PIO na teret poslodavca"
+	ContributionForUnemploymentEmployeeTitle ObligationTitles = "Nezaposlenost na teret zaposlenog"
+	ContributionForUnemploymentEmployerTitle ObligationTitles = "Nezaposlenost na teret poslodavca"
 )
 
 type AccountingEntry struct {

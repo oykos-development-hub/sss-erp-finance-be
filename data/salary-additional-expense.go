@@ -18,7 +18,7 @@ type SalaryAdditionalExpense struct {
 	OrganizationUnitID int                         `db:"organization_unit_id"`
 	DebtorID           int                         `db:"debtor_id"`
 	Type               SalaryAdditionalExpenseType `db:"type"`
-	Title              string                      `db:"title"`
+	Title              AccountingOrderItemsTitle   `db:"title"`
 	CreatedAt          time.Time                   `db:"created_at,omitempty"`
 	UpdatedAt          time.Time                   `db:"updated_at"`
 }

@@ -234,9 +234,9 @@ func (h *PaymentOrderServiceImpl) GetPaymentOrder(id int) (*dto.PaymentOrderResp
 			builtItem.Amount = item.GrossPrice
 
 			if builtItem.Type == data.TypeDecision {
-				builtItem.Title = "Rješenje broj " + item.InvoiceNumber + " " + additionalItem.Title
+				builtItem.Title = "Rješenje broj " + item.InvoiceNumber + " " + string(additionalItem.Title)
 			} else {
-				builtItem.Title = "Ugovor broj " + item.InvoiceNumber + " " + additionalItem.Title
+				builtItem.Title = "Ugovor broj " + item.InvoiceNumber + " " + string(additionalItem.Title)
 			}
 
 		} else if item.SalaryAdditionalExpenseID != nil {
@@ -254,7 +254,7 @@ func (h *PaymentOrderServiceImpl) GetPaymentOrder(id int) (*dto.PaymentOrderResp
 
 			builtItem.Type = data.TypeSalary
 			builtItem.Amount = additionalItem.Amount
-			builtItem.Title = "Zarada " + item.Month + " " + additionalItem.Title
+			builtItem.Title = "Zarada " + item.Month + " " + string(additionalItem.Title)
 
 		}
 

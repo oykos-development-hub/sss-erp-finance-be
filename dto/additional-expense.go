@@ -7,29 +7,29 @@ import (
 )
 
 type AdditionalExpenseDTO struct {
-	ID                 int                `json:"id"`
-	Title              string             `json:"title"`
-	AccountID          int                `json:"account_id"`
-	OrganizationUnitID int                `json:"organization_unit_id"`
-	Price              float32            `json:"price"`
-	SubjectID          int                `json:"subject_id"`
-	BankAccount        string             `json:"bank_account"`
-	InvoiceID          int                `json:"invoice_id"`
-	Status             data.InvoiceStatus `json:"status"`
+	ID                 int                   `json:"id"`
+	Title              data.ObligationTitles `json:"title"`
+	AccountID          int                   `json:"account_id"`
+	OrganizationUnitID int                   `json:"organization_unit_id"`
+	Price              float32               `json:"price"`
+	SubjectID          int                   `json:"subject_id"`
+	BankAccount        string                `json:"bank_account"`
+	InvoiceID          int                   `json:"invoice_id"`
+	Status             data.InvoiceStatus    `json:"status"`
 }
 
 type AdditionalExpenseResponseDTO struct {
-	ID                 int                `json:"id"`
-	Title              string             `json:"title"`
-	AccountID          int                `json:"account_id"`
-	Price              float32            `json:"price"`
-	SubjectID          int                `json:"subject_id"`
-	OrganizationUnitID int                `json:"organization_unit_id"`
-	BankAccount        string             `json:"bank_account"`
-	InvoiceID          int                `json:"invoice_id"`
-	Status             data.InvoiceStatus `json:"status"`
-	CreatedAt          time.Time          `json:"created_at"`
-	UpdatedAt          time.Time          `json:"updated_at"`
+	ID                 int                   `json:"id"`
+	Title              data.ObligationTitles `json:"title"`
+	AccountID          int                   `json:"account_id"`
+	Price              float32               `json:"price"`
+	SubjectID          int                   `json:"subject_id"`
+	OrganizationUnitID int                   `json:"organization_unit_id"`
+	BankAccount        string                `json:"bank_account"`
+	InvoiceID          int                   `json:"invoice_id"`
+	Status             data.InvoiceStatus    `json:"status"`
+	CreatedAt          time.Time             `json:"created_at"`
+	UpdatedAt          time.Time             `json:"updated_at"`
 }
 
 type AdditionalExpenseFilterDTO struct {
