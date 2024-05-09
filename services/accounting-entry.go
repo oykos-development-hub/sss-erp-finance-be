@@ -661,6 +661,8 @@ func buildAccountingOrderForDecisions(id int, h *AccountingEntryServiceImpl) ([]
 	var netPrice float64
 	var taxPrice float64
 	var subTaxPrice float64
+	var contributionForPIO float64
+	var contributionForUnemployment float64
 	var contributionForPIOEmployee float64
 	var contributionForPIOEmployer float64
 	var contributionForUnemploymentEmployee float64
@@ -675,6 +677,10 @@ func buildAccountingOrderForDecisions(id int, h *AccountingEntryServiceImpl) ([]
 			taxPrice += float64(item.Price)
 		case data.ObligationSubTaxTitle:
 			subTaxPrice += float64(item.Price)
+		case data.ContributionForPIOTitle:
+			contributionForPIO += float64(item.Price)
+		case data.ContributionForUnemploymentTitle:
+			contributionForUnemployment += float64(item.Price)
 		case data.ContributionForPIOEmployeeTitle:
 			contributionForPIOEmployee += float64(item.Price)
 		case data.ContributionForPIOEmployerTitle:
@@ -765,6 +771,32 @@ func buildAccountingOrderForDecisions(id int, h *AccountingEntryServiceImpl) ([]
 					},
 				})
 			}
+		case data.PIOContributionsTitle:
+			if contributionForPIO > 0 {
+				response = append(response, dto.AccountingOrderItemsForObligations{
+					AccountID:    modelItem.CreditAccountID,
+					CreditAmount: float32(contributionForPIO),
+					Title:        modelItem.Title,
+					Type:         data.TypeDecision,
+					Invoice: dto.DropdownSimple{
+						ID:    invoice.ID,
+						Title: invoice.InvoiceNumber,
+					},
+				})
+			}
+		case data.UnemployementContributionsTitle:
+			if contributionForUnemploymentEmployee > 0 {
+				response = append(response, dto.AccountingOrderItemsForObligations{
+					AccountID:    modelItem.CreditAccountID,
+					CreditAmount: float32(contributionForUnemployment),
+					Title:        modelItem.Title,
+					Type:         data.TypeDecision,
+					Invoice: dto.DropdownSimple{
+						ID:    invoice.ID,
+						Title: invoice.InvoiceNumber,
+					},
+				})
+			}
 		case data.PIOEmployeeContributionsTitle:
 			if contributionForPIOEmployee > 0 {
 				response = append(response, dto.AccountingOrderItemsForObligations{
@@ -845,6 +877,8 @@ func buildAccountingOrderForContracts(id int, h *AccountingEntryServiceImpl) ([]
 	var netPrice float64
 	var taxPrice float64
 	var subTaxPrice float64
+	var contributionForPIO float64
+	var contributionForUnemployment float64
 	var contributionForPIOEmployee float64
 	var contributionForPIOEmployer float64
 	var contributionForUnemploymentEmployee float64
@@ -859,6 +893,10 @@ func buildAccountingOrderForContracts(id int, h *AccountingEntryServiceImpl) ([]
 			taxPrice += float64(item.Price)
 		case data.ObligationSubTaxTitle:
 			subTaxPrice += float64(item.Price)
+		case data.ContributionForPIOTitle:
+			contributionForPIO += float64(item.Price)
+		case data.ContributionForUnemploymentTitle:
+			contributionForUnemployment += float64(item.Price)
 		case data.ContributionForPIOEmployeeTitle:
 			contributionForPIOEmployee += float64(item.Price)
 		case data.ContributionForPIOEmployerTitle:
@@ -941,6 +979,32 @@ func buildAccountingOrderForContracts(id int, h *AccountingEntryServiceImpl) ([]
 				response = append(response, dto.AccountingOrderItemsForObligations{
 					AccountID:    modelItem.CreditAccountID,
 					CreditAmount: float32(contributionForLaborFund),
+					Title:        modelItem.Title,
+					Type:         data.TypeContract,
+					Invoice: dto.DropdownSimple{
+						ID:    invoice.ID,
+						Title: invoice.InvoiceNumber,
+					},
+				})
+			}
+		case data.PIOContributionsTitle:
+			if contributionForPIO > 0 {
+				response = append(response, dto.AccountingOrderItemsForObligations{
+					AccountID:    modelItem.CreditAccountID,
+					CreditAmount: float32(contributionForPIO),
+					Title:        modelItem.Title,
+					Type:         data.TypeContract,
+					Invoice: dto.DropdownSimple{
+						ID:    invoice.ID,
+						Title: invoice.InvoiceNumber,
+					},
+				})
+			}
+		case data.UnemployementContributionsTitle:
+			if contributionForUnemploymentEmployee > 0 {
+				response = append(response, dto.AccountingOrderItemsForObligations{
+					AccountID:    modelItem.CreditAccountID,
+					CreditAmount: float32(contributionForUnemployment),
 					Title:        modelItem.Title,
 					Type:         data.TypeContract,
 					Invoice: dto.DropdownSimple{
