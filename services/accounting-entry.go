@@ -1089,7 +1089,7 @@ func buildAccountingOrderForSalaries(id int, h *AccountingEntryServiceImpl) ([]d
 		return nil, err
 	}
 
-	model, _, err := h.modelOfAccountingRepo.GetModelsOfAccountingList(dto.ModelsOfAccountingFilterDTO{
+	models, _, err := h.modelOfAccountingRepo.GetModelsOfAccountingList(dto.ModelsOfAccountingFilterDTO{
 		Type: &data.TypeSalary,
 	})
 
@@ -1098,11 +1098,12 @@ func buildAccountingOrderForSalaries(id int, h *AccountingEntryServiceImpl) ([]d
 	}
 
 	//ako ne postoji u bazi odgovarajuci model za taj tip obaveze/naloga vraca se invalid input
-	if len(model) != 1 {
+	if len(models) != 1 {
 		return nil, errors.ErrInvalidInput
 	}
 
 	var price float64
+	var taxPrice float64
 
 	for _, item := range additionalExpenses {
 		price += float64(item.Amount)
@@ -1111,24 +1112,24 @@ func buildAccountingOrderForSalaries(id int, h *AccountingEntryServiceImpl) ([]d
 		case data.SalaryAdditionalExpenseType(data.ContributionsSalaryExpenseType):
 			switch item.Title {
 			case data.PIOEmployeeContributionsTitle:
-				bookedItem = buildBookedItemForSalary(item, model[0].Items, data.PIOEmployeeContributionsTitle)
+				bookedItem = buildBookedItemForSalary(item, models[0].Items, data.PIOEmployeeContributionsTitle)
 			case data.PIOEmployerContributionsTitle:
-				bookedItem = buildBookedItemForSalary(item, model[0].Items, data.PIOEmployerContributionsTitle)
+				bookedItem = buildBookedItemForSalary(item, models[0].Items, data.PIOEmployerContributionsTitle)
 			case data.UnemployementEmployeeContributionsTitle:
-				bookedItem = buildBookedItemForSalary(item, model[0].Items, data.UnemployementEmployeeContributionsTitle)
+				bookedItem = buildBookedItemForSalary(item, models[0].Items, data.UnemployementEmployeeContributionsTitle)
 			case data.UnemployementEmployerContributionsTitle:
-				bookedItem = buildBookedItemForSalary(item, model[0].Items, data.UnemployementEmployerContributionsTitle)
+				bookedItem = buildBookedItemForSalary(item, models[0].Items, data.UnemployementEmployerContributionsTitle)
 			case data.LaborContributionsTitle:
-				bookedItem = buildBookedItemForSalary(item, model[0].Items, data.LaborContributionsTitle)
+				bookedItem = buildBookedItemForSalary(item, models[0].Items, data.LaborContributionsTitle)
 			}
 		case data.SalaryAdditionalExpenseType(data.TaxesSalaryExpenseType):
-			bookedItem = buildBookedItemForSalary(item, model[0].Items, "Porez")
+			taxPrice += item.Amount
 		case data.SalaryAdditionalExpenseType(data.SubTaxesSalaryExpenseType):
-			bookedItem = buildBookedItemForSalary(item, model[0].Items, "Prirez")
+			bookedItem = buildBookedItemForSalary(item, models[0].Items, "Prirez")
 		case data.SalaryAdditionalExpenseType(data.BanksSalaryExpenseType):
-			bookedItem = buildBookedItemForSalaryForBanks(item, model[0].Items, "Banka")
+			bookedItem = buildBookedItemForSalaryForBanks(item, models[0].Items, "Banka")
 		case data.SalaryAdditionalExpenseType(data.SuspensionsSalaryExpenseType):
-			bookedItem = buildBookedItemForSalaryForBanks(item, model[0].Items, "Obustave")
+			bookedItem = buildBookedItemForSalaryForBanks(item, models[0].Items, "Obustave")
 		}
 		if bookedItem != nil {
 			bookedItem.Salary = dto.DropdownSimple{
@@ -1139,7 +1140,7 @@ func buildAccountingOrderForSalaries(id int, h *AccountingEntryServiceImpl) ([]d
 		}
 	}
 
-	for _, model := range model[0].Items {
+	for _, model := range models[0].Items {
 		if model.Title == data.MainBillTitle {
 
 			newSlice := make([]dto.AccountingOrderItemsForObligations, 0)
@@ -1157,6 +1158,11 @@ func buildAccountingOrderForSalaries(id int, h *AccountingEntryServiceImpl) ([]d
 
 			response = append(newSlice, response...)
 
+		} else if model.Title == data.TaxTitle {
+			if taxPrice > 0 {
+				bookedItem := buildBookedItemForSalary(&data.SalaryAdditionalExpense{Amount: taxPrice}, models[0].Items, "Porez")
+				response = append(response, *bookedItem)
+			}
 		}
 
 	}
@@ -1171,7 +1177,7 @@ func buildBookedItemForSalary(item *data.SalaryAdditionalExpense, models []dto.M
 			response := dto.AccountingOrderItemsForObligations{
 				AccountID:    model.CreditAccountID,
 				CreditAmount: float32(item.Amount),
-				Title:        item.Title,
+				Title:        model.Title,
 				Type:         data.TypeSalary,
 			}
 			return &response
