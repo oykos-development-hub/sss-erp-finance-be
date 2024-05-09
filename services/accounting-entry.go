@@ -1189,7 +1189,7 @@ func buildBookedItemForSalary(item *data.SalaryAdditionalExpense, models []dto.M
 			response := dto.AccountingOrderItemsForObligations{
 				AccountID:    model.CreditAccountID,
 				CreditAmount: float32(item.Amount),
-				Title:        model.Title,
+				Title:        model.Title + " " + item.Title,
 				Type:         data.TypeSalary,
 			}
 			return &response
