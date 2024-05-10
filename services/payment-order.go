@@ -295,9 +295,9 @@ func (h *PaymentOrderServiceImpl) GetPaymentOrderList(filter dto.PaymentOrderFil
 	if filter.Status != nil {
 		switch *filter.Status {
 		case "Plaćen":
-			conditionAndExp = up.And(conditionAndExp, &up.Cond{"id_of_statement is not ": nil})
+			conditionAndExp = up.And(conditionAndExp, &up.Cond{"sap_id is not ": nil})
 		case "Na čekanju":
-			conditionAndExp = up.And(conditionAndExp, &up.Cond{"id_of_statement is ": nil})
+			conditionAndExp = up.And(conditionAndExp, &up.Cond{"sap_id is ": nil})
 		}
 	}
 
