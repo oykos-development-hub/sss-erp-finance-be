@@ -399,7 +399,7 @@ func updateInvoiceStatus(id int, amount float64, lenOfArray int, tx up.Session, 
 
 	var price float64
 	for _, article := range articles {
-		price += float64(article.NetPrice)
+		price += float64((article.NetPrice + article.NetPrice*article.VatPrice/100) * float64(article.Amount))
 	}
 
 	conditionAndExp = &up.AndExpr{}
