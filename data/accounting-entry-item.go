@@ -11,6 +11,7 @@ type AccountingEntryItem struct {
 	ID                      int       `db:"id,omitempty"`
 	Title                   string    `db:"title"`
 	EntryID                 int       `db:"entry_id"`
+	SupplierID              int       `db:"supplier_id"`
 	AccountID               int       `db:"account_id"`
 	CreditAmount            float64   `db:"credit_amount"`
 	DebitAmount             float64   `db:"debit_amount"`

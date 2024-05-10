@@ -9,6 +9,7 @@ import (
 type AccountingEntryItemDTO struct {
 	Title                   string  `json:"title"`
 	EntryID                 int     `json:"entry_id"`
+	SupplierID              int     `json:"supplier_id"`
 	AccountID               int     `json:"account_id"`
 	CreditAmount            float64 `json:"credit_amount"`
 	DebitAmount             float64 `json:"debit_amount"`
@@ -23,6 +24,7 @@ type AccountingEntryItemDTO struct {
 type AccountingEntryItemResponseDTO struct {
 	ID                      int       `json:"id"`
 	Title                   string    `json:"title"`
+	SupplierID              int       `json:"supplier_id"`
 	EntryID                 int       `json:"entry_id"`
 	AccountID               int       `json:"account_id"`
 	CreditAmount            float64   `json:"credit_amount"`
@@ -48,6 +50,7 @@ func (dto AccountingEntryItemDTO) ToAccountingEntryItem() *data.AccountingEntryI
 	return &data.AccountingEntryItem{
 		Title:                   dto.Title,
 		EntryID:                 dto.EntryID,
+		SupplierID:              dto.SupplierID,
 		AccountID:               dto.AccountID,
 		CreditAmount:            dto.CreditAmount,
 		DebitAmount:             dto.DebitAmount,
@@ -65,6 +68,7 @@ func ToAccountingEntryItemResponseDTO(data data.AccountingEntryItem) AccountingE
 		ID:                      data.ID,
 		Title:                   data.Title,
 		EntryID:                 data.EntryID,
+		SupplierID:              data.SupplierID,
 		AccountID:               data.AccountID,
 		CreditAmount:            data.CreditAmount,
 		DebitAmount:             data.DebitAmount,
