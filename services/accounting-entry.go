@@ -1114,24 +1114,40 @@ func buildAccountingOrderForSalaries(id int, h *AccountingEntryServiceImpl) ([]d
 		case data.SalaryAdditionalExpenseType(data.ContributionsSalaryExpenseType):
 			switch item.Title {
 			case data.PIOEmployeeContributionsTitle:
-				bookedItem = buildBookedItemForSalary(item, models[0].Items, data.PIOEmployeeContributionsTitle)
+				if item.Amount > 0 {
+					bookedItem = buildBookedItemForSalary(item, models[0].Items, data.PIOEmployeeContributionsTitle)
+				}
 			case data.PIOEmployerContributionsTitle:
-				bookedItem = buildBookedItemForSalary(item, models[0].Items, data.PIOEmployerContributionsTitle)
+				if item.Amount > 0 {
+					bookedItem = buildBookedItemForSalary(item, models[0].Items, data.PIOEmployerContributionsTitle)
+				}
 			case data.UnemployementEmployeeContributionsTitle:
-				bookedItem = buildBookedItemForSalary(item, models[0].Items, data.UnemployementEmployeeContributionsTitle)
+				if item.Amount > 0 {
+					bookedItem = buildBookedItemForSalary(item, models[0].Items, data.UnemployementEmployeeContributionsTitle)
+				}
 			case data.UnemployementEmployerContributionsTitle:
-				bookedItem = buildBookedItemForSalary(item, models[0].Items, data.UnemployementEmployerContributionsTitle)
+				if item.Amount > 0 {
+					bookedItem = buildBookedItemForSalary(item, models[0].Items, data.UnemployementEmployerContributionsTitle)
+				}
 			case data.LaborContributionsTitle:
-				bookedItem = buildBookedItemForSalary(item, models[0].Items, data.LaborContributionsTitle)
+				if item.Amount > 0 {
+					bookedItem = buildBookedItemForSalary(item, models[0].Items, data.LaborContributionsTitle)
+				}
 			}
 		case data.SalaryAdditionalExpenseType(data.TaxesSalaryExpenseType):
 			taxPrice += item.Amount
 		case data.SalaryAdditionalExpenseType(data.SubTaxesSalaryExpenseType):
-			bookedItem = buildBookedItemForSalary(item, models[0].Items, data.SubTaxTitle)
+			if item.Amount > 0 {
+				bookedItem = buildBookedItemForSalary(item, models[0].Items, data.SubTaxTitle)
+			}
 		case data.SalaryAdditionalExpenseType(data.BanksSalaryExpenseType):
-			bookedItem = buildBookedItemForSalaryForBanks(item, models[0].Items, data.BankTitle)
+			if item.Amount > 0 {
+				bookedItem = buildBookedItemForSalaryForBanks(item, models[0].Items, data.BankTitle)
+			}
 		case data.SalaryAdditionalExpenseType(data.SuspensionsSalaryExpenseType):
-			bookedItem = buildBookedItemForSalaryForBanks(item, models[0].Items, data.SuspensionsTitle)
+			if item.Amount > 0 {
+				bookedItem = buildBookedItemForSalaryForBanks(item, models[0].Items, data.SuspensionsTitle)
+			}
 		}
 		if bookedItem != nil && bookedItem.Title != "" {
 			bookedItem.Salary = dto.DropdownSimple{
@@ -1172,6 +1188,9 @@ func buildAccountingOrderForSalaries(id int, h *AccountingEntryServiceImpl) ([]d
 						index++
 					}
 				}
+
+				bookedItem.Salary.ID = salary.ID
+				bookedItem.Salary.Title = salary.Month
 
 				response = append(response[:index], append([]dto.AccountingOrderItemsForObligations{*bookedItem}, response[index:]...)...)
 			}
