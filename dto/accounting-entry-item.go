@@ -7,19 +7,19 @@ import (
 )
 
 type AccountingEntryItemDTO struct {
-	Title                   string  `json:"title"`
-	EntryID                 int     `json:"entry_id"`
-	SupplierID              int     `json:"supplier_id"`
-	AccountID               int     `json:"account_id"`
-	CreditAmount            float64 `json:"credit_amount"`
-	DebitAmount             float64 `json:"debit_amount"`
-	InvoiceID               *int    `json:"invoice_id"`
-	SalaryID                *int    `json:"salary_id"`
-	PaymentOrderID          *int    `json:"payment_order_id"`
-	EnforcedPaymentID       *int    `json:"enforced_payment_id"`
-	ReturnEnforcedPaymentID *int    `json:"return_enforced_payment_id"`
-	Type                    string  `json:"type"`
-	Date                    string  `json:"date"`
+	Title                   string    `json:"title"`
+	EntryID                 int       `json:"entry_id"`
+	SupplierID              int       `json:"supplier_id"`
+	AccountID               int       `json:"account_id"`
+	CreditAmount            float64   `json:"credit_amount"`
+	DebitAmount             float64   `json:"debit_amount"`
+	InvoiceID               *int      `json:"invoice_id"`
+	SalaryID                *int      `json:"salary_id"`
+	PaymentOrderID          *int      `json:"payment_order_id"`
+	EnforcedPaymentID       *int      `json:"enforced_payment_id"`
+	ReturnEnforcedPaymentID *int      `json:"return_enforced_payment_id"`
+	Type                    string    `json:"type"`
+	Date                    time.Time `json:"date"`
 }
 
 type AccountingEntryItemResponseDTO struct {
@@ -36,7 +36,7 @@ type AccountingEntryItemResponseDTO struct {
 	EnforcedPaymentID       *int      `json:"enforced_payment_id"`
 	ReturnEnforcedPaymentID *int      `json:"return_enforced_payment_id"`
 	Type                    string    `json:"type"`
-	Date                    string    `json:"date"`
+	Date                    time.Time `json:"date"`
 	CreatedAt               time.Time `json:"created_at"`
 	UpdatedAt               time.Time `json:"updated_at"`
 }
