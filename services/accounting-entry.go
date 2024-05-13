@@ -1160,6 +1160,7 @@ func buildAccountingOrderForSalaries(id int, h *AccountingEntryServiceImpl) ([]d
 
 	var price float64
 	var taxPrice float64
+	var taxSupplierID int
 
 	for _, item := range additionalExpenses {
 		price += float64(item.Amount)
@@ -1190,6 +1191,7 @@ func buildAccountingOrderForSalaries(id int, h *AccountingEntryServiceImpl) ([]d
 			}
 		case data.SalaryAdditionalExpenseType(data.TaxesSalaryExpenseType):
 			taxPrice += item.Amount
+			taxSupplierID = item.SubjectID
 		case data.SalaryAdditionalExpenseType(data.SubTaxesSalaryExpenseType):
 			if item.Amount > 0 {
 				bookedItem = buildBookedItemForSalary(item, models[0].Items, data.SubTaxTitle)
@@ -1234,7 +1236,7 @@ func buildAccountingOrderForSalaries(id int, h *AccountingEntryServiceImpl) ([]d
 
 		if model.Title == data.TaxTitle {
 			if taxPrice > 0 {
-				bookedItem := buildBookedItemForSalary(&data.SalaryAdditionalExpense{Amount: taxPrice}, models[0].Items, data.TaxTitle)
+				bookedItem := buildBookedItemForSalary(&data.SalaryAdditionalExpense{Amount: taxPrice, SubjectID: taxSupplierID}, models[0].Items, data.TaxTitle)
 
 				index := 0
 				if len(response) > 0 {
