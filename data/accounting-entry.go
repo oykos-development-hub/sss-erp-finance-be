@@ -400,7 +400,7 @@ func (t *AccountingEntry) GetAnalyticalCard(filter AnalyticalCardFilter) (*Analy
 	queryForItems := `select a.date, a.title, a.created_at, a.debit_amount, a.credit_amount, 
 						COALESCE(i.invoice_number, s.month, e.sap_id, ep.sap_id) as document_number
 						from accounting_entry_items a
-						left join accounting_entries on ae.id = a.entry_id
+						left join accounting_entries ae on ae.id = a.entry_id
 						left join invoices i on i.id = a.invoice_id
 						left join salaries s on s.id = a.salary_id
 						left join enforced_payments e on e.id = a.enforced_payment_id
