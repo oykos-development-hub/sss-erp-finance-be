@@ -417,10 +417,17 @@ func (t *AccountingEntry) GetAnalyticalCard(filter AnalyticalCardFilter) (*Analy
 	id := 0
 
 	for rows.Next() {
-		err = rows.Scan(&item.InitialState)
+		var balance *float64
+		err = rows.Scan(&balance)
 
 		if err != nil {
 			return nil, err
+		}
+
+		if balance == nil {
+			item.InitialState = 0
+		} else {
+			item.InitialState = *balance
 		}
 
 		item.Items = append(item.Items, AnalyticalCardItems{
