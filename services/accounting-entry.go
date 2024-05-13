@@ -668,6 +668,15 @@ func buildAccountingOrderForDecisions(id int, h *AccountingEntryServiceImpl) ([]
 	var contributionForUnemploymentEmployee float64
 	var contributionForUnemploymentEmployer float64
 	var contributionForLaborFund float64
+	var taxSupplierID int
+	var subTaxSupplierID int
+	var PIOSupplierID int
+	var UnemploymentSupplierID int
+	var PIOEmployeeSupplierID int
+	var PIOEmployerSupplierID int
+	var UnemploymentEmployeeSupplierID int
+	var UnemploymentEmployerSupplierID int
+	var LaborFundSupplierID int
 
 	for _, item := range additionalExpenses {
 		price += float64(item.Price)
@@ -676,22 +685,31 @@ func buildAccountingOrderForDecisions(id int, h *AccountingEntryServiceImpl) ([]
 			netPrice += float64(item.Price)
 		case data.ObligationTaxTitle:
 			taxPrice += float64(item.Price)
+			taxSupplierID = item.SubjectID
 		case data.ObligationSubTaxTitle:
 			subTaxPrice += float64(item.Price)
+			subTaxSupplierID = item.SubjectID
 		case data.ContributionForPIOTitle:
 			contributionForPIO += float64(item.Price)
+			PIOSupplierID = item.SubjectID
 		case data.ContributionForUnemploymentTitle:
 			contributionForUnemployment += float64(item.Price)
+			UnemploymentSupplierID = item.SubjectID
 		case data.ContributionForPIOEmployeeTitle:
 			contributionForPIOEmployee += float64(item.Price)
+			PIOEmployeeSupplierID = item.SubjectID
 		case data.ContributionForPIOEmployerTitle:
 			contributionForPIOEmployer += float64(item.Price)
+			PIOEmployerSupplierID = item.SubjectID
 		case data.ContributionForUnemploymentEmployeeTitle:
 			contributionForUnemploymentEmployee += float64(item.Price)
+			UnemploymentEmployeeSupplierID = item.SubjectID
 		case data.ContributionForUnemploymentEmployerTitle:
 			contributionForUnemploymentEmployer += float64(item.Price)
+			UnemploymentEmployerSupplierID = item.SubjectID
 		case data.LaborFundTitle:
 			contributionForLaborFund += float64(item.Price)
+			LaborFundSupplierID = item.SubjectID
 		}
 	}
 
@@ -744,6 +762,7 @@ func buildAccountingOrderForDecisions(id int, h *AccountingEntryServiceImpl) ([]
 						ID:    invoice.ID,
 						Title: invoice.InvoiceNumber,
 					},
+					SupplierID: taxSupplierID,
 				})
 			}
 		case data.SubTaxTitle:
@@ -757,6 +776,7 @@ func buildAccountingOrderForDecisions(id int, h *AccountingEntryServiceImpl) ([]
 						ID:    invoice.ID,
 						Title: invoice.InvoiceNumber,
 					},
+					SupplierID: subTaxSupplierID,
 				})
 			}
 		case data.LaborContributionsTitle:
@@ -770,6 +790,7 @@ func buildAccountingOrderForDecisions(id int, h *AccountingEntryServiceImpl) ([]
 						ID:    invoice.ID,
 						Title: invoice.InvoiceNumber,
 					},
+					SupplierID: LaborFundSupplierID,
 				})
 			}
 		case data.PIOContributionsTitle:
@@ -783,6 +804,7 @@ func buildAccountingOrderForDecisions(id int, h *AccountingEntryServiceImpl) ([]
 						ID:    invoice.ID,
 						Title: invoice.InvoiceNumber,
 					},
+					SupplierID: PIOSupplierID,
 				})
 			}
 		case data.UnemployementContributionsTitle:
@@ -796,6 +818,7 @@ func buildAccountingOrderForDecisions(id int, h *AccountingEntryServiceImpl) ([]
 						ID:    invoice.ID,
 						Title: invoice.InvoiceNumber,
 					},
+					SupplierID: UnemploymentSupplierID,
 				})
 			}
 		case data.PIOEmployeeContributionsTitle:
@@ -809,6 +832,7 @@ func buildAccountingOrderForDecisions(id int, h *AccountingEntryServiceImpl) ([]
 						ID:    invoice.ID,
 						Title: invoice.InvoiceNumber,
 					},
+					SupplierID: PIOEmployeeSupplierID,
 				})
 			}
 		case data.PIOEmployerContributionsTitle:
@@ -822,6 +846,7 @@ func buildAccountingOrderForDecisions(id int, h *AccountingEntryServiceImpl) ([]
 						ID:    invoice.ID,
 						Title: invoice.InvoiceNumber,
 					},
+					SupplierID: PIOEmployerSupplierID,
 				})
 			}
 		case data.UnemployementEmployeeContributionsTitle:
@@ -835,6 +860,7 @@ func buildAccountingOrderForDecisions(id int, h *AccountingEntryServiceImpl) ([]
 						ID:    invoice.ID,
 						Title: invoice.InvoiceNumber,
 					},
+					SupplierID: UnemploymentEmployeeSupplierID,
 				})
 			}
 		case data.UnemployementEmployerContributionsTitle:
@@ -848,6 +874,7 @@ func buildAccountingOrderForDecisions(id int, h *AccountingEntryServiceImpl) ([]
 						ID:    invoice.ID,
 						Title: invoice.InvoiceNumber,
 					},
+					SupplierID: UnemploymentEmployerSupplierID,
 				})
 			}
 		}
@@ -886,6 +913,16 @@ func buildAccountingOrderForContracts(id int, h *AccountingEntryServiceImpl) ([]
 	var contributionForUnemploymentEmployer float64
 	var contributionForLaborFund float64
 
+	var taxSupplierID int
+	var subTaxSupplierID int
+	var PIOSupplierID int
+	var UnemploymentSupplierID int
+	var PIOEmployeeSupplierID int
+	var PIOEmployerSupplierID int
+	var UnemploymentEmployeeSupplierID int
+	var UnemploymentEmployerSupplierID int
+	var LaborFundSupplierID int
+
 	for _, item := range additionalExpenses {
 		price += float64(item.Price)
 		switch item.Title {
@@ -893,25 +930,33 @@ func buildAccountingOrderForContracts(id int, h *AccountingEntryServiceImpl) ([]
 			netPrice += float64(item.Price)
 		case data.ObligationTaxTitle:
 			taxPrice += float64(item.Price)
+			taxSupplierID = item.SubjectID
 		case data.ObligationSubTaxTitle:
 			subTaxPrice += float64(item.Price)
+			subTaxSupplierID = item.SubjectID
 		case data.ContributionForPIOTitle:
 			contributionForPIO += float64(item.Price)
+			PIOSupplierID = item.SubjectID
 		case data.ContributionForUnemploymentTitle:
 			contributionForUnemployment += float64(item.Price)
+			UnemploymentSupplierID = item.SubjectID
 		case data.ContributionForPIOEmployeeTitle:
 			contributionForPIOEmployee += float64(item.Price)
+			PIOEmployeeSupplierID = item.SubjectID
 		case data.ContributionForPIOEmployerTitle:
 			contributionForPIOEmployer += float64(item.Price)
+			PIOEmployerSupplierID = item.SubjectID
 		case data.ContributionForUnemploymentEmployeeTitle:
 			contributionForUnemploymentEmployee += float64(item.Price)
+			UnemploymentEmployeeSupplierID = item.SubjectID
 		case data.ContributionForUnemploymentEmployerTitle:
 			contributionForUnemploymentEmployer += float64(item.Price)
+			UnemploymentEmployerSupplierID = item.SubjectID
 		case data.LaborFundTitle:
 			contributionForLaborFund += float64(item.Price)
+			LaborFundSupplierID = item.SubjectID
 		}
 	}
-
 	model, _, err := h.modelOfAccountingRepo.GetModelsOfAccountingList(dto.ModelsOfAccountingFilterDTO{
 		Type: &data.TypeContract,
 	})
@@ -961,6 +1006,7 @@ func buildAccountingOrderForContracts(id int, h *AccountingEntryServiceImpl) ([]
 						ID:    invoice.ID,
 						Title: invoice.InvoiceNumber,
 					},
+					SupplierID: taxSupplierID,
 				})
 			}
 		case data.SubTaxTitle:
@@ -974,6 +1020,7 @@ func buildAccountingOrderForContracts(id int, h *AccountingEntryServiceImpl) ([]
 						ID:    invoice.ID,
 						Title: invoice.InvoiceNumber,
 					},
+					SupplierID: subTaxSupplierID,
 				})
 			}
 		case data.LaborContributionsTitle:
@@ -987,6 +1034,7 @@ func buildAccountingOrderForContracts(id int, h *AccountingEntryServiceImpl) ([]
 						ID:    invoice.ID,
 						Title: invoice.InvoiceNumber,
 					},
+					SupplierID: LaborFundSupplierID,
 				})
 			}
 		case data.PIOContributionsTitle:
@@ -1000,6 +1048,7 @@ func buildAccountingOrderForContracts(id int, h *AccountingEntryServiceImpl) ([]
 						ID:    invoice.ID,
 						Title: invoice.InvoiceNumber,
 					},
+					SupplierID: PIOSupplierID,
 				})
 			}
 		case data.UnemployementContributionsTitle:
@@ -1013,6 +1062,7 @@ func buildAccountingOrderForContracts(id int, h *AccountingEntryServiceImpl) ([]
 						ID:    invoice.ID,
 						Title: invoice.InvoiceNumber,
 					},
+					SupplierID: UnemploymentSupplierID,
 				})
 			}
 		case data.PIOEmployeeContributionsTitle:
@@ -1026,6 +1076,7 @@ func buildAccountingOrderForContracts(id int, h *AccountingEntryServiceImpl) ([]
 						ID:    invoice.ID,
 						Title: invoice.InvoiceNumber,
 					},
+					SupplierID: PIOEmployeeSupplierID,
 				})
 			}
 		case data.PIOEmployerContributionsTitle:
@@ -1039,6 +1090,7 @@ func buildAccountingOrderForContracts(id int, h *AccountingEntryServiceImpl) ([]
 						ID:    invoice.ID,
 						Title: invoice.InvoiceNumber,
 					},
+					SupplierID: PIOEmployerSupplierID,
 				})
 			}
 		case data.UnemployementEmployeeContributionsTitle:
@@ -1052,6 +1104,7 @@ func buildAccountingOrderForContracts(id int, h *AccountingEntryServiceImpl) ([]
 						ID:    invoice.ID,
 						Title: invoice.InvoiceNumber,
 					},
+					SupplierID: UnemploymentEmployeeSupplierID,
 				})
 			}
 		case data.UnemployementEmployerContributionsTitle:
@@ -1065,6 +1118,7 @@ func buildAccountingOrderForContracts(id int, h *AccountingEntryServiceImpl) ([]
 						ID:    invoice.ID,
 						Title: invoice.InvoiceNumber,
 					},
+					SupplierID: UnemploymentEmployerSupplierID,
 				})
 			}
 		}
@@ -1214,6 +1268,7 @@ func buildBookedItemForSalary(item *data.SalaryAdditionalExpense, models []dto.M
 				CreditAmount: float32(item.Amount),
 				Title:        title,
 				Type:         data.TypeSalary,
+				SupplierID:   item.SubjectID,
 			}
 			return &response
 		}
