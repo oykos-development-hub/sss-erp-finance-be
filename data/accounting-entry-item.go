@@ -13,6 +13,7 @@ type AccountingEntryItem struct {
 	EntryID                 int       `db:"entry_id"`
 	SupplierID              int       `db:"supplier_id"`
 	AccountID               int       `db:"account_id"`
+	Date                    string    `db:"date"`
 	CreditAmount            float64   `db:"credit_amount"`
 	DebitAmount             float64   `db:"debit_amount"`
 	InvoiceID               *int      `db:"invoice_id"`

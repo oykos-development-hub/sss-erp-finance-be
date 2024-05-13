@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS accounting_entry_items (
     return_enforced_payment_id INTEGER REFERENCES enforced_payments(id), 
     supplier_id INTEGER,
     type TEXT,
+    date TEXT,
     created_at TIMESTAMP,
     updated_at TIMESTAMP
 );

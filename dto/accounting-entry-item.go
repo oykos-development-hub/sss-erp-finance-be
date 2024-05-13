@@ -19,6 +19,7 @@ type AccountingEntryItemDTO struct {
 	EnforcedPaymentID       *int    `json:"enforced_payment_id"`
 	ReturnEnforcedPaymentID *int    `json:"return_enforced_payment_id"`
 	Type                    string  `json:"type"`
+	Date                    string  `json:"date"`
 }
 
 type AccountingEntryItemResponseDTO struct {
@@ -35,6 +36,7 @@ type AccountingEntryItemResponseDTO struct {
 	EnforcedPaymentID       *int      `json:"enforced_payment_id"`
 	ReturnEnforcedPaymentID *int      `json:"return_enforced_payment_id"`
 	Type                    string    `json:"type"`
+	Date                    string    `json:"date"`
 	CreatedAt               time.Time `json:"created_at"`
 	UpdatedAt               time.Time `json:"updated_at"`
 }
@@ -60,6 +62,7 @@ func (dto AccountingEntryItemDTO) ToAccountingEntryItem() *data.AccountingEntryI
 		EnforcedPaymentID:       dto.EnforcedPaymentID,
 		ReturnEnforcedPaymentID: dto.ReturnEnforcedPaymentID,
 		Type:                    dto.Type,
+		Date:                    dto.Date,
 	}
 }
 
@@ -77,6 +80,7 @@ func ToAccountingEntryItemResponseDTO(data data.AccountingEntryItem) AccountingE
 		EnforcedPaymentID:       data.EnforcedPaymentID,
 		ReturnEnforcedPaymentID: data.ReturnEnforcedPaymentID,
 		Type:                    data.Type,
+		Date:                    data.Date,
 		CreatedAt:               data.CreatedAt,
 		UpdatedAt:               data.UpdatedAt,
 	}
