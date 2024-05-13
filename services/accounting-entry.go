@@ -616,6 +616,7 @@ func buildAccountingOrderForInvoice(id int, h *AccountingEntryServiceImpl) ([]dt
 				DebitAmount: float32(price),
 				Title:       modelItem.Title,
 				Type:        data.TypeInvoice,
+				Date:        invoice.DateOfInvoice,
 				Invoice: dto.DropdownSimple{
 					ID:    invoice.ID,
 					Title: invoice.InvoiceNumber,
@@ -627,6 +628,7 @@ func buildAccountingOrderForInvoice(id int, h *AccountingEntryServiceImpl) ([]dt
 				CreditAmount: float32(price),
 				Title:        modelItem.Title,
 				Type:         data.TypeInvoice,
+				Date:         invoice.DateOfInvoice,
 				Invoice: dto.DropdownSimple{
 					ID:    invoice.ID,
 					Title: invoice.InvoiceNumber,
@@ -734,6 +736,7 @@ func buildAccountingOrderForDecisions(id int, h *AccountingEntryServiceImpl) ([]
 				DebitAmount: float32(price),
 				Title:       modelItem.Title,
 				Type:        data.TypeDecision,
+				Date:        invoice.DateOfInvoice,
 				Invoice: dto.DropdownSimple{
 					ID:    invoice.ID,
 					Title: invoice.InvoiceNumber,
@@ -745,6 +748,7 @@ func buildAccountingOrderForDecisions(id int, h *AccountingEntryServiceImpl) ([]
 				CreditAmount: float32(netPrice),
 				Title:        modelItem.Title,
 				Type:         data.TypeDecision,
+				Date:         invoice.DateOfInvoice,
 				Invoice: dto.DropdownSimple{
 					ID:    invoice.ID,
 					Title: invoice.InvoiceNumber,
@@ -758,6 +762,7 @@ func buildAccountingOrderForDecisions(id int, h *AccountingEntryServiceImpl) ([]
 					CreditAmount: float32(taxPrice),
 					Title:        modelItem.Title,
 					Type:         data.TypeDecision,
+					Date:         invoice.DateOfInvoice,
 					Invoice: dto.DropdownSimple{
 						ID:    invoice.ID,
 						Title: invoice.InvoiceNumber,
@@ -772,6 +777,7 @@ func buildAccountingOrderForDecisions(id int, h *AccountingEntryServiceImpl) ([]
 					CreditAmount: float32(subTaxPrice),
 					Title:        modelItem.Title,
 					Type:         data.TypeDecision,
+					Date:         invoice.DateOfInvoice,
 					Invoice: dto.DropdownSimple{
 						ID:    invoice.ID,
 						Title: invoice.InvoiceNumber,
@@ -786,6 +792,7 @@ func buildAccountingOrderForDecisions(id int, h *AccountingEntryServiceImpl) ([]
 					CreditAmount: float32(contributionForLaborFund),
 					Title:        modelItem.Title,
 					Type:         data.TypeDecision,
+					Date:         invoice.DateOfInvoice,
 					Invoice: dto.DropdownSimple{
 						ID:    invoice.ID,
 						Title: invoice.InvoiceNumber,
@@ -800,6 +807,7 @@ func buildAccountingOrderForDecisions(id int, h *AccountingEntryServiceImpl) ([]
 					CreditAmount: float32(contributionForPIO),
 					Title:        modelItem.Title,
 					Type:         data.TypeDecision,
+					Date:         invoice.DateOfInvoice,
 					Invoice: dto.DropdownSimple{
 						ID:    invoice.ID,
 						Title: invoice.InvoiceNumber,
@@ -814,6 +822,7 @@ func buildAccountingOrderForDecisions(id int, h *AccountingEntryServiceImpl) ([]
 					CreditAmount: float32(contributionForUnemployment),
 					Title:        modelItem.Title,
 					Type:         data.TypeDecision,
+					Date:         invoice.DateOfInvoice,
 					Invoice: dto.DropdownSimple{
 						ID:    invoice.ID,
 						Title: invoice.InvoiceNumber,
@@ -828,6 +837,7 @@ func buildAccountingOrderForDecisions(id int, h *AccountingEntryServiceImpl) ([]
 					CreditAmount: float32(contributionForPIOEmployee),
 					Title:        modelItem.Title,
 					Type:         data.TypeDecision,
+					Date:         invoice.DateOfInvoice,
 					Invoice: dto.DropdownSimple{
 						ID:    invoice.ID,
 						Title: invoice.InvoiceNumber,
@@ -842,6 +852,7 @@ func buildAccountingOrderForDecisions(id int, h *AccountingEntryServiceImpl) ([]
 					CreditAmount: float32(contributionForPIOEmployer),
 					Title:        modelItem.Title,
 					Type:         data.TypeDecision,
+					Date:         invoice.DateOfInvoice,
 					Invoice: dto.DropdownSimple{
 						ID:    invoice.ID,
 						Title: invoice.InvoiceNumber,
@@ -856,6 +867,7 @@ func buildAccountingOrderForDecisions(id int, h *AccountingEntryServiceImpl) ([]
 					CreditAmount: float32(contributionForUnemploymentEmployee),
 					Title:        modelItem.Title,
 					Type:         data.TypeDecision,
+					Date:         invoice.DateOfInvoice,
 					Invoice: dto.DropdownSimple{
 						ID:    invoice.ID,
 						Title: invoice.InvoiceNumber,
@@ -870,6 +882,7 @@ func buildAccountingOrderForDecisions(id int, h *AccountingEntryServiceImpl) ([]
 					CreditAmount: float32(contributionForUnemploymentEmployer),
 					Title:        modelItem.Title,
 					Type:         data.TypeDecision,
+					Date:         invoice.DateOfInvoice,
 					Invoice: dto.DropdownSimple{
 						ID:    invoice.ID,
 						Title: invoice.InvoiceNumber,
@@ -978,6 +991,7 @@ func buildAccountingOrderForContracts(id int, h *AccountingEntryServiceImpl) ([]
 				DebitAmount: float32(price),
 				Title:       modelItem.Title,
 				Type:        data.TypeContract,
+				Date:        invoice.DateOfInvoice,
 				Invoice: dto.DropdownSimple{
 					ID:    invoice.ID,
 					Title: invoice.InvoiceNumber,
@@ -989,6 +1003,7 @@ func buildAccountingOrderForContracts(id int, h *AccountingEntryServiceImpl) ([]
 				CreditAmount: float32(netPrice),
 				Title:        modelItem.Title,
 				Type:         data.TypeContract,
+				Date:         invoice.DateOfInvoice,
 				Invoice: dto.DropdownSimple{
 					ID:    invoice.ID,
 					Title: invoice.InvoiceNumber,
@@ -1002,6 +1017,7 @@ func buildAccountingOrderForContracts(id int, h *AccountingEntryServiceImpl) ([]
 					CreditAmount: float32(taxPrice),
 					Title:        modelItem.Title,
 					Type:         data.TypeContract,
+					Date:         invoice.DateOfInvoice,
 					Invoice: dto.DropdownSimple{
 						ID:    invoice.ID,
 						Title: invoice.InvoiceNumber,
@@ -1016,6 +1032,7 @@ func buildAccountingOrderForContracts(id int, h *AccountingEntryServiceImpl) ([]
 					CreditAmount: float32(subTaxPrice),
 					Title:        modelItem.Title,
 					Type:         data.TypeContract,
+					Date:         invoice.DateOfInvoice,
 					Invoice: dto.DropdownSimple{
 						ID:    invoice.ID,
 						Title: invoice.InvoiceNumber,
@@ -1030,6 +1047,7 @@ func buildAccountingOrderForContracts(id int, h *AccountingEntryServiceImpl) ([]
 					CreditAmount: float32(contributionForLaborFund),
 					Title:        modelItem.Title,
 					Type:         data.TypeContract,
+					Date:         invoice.DateOfInvoice,
 					Invoice: dto.DropdownSimple{
 						ID:    invoice.ID,
 						Title: invoice.InvoiceNumber,
@@ -1044,6 +1062,7 @@ func buildAccountingOrderForContracts(id int, h *AccountingEntryServiceImpl) ([]
 					CreditAmount: float32(contributionForPIO),
 					Title:        modelItem.Title,
 					Type:         data.TypeContract,
+					Date:         invoice.DateOfInvoice,
 					Invoice: dto.DropdownSimple{
 						ID:    invoice.ID,
 						Title: invoice.InvoiceNumber,
@@ -1058,6 +1077,7 @@ func buildAccountingOrderForContracts(id int, h *AccountingEntryServiceImpl) ([]
 					CreditAmount: float32(contributionForUnemployment),
 					Title:        modelItem.Title,
 					Type:         data.TypeContract,
+					Date:         invoice.DateOfInvoice,
 					Invoice: dto.DropdownSimple{
 						ID:    invoice.ID,
 						Title: invoice.InvoiceNumber,
@@ -1072,6 +1092,7 @@ func buildAccountingOrderForContracts(id int, h *AccountingEntryServiceImpl) ([]
 					CreditAmount: float32(contributionForPIOEmployee),
 					Title:        modelItem.Title,
 					Type:         data.TypeContract,
+					Date:         invoice.DateOfInvoice,
 					Invoice: dto.DropdownSimple{
 						ID:    invoice.ID,
 						Title: invoice.InvoiceNumber,
@@ -1086,6 +1107,7 @@ func buildAccountingOrderForContracts(id int, h *AccountingEntryServiceImpl) ([]
 					CreditAmount: float32(contributionForPIOEmployer),
 					Title:        modelItem.Title,
 					Type:         data.TypeContract,
+					Date:         invoice.DateOfInvoice,
 					Invoice: dto.DropdownSimple{
 						ID:    invoice.ID,
 						Title: invoice.InvoiceNumber,
@@ -1100,6 +1122,7 @@ func buildAccountingOrderForContracts(id int, h *AccountingEntryServiceImpl) ([]
 					CreditAmount: float32(contributionForUnemploymentEmployee),
 					Title:        modelItem.Title,
 					Type:         data.TypeContract,
+					Date:         invoice.DateOfInvoice,
 					Invoice: dto.DropdownSimple{
 						ID:    invoice.ID,
 						Title: invoice.InvoiceNumber,
@@ -1114,6 +1137,7 @@ func buildAccountingOrderForContracts(id int, h *AccountingEntryServiceImpl) ([]
 					CreditAmount: float32(contributionForUnemploymentEmployer),
 					Title:        modelItem.Title,
 					Type:         data.TypeContract,
+					Date:         invoice.DateOfInvoice,
 					Invoice: dto.DropdownSimple{
 						ID:    invoice.ID,
 						Title: invoice.InvoiceNumber,
@@ -1210,6 +1234,7 @@ func buildAccountingOrderForSalaries(id int, h *AccountingEntryServiceImpl) ([]d
 				ID:    salary.ID,
 				Title: salary.Month,
 			}
+			bookedItem.Date = salary.DateOfCalculation
 			response = append(response, *bookedItem)
 		}
 	}
@@ -1224,6 +1249,7 @@ func buildAccountingOrderForSalaries(id int, h *AccountingEntryServiceImpl) ([]d
 				DebitAmount: float32(price),
 				Title:       model.Title,
 				Type:        data.TypeSalary,
+				Date:        salary.DateOfCalculation,
 				Salary: dto.DropdownSimple{
 					ID:    salary.ID,
 					Title: salary.Month,
@@ -1247,6 +1273,7 @@ func buildAccountingOrderForSalaries(id int, h *AccountingEntryServiceImpl) ([]d
 
 				bookedItem.Salary.ID = salary.ID
 				bookedItem.Salary.Title = salary.Month
+				bookedItem.Date = salary.DateOfCalculation
 
 				response = append(response[:index], append([]dto.AccountingOrderItemsForObligations{*bookedItem}, response[index:]...)...)
 			}
@@ -1327,6 +1354,7 @@ func buildAccountingOrderForPaymentOrder(id int, h *AccountingEntryServiceImpl) 
 				DebitAmount: float32(paymentOrder.Amount),
 				Title:       modelItem.Title,
 				Type:        data.TypePaymentOrder,
+				Date:        *paymentOrder.DateOfSAP,
 				PaymentOrder: dto.DropdownSimple{
 					ID:    paymentOrder.ID,
 					Title: *paymentOrder.SAPID,
@@ -1339,6 +1367,7 @@ func buildAccountingOrderForPaymentOrder(id int, h *AccountingEntryServiceImpl) 
 				CreditAmount: float32(paymentOrder.Amount),
 				Title:        modelItem.Title,
 				Type:         data.TypePaymentOrder,
+				Date:         *paymentOrder.DateOfSAP,
 				PaymentOrder: dto.DropdownSimple{
 					ID:    paymentOrder.ID,
 					Title: *paymentOrder.SAPID,
@@ -1349,6 +1378,7 @@ func buildAccountingOrderForPaymentOrder(id int, h *AccountingEntryServiceImpl) 
 				AccountID:   modelItem.DebitAccountID,
 				DebitAmount: float32(paymentOrder.Amount),
 				Title:       modelItem.Title,
+				Date:        *paymentOrder.DateOfSAP,
 				Type:        data.TypePaymentOrder,
 				PaymentOrder: dto.DropdownSimple{
 					ID:    paymentOrder.ID,
@@ -1360,6 +1390,7 @@ func buildAccountingOrderForPaymentOrder(id int, h *AccountingEntryServiceImpl) 
 				AccountID:    modelItem.CreditAccountID,
 				CreditAmount: float32(paymentOrder.Amount),
 				Title:        modelItem.Title,
+				Date:         *paymentOrder.DateOfSAP,
 				Type:         data.TypePaymentOrder,
 				PaymentOrder: dto.DropdownSimple{
 					ID:    paymentOrder.ID,
@@ -1402,6 +1433,7 @@ func buildAccountingOrderForEnforcedPayment(id int, h *AccountingEntryServiceImp
 				AccountID:   modelItem.DebitAccountID,
 				DebitAmount: float32(enforcedPayment.Amount),
 				Title:       modelItem.Title,
+				Date:        *enforcedPayment.DateOfSAP,
 				Type:        data.TypeEnforcedPayment,
 				EnforcedPayment: dto.DropdownSimple{
 					ID:    enforcedPayment.ID,
@@ -1416,6 +1448,7 @@ func buildAccountingOrderForEnforcedPayment(id int, h *AccountingEntryServiceImp
 					DebitAmount: float32(enforcedPayment.AmountForAgent),
 					Title:       modelItem.Title,
 					Type:        data.TypeEnforcedPayment,
+					Date:        *enforcedPayment.DateOfSAP,
 					EnforcedPayment: dto.DropdownSimple{
 						ID:    enforcedPayment.ID,
 						Title: *enforcedPayment.SAPID,
@@ -1429,6 +1462,7 @@ func buildAccountingOrderForEnforcedPayment(id int, h *AccountingEntryServiceImp
 					DebitAmount: float32(enforcedPayment.AmountForLawyer),
 					Title:       modelItem.Title,
 					Type:        data.TypeEnforcedPayment,
+					Date:        *enforcedPayment.DateOfSAP,
 					EnforcedPayment: dto.DropdownSimple{
 						ID:    enforcedPayment.ID,
 						Title: *enforcedPayment.SAPID,
@@ -1441,6 +1475,7 @@ func buildAccountingOrderForEnforcedPayment(id int, h *AccountingEntryServiceImp
 				CreditAmount: float32(enforcedPayment.Amount + enforcedPayment.AmountForAgent + enforcedPayment.AmountForLawyer),
 				Title:        modelItem.Title,
 				Type:         data.TypeEnforcedPayment,
+				Date:         *enforcedPayment.DateOfSAP,
 				EnforcedPayment: dto.DropdownSimple{
 					ID:    enforcedPayment.ID,
 					Title: *enforcedPayment.SAPID,

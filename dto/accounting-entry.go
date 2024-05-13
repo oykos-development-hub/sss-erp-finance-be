@@ -83,6 +83,7 @@ type AccountingOrderItemsForObligations struct {
 	DebitAmount           float32                        `json:"debit_amount"`
 	Type                  data.TypesOfObligation         `json:"type"`
 	SupplierID            int                            `json:"supplier_id"`
+	Date                  time.Time                      `json:"date"`
 	Invoice               DropdownSimple                 `json:"invoice"`
 	Salary                DropdownSimple                 `json:"salary"`
 	PaymentOrder          DropdownSimple                 `json:"payment_order"`
