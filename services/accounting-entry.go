@@ -808,7 +808,7 @@ func buildAccountingOrderForDecisions(id int, h *AccountingEntryServiceImpl) ([]
 				})
 			}
 		case data.UnemployementContributionsTitle:
-			if contributionForUnemploymentEmployee > 0 {
+			if contributionForUnemployment > 0 {
 				response = append(response, dto.AccountingOrderItemsForObligations{
 					AccountID:    modelItem.CreditAccountID,
 					CreditAmount: float32(contributionForUnemployment),
@@ -1052,7 +1052,7 @@ func buildAccountingOrderForContracts(id int, h *AccountingEntryServiceImpl) ([]
 				})
 			}
 		case data.UnemployementContributionsTitle:
-			if contributionForUnemploymentEmployee > 0 {
+			if contributionForUnemployment > 0 {
 				response = append(response, dto.AccountingOrderItemsForObligations{
 					AccountID:    modelItem.CreditAccountID,
 					CreditAmount: float32(contributionForUnemployment),
@@ -1284,7 +1284,7 @@ func buildBookedItemForSalaryForBanks(item *data.SalaryAdditionalExpense, models
 			response := dto.AccountingOrderItemsForObligations{
 				AccountID:    model.CreditAccountID,
 				CreditAmount: float32(item.Amount),
-				Title:        model.Title + " - " + title,
+				Title:        item.Title + " - " + title,
 				Type:         data.TypeSalary,
 				SupplierID:   item.SubjectID,
 			}
