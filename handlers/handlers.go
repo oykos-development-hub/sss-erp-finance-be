@@ -386,6 +386,8 @@ type AccountingEntryHandler interface {
 	GetEnforcedPaymentsForAccounting(w http.ResponseWriter, r *http.Request)
 	GetReturnedEnforcedPaymentsForAccounting(w http.ResponseWriter, r *http.Request)
 	BuildAccountingOrderForObligations(w http.ResponseWriter, r *http.Request)
+
+	GetAnalyticalCard(w http.ResponseWriter, r *http.Request)
 }
 
 type ModelsOfAccountingHandler interface {

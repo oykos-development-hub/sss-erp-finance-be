@@ -383,6 +383,18 @@ func (h *AccountingEntryServiceImpl) GetAccountingEntryList(filter dto.Accountin
 	return response, total, nil
 }
 
+func (h *AccountingEntryServiceImpl) GetAnalyticalCard(filter data.AnalyticalCardFilter) (*data.AnalyticalCard, error) {
+
+	response, err := h.repo.GetAnalyticalCard(filter)
+
+	if err != nil {
+		h.App.ErrorLog.Println(err)
+		return nil, errors.ErrInternalServer
+	}
+
+	return response, nil
+}
+
 func (h *AccountingEntryServiceImpl) GetObligationsForAccounting(filter dto.GetObligationsFilterDTO) ([]dto.ObligationForAccounting, *uint64, error) {
 
 	dataFilter := data.ObligationsFilter{

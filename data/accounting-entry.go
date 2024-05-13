@@ -44,6 +44,8 @@ var (
 	ContributionForUnemploymentEmployerTitle ObligationTitles = "Nezaposlenost na teret poslodavca"
 )
 
+var InitialStateTitle = "Početno stanje"
+
 type AccountingEntry struct {
 	ID                 int               `db:"id,omitempty"`
 	Title              string            `db:"title"`
@@ -74,6 +76,35 @@ type PaymentOrdersForAccounting struct {
 	Title          string    `json:"title"`
 	Price          float64   `json:"price"`
 	CreatedAt      time.Time `json:"created_at"`
+}
+
+type AnalyticalCardFilter struct {
+	SupplierID         int       `json:"supplier_id"`
+	OrganizationUnitID int       `json:"organization_unit_id"`
+	DateOfStart        time.Time `json:"date_of_start"`
+	DateOfEnd          time.Time `json:"date_of_end"`
+}
+
+type AnalyticalCard struct {
+	InitialState            float64               `json:"initial_state"`
+	SumCreditAmount         float64               `json:"sum_credit_amount"`
+	SumDebitAmount          float64               `json:"sum_debit_amount"`
+	SumCreditAmountInPeriod float64               `json:"sum_credit_amount_in_period"`
+	SumDebitAmountInPeriod  float64               `json:"sum_debit_amount_in_period"`
+	Items                   []AnalyticalCardItems `json:"items"`
+}
+
+type AnalyticalCardItems struct {
+	ID             int       `json:"id"`
+	Title          string    `json:"title"`
+	CreditAmount   float64   `json:"credit_amount"`
+	DebitAmount    float64   `json:"debit_amount"`
+	Balance        float64   `json:"balance"`
+	DateOfBooking  time.Time `json:"date_of_booking"`
+	Date           time.Time `json:"date"`
+	DocumentNumber string    `json:"document_number"`
+	CreatedAt      time.Time `json:"created_at"`
+	UpdatedAt      time.Time `json:"updated_at"`
 }
 
 // Table returns the table name
@@ -354,4 +385,84 @@ func (t *AccountingEntry) GetReturnedEnforcedPaymentsForAccounting(filter Obliga
 	total := uint64(len(items))
 
 	return items, &total, nil
+}
+
+func (t *AccountingEntry) GetAnalyticalCard(filter AnalyticalCardFilter) (*AnalyticalCard, error) {
+	var item AnalyticalCard
+	var sumDebitAmount float64
+	var sumCreditAmount float64
+
+	queryForInitialState := `select sum(credit_amount) - sum(debit_amount) as saldo 
+							from accounting_entry_items 
+							where supplier_id = $1 and organization_unit_id = $2 and date < $3;`
+
+	queryForItems := `select a.date, a.title, a.created_at, a.debit_amount, a.credit_amount, 
+						COALESCE(i.invoice_number, s.month, e.sap_id, ep.sap_id) as document_number
+						from accounting_entry_items a
+						left join accounting_entries on ae.id = a.entry_id
+						left join invoices i on i.id = a.invoice_id
+						left join salaries s on s.id = a.salary_id
+						left join enforced_payments e on e.id = a.enforced_payment_id
+						left join enforced_payments ep on ep.id = a.return_enforced_payment_id
+						where a.supplier_id = $1 and ae.organization_unit_id = $2 and
+						a.date <= $3 and a.date >= $4;`
+
+	rows, err := Upper.SQL().Query(queryForInitialState, filter.SupplierID, filter.OrganizationUnitID, filter.DateOfStart)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	id := 0
+
+	for rows.Next() {
+		err = rows.Scan(&item.InitialState)
+
+		if err != nil {
+			return nil, err
+		}
+
+		item.Items = append(item.Items, AnalyticalCardItems{
+			ID:            id,
+			Title:         InitialStateTitle,
+			CreditAmount:  item.InitialState,
+			DateOfBooking: filter.DateOfStart,
+			Balance:       item.InitialState,
+		})
+
+		id++
+	}
+
+	rows, err = Upper.SQL().Query(queryForItems, filter.SupplierID, filter.OrganizationUnitID, filter.DateOfStart, filter.DateOfEnd)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var analyticItem AnalyticalCardItems
+		err = rows.Scan(&analyticItem.Date, &analyticItem.Title, &analyticItem.DateOfBooking, &analyticItem.DebitAmount, &analyticItem.CreditAmount,
+			&analyticItem.DocumentNumber)
+
+		if err != nil {
+			return nil, err
+		}
+
+		analyticItem.ID = id
+		analyticItem.Balance = item.Items[id-1].Balance + analyticItem.CreditAmount - analyticItem.DebitAmount
+		sumDebitAmount += analyticItem.DebitAmount
+		sumCreditAmount += analyticItem.CreditAmount
+
+		id++
+
+		item.Items = append(item.Items, analyticItem)
+	}
+
+	item.SumCreditAmountInPeriod = sumCreditAmount
+	item.SumDebitAmountInPeriod = sumDebitAmount
+
+	item.SumDebitAmount = sumDebitAmount
+	item.SumCreditAmount = sumCreditAmount + item.InitialState
+
+	return &item, nil
 }
