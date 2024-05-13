@@ -392,9 +392,10 @@ func (t *AccountingEntry) GetAnalyticalCard(filter AnalyticalCardFilter) (*Analy
 	var sumDebitAmount float64
 	var sumCreditAmount float64
 
-	queryForInitialState := `select sum(credit_amount) - sum(debit_amount) as saldo 
-							from accounting_entry_items 
-							where supplier_id = $1 and organization_unit_id = $2 and date < $3;`
+	queryForInitialState := `select sum(a.credit_amount) - sum(a.debit_amount) as saldo 
+							from accounting_entry_items a
+							left join accounting_entries ae on ae.id = a.entry_id
+							where a.supplier_id = $1 and ae.organization_unit_id = $2 and a.date < $3;`
 
 	queryForItems := `select a.date, a.title, a.created_at, a.debit_amount, a.credit_amount, 
 						COALESCE(i.invoice_number, s.month, e.sap_id, ep.sap_id) as document_number
