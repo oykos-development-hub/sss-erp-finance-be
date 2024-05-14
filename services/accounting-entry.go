@@ -53,6 +53,8 @@ func (h *AccountingEntryServiceImpl) CreateAccountingEntry(input dto.AccountingE
 				dataToInsert.Type = data.TypePaymentOrder
 			} else if input.Items[0].EnforcedPaymentID != nil && *input.Items[0].EnforcedPaymentID != 0 {
 				dataToInsert.Type = data.TypeEnforcedPayment
+			} else if input.Items[0].ReturnEnforcedPaymentID != nil && *input.Items[0].ReturnEnforcedPaymentID != 0 {
+				dataToInsert.Type = data.TypeReturnEnforcedPayment
 			}
 		}
 
