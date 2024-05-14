@@ -104,6 +104,7 @@ type AnalyticalCardItems struct {
 	Balance        float64   `json:"balance"`
 	DateOfBooking  time.Time `json:"date_of_booking"`
 	Date           time.Time `json:"date"`
+	Type           string    `json:"type"`
 	DocumentNumber string    `json:"document_number"`
 	CreatedAt      time.Time `json:"created_at"`
 	UpdatedAt      time.Time `json:"updated_at"`
@@ -402,7 +403,7 @@ func (t *AccountingEntry) GetAnalyticalCard(filter AnalyticalCardFilter) (*Analy
     						      (cast($4 AS timestamp) IS NOT NULL AND ae.date_of_booking < cast($4 AS timestamp)));`
 
 	queryForItems := `select a.date, a.title, a.created_at, a.debit_amount, a.credit_amount, 
-						COALESCE(i.invoice_number, s.month, e.sap_id, ep.sap_id) as document_number
+						COALESCE(i.invoice_number, s.month, e.sap_id, ep.sap_id) as document_number, type
 						from accounting_entry_items a
 						left join accounting_entries ae on ae.id = a.entry_id
 						left join invoices i on i.id = a.invoice_id
@@ -410,8 +411,8 @@ func (t *AccountingEntry) GetAnalyticalCard(filter AnalyticalCardFilter) (*Analy
 						left join enforced_payments e on e.id = a.enforced_payment_id
 						left join enforced_payments ep on ep.id = a.return_enforced_payment_id
 						where a.supplier_id = $1 and ae.organization_unit_id = $2 and
-						(cast($3 AS timestamp) is not null and a.date >= cast($3 AS timestamp) and cast($4 AS timestamp) is not null and a.date <= cast($4 AS timestamp)) or
-						(cast($5 AS timestamp) is not null and ae.date_of_booking >= cast($5 AS timestamp) and cast($6 AS timestamp) is not null and ae.date_of_booking <= cast($6 AS timestamp));`
+						((cast($3 AS timestamp) is not null and a.date >= cast($3 AS timestamp) and cast($4 AS timestamp) is not null and a.date <= cast($4 AS timestamp)) or
+						(cast($5 AS timestamp) is not null and ae.date_of_booking >= cast($5 AS timestamp) and cast($6 AS timestamp) is not null and ae.date_of_booking <= cast($6 AS timestamp)));`
 
 	rows, err := Upper.SQL().Query(queryForInitialState, filter.SupplierID, filter.OrganizationUnitID, filter.DateOfStart, filter.DateOfStartBooking)
 	if err != nil {
@@ -462,7 +463,7 @@ func (t *AccountingEntry) GetAnalyticalCard(filter AnalyticalCardFilter) (*Analy
 	for rows.Next() {
 		var analyticItem AnalyticalCardItems
 		err = rows.Scan(&analyticItem.Date, &analyticItem.Title, &analyticItem.DateOfBooking, &analyticItem.DebitAmount, &analyticItem.CreditAmount,
-			&analyticItem.DocumentNumber)
+			&analyticItem.DocumentNumber, &analyticItem.Type)
 
 		if err != nil {
 			return nil, err
@@ -505,8 +506,8 @@ func (t *AccountingEntry) GetAllSuppliers(filter AnalyticalCardFilter) ([]int, e
 						left join enforced_payments e on e.id = a.enforced_payment_id
 						left join enforced_payments ep on ep.id = a.return_enforced_payment_id
 						where ae.organization_unit_id = $1 and
-						(cast($2 AS timestamp) is not null and a.date >= cast($2 AS timestamp) and cast($3 AS timestamp) is not null and a.date <= cast($3 AS timestamp)) or
-						(cast($4 AS timestamp) is not null and ae.date_of_booking >= cast($4 AS timestamp) and cast($5 AS timestamp) is not null and ae.date_of_booking <= cast($5 AS timestamp))
+						((cast($2 AS timestamp) is not null and a.date >= cast($2 AS timestamp) and cast($3 AS timestamp) is not null and a.date <= cast($3 AS timestamp)) or
+						(cast($4 AS timestamp) is not null and ae.date_of_booking >= cast($4 AS timestamp) and cast($5 AS timestamp) is not null and ae.date_of_booking <= cast($5 AS timestamp)))
 						group by a.supplier_id;`
 
 	rows, err := Upper.SQL().Query(queryForItems, filter.OrganizationUnitID, filter.DateOfStart, filter.DateOfEnd, filter.DateOfStartBooking, filter.DateOfEndBooking)
