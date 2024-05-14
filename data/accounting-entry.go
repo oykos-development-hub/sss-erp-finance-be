@@ -403,11 +403,12 @@ func (t *AccountingEntry) GetAnalyticalCard(filter AnalyticalCardFilter) (*Analy
     						      (cast($4 AS timestamp) IS NOT NULL AND ae.date_of_booking < cast($4 AS timestamp)));`
 
 	queryForItems := `select a.date, a.title, a.created_at, a.debit_amount, a.credit_amount, 
-						COALESCE(i.invoice_number, s.month, e.sap_id, ep.sap_id) as document_number, a.type
+						COALESCE(i.invoice_number, s.month, p.sap_id, e.sap_id, ep.sap_id) as document_number, a.type
 						from accounting_entry_items a
 						left join accounting_entries ae on ae.id = a.entry_id
 						left join invoices i on i.id = a.invoice_id
 						left join salaries s on s.id = a.salary_id
+						left join payment_orders p on p.id = a.payment_order_id
 						left join enforced_payments e on e.id = a.enforced_payment_id
 						left join enforced_payments ep on ep.id = a.return_enforced_payment_id
 						where a.supplier_id = $1 and ae.organization_unit_id = $2 and
@@ -501,10 +502,6 @@ func (t *AccountingEntry) GetAllSuppliers(filter AnalyticalCardFilter) ([]int, e
 	queryForItems := `select a.supplier_id
 						from accounting_entry_items a
 						left join accounting_entries ae on ae.id = a.entry_id
-						left join invoices i on i.id = a.invoice_id
-						left join salaries s on s.id = a.salary_id
-						left join enforced_payments e on e.id = a.enforced_payment_id
-						left join enforced_payments ep on ep.id = a.return_enforced_payment_id
 						where ae.organization_unit_id = $1 and
 						((cast($2 AS timestamp) is not null and a.date >= cast($2 AS timestamp) and cast($3 AS timestamp) is not null and a.date <= cast($3 AS timestamp)) or
 						(cast($4 AS timestamp) is not null and ae.date_of_booking >= cast($4 AS timestamp) and cast($5 AS timestamp) is not null and ae.date_of_booking <= cast($5 AS timestamp)))
@@ -523,8 +520,9 @@ func (t *AccountingEntry) GetAllSuppliers(filter AnalyticalCardFilter) ([]int, e
 		if err != nil {
 			return nil, err
 		}
-
-		items = append(items, supplierID)
+		if supplierID != 0 {
+			items = append(items, supplierID)
+		}
 	}
 
 	return items, nil
