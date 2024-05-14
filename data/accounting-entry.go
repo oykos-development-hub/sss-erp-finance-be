@@ -93,6 +93,7 @@ type AnalyticalCard struct {
 	SumDebitAmount          float64               `json:"sum_debit_amount"`
 	SumCreditAmountInPeriod float64               `json:"sum_credit_amount_in_period"`
 	SumDebitAmountInPeriod  float64               `json:"sum_debit_amount_in_period"`
+	SupplierID              int                   `json:"supplier_id"`
 	Items                   []AnalyticalCardItems `json:"items"`
 }
 

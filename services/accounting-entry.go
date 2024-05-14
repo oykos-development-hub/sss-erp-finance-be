@@ -426,7 +426,7 @@ func (h *AccountingEntryServiceImpl) GetAnalyticalCard(filter data.AnalyticalCar
 			h.App.ErrorLog.Println(err)
 			return nil, errors.ErrInternalServer
 		}
-
+		responseItem.SupplierID = *filter.SupplierID
 		response = append(response, *responseItem)
 	} else {
 		allSuppliers, err := h.repo.GetAllSuppliers(filter)
@@ -446,6 +446,7 @@ func (h *AccountingEntryServiceImpl) GetAnalyticalCard(filter data.AnalyticalCar
 				return nil, errors.ErrInternalServer
 			}
 
+			responseItem.SupplierID = *filter.SupplierID
 			response = append(response, *responseItem)
 
 		}
