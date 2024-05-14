@@ -357,7 +357,7 @@ func (t *AccountingEntry) GetEnforcedPaymentsForAccounting(filter ObligationsFil
 func (t *AccountingEntry) GetReturnedEnforcedPaymentsForAccounting(filter ObligationsFilter) ([]PaymentOrdersForAccounting, *uint64, error) {
 	var items []PaymentOrdersForAccounting
 
-	query := `select id, supplier_id, sap_id, date_of_sap, amount
+	query := `select id, supplier_id, sap_id, date_of_sap, return_amount
 			  from enforced_payments 
 			  where registred_return = false 
 			  and return_date is not null and return_date <> '0001-01-01' 
