@@ -398,8 +398,8 @@ func (t *AccountingEntry) GetAnalyticalCard(filter AnalyticalCardFilter) (*Analy
     						 FROM accounting_entry_items a
     						 LEFT JOIN accounting_entries ae ON ae.id = a.entry_id
     						 WHERE a.supplier_id = $1 AND ae.organization_unit_id = $2 
-    						 AND (($3 IS NOT NULL AND a.date <  cast($3 AS timestamp)) OR 
-    						      ($4 IS NOT NULL AND ae.date_of_booking < cast($4 AS timestamp)));`
+    						 AND ((cast($3 AS timestamp) IS NOT NULL AND a.date <  cast($3 AS timestamp)) OR 
+    						      (cast($4 AS timestamp) IS NOT NULL AND ae.date_of_booking < cast($4 AS timestamp)));`
 
 	queryForItems := `select a.date, a.title, a.created_at, a.debit_amount, a.credit_amount, 
 						COALESCE(i.invoice_number, s.month, e.sap_id, ep.sap_id) as document_number
@@ -410,8 +410,8 @@ func (t *AccountingEntry) GetAnalyticalCard(filter AnalyticalCardFilter) (*Analy
 						left join enforced_payments e on e.id = a.enforced_payment_id
 						left join enforced_payments ep on ep.id = a.return_enforced_payment_id
 						where a.supplier_id = $1 and ae.organization_unit_id = $2 and
-						($3 is not null and a.date >= cast($3 AS timestamp) and $4 is not null and a.date <= cast($4 AS timestamp)) or
-						($5 is not null and ae.date_of_booking >= cast($5 AS timestamp) and $6 is not null and ae.date_of_booking <= cast($6 AS timestamp));`
+						(cast($3 AS timestamp) is not null and a.date >= cast($3 AS timestamp) and cast($4 AS timestamp) is not null and a.date <= cast($4 AS timestamp)) or
+						(cast($5 AS timestamp) is not null and ae.date_of_booking >= cast($5 AS timestamp) and cast($6 AS timestamp) is not null and ae.date_of_booking <= cast($6 AS timestamp));`
 
 	rows, err := Upper.SQL().Query(queryForInitialState, filter.SupplierID, filter.OrganizationUnitID, filter.DateOfStart, filter.DateOfStartBooking)
 	if err != nil {
@@ -505,8 +505,8 @@ func (t *AccountingEntry) GetAllSuppliers(filter AnalyticalCardFilter) ([]int, e
 						left join enforced_payments e on e.id = a.enforced_payment_id
 						left join enforced_payments ep on ep.id = a.return_enforced_payment_id
 						where ae.organization_unit_id = $1 and
-						($2 is not null and a.date >= cast($2 AS timestamp) and $3 is not null and a.date <= cast($3 AS timestamp)) or
-						($4 is not null and ae.date_of_booking >= cast($4 AS timestamp) and $5 is not null and ae.date_of_booking <= cast($5 AS timestamp))
+						(cast($2 AS timestamp) is not null and a.date >= cast($2 AS timestamp) and $3 is not null and a.date <= cast($3 AS timestamp)) or
+						(cast($4 AS timestamp) is not null and ae.date_of_booking >= cast($4 AS timestamp) and $5 is not null and ae.date_of_booking <= cast($5 AS timestamp))
 						group by a.supplier_id;`
 
 	rows, err := Upper.SQL().Query(queryForItems, filter.OrganizationUnitID, filter.DateOfStart, filter.DateOfEnd, filter.DateOfStartBooking, filter.DateOfEndBooking)
