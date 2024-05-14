@@ -505,8 +505,8 @@ func (t *AccountingEntry) GetAllSuppliers(filter AnalyticalCardFilter) ([]int, e
 						left join enforced_payments e on e.id = a.enforced_payment_id
 						left join enforced_payments ep on ep.id = a.return_enforced_payment_id
 						where ae.organization_unit_id = $1 and
-						(cast($2 AS timestamp) is not null and a.date >= cast($2 AS timestamp) and $3 is not null and a.date <= cast($3 AS timestamp)) or
-						(cast($4 AS timestamp) is not null and ae.date_of_booking >= cast($4 AS timestamp) and $5 is not null and ae.date_of_booking <= cast($5 AS timestamp))
+						(cast($2 AS timestamp) is not null and a.date >= cast($2 AS timestamp) and cast($3 AS timestamp) is not null and a.date <= cast($3 AS timestamp)) or
+						(cast($4 AS timestamp) is not null and ae.date_of_booking >= cast($4 AS timestamp) and cast($5 AS timestamp) is not null and ae.date_of_booking <= cast($5 AS timestamp))
 						group by a.supplier_id;`
 
 	rows, err := Upper.SQL().Query(queryForItems, filter.OrganizationUnitID, filter.DateOfStart, filter.DateOfEnd, filter.DateOfStartBooking, filter.DateOfEndBooking)
