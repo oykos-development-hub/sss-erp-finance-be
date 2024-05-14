@@ -9,13 +9,14 @@ import (
 type TypesOfObligation string
 
 var (
-	TypeInvoice         TypesOfObligation = "invoices"
-	TypeContract        TypesOfObligation = "contracts"
-	TypeDecision        TypesOfObligation = "decisions"
-	TypeSalary          TypesOfObligation = "salaries"
-	TypeObligations     TypesOfObligation = "obligations"
-	TypePaymentOrder    TypesOfObligation = "payment_orders"
-	TypeEnforcedPayment TypesOfObligation = "enforced_payments"
+	TypeInvoice               TypesOfObligation = "invoices"
+	TypeContract              TypesOfObligation = "contracts"
+	TypeDecision              TypesOfObligation = "decisions"
+	TypeSalary                TypesOfObligation = "salaries"
+	TypeObligations           TypesOfObligation = "obligations"
+	TypePaymentOrder          TypesOfObligation = "payment_orders"
+	TypeEnforcedPayment       TypesOfObligation = "enforced_payments"
+	TypeReturnEnforcedPayment TypesOfObligation = "return_enforced_payment"
 )
 
 // ModelsOfAccounting struct

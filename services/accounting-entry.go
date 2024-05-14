@@ -585,6 +585,16 @@ func (h *AccountingEntryServiceImpl) BuildAccountingOrderForObligations(orderDat
 		response.Items = append(response.Items, item...)
 	}
 
+	for _, id := range orderData.ReturnEnforcedPaymentID {
+		item, err := buildAccountingOrderForReturnEnforcedPayment(id, h)
+
+		if err != nil {
+			return nil, err
+		}
+		response.Items = append(response.Items, item...)
+
+	}
+
 	for _, item := range response.Items {
 		response.CreditAmount += item.CreditAmount
 		response.DebitAmount += item.DebitAmount
@@ -1500,6 +1510,62 @@ func buildAccountingOrderForEnforcedPayment(id int, h *AccountingEntryServiceImp
 					ID:    enforcedPayment.ID,
 					Title: *enforcedPayment.SAPID,
 				},
+			})
+		}
+
+	}
+
+	return response, nil
+}
+
+func buildAccountingOrderForReturnEnforcedPayment(id int, h *AccountingEntryServiceImpl) ([]dto.AccountingOrderItemsForObligations, error) {
+	response := []dto.AccountingOrderItemsForObligations{}
+
+	enforcedPayment, err := h.enforcedPaymentRepo.Get(id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	model, _, err := h.modelOfAccountingRepo.GetModelsOfAccountingList(dto.ModelsOfAccountingFilterDTO{
+		Type: &data.TypeReturnEnforcedPayment,
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	//ako ne postoji u bazi odgovarajuci model za taj tip obaveze/naloga vraca se invalid input
+	if len(model) != 1 {
+		return nil, errors.ErrInvalidInput
+	}
+
+	for _, modelItem := range model[0].Items {
+		switch modelItem.Title {
+		case data.EnforcedPaymentTitle:
+			response = append(response, dto.AccountingOrderItemsForObligations{
+				AccountID:   modelItem.DebitAccountID,
+				DebitAmount: float32(*enforcedPayment.ReturnAmount),
+				Title:       modelItem.Title,
+				Type:        data.TypeReturnEnforcedPayment,
+				Date:        *enforcedPayment.ReturnDate,
+				ReturnEnforcedPayment: dto.DropdownSimple{
+					ID:    enforcedPayment.ID,
+					Title: *enforcedPayment.SAPID,
+				},
+			})
+		case data.SupplierTitle:
+			response = append(response, dto.AccountingOrderItemsForObligations{
+				AccountID:    modelItem.CreditAccountID,
+				CreditAmount: float32(*enforcedPayment.ReturnAmount),
+				Title:        modelItem.Title,
+				Date:         *enforcedPayment.DateOfSAP,
+				Type:         data.TypeReturnEnforcedPayment,
+				ReturnEnforcedPayment: dto.DropdownSimple{
+					ID:    enforcedPayment.ID,
+					Title: *enforcedPayment.SAPID,
+				},
+				SupplierID: enforcedPayment.SupplierID,
 			})
 		}
 

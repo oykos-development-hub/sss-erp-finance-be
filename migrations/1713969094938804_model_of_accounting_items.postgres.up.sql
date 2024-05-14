@@ -15,7 +15,8 @@ INSERT INTO models_of_accounting(title, type, created_at, updated_at) VALUES
 ('Model knjiženja ugovora', 'contracts', NOW(), NOW()),
 ('Model knjiženja zarada', 'salaries', NOW(), NOW()),
 ('Model knjiženja naloga za plaćanje', 'payment_orders', NOW(), NOW()),
-('Model knjiženja prnudnih naplata', 'enforced_payments', NOW(), NOW());
+('Model knjiženja prinudnih naplata', 'enforced_payments', NOW(), NOW()),
+('Model knjiženja povraćaja prinudnih naplata', 'return_enforced_payment', NOW(), NOW());
 
 INSERT INTO model_of_accounting_items(title, model_id, debit_account_id, credit_account_id, created_at, updated_at) VALUES
 -- knjizenje racuna
@@ -65,5 +66,8 @@ INSERT INTO model_of_accounting_items(title, model_id, debit_account_id, credit_
 ('Dobavljač', 6, 1175, 0, NOW(), NOW()),
 ('Trošak izvršenja', 6, 1175, 0, NOW(), NOW()),
 ('Trošak advokata', 6, 1175, 0, NOW(), NOW()),
-('Prinudna naplata', 6, 0, 1175, NOW(), NOW());
+('Prinudna naplata', 6, 0, 1175, NOW(), NOW()),
+--knjizenje povracaja
+('Prinudna naplata', 7, 1175, 0, NOW(), NOW()),
+('Dobavljač', 7, 0, 1175, NOW(), NOW());
 
