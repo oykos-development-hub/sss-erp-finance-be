@@ -79,10 +79,12 @@ type PaymentOrdersForAccounting struct {
 }
 
 type AnalyticalCardFilter struct {
-	SupplierID         int       `json:"supplier_id"`
-	OrganizationUnitID int       `json:"organization_unit_id"`
-	DateOfStart        time.Time `json:"date_of_start"`
-	DateOfEnd          time.Time `json:"date_of_end"`
+	SupplierID         *int       `json:"supplier_id"`
+	OrganizationUnitID int        `json:"organization_unit_id"`
+	DateOfStart        *time.Time `json:"date_of_start"`
+	DateOfEnd          *time.Time `json:"date_of_end"`
+	DateOfStartBooking *time.Time `json:"date_of_start_booking"`
+	DateOfEndBooking   *time.Time `json:"date_of_end_booking"`
 }
 
 type AnalyticalCard struct {
@@ -392,10 +394,12 @@ func (t *AccountingEntry) GetAnalyticalCard(filter AnalyticalCardFilter) (*Analy
 	var sumDebitAmount float64
 	var sumCreditAmount float64
 
-	queryForInitialState := `select sum(a.credit_amount) - sum(a.debit_amount) as saldo 
-							from accounting_entry_items a
-							left join accounting_entries ae on ae.id = a.entry_id
-							where a.supplier_id = $1 and ae.organization_unit_id = $2 and a.date < $3;`
+	queryForInitialState := `SELECT SUM(a.credit_amount) - SUM(a.debit_amount) AS saldo 
+    						 FROM accounting_entry_items a
+    						 LEFT JOIN accounting_entries ae ON ae.id = a.entry_id
+    						 WHERE a.supplier_id = $1 AND ae.organization_unit_id = $2 
+    						 AND (($3 IS NOT NULL AND a.date < $3) OR 
+    						      ($4 IS NOT NULL AND ae.date_of_booking < $4));`
 
 	queryForItems := `select a.date, a.title, a.created_at, a.debit_amount, a.credit_amount, 
 						COALESCE(i.invoice_number, s.month, e.sap_id, ep.sap_id) as document_number
@@ -406,9 +410,10 @@ func (t *AccountingEntry) GetAnalyticalCard(filter AnalyticalCardFilter) (*Analy
 						left join enforced_payments e on e.id = a.enforced_payment_id
 						left join enforced_payments ep on ep.id = a.return_enforced_payment_id
 						where a.supplier_id = $1 and ae.organization_unit_id = $2 and
-						a.date >= $3 and a.date <= $4;`
+						($3 is not null and a.date >= $3 and $4 is not null and a.date <= $4) or
+						($5 is not null and ae.date_of_booking >= $5 and $6 is not null and ae.date_of_booking <= $6);`
 
-	rows, err := Upper.SQL().Query(queryForInitialState, filter.SupplierID, filter.OrganizationUnitID, filter.DateOfStart)
+	rows, err := Upper.SQL().Query(queryForInitialState, filter.SupplierID, filter.OrganizationUnitID, filter.DateOfStart, filter.DateOfStartBooking)
 	if err != nil {
 		return nil, err
 	}
@@ -429,19 +434,26 @@ func (t *AccountingEntry) GetAnalyticalCard(filter AnalyticalCardFilter) (*Analy
 		} else {
 			item.InitialState = *balance
 		}
+		var dateOfInitialState time.Time
+
+		if filter.DateOfStart != nil {
+			dateOfInitialState = *filter.DateOfStart
+		} else if filter.DateOfStartBooking != nil {
+			dateOfInitialState = *filter.DateOfStartBooking
+		}
 
 		item.Items = append(item.Items, AnalyticalCardItems{
 			ID:            id,
 			Title:         InitialStateTitle,
 			CreditAmount:  item.InitialState,
-			DateOfBooking: filter.DateOfStart,
+			DateOfBooking: dateOfInitialState,
 			Balance:       item.InitialState,
 		})
 
 		id++
 	}
 
-	rows, err = Upper.SQL().Query(queryForItems, filter.SupplierID, filter.OrganizationUnitID, filter.DateOfStart, filter.DateOfEnd)
+	rows, err = Upper.SQL().Query(queryForItems, filter.SupplierID, filter.OrganizationUnitID, filter.DateOfStart, filter.DateOfEnd, filter.DateOfStartBooking, filter.DateOfEndBooking)
 	if err != nil {
 		return nil, err
 	}
@@ -473,4 +485,46 @@ func (t *AccountingEntry) GetAnalyticalCard(filter AnalyticalCardFilter) (*Analy
 	item.SumCreditAmount = sumCreditAmount + item.InitialState
 
 	return &item, nil
+}
+
+func (t *AccountingEntry) GetAllSuppliers(filter AnalyticalCardFilter) ([]int, error) {
+	var items []int
+
+	/*queryForInitialState := `SELECT SUM(a.credit_amount) - SUM(a.debit_amount) AS saldo
+	FROM accounting_entry_items a
+	LEFT JOIN accounting_entries ae ON ae.id = a.entry_id
+	WHERE a.supplier_id = $1 AND ae.organization_unit_id = $2
+	AND (($3 IS NOT NULL AND a.date < $3) OR
+	     ($4 IS NOT NULL AND ae.date_of_booking < $4));`*/
+
+	queryForItems := `select a.supplier_id
+						from accounting_entry_items a
+						left join accounting_entries ae on ae.id = a.entry_id
+						left join invoices i on i.id = a.invoice_id
+						left join salaries s on s.id = a.salary_id
+						left join enforced_payments e on e.id = a.enforced_payment_id
+						left join enforced_payments ep on ep.id = a.return_enforced_payment_id
+						where ae.organization_unit_id = $1 and
+						($2 is not null and a.date >= $2 and $3 is not null and a.date <= $5) or
+						($4 is not null and ae.date_of_booking >= $4 and $5 is not null and ae.date_of_booking <= $5)
+						group by a.supplier_id;`
+
+	rows, err := Upper.SQL().Query(queryForItems, filter.OrganizationUnitID, filter.DateOfStart, filter.DateOfEnd, filter.DateOfStartBooking, filter.DateOfEndBooking)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var supplierID int
+		err = rows.Scan(&supplierID)
+
+		if err != nil {
+			return nil, err
+		}
+
+		items = append(items, supplierID)
+	}
+
+	return items, nil
 }

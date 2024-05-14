@@ -133,6 +133,20 @@ func (h *AccountingEntryServiceImpl) CreateAccountingEntry(input dto.AccountingE
 				if err != nil {
 					return err
 				}
+			} else if item.Title == string(data.SupplierTitle) && item.ReturnEnforcedPaymentID != nil && *item.ReturnEnforcedPaymentID != 0 {
+				enforcedPayment, err := h.enforcedPaymentRepo.Get(*item.ReturnEnforcedPaymentID)
+
+				if err != nil {
+					return err
+				}
+
+				enforcedPayment.RegistredReturn = &boolTrue
+
+				err = h.enforcedPaymentRepo.Update(tx, *enforcedPayment)
+
+				if err != nil {
+					return err
+				}
 			}
 
 		}
@@ -240,6 +254,20 @@ func (h *AccountingEntryServiceImpl) DeleteAccountingEntry(id int) error {
 				}
 
 				enforcedPayment.Registred = &boolFalse
+
+				err = h.enforcedPaymentRepo.Update(tx, *enforcedPayment)
+
+				if err != nil {
+					return err
+				}
+			} else if item.Title == string(data.SupplierTitle) && item.ReturnEnforcedPaymentID != nil && *item.ReturnEnforcedPaymentID != 0 {
+				enforcedPayment, err := h.enforcedPaymentRepo.Get(*item.ReturnEnforcedPaymentID)
+
+				if err != nil {
+					return err
+				}
+
+				enforcedPayment.RegistredReturn = &boolFalse
 
 				err = h.enforcedPaymentRepo.Update(tx, *enforcedPayment)
 
@@ -385,13 +413,40 @@ func (h *AccountingEntryServiceImpl) GetAccountingEntryList(filter dto.Accountin
 	return response, total, nil
 }
 
-func (h *AccountingEntryServiceImpl) GetAnalyticalCard(filter data.AnalyticalCardFilter) (*data.AnalyticalCard, error) {
+func (h *AccountingEntryServiceImpl) GetAnalyticalCard(filter data.AnalyticalCardFilter) ([]data.AnalyticalCard, error) {
 
-	response, err := h.repo.GetAnalyticalCard(filter)
+	var response []data.AnalyticalCard
 
-	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrInternalServer
+	if filter.SupplierID != nil && *filter.SupplierID != 0 {
+		responseItem, err := h.repo.GetAnalyticalCard(filter)
+
+		if err != nil {
+			h.App.ErrorLog.Println(err)
+			return nil, errors.ErrInternalServer
+		}
+
+		response = append(response, *responseItem)
+	} else {
+		allSuppliers, err := h.repo.GetAllSuppliers(filter)
+
+		if err != nil {
+			h.App.ErrorLog.Println(err)
+			return nil, errors.ErrInternalServer
+		}
+
+		for _, supplierID := range allSuppliers {
+			filter.SupplierID = &supplierID
+
+			responseItem, err := h.repo.GetAnalyticalCard(filter)
+
+			if err != nil {
+				h.App.ErrorLog.Println(err)
+				return nil, errors.ErrInternalServer
+			}
+
+			response = append(response, *responseItem)
+
+		}
 	}
 
 	return response, nil

@@ -366,7 +366,7 @@ type AccountingEntryService interface {
 	GetReturnedEnforcedPaymentsForAccounting(filter dto.GetObligationsFilterDTO) ([]dto.PaymentOrdersForAccounting, *uint64, error)
 	BuildAccountingOrderForObligations(data dto.AccountingOrderForObligationsData) (*dto.AccountingOrderForObligations, error)
 
-	GetAnalyticalCard(filter data.AnalyticalCardFilter) (*data.AnalyticalCard, error)
+	GetAnalyticalCard(filter data.AnalyticalCardFilter) ([]data.AnalyticalCard, error)
 }
 
 type ModelsOfAccountingService interface {
