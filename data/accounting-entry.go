@@ -403,7 +403,7 @@ func (t *AccountingEntry) GetAnalyticalCard(filter AnalyticalCardFilter) (*Analy
     						      (cast($4 AS timestamp) IS NOT NULL AND ae.date_of_booking < cast($4 AS timestamp)));`
 
 	queryForItems := `select a.date, a.title, a.created_at, a.debit_amount, a.credit_amount, 
-						COALESCE(i.invoice_number, s.month, e.sap_id, ep.sap_id) as document_number, type
+						COALESCE(i.invoice_number, s.month, e.sap_id, ep.sap_id) as document_number, a.type
 						from accounting_entry_items a
 						left join accounting_entries ae on ae.id = a.entry_id
 						left join invoices i on i.id = a.invoice_id
