@@ -133,6 +133,20 @@ func (h *AccountingEntryServiceImpl) CreateAccountingEntry(input dto.AccountingE
 				if err != nil {
 					return err
 				}
+			} else if item.Title == string(data.SupplierTitle) && item.ReturnEnforcedPaymentID != nil && *item.ReturnEnforcedPaymentID != 0 {
+				enforcedPayment, err := h.enforcedPaymentRepo.Get(*item.ReturnEnforcedPaymentID)
+
+				if err != nil {
+					return err
+				}
+
+				enforcedPayment.RegistredReturn = &boolTrue
+
+				err = h.enforcedPaymentRepo.Update(tx, *enforcedPayment)
+
+				if err != nil {
+					return err
+				}
 			}
 
 		}
@@ -240,6 +254,20 @@ func (h *AccountingEntryServiceImpl) DeleteAccountingEntry(id int) error {
 				}
 
 				enforcedPayment.Registred = &boolFalse
+
+				err = h.enforcedPaymentRepo.Update(tx, *enforcedPayment)
+
+				if err != nil {
+					return err
+				}
+			} else if item.Title == string(data.SupplierTitle) && item.ReturnEnforcedPaymentID != nil && *item.ReturnEnforcedPaymentID != 0 {
+				enforcedPayment, err := h.enforcedPaymentRepo.Get(*item.ReturnEnforcedPaymentID)
+
+				if err != nil {
+					return err
+				}
+
+				enforcedPayment.RegistredReturn = &boolFalse
 
 				err = h.enforcedPaymentRepo.Update(tx, *enforcedPayment)
 
