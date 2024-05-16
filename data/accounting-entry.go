@@ -104,6 +104,7 @@ type AnalyticalCardItems struct {
 	DebitAmount    float64   `json:"debit_amount"`
 	Balance        float64   `json:"balance"`
 	DateOfBooking  time.Time `json:"date_of_booking"`
+	IDOfEntry      int       `json:"id_of_entry"`
 	Date           time.Time `json:"date"`
 	Type           string    `json:"type"`
 	DocumentNumber string    `json:"document_number"`
@@ -403,8 +404,8 @@ func (t *AccountingEntry) GetAnalyticalCard(filter AnalyticalCardFilter) (*Analy
     						 AND ((cast($3 AS timestamp) IS NOT NULL AND a.date <  cast($3 AS timestamp)) OR 
     						      (cast($4 AS timestamp) IS NOT NULL AND ae.date_of_booking < cast($4 AS timestamp)));`
 
-	queryForItems := `select a.date, a.title, a.created_at, a.debit_amount, a.credit_amount, 
-						COALESCE(i.invoice_number, s.month, p.sap_id, e.sap_id, ep.sap_id) as document_number, a.type
+	queryForItems := `select a.date, a.title, ae.date_of_booking, a.debit_amount, a.credit_amount, 
+						COALESCE(i.invoice_number, s.month, p.sap_id, e.sap_id, ep.sap_id) as document_number, a.type, ae.id_of_entry
 						from accounting_entry_items a
 						left join accounting_entries ae on ae.id = a.entry_id
 						left join invoices i on i.id = a.invoice_id
@@ -465,7 +466,7 @@ func (t *AccountingEntry) GetAnalyticalCard(filter AnalyticalCardFilter) (*Analy
 	for rows.Next() {
 		var analyticItem AnalyticalCardItems
 		err = rows.Scan(&analyticItem.Date, &analyticItem.Title, &analyticItem.DateOfBooking, &analyticItem.DebitAmount, &analyticItem.CreditAmount,
-			&analyticItem.DocumentNumber, &analyticItem.Type)
+			&analyticItem.DocumentNumber, &analyticItem.Type, &analyticItem.IDOfEntry)
 
 		if err != nil {
 			return nil, err
