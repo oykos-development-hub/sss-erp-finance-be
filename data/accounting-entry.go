@@ -505,7 +505,7 @@ func (t *AccountingEntry) GetAllSuppliers(filter AnalyticalCardFilter) ([]int, e
 						from accounting_entry_items a
 						left join accounting_entries ae on ae.id = a.entry_id
 						where ae.organization_unit_id = $1 and
-						(cast($2 AS timestamp) is not null and a.date <= cast($2 AS timestamp)) or
+						((cast($2 AS timestamp) is not null and a.date <= cast($2 AS timestamp)) or
 						(cast($3 AS timestamp) is not null and ae.date_of_booking <= cast($3 AS timestamp)))
 						group by a.supplier_id;`
 
