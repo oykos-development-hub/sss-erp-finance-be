@@ -15,7 +15,8 @@ BEGIN
     -- Pronalazi poslednji id_of_entry za organization_unit_id
     SELECT COALESCE(MAX(id_of_entry), 0) + 1 INTO NEW.id_of_entry
     FROM accounting_entries
-    WHERE organization_unit_id = NEW.organization_unit_id and type = NEW.type;
+    WHERE organization_unit_id = NEW.organization_unit_id and type = NEW.type
+    AND EXTRACT(YEAR FROM date_of_booking) = EXTRACT(YEAR FROM CURRENT_DATE);
 
     RETURN NEW;
 END;
