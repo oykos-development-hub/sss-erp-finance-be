@@ -390,3 +390,10 @@ type AccountingEntryItemService interface {
 	GetAccountingEntryItem(id int) (*dto.AccountingEntryItemResponseDTO, error)
 	GetAccountingEntryItemList(filter dto.AccountingEntryItemFilterDTO) ([]dto.AccountingEntryItemResponseDTO, *uint64, error)
 }
+
+type SpendingDynamicService interface {
+	CreateSpendingDynamic(input dto.SpendingDynamicDTO) (*dto.SpendingDynamicWithEntriesResponseDTO, error)
+	GetSpendingDynamic(budgetID, unitID int) (*dto.SpendingDynamicWithEntriesResponseDTO, error)
+	GetActual(budgetID, unitID int) (decimal.NullDecimal, error)
+	GetSpendingDynamicHistory(budgetID, unitID int) (*dto.SpendingDynamicWithEntriesResponseDTO, error)
+}

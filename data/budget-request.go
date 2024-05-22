@@ -3,6 +3,7 @@ package data
 import (
 	"time"
 
+	"github.com/shopspring/decimal"
 	up "github.com/upper/db/v4"
 )
 
@@ -85,6 +86,27 @@ func (t *BudgetRequest) Get(id int) (*BudgetRequest, error) {
 		return nil, err
 	}
 	return &one, nil
+}
+
+func (t *BudgetRequest) GetActual(budgetID, unitID int) (decimal.NullDecimal, error) {
+	var actual decimal.NullDecimal
+
+	query := `SELECT FFR.actual
+		FROM budget_requests BR
+		JOIN filled_financial_budgets FFR ON BR.id = FFR.budget_request_id
+		WHERE BR.budget_id = $1 AND BR.organization_unit_id = $2 AND BR.request_type = $3;`
+
+	row, err := Upper.SQL().QueryRow(query, budgetID, unitID, RequestTypeCurrentFinancial)
+	if err != nil {
+		return actual, err
+	}
+
+	err = row.Scan(&actual)
+	if err != nil {
+		return decimal.NullDecimal{}, err
+	}
+
+	return actual, nil
 }
 
 // Update updates a record in the database, using upper

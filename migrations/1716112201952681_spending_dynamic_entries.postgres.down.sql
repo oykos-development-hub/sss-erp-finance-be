@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS spending_dynamic_entries;
