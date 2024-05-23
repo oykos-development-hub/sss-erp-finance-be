@@ -42,13 +42,14 @@ func (h *SpendingDynamicServiceImpl) CreateSpendingDynamic(input dto.SpendingDyn
 	spendingDynamic, err := h.repo.GetBy(up.And(
 		up.Cond{"budget_id": inputData.BudgetID},
 		up.Cond{"unit_id": inputData.UnitID},
+		up.Cond{"account_id": inputData.AccountID},
 	), nil)
 	if err != nil {
 		if !goerrors.Is(err, errors.ErrNotFound) {
 			return nil, err
 		}
 
-		actual, err := h.repoBudgetRequests.GetActual(inputData.BudgetID, inputData.UnitID)
+		actual, err := h.repoBudgetRequests.GetActual(inputData.BudgetID, inputData.UnitID, input.AccountID)
 		if err != nil {
 			return nil, errors.ErrInternalServer
 		}
@@ -106,8 +107,8 @@ func (h *SpendingDynamicServiceImpl) CreateSpendingDynamic(input dto.SpendingDyn
 	return dto.ToSpendingDynamicWithEntryResponseDTO(spendingDynamic, entriesData), nil
 }
 
-func (h *SpendingDynamicServiceImpl) GetSpendingDynamicHistory(budgetID, unitID int) (*dto.SpendingDynamicWithEntriesResponseDTO, error) {
-	data, err := h.repo.GetBy(up.And(
+func (h *SpendingDynamicServiceImpl) GetSpendingDynamicHistory(budgetID, unitID int) ([]dto.SpendingDynamicHistoryResponseDTO, error) {
+	spendingDynamic, err := h.repo.GetBy(up.And(
 		up.Cond{"budget_id": budgetID},
 		up.Cond{"unit_id": unitID},
 	), nil)
@@ -115,16 +116,26 @@ func (h *SpendingDynamicServiceImpl) GetSpendingDynamicHistory(budgetID, unitID 
 		return nil, errors.ErrNotFound
 	}
 
-	entries, err := h.repoEntries.FindAll(&up.Cond{"spending_dynamic_id": data.ID})
+	history, err := h.repoEntries.FindAll(&up.Cond{"spending_dynamic_id": spendingDynamic.ID})
 	if err != nil {
 		return nil, err
 	}
 
-	return dto.ToSpendingDynamicWithEntryResponseDTO(data, entries), nil
+	res := make([]dto.SpendingDynamicHistoryResponseDTO, len(history))
+
+	for i, item := range history {
+		res[i] = dto.SpendingDynamicHistoryResponseDTO{
+			BudgetID:  budgetID,
+			UnitID:    unitID,
+			CreatedAt: item.CreatedAt,
+		}
+	}
+
+	return res, nil
 }
 
-func (h *SpendingDynamicServiceImpl) GetSpendingDynamic(budgetID, unitID int) (*dto.SpendingDynamicWithEntriesResponseDTO, error) {
-	spendingDynamic, err := h.repo.GetBy(up.And(
+func (h *SpendingDynamicServiceImpl) GetSpendingDynamic(budgetID, unitID int) ([]dto.SpendingDynamicWithEntriesResponseDTO, error) {
+	data, err := h.repo.List(up.And(
 		up.Cond{"budget_id": budgetID},
 		up.Cond{"unit_id": unitID},
 	), nil)
@@ -132,17 +143,21 @@ func (h *SpendingDynamicServiceImpl) GetSpendingDynamic(budgetID, unitID int) (*
 		return nil, err
 	}
 
-	entry, err := h.repoEntries.FindBy(&up.Cond{"spending_dynamic_id": spendingDynamic.ID})
-	if err != nil {
-		return nil, err
+	res := make([]dto.SpendingDynamicWithEntriesResponseDTO, len(data))
+
+	for i, spendingDynamic := range data {
+		entries, err := h.repoEntries.FindAll(&up.Cond{"spending_dynamic_id": spendingDynamic.ID})
+		if err != nil {
+			return nil, err
+		}
+		res[i] = *dto.ToSpendingDynamicWithEntryResponseDTO(&spendingDynamic, entries)
 	}
 
-	return dto.ToSpendingDynamicWithEntryResponseDTO(spendingDynamic, []data.SpendingDynamicEntry{*entry}), nil
+	return res, nil
 }
 
-func (h *SpendingDynamicServiceImpl) GetActual(budgetID, unitID int) (decimal.NullDecimal, error) {
-
-	actual, err := h.repoBudgetRequests.GetActual(budgetID, unitID)
+func (h *SpendingDynamicServiceImpl) GetActual(budgetID, unitID, accountID int) (decimal.NullDecimal, error) {
+	actual, err := h.repoBudgetRequests.GetActual(budgetID, unitID, accountID)
 	if err != nil {
 		return decimal.NullDecimal{}, errors.ErrInternalServer
 	}

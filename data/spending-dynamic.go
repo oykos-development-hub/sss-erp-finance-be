@@ -13,12 +13,34 @@ type SpendingDynamic struct {
 	ID           int             `db:"id,omitempty"`
 	BudgetID     int             `db:"budget_id"`
 	UnitID       int             `db:"unit_id"`
+	AccountID    int             `db:"account_id"`
 	PlannedTotal decimal.Decimal `db:"actual"`
 }
 
 // Table returns the table name
 func (t *SpendingDynamic) Table() string {
 	return "spending_dynamics"
+}
+
+func (t *SpendingDynamic) List(cond *up.AndExpr, orders []any) ([]SpendingDynamic, error) {
+	if cond == nil {
+		return nil, goerrors.New("cond param is required")
+	}
+	collection := Upper.Collection(t.Table())
+
+	var all []SpendingDynamic
+	err := collection.
+		Find(cond).
+		OrderBy(orders...).
+		All(&all)
+	if err != nil {
+		if goerrors.Is(err, up.ErrNoMoreRows) {
+			return nil, errors.ErrNotFound
+		}
+		return nil, err
+	}
+
+	return all, nil
 }
 
 func (t *SpendingDynamic) GetBy(cond *up.AndExpr, orders []any) (*SpendingDynamic, error) {

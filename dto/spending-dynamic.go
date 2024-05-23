@@ -7,13 +7,10 @@ import (
 	"gitlab.sudovi.me/erp/finance-api/data"
 )
 
-type SpendingDynamicFilter struct {
-	All *bool `json:"all"`
-}
-
 type SpendingDynamicDTO struct {
 	BudgetID  int             `json:"budget_id" validate:"required"`
 	UnitID    int             `json:"unit_id" validate:"required"`
+	AccountID int             `json:"account_id" validate:"required"`
 	January   decimal.Decimal `json:"january" validate:"required"`
 	February  decimal.Decimal `json:"february" validate:"required"`
 	March     decimal.Decimal `json:"march" validate:"required"`
@@ -28,10 +25,17 @@ type SpendingDynamicDTO struct {
 	December  decimal.Decimal `json:"december" validate:"required"`
 }
 
+type SpendingDynamicHistoryResponseDTO struct {
+	BudgetID  int       `json:"budget_id"`
+	UnitID    int       `json:"unit_id"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
 type SpendingDynamicWithEntriesResponseDTO struct {
 	ID           int                               `json:"id"`
 	BudgetID     int                               `json:"budget_id"`
 	UnitID       int                               `json:"unit_id"`
+	AccountID    int                               `json:"account_id"`
 	PlannedTotal decimal.Decimal                   `json:"actual"`
 	Entries      []SpendingDynamicEntryResponseDTO `json:"entries"`
 	CreatedAt    time.Time                         `json:"created_at"`
@@ -40,8 +44,9 @@ type SpendingDynamicWithEntriesResponseDTO struct {
 
 func (dto SpendingDynamicDTO) ToSpendingDynamic() *data.SpendingDynamic {
 	return &data.SpendingDynamic{
-		BudgetID: dto.BudgetID,
-		UnitID:   dto.UnitID,
+		BudgetID:  dto.BudgetID,
+		AccountID: dto.AccountID,
+		UnitID:    dto.UnitID,
 	}
 }
 
@@ -67,6 +72,7 @@ func ToSpendingDynamicWithEntryResponseDTO(data *data.SpendingDynamic, entries [
 		ID:           data.ID,
 		BudgetID:     data.BudgetID,
 		UnitID:       data.UnitID,
+		AccountID:    data.AccountID,
 		PlannedTotal: data.PlannedTotal,
 		Entries:      ToSpendingDynamicEntryListResponseDTO(entries),
 	}

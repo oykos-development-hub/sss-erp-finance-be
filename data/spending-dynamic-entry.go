@@ -66,7 +66,7 @@ func (t *SpendingDynamicEntry) FindBy(condition *up.Cond) (*SpendingDynamicEntry
 		res = collection.Find()
 	}
 
-	err := res.Limit(1).OrderBy("-created_at").One(&one)
+	err := res.OrderBy("-created_at").One(&one)
 	if err != nil {
 		return nil, err
 	}

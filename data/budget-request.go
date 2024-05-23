@@ -88,15 +88,15 @@ func (t *BudgetRequest) Get(id int) (*BudgetRequest, error) {
 	return &one, nil
 }
 
-func (t *BudgetRequest) GetActual(budgetID, unitID int) (decimal.NullDecimal, error) {
+func (t *BudgetRequest) GetActual(budgetID, unitID, accountID int) (decimal.NullDecimal, error) {
 	var actual decimal.NullDecimal
 
-	query := `SELECT FFR.actual
+	query := `SELECT FFb.actual
 		FROM budget_requests BR
-		JOIN filled_financial_budgets FFR ON BR.id = FFR.budget_request_id
-		WHERE BR.budget_id = $1 AND BR.organization_unit_id = $2 AND BR.request_type = $3;`
+		JOIN filled_financial_budgets FFB ON BR.id = FFB.budget_request_id 
+		WHERE BR.budget_id = $1 AND BR.organization_unit_id = $2 AND FFB.account_id = $3 AND BR.request_type = $4;`
 
-	row, err := Upper.SQL().QueryRow(query, budgetID, unitID, RequestTypeCurrentFinancial)
+	row, err := Upper.SQL().QueryRow(query, budgetID, unitID, accountID, RequestTypeCurrentFinancial)
 	if err != nil {
 		return actual, err
 	}

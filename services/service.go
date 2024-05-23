@@ -393,7 +393,7 @@ type AccountingEntryItemService interface {
 
 type SpendingDynamicService interface {
 	CreateSpendingDynamic(input dto.SpendingDynamicDTO) (*dto.SpendingDynamicWithEntriesResponseDTO, error)
-	GetSpendingDynamic(budgetID, unitID int) (*dto.SpendingDynamicWithEntriesResponseDTO, error)
-	GetActual(budgetID, unitID int) (decimal.NullDecimal, error)
-	GetSpendingDynamicHistory(budgetID, unitID int) (*dto.SpendingDynamicWithEntriesResponseDTO, error)
+	GetSpendingDynamic(budgetID, unitID int) ([]dto.SpendingDynamicWithEntriesResponseDTO, error)
+	GetActual(budgetID, unitID, accountID int) (decimal.NullDecimal, error)
+	GetSpendingDynamicHistory(budgetID, unitID int) ([]dto.SpendingDynamicHistoryResponseDTO, error)
 }
