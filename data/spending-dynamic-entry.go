@@ -74,18 +74,45 @@ func (t *SpendingDynamicEntry) FindBy(condition *up.Cond) (*SpendingDynamicEntry
 	return &one, err
 }
 
-// Get gets one record from the database, by id, using upper
-func (t *SpendingDynamicEntry) Get(id int) (*SpendingDynamicEntry, error) {
-	var one SpendingDynamicEntry
+// ValidateNewEntry validates the new entry against the old entry up to the end of the previous month.
+func (t *SpendingDynamicEntry) ValidateNewEntry(oldEntry *SpendingDynamicEntry) bool {
+	now := time.Now()
+	currentMonth := now.Month()
 
-	collection := Upper.Collection(t.Table())
-
-	res := collection.Find(up.Cond{"id": id})
-	err := res.One(&one)
-	if err != nil {
-		return nil, err
+	// If it's January, no previous month to validate
+	if currentMonth == time.January {
+		return true
 	}
-	return &one, nil
+
+	// Get the month values for the current and old entries.
+	newValues := t.monthValues()
+	oldValues := oldEntry.monthValues()
+
+	// Validate up to the end of the previous month
+	for month := time.January; month < currentMonth; month++ {
+		if !newValues[month].Equal(oldValues[month]) {
+			return false
+		}
+	}
+
+	return true
+}
+
+func (s *SpendingDynamicEntry) monthValues() map[time.Month]decimal.Decimal {
+	return map[time.Month]decimal.Decimal{
+		time.January:   s.January,
+		time.February:  s.February,
+		time.March:     s.March,
+		time.April:     s.April,
+		time.May:       s.May,
+		time.June:      s.June,
+		time.July:      s.July,
+		time.August:    s.August,
+		time.September: s.September,
+		time.October:   s.October,
+		time.November:  s.November,
+		time.December:  s.December,
+	}
 }
 
 // Insert inserts a model into the database, using upper

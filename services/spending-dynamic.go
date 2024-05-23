@@ -75,7 +75,24 @@ func (h *SpendingDynamicServiceImpl) CreateSpendingDynamic(input dto.SpendingDyn
 		return nil, errors.ErrInvalidInput
 	}
 
+	entry, err := h.repoEntries.FindBy(&up.Cond{"spending_dynamic_id": spendingDynamic.ID})
+	if err != nil {
+		if !goerrors.Is(err, up.ErrNoMoreRows) {
+			return nil, err
+		}
+	}
+
+	// validate months if there are entries already
+	if entry != nil {
+		ok := entriesInputData.ValidateNewEntry(entry)
+		if !ok {
+			log.Println("cannot change months in past")
+			return nil, errors.ErrBadRequest
+		}
+	}
+
 	entriesInputData.SpendingDynamicID = spendingDynamic.ID
+
 	_, err = h.repoEntries.Insert(*entriesInputData)
 	if err != nil {
 		return nil, errors.ErrInternalServer
