@@ -11,6 +11,7 @@ import (
 type SpendingDynamicEntry struct {
 	ID                int             `db:"id,omitempty"`
 	SpendingDynamicID int             `db:"spending_dynamic_id"`
+	Username          string          `db:"username"`
 	January           decimal.Decimal `db:"january"`
 	February          decimal.Decimal `db:"february"`
 	March             decimal.Decimal `db:"march"`

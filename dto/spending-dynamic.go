@@ -11,6 +11,7 @@ type SpendingDynamicDTO struct {
 	BudgetID  int             `json:"budget_id" validate:"required"`
 	UnitID    int             `json:"unit_id" validate:"required"`
 	AccountID int             `json:"account_id" validate:"required"`
+	Username  string          `json:"username" validate:"required"`
 	January   decimal.Decimal `json:"january" validate:"required"`
 	February  decimal.Decimal `json:"february" validate:"required"`
 	March     decimal.Decimal `json:"march" validate:"required"`
@@ -29,17 +30,16 @@ type SpendingDynamicHistoryResponseDTO struct {
 	BudgetID  int       `json:"budget_id"`
 	UnitID    int       `json:"unit_id"`
 	CreatedAt time.Time `json:"created_at"`
+	Username  string    `json:"username"`
 }
 
-type SpendingDynamicWithEntriesResponseDTO struct {
-	ID           int                               `json:"id"`
-	BudgetID     int                               `json:"budget_id"`
-	UnitID       int                               `json:"unit_id"`
-	AccountID    int                               `json:"account_id"`
-	PlannedTotal decimal.Decimal                   `json:"actual"`
-	Entries      []SpendingDynamicEntryResponseDTO `json:"entries"`
-	CreatedAt    time.Time                         `json:"created_at"`
-	UpdatedAt    time.Time                         `json:"updated_at"`
+type SpendingDynamicWithEntryResponseDTO struct {
+	ID           int             `json:"id"`
+	BudgetID     int             `json:"budget_id"`
+	UnitID       int             `json:"unit_id"`
+	AccountID    int             `json:"account_id"`
+	PlannedTotal decimal.Decimal `json:"actual"`
+	SpendingDynamicEntryResponseDTO
 }
 
 func (dto SpendingDynamicDTO) ToSpendingDynamic() *data.SpendingDynamic {
@@ -52,6 +52,7 @@ func (dto SpendingDynamicDTO) ToSpendingDynamic() *data.SpendingDynamic {
 
 func (dto SpendingDynamicDTO) ToSpendingDynamicEntry() *data.SpendingDynamicEntry {
 	return &data.SpendingDynamicEntry{
+		Username:  dto.Username,
 		January:   dto.January,
 		February:  dto.February,
 		March:     dto.March,
@@ -67,13 +68,13 @@ func (dto SpendingDynamicDTO) ToSpendingDynamicEntry() *data.SpendingDynamicEntr
 	}
 }
 
-func ToSpendingDynamicWithEntryResponseDTO(data *data.SpendingDynamic, entries []data.SpendingDynamicEntry) *SpendingDynamicWithEntriesResponseDTO {
-	return &SpendingDynamicWithEntriesResponseDTO{
-		ID:           data.ID,
-		BudgetID:     data.BudgetID,
-		UnitID:       data.UnitID,
-		AccountID:    data.AccountID,
-		PlannedTotal: data.PlannedTotal,
-		Entries:      ToSpendingDynamicEntryListResponseDTO(entries),
+func ToSpendingDynamicWithEntryResponseDTO(data *data.SpendingDynamic, entry *data.SpendingDynamicEntry) *SpendingDynamicWithEntryResponseDTO {
+	return &SpendingDynamicWithEntryResponseDTO{
+		ID:                              data.ID,
+		BudgetID:                        data.BudgetID,
+		UnitID:                          data.UnitID,
+		AccountID:                       data.AccountID,
+		PlannedTotal:                    data.PlannedTotal,
+		SpendingDynamicEntryResponseDTO: *ToSpendingDynamicEntryResponseDTO(entry),
 	}
 }

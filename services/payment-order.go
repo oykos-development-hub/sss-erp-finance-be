@@ -304,9 +304,8 @@ func (h *PaymentOrderServiceImpl) GetPaymentOrderList(filter dto.PaymentOrderFil
 	if filter.Search != nil && *filter.Search != "" {
 		likeCondition := fmt.Sprintf("%%%s%%", *filter.Search)
 		search := up.Or(
-			up.Cond{"payer ILIKE": likeCondition},
-			up.Cond{"case_number ILIKE": likeCondition},
-			up.Cond{"party_name ILIKE": likeCondition},
+			up.Cond{"id_of_statement ILIKE": likeCondition},
+			up.Cond{"sap_id ILIKE": likeCondition},
 		)
 		conditionAndExp = up.And(conditionAndExp, search)
 	}

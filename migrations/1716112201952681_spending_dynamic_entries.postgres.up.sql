@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS spending_dynamic_entries (
     id serial PRIMARY KEY,
     spending_dynamic_id INTEGER NOT NULL REFERENCES spending_dynamics(id) ON DELETE CASCADE,
+    username TEXT NOT NULL,
     january DECIMAL(10, 2) NOT NULL NOT NULL,
     february DECIMAL(10, 2) NOT NULL,
     march DECIMAL(10, 2) NOT NULL,

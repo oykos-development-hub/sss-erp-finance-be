@@ -8,8 +8,8 @@ import (
 )
 
 type SpendingDynamicEntryResponseDTO struct {
-	ID                int             `json:"id"`
 	SpendingDynamicID int             `json:"spending_dynamic_id"`
+	Username          string          `json:"username"`
 	January           decimal.Decimal `json:"january"`
 	February          decimal.Decimal `json:"february"`
 	March             decimal.Decimal `json:"march"`
@@ -27,8 +27,8 @@ type SpendingDynamicEntryResponseDTO struct {
 
 func ToSpendingDynamicEntryResponseDTO(data *data.SpendingDynamicEntry) *SpendingDynamicEntryResponseDTO {
 	return &SpendingDynamicEntryResponseDTO{
-		ID:                data.ID,
 		SpendingDynamicID: data.SpendingDynamicID,
+		Username:          data.Username,
 		January:           data.January,
 		February:          data.February,
 		March:             data.March,

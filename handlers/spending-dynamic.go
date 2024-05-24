@@ -27,7 +27,7 @@ func NewSpendingDynamicHandler(app *celeritas.Celeritas, spendingdynamicService 
 }
 
 func (h *spendingdynamicHandlerImpl) CreateSpendingDynamic(w http.ResponseWriter, r *http.Request) {
-	var input dto.SpendingDynamicDTO
+	var input []dto.SpendingDynamicDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
