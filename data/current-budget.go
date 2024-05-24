@@ -80,10 +80,10 @@ func (t *CurrentBudget) Get(id int) (*CurrentBudget, error) {
 }
 
 // Update updates a record in the database, using upper
-func (t *CurrentBudget) UpdateActual(budgetID, accountID, unitID int, actual decimal.Decimal) error {
-	updateQuery := fmt.Sprintf("UPDATE %s SET actual = $1 WHERE budget_id = $2 AND account_id = $3 AND unit_id = $4", t.Table())
+func (t *CurrentBudget) UpdateActual(currentBudgetID int, actual decimal.Decimal) error {
+	updateQuery := fmt.Sprintf("UPDATE %s SET actual = $1 WHERE id = $2", t.Table())
 
-	res, err := Upper.SQL().Exec(updateQuery, actual, budgetID, accountID, unitID)
+	res, err := Upper.SQL().Exec(updateQuery, actual, currentBudgetID)
 	if err != nil {
 		return err
 	}
@@ -96,10 +96,10 @@ func (t *CurrentBudget) UpdateActual(budgetID, accountID, unitID int, actual dec
 }
 
 // Update updates a record in the database, using upper
-func (t *CurrentBudget) UpdateBalance(budgetID, accountID, unitID int, balance decimal.Decimal) error {
-	updateQuery := fmt.Sprintf("UPDATE %s SET actual = $1 WHERE budget_id = $2 AND account_id = $3 AND unit_id = $4", t.Table())
+func (t *CurrentBudget) UpdateBalance(currentBudgetID int, balance decimal.Decimal) error {
+	updateQuery := fmt.Sprintf("UPDATE %s SET balance = $1 WHERE id = $2", t.Table())
 
-	res, err := Upper.SQL().Exec(updateQuery, balance, budgetID, accountID, unitID)
+	res, err := Upper.SQL().Exec(updateQuery, balance, currentBudgetID)
 	if err != nil {
 		return err
 	}

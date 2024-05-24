@@ -404,3 +404,10 @@ type CurrentBudgetService interface {
 	GetCurrentBudget(id int) (*dto.CurrentBudgetResponseDTO, error)
 	GetCurrentBudgetList(filter dto.CurrentBudgetFilterDTO) ([]dto.CurrentBudgetResponseDTO, *uint64, error)
 }
+
+type SpendingReleaseService interface {
+	CreateSpendingRelease(input dto.SpendingReleaseDTO) (*dto.SpendingReleaseResponseDTO, error)
+	DeleteSpendingRelease(id int) error
+	GetSpendingRelease(id int) (*dto.SpendingReleaseResponseDTO, error)
+	GetSpendingReleaseList(filter dto.SpendingReleaseFilterDTO) ([]dto.SpendingReleaseResponseDTO, *uint64, error)
+}

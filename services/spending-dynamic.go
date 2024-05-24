@@ -2,7 +2,6 @@ package services
 
 import (
 	goerrors "errors"
-	"fmt"
 	"log"
 
 	"gitlab.sudovi.me/erp/finance-api/data"
@@ -36,34 +35,32 @@ func NewSpendingDynamicServiceImpl(
 	}
 }
 
-func (h *SpendingDynamicServiceImpl) CreateSpendingDynamic(inputData []dto.SpendingDynamicDTO) ([]dto.SpendingDynamicWithEntryResponseDTO, error) {
-	res := make([]dto.SpendingDynamicWithEntryResponseDTO, len(inputData))
-	for i, input := range inputData {
-		inputData := input.ToSpendingDynamic()
-		entriesInputData := input.ToSpendingDynamicEntry()
+func (h *SpendingDynamicServiceImpl) CreateSpendingDynamic(inputDataDTO []dto.SpendingDynamicDTO) ([]dto.SpendingDynamicWithEntryResponseDTO, error) {
+	res := make([]dto.SpendingDynamicWithEntryResponseDTO, len(inputDataDTO))
+	for i, inputDTO := range inputDataDTO {
+		currentBudget, err := h.repoCurrentBudget.GetBy(*up.And(
+			up.Cond{"budget_id": inputDTO.BudgetID},
+			up.Cond{"unit_id": inputDTO.UnitID},
+			up.Cond{"account_id": inputDTO.AccountID},
+		))
+		if err != nil {
+			return nil, errors.ErrInternalServer
+		}
 
 		spendingDynamic, err := h.repo.GetBy(up.And(
-			up.Cond{"budget_id": inputData.BudgetID},
-			up.Cond{"unit_id": inputData.UnitID},
-			up.Cond{"account_id": inputData.AccountID},
+			up.Cond{"current_budget_id": currentBudget.ID},
 		), nil)
 		if err != nil {
 			if !goerrors.Is(err, errors.ErrNotFound) {
 				return nil, err
 			}
 
-			currentBudget, err := h.repoCurrentBudget.GetBy(*up.And(
-				up.Cond{"budget_id": input.BudgetID},
-				up.Cond{"unit_id": input.UnitID},
-				up.Cond{"account_id": input.AccountID},
-			))
-			if err != nil {
-				return nil, errors.ErrInternalServer
+			inputData := data.SpendingDynamic{
+				CurrentBudgetID: currentBudget.ID,
+				PlannedTotal:    currentBudget.Actual,
 			}
 
-			inputData.PlannedTotal = currentBudget.Actual
-
-			id, err := h.repo.Insert(*inputData)
+			id, err := h.repo.Insert(inputData)
 			if err != nil {
 				return nil, errors.ErrInternalServer
 			}
@@ -74,7 +71,7 @@ func (h *SpendingDynamicServiceImpl) CreateSpendingDynamic(inputData []dto.Spend
 			}
 		}
 
-		fmt.Println(entriesInputData.SumOfMonths(), spendingDynamic.PlannedTotal)
+		entriesInputData := inputDTO.ToSpendingDynamicEntry()
 
 		// Validate that the sum of the months matches the planned total
 		if !entriesInputData.SumOfMonths().Equal(spendingDynamic.PlannedTotal) {

@@ -10,11 +10,9 @@ import (
 
 // SpendingDynamic struct
 type SpendingDynamic struct {
-	ID           int             `db:"id,omitempty"`
-	BudgetID     int             `db:"budget_id"`
-	UnitID       int             `db:"unit_id"`
-	AccountID    int             `db:"account_id"`
-	PlannedTotal decimal.Decimal `db:"actual"`
+	ID              int             `db:"id,omitempty"`
+	CurrentBudgetID int             `db:"current_budget_id"`
+	PlannedTotal    decimal.Decimal `db:"actual"`
 }
 
 // Table returns the table name

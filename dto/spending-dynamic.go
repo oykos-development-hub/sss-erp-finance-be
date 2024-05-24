@@ -34,20 +34,10 @@ type SpendingDynamicHistoryResponseDTO struct {
 }
 
 type SpendingDynamicWithEntryResponseDTO struct {
-	ID           int             `json:"id"`
-	BudgetID     int             `json:"budget_id"`
-	UnitID       int             `json:"unit_id"`
-	AccountID    int             `json:"account_id"`
-	PlannedTotal decimal.Decimal `json:"actual"`
+	ID              int             `json:"id"`
+	CurrentBudgetID int             `json:"current_budget_id"`
+	PlannedTotal    decimal.Decimal `json:"actual"`
 	SpendingDynamicEntryResponseDTO
-}
-
-func (dto SpendingDynamicDTO) ToSpendingDynamic() *data.SpendingDynamic {
-	return &data.SpendingDynamic{
-		BudgetID:  dto.BudgetID,
-		AccountID: dto.AccountID,
-		UnitID:    dto.UnitID,
-	}
 }
 
 func (dto SpendingDynamicDTO) ToSpendingDynamicEntry() *data.SpendingDynamicEntry {
@@ -71,9 +61,7 @@ func (dto SpendingDynamicDTO) ToSpendingDynamicEntry() *data.SpendingDynamicEntr
 func ToSpendingDynamicWithEntryResponseDTO(data *data.SpendingDynamic, entry *data.SpendingDynamicEntry) *SpendingDynamicWithEntryResponseDTO {
 	return &SpendingDynamicWithEntryResponseDTO{
 		ID:                              data.ID,
-		BudgetID:                        data.BudgetID,
-		UnitID:                          data.UnitID,
-		AccountID:                       data.AccountID,
+		CurrentBudgetID:                 data.CurrentBudgetID,
 		PlannedTotal:                    data.PlannedTotal,
 		SpendingDynamicEntryResponseDTO: *ToSpendingDynamicEntryResponseDTO(entry),
 	}

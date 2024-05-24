@@ -41,16 +41,16 @@ func (h *CurrentBudgetServiceImpl) CreateCurrentBudget(input dto.CurrentBudgetDT
 }
 
 func (h *CurrentBudgetServiceImpl) UpdateActual(unitID, budgetID, accountID int, actual decimal.Decimal) (*dto.CurrentBudgetResponseDTO, error) {
-	err := h.repo.UpdateActual(budgetID, accountID, unitID, actual)
-	if err != nil {
-		return nil, errors.ErrInternalServer
-	}
-
 	currentBudget, err := h.repo.GetBy(*up.And(
 		up.Cond{"budget_id": budgetID},
 		up.Cond{"unit_id": unitID},
 		up.Cond{"account_id": accountID},
 	))
+	if err != nil {
+		return nil, errors.ErrInternalServer
+	}
+
+	err = h.repo.UpdateActual(currentBudget.ID, actual)
 	if err != nil {
 		return nil, errors.ErrInternalServer
 	}

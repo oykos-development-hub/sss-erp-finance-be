@@ -295,6 +295,11 @@ func routes(app *celeritas.Celeritas, middleware *middleware.Middleware, handler
 		rt.Post("/current-budgets", handlers.CurrentBudgetHandler.CreateCurrentBudget)
 		rt.Get("/current-budgets/{id}", handlers.CurrentBudgetHandler.GetCurrentBudgetById)
 		rt.Get("/current-budgets", handlers.CurrentBudgetHandler.GetCurrentBudgetList)
+
+		rt.Post("/spending-releases", handlers.SpendingReleaseHandler.CreateSpendingRelease)
+		rt.Get("/spending-releases/{id}", handlers.SpendingReleaseHandler.GetSpendingReleaseById)
+		rt.Get("/spending-releases", handlers.SpendingReleaseHandler.GetSpendingReleaseList)
+		rt.Delete("/spending-releases/{id}", handlers.SpendingReleaseHandler.DeleteSpendingRelease)
 	})
 
 	return app.Routes

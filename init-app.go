@@ -180,6 +180,10 @@ func initApplication() *celeritas.Celeritas {
 	CurrentBudgetService := services.NewCurrentBudgetServiceImpl(cel, models.CurrentBudget)
 	CurrentBudgetHandler := handlers.NewCurrentBudgetHandler(cel, CurrentBudgetService)
 
+		
+	SpendingReleaseService := services.NewSpendingReleaseServiceImpl(cel, models.SpendingRelease)
+	SpendingReleaseHandler := handlers.NewSpendingReleaseHandler(cel, SpendingReleaseService)
+
 	myHandlers := &handlers.Handlers{
 		InvoiceHandler:                  InvoiceHandler,
 		ArticleHandler:                  ArticleHandler,
@@ -226,6 +230,7 @@ func initApplication() *celeritas.Celeritas {
 		AccountingEntryItemHandler:      AccountingEntryItemHandler,
 		SpendingDynamicHandler:          SpendingDynamicHandler,
 		CurrentBudgetHandler:            CurrentBudgetHandler,
+		SpendingReleaseHandler: SpendingReleaseHandler,
 	}
 
 	myMiddleware := &middleware.Middleware{
