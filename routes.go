@@ -291,6 +291,10 @@ func routes(app *celeritas.Celeritas, middleware *middleware.Middleware, handler
 		rt.Post("/spending-dynamics", handlers.SpendingDynamicHandler.CreateSpendingDynamic)
 		rt.Get("/budgets/{budget_id}/units/{unit_id}/spending-dynamics", handlers.SpendingDynamicHandler.GetBudgetSpendingDynamic)
 		rt.Get("/budgets/{budget_id}/units/{unit_id}/spending-dynamics/history", handlers.SpendingDynamicHandler.GetBudgetSpendingDynamicHistory)
+
+		rt.Post("/current-budgets", handlers.CurrentBudgetHandler.CreateCurrentBudget)
+		rt.Get("/current-budgets/{id}", handlers.CurrentBudgetHandler.GetCurrentBudgetById)
+		rt.Get("/current-budgets", handlers.CurrentBudgetHandler.GetCurrentBudgetList)
 	})
 
 	return app.Routes

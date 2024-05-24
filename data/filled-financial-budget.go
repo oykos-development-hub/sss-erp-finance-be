@@ -18,6 +18,7 @@ type FilledFinancialBudget struct {
 	NextYear        decimal.Decimal     `db:"next_year"`
 	YearAfterNext   decimal.Decimal     `db:"year_after_next"`
 	Actual          decimal.NullDecimal `db:"actual"`
+	Balance         decimal.NullDecimal `db:"balance"`
 	Description     string              `db:"description"`
 	CreatedAt       time.Time           `db:"created_at,omitempty"`
 	UpdatedAt       time.Time           `db:"updated_at"`
@@ -122,6 +123,22 @@ func (t *FilledFinancialBudget) UpdateActual(id int, actual decimal.Decimal) err
 	updateQuery := fmt.Sprintf("UPDATE %s SET actual = $1, updated_at = $2 WHERE id = $3", t.Table())
 
 	res, err := Upper.SQL().Exec(updateQuery, actual, time.Now(), id)
+	if err != nil {
+		return err
+	}
+	rowsAffected, _ := res.RowsAffected()
+	if rowsAffected != 1 {
+		return errors.ErrNotFound
+	}
+
+	return nil
+}
+
+// Update updates a record in the database, using upper
+func (t *FilledFinancialBudget) UpdateBalance(id int, balance decimal.Decimal) error {
+	updateQuery := fmt.Sprintf("UPDATE %s SET balance = $1, updated_at = $2 WHERE id = $3", t.Table())
+
+	res, err := Upper.SQL().Exec(updateQuery, balance, time.Now(), id)
 	if err != nil {
 		return err
 	}

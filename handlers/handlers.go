@@ -47,6 +47,7 @@ type Handlers struct {
 	ModelOfAccountingItemHandler    ModelOfAccountingItemHandler
 	AccountingEntryItemHandler      AccountingEntryItemHandler
 	SpendingDynamicHandler          SpendingDynamicHandler
+	CurrentBudgetHandler            CurrentBudgetHandler
 }
 
 type InvoiceHandler interface {
@@ -418,4 +419,10 @@ type SpendingDynamicHandler interface {
 	GetBudgetSpendingDynamic(w http.ResponseWriter, r *http.Request)
 	GetBudgetSpendingDynamicHistory(w http.ResponseWriter, r *http.Request)
 	GetActual(w http.ResponseWriter, r *http.Request)
+}
+
+type CurrentBudgetHandler interface {
+	CreateCurrentBudget(w http.ResponseWriter, r *http.Request)
+	GetCurrentBudgetById(w http.ResponseWriter, r *http.Request)
+	GetCurrentBudgetList(w http.ResponseWriter, r *http.Request)
 }

@@ -16,23 +16,23 @@ import (
 )
 
 type SpendingDynamicServiceImpl struct {
-	App                *celeritas.Celeritas
-	repo               data.SpendingDynamic
-	repoEntries        data.SpendingDynamicEntry
-	repoBudgetRequests data.BudgetRequest
+	App               *celeritas.Celeritas
+	repo              data.SpendingDynamic
+	repoEntries       data.SpendingDynamicEntry
+	repoCurrentBudget data.CurrentBudget
 }
 
 func NewSpendingDynamicServiceImpl(
 	app *celeritas.Celeritas,
 	repo data.SpendingDynamic,
 	repoEntries data.SpendingDynamicEntry,
-	repoBudgetRequests data.BudgetRequest,
+	repoCurrentBudget data.CurrentBudget,
 ) SpendingDynamicService {
 	return &SpendingDynamicServiceImpl{
-		App:                app,
-		repo:               repo,
-		repoEntries:        repoEntries,
-		repoBudgetRequests: repoBudgetRequests,
+		App:               app,
+		repo:              repo,
+		repoEntries:       repoEntries,
+		repoCurrentBudget: repoCurrentBudget,
 	}
 }
 
@@ -52,16 +52,16 @@ func (h *SpendingDynamicServiceImpl) CreateSpendingDynamic(inputData []dto.Spend
 				return nil, err
 			}
 
-			actual, err := h.repoBudgetRequests.GetActual(inputData.BudgetID, inputData.UnitID, input.AccountID)
+			currentBudget, err := h.repoCurrentBudget.GetBy(*up.And(
+				up.Cond{"budget_id": input.BudgetID},
+				up.Cond{"unit_id": input.UnitID},
+				up.Cond{"account_id": input.AccountID},
+			))
 			if err != nil {
 				return nil, errors.ErrInternalServer
 			}
-			if !actual.Valid {
-				log.Printf("No actual for budget with id: %d and unit id: %d", input.BudgetID, input.UnitID)
-				return nil, errors.ErrInternalServer
-			}
 
-			inputData.PlannedTotal = actual.Decimal
+			inputData.PlannedTotal = currentBudget.Actual
 
 			id, err := h.repo.Insert(*inputData)
 			if err != nil {
@@ -165,11 +165,15 @@ func (h *SpendingDynamicServiceImpl) GetSpendingDynamic(budgetID, unitID int) ([
 	return res, nil
 }
 
-func (h *SpendingDynamicServiceImpl) GetActual(budgetID, unitID, accountID int) (decimal.NullDecimal, error) {
-	actual, err := h.repoBudgetRequests.GetActual(budgetID, unitID, accountID)
+func (h *SpendingDynamicServiceImpl) GetActual(budgetID, unitID, accountID int) (decimal.Decimal, error) {
+	currentBudget, err := h.repoCurrentBudget.GetBy(*up.And(
+		up.Cond{"budget_id": budgetID},
+		up.Cond{"unit_id": unitID},
+		up.Cond{"account_id": accountID},
+	))
 	if err != nil {
-		return decimal.NullDecimal{}, errors.ErrInternalServer
+		return decimal.Zero, errors.ErrInternalServer
 	}
 
-	return actual, nil
+	return currentBudget.Actual, nil
 }

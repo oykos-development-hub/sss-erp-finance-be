@@ -63,7 +63,7 @@ func initApplication() *celeritas.Celeritas {
 	GoalIndicatorService := services.NewGoalIndicatorServiceImpl(cel, models.GoalIndicator)
 	GoalIndicatorHandler := handlers.NewGoalIndicatorHandler(cel, GoalIndicatorService)
 
-	FilledFinancialBudgetService := services.NewFilledFinancialBudgetServiceImpl(cel, models.FilledFinancialBudget)
+	FilledFinancialBudgetService := services.NewFilledFinancialBudgetServiceImpl(cel, models.FilledFinancialBudget, models.BudgetRequest, models.CurrentBudget)
 	FilledFinancialBudgetHandler := handlers.NewFilledFinancialBudgetHandler(cel, FilledFinancialBudgetService)
 
 	BudgetRequestService := services.NewBudgetRequestServiceImpl(cel, models.BudgetRequest)
@@ -174,8 +174,11 @@ func initApplication() *celeritas.Celeritas {
 	AccountingEntryItemService := services.NewAccountingEntryItemServiceImpl(cel, models.AccountingEntryItem)
 	AccountingEntryItemHandler := handlers.NewAccountingEntryItemHandler(cel, AccountingEntryItemService)
 
-	SpendingDynamicService := services.NewSpendingDynamicServiceImpl(cel, models.SpendingDynamic, models.SpendingDynamicEntry, models.BudgetRequest)
+	SpendingDynamicService := services.NewSpendingDynamicServiceImpl(cel, models.SpendingDynamic, models.SpendingDynamicEntry, models.CurrentBudget)
 	SpendingDynamicHandler := handlers.NewSpendingDynamicHandler(cel, SpendingDynamicService)
+
+	CurrentBudgetService := services.NewCurrentBudgetServiceImpl(cel, models.CurrentBudget)
+	CurrentBudgetHandler := handlers.NewCurrentBudgetHandler(cel, CurrentBudgetService)
 
 	myHandlers := &handlers.Handlers{
 		InvoiceHandler:                  InvoiceHandler,
@@ -222,6 +225,7 @@ func initApplication() *celeritas.Celeritas {
 		ModelOfAccountingItemHandler:    ModelOfAccountingItemHandler,
 		AccountingEntryItemHandler:      AccountingEntryItemHandler,
 		SpendingDynamicHandler:          SpendingDynamicHandler,
+		CurrentBudgetHandler:            CurrentBudgetHandler,
 	}
 
 	myMiddleware := &middleware.Middleware{

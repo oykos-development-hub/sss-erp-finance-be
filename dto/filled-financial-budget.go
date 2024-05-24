@@ -28,6 +28,7 @@ type FilledFinancialBudgetResponseDTO struct {
 	NextYear        decimal.Decimal     `json:"next_year"`
 	YearAfterNext   decimal.Decimal     `json:"year_after_next"`
 	Actual          decimal.NullDecimal `json:"actual"`
+	Balance         decimal.NullDecimal `json:"balance"`
 	Description     string              `json:"description,omitempty"`
 	CreatedAt       time.Time           `json:"created_at,omitempty"`
 	UpdatedAt       time.Time           `json:"updated_at,omitempty"`
@@ -61,6 +62,7 @@ func ToFilledFinancialBudgetResponseDTO(data *data.FilledFinancialBudget) Filled
 		YearAfterNext:   data.YearAfterNext,
 		Actual:          data.Actual,
 		Description:     data.Description,
+		Balance:         data.Balance,
 		CreatedAt:       data.CreatedAt,
 		UpdatedAt:       data.UpdatedAt,
 	}

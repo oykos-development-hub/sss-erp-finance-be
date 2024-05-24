@@ -66,7 +66,8 @@ type Models struct {
 	AccountingEntryItem      AccountingEntryItem
 	SpendingDynamic          SpendingDynamic
 	SpendingDynamicEntry     SpendingDynamicEntry
-}
+	CurrentBudget CurrentBudget
+	}
 
 func New(databasePool *sql.DB) Models {
 	//db = databasePool
@@ -121,6 +122,7 @@ func New(databasePool *sql.DB) Models {
 		AccountingEntryItem:      AccountingEntryItem{},
 		SpendingDynamic:          SpendingDynamic{},
 		SpendingDynamicEntry:     SpendingDynamicEntry{},
+		CurrentBudget: CurrentBudget{},
 	}
 }
 
