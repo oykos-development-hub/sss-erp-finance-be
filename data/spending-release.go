@@ -1,6 +1,7 @@
 package data
 
 import (
+	goerrors "errors"
 	"time"
 
 	"github.com/shopspring/decimal"
@@ -26,14 +27,13 @@ func (t *SpendingRelease) Table() string {
 // ValidateNewEntry validates if not expired
 func (t *SpendingRelease) ValidateNewRelease() bool {
 	now := time.Now()
-	day := now.Day()
+
+	// TODO: add validations for year and first 5 days if needed.
+	// day := now.Day()
+	// year := now.Year()
 	currentMonth := int(now.Month())
 
-	if t.Month == currentMonth && day <= 5 {
-		return true
-	}
-
-	return false
+	return t.Month == currentMonth
 }
 
 // GetAll gets all records from the database, using upper
@@ -64,6 +64,24 @@ func (t *SpendingRelease) GetAll(page *int, size *int, condition *up.AndExpr, or
 	return all, &total, err
 }
 
+// GetAll gets all records from the database, using upper
+func (t *SpendingRelease) GetBy(condition up.AndExpr) (*SpendingRelease, error) {
+	collection := Upper.Collection(t.Table())
+	var one SpendingRelease
+
+	res := collection.Find(&condition)
+
+	err := res.One(&one)
+	if err != nil {
+		if goerrors.Is(err, up.ErrNoMoreRows) {
+			return nil, errors.WrapNotFoundError(err, "repo spending-release getBy")
+		}
+		return nil, errors.Wrap(err, "repo spending-release getBy")
+	}
+
+	return &one, err
+}
+
 // Get gets one record from the database, by id, using upper
 func (t *SpendingRelease) Get(id int) (*SpendingRelease, error) {
 	var one SpendingRelease
@@ -72,6 +90,9 @@ func (t *SpendingRelease) Get(id int) (*SpendingRelease, error) {
 	res := collection.Find(up.Cond{"id": id})
 	err := res.One(&one)
 	if err != nil {
+		if goerrors.Is(err, up.ErrNoMoreRows) {
+			return nil, errors.WrapNotFoundError(err, "repo spending-release get")
+		}
 		return nil, errors.Wrap(err, "repo spending-release get")
 	}
 	return &one, nil
@@ -94,6 +115,9 @@ func (t *SpendingRelease) Delete(id int) error {
 	res := collection.Find(id)
 	err := res.Delete()
 	if err != nil {
+		if goerrors.Is(err, up.ErrNoMoreRows) {
+			return errors.WrapNotFoundError(err, "repo spending-release delete")
+		}
 		return errors.Wrap(err, "repo spending-release delete")
 	}
 	return nil

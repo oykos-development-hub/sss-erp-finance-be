@@ -6,9 +6,8 @@ import (
 )
 
 var (
-	ErrNotFoundField              = errors.New("field not found")
-	ErrMock                       = errors.New("mock-error")
-	ErrNonFinancialBudgetNotFound = errors.New("financial budget not found")
+	ErrNotFoundField = errors.New("field not found")
+	ErrMock          = errors.New("mock-error")
 )
 
 type AppError struct {
@@ -49,6 +48,13 @@ func New(format string, args ...interface{}) error {
 	}
 }
 
+func NewWithCode(code int, format string, args ...interface{}) error {
+	return AppError{
+		Code: code,
+		Err:  fmt.Errorf(format, args...),
+	}
+}
+
 func Wrap(err error, message string) error {
 	code := InternalCode
 
@@ -81,13 +87,6 @@ func NewBadRequestError(message string, args ...interface{}) error {
 func WrapBadRequestError(err error, message string, args ...interface{}) error {
 	return AppError{
 		Code: BadRequestCode,
-		Err:  fmt.Errorf("%s: %w", fmt.Sprintf(message, args...), err),
-	}
-}
-
-func WrapMicroserviceError(err error, message string, args ...interface{}) error {
-	return AppError{
-		Code: MicroserviceRequestCode,
 		Err:  fmt.Errorf("%s: %w", fmt.Sprintf(message, args...), err),
 	}
 }

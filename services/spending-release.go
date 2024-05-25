@@ -36,6 +36,11 @@ func (h *SpendingReleaseServiceImpl) CreateSpendingRelease(inputDTO dto.Spending
 		return nil, err
 	}
 
+	_, err = h.repo.GetBy(*up.And(up.Cond{"current_budget_id": currentBudget.ID}, up.Cond{"month": inputDTO.Month}))
+	if !errors.IsErr(err, errors.NotFoundCode) {
+		return nil, errors.NewWithCode(errors.SingleMonthSpendingReleaseCode, "service.spending-release.CreateSpendingRelease: only single release is allowed per month")
+	}
+
 	budget, err := h.repoBudget.Get(currentBudget.BudgetID)
 	if err != nil {
 		return nil, errors.Wrap(err, "service.spending-release.CreateSpendingRelease")
@@ -47,12 +52,12 @@ func (h *SpendingReleaseServiceImpl) CreateSpendingRelease(inputDTO dto.Spending
 		Month:           inputDTO.Month,
 		Value:           inputDTO.Value,
 	}
-	if inputData.ValidateNewRelease() {
-		return nil, errors.NewBadRequestError("service.CreateSpendingRelease: release is possible only in the first 5 days of current month")
+	if !inputData.ValidateNewRelease() {
+		return nil, errors.NewWithCode(errors.ReleaseInCurrentMonthCode, "service.CreateSpendingRelease: release is possible only in the current month")
 	}
 
-	if currentBudget.Actual.Sub(inputData.Value).LessThan(decimal.Zero) {
-		return nil, errors.NewBadRequestError("service.CreateSpendingRelease: not enough funds")
+	if currentBudget.Actual.Sub(currentBudget.Balance).Sub(inputData.Value).LessThan(decimal.Zero) {
+		return nil, errors.NewWithCode(errors.NotEnoughFundsCode, "service.CreateSpendingRelease: not enough funds")
 	}
 
 	id, err := h.repo.Insert(inputData)
