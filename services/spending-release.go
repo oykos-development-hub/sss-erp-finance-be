@@ -56,7 +56,7 @@ func (h *SpendingReleaseServiceImpl) CreateSpendingRelease(inputDTO dto.Spending
 		return nil, errors.NewWithCode(errors.ReleaseInCurrentMonthCode, "service.CreateSpendingRelease: release is possible only in the current month")
 	}
 
-	if currentBudget.Actual.Sub(currentBudget.Balance).Sub(inputData.Value).LessThan(decimal.Zero) {
+	if currentBudget.Vault().Sub(inputData.Value).LessThan(decimal.Zero) {
 		return nil, errors.NewWithCode(errors.NotEnoughFundsCode, "service.CreateSpendingRelease: not enough funds")
 	}
 

@@ -21,6 +21,10 @@ type CurrentBudget struct {
 	CreatedAt     time.Time       `db:"created_at,omitempty"`
 }
 
+func (t *CurrentBudget) Vault() decimal.Decimal {
+	return t.Actual.Sub(t.Balance)
+}
+
 // Table returns the table name
 func (t *CurrentBudget) Table() string {
 	return "current_budgets"
