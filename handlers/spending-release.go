@@ -5,7 +5,7 @@ import (
 	"strconv"
 
 	"gitlab.sudovi.me/erp/finance-api/dto"
-	"gitlab.sudovi.me/erp/finance-api/errors"
+	"gitlab.sudovi.me/erp/finance-api/pkg/errors"
 	"gitlab.sudovi.me/erp/finance-api/services"
 
 	"github.com/go-chi/chi/v5"
@@ -36,13 +36,21 @@ func (h *spendingreleaseHandlerImpl) CreateSpendingRelease(w http.ResponseWriter
 
 	validator := h.App.Validator().ValidateStruct(&input)
 	if !validator.Valid() {
-		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
+		_ = h.App.WriteErrorResponseWithData(w, errors.BadRequestCode, errors.NewBadRequestError("input validation"), validator.Errors)
 		return
 	}
 
 	res, err := h.service.CreateSpendingRelease(input)
 	if err != nil {
-		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
+		if errors.IsErr(err, errors.BadRequestCode) {
+			_ = h.App.WriteErrorResponse(w, errors.BadRequestCode, err)
+			return
+		}
+		if errors.IsErr(err, errors.NotFoundCode) {
+			_ = h.App.WriteErrorResponse(w, errors.NotFoundCode, err)
+			return
+		}
+		_ = h.App.WriteErrorResponse(w, errors.InternalCode, err)
 		return
 	}
 
@@ -54,7 +62,7 @@ func (h *spendingreleaseHandlerImpl) DeleteSpendingRelease(w http.ResponseWriter
 
 	err := h.service.DeleteSpendingRelease(id)
 	if err != nil {
-		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
+		_ = h.App.WriteErrorResponse(w, errors.InternalCode, err)
 		return
 	}
 
@@ -66,7 +74,7 @@ func (h *spendingreleaseHandlerImpl) GetSpendingReleaseById(w http.ResponseWrite
 
 	res, err := h.service.GetSpendingRelease(id)
 	if err != nil {
-		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
+		_ = h.App.WriteErrorResponse(w, errors.InternalCode, err)
 		return
 	}
 
@@ -80,13 +88,13 @@ func (h *spendingreleaseHandlerImpl) GetSpendingReleaseList(w http.ResponseWrite
 
 	validator := h.App.Validator().ValidateStruct(&filter)
 	if !validator.Valid() {
-		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
+		_ = h.App.WriteErrorResponseWithData(w, errors.BadRequestCode, errors.NewBadRequestError("input validation"), validator.Errors)
 		return
 	}
 
 	res, total, err := h.service.GetSpendingReleaseList(filter)
 	if err != nil {
-		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
+		_ = h.App.WriteErrorResponse(w, errors.InternalCode, err)
 		return
 	}
 

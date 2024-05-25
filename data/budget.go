@@ -1,9 +1,11 @@
 package data
 
 import (
+	goerrors "errors"
 	"time"
 
 	up "github.com/upper/db/v4"
+	"gitlab.sudovi.me/erp/finance-api/pkg/errors"
 )
 
 type BudgetType int
@@ -70,7 +72,10 @@ func (t *Budget) Get(id int) (*Budget, error) {
 	res := collection.Find(up.Cond{"id": id})
 	err := res.One(&one)
 	if err != nil {
-		return nil, err
+		if goerrors.Is(err, up.ErrNoMoreRows) {
+			return nil, errors.WrapNotFoundError(err, "repo get")
+		}
+		return nil, errors.Wrap(err, "repo budget get")
 	}
 	return &one, nil
 }

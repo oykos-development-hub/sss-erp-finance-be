@@ -5,12 +5,14 @@ import (
 
 	"github.com/shopspring/decimal"
 	up "github.com/upper/db/v4"
+	"gitlab.sudovi.me/erp/finance-api/pkg/errors"
 )
 
 // SpendingRelease struct
 type SpendingRelease struct {
 	ID              int             `db:"id,omitempty"`
 	CurrentBudgetID int             `db:"current_budget_id"`
+	Year            int             `db:"year"`
 	Month           int             `db:"month"`
 	Value           decimal.Decimal `db:"value"`
 	CreatedAt       time.Time       `db:"created_at,omitempty"`
@@ -21,7 +23,7 @@ func (t *SpendingRelease) Table() string {
 	return "spending_releases"
 }
 
-// ValidateNewEntry validates the new entry against the old entry up to the end of the previous month.
+// ValidateNewEntry validates if not expired
 func (t *SpendingRelease) ValidateNewRelease() bool {
 	now := time.Now()
 	day := now.Day()
@@ -47,7 +49,7 @@ func (t *SpendingRelease) GetAll(page *int, size *int, condition *up.AndExpr, or
 	}
 	total, err := res.Count()
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, errors.Wrap(err, "repo spending-release get all")
 	}
 
 	if page != nil && size != nil {
@@ -56,7 +58,7 @@ func (t *SpendingRelease) GetAll(page *int, size *int, condition *up.AndExpr, or
 
 	err = res.OrderBy(orders...).All(&all)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, errors.Wrap(err, "repo spending-release getAll")
 	}
 
 	return all, &total, err
@@ -70,7 +72,7 @@ func (t *SpendingRelease) Get(id int) (*SpendingRelease, error) {
 	res := collection.Find(up.Cond{"id": id})
 	err := res.One(&one)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "repo spending-release get")
 	}
 	return &one, nil
 }
@@ -81,7 +83,7 @@ func (t *SpendingRelease) Update(m SpendingRelease) error {
 	res := collection.Find(m.ID)
 	err := res.Update(&m)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "repo spending-release update")
 	}
 	return nil
 }
@@ -92,7 +94,7 @@ func (t *SpendingRelease) Delete(id int) error {
 	res := collection.Find(id)
 	err := res.Delete()
 	if err != nil {
-		return err
+		return errors.Wrap(err, "repo spending-release delete")
 	}
 	return nil
 }
@@ -103,7 +105,7 @@ func (t *SpendingRelease) Insert(m SpendingRelease) (int, error) {
 	collection := Upper.Collection(t.Table())
 	res, err := collection.Insert(m)
 	if err != nil {
-		return 0, err
+		return 0, errors.Wrap(err, "repo spending-release insert")
 	}
 
 	id := getInsertId(res.ID())
