@@ -24,6 +24,7 @@ type SpendingDynamicEntry struct {
 	October           decimal.Decimal `db:"october"`
 	November          decimal.Decimal `db:"november"`
 	December          decimal.Decimal `db:"december"`
+	Version           int             `db:"version"`
 	CreatedAt         time.Time       `db:"created_at,omitempty"`
 }
 
@@ -48,7 +49,7 @@ func (t *SpendingDynamicEntry) FindAll(condition *up.Cond) ([]SpendingDynamicEnt
 		res = collection.Find()
 	}
 
-	err := res.All(&all)
+	err := res.OrderBy("-created_at").All(&all)
 	if err != nil {
 		return nil, err
 	}
@@ -56,13 +57,13 @@ func (t *SpendingDynamicEntry) FindAll(condition *up.Cond) ([]SpendingDynamicEnt
 	return all, err
 }
 
-func (t *SpendingDynamicEntry) FindBy(condition *up.Cond) (*SpendingDynamicEntry, error) {
+func (t *SpendingDynamicEntry) FindBy(condition *up.AndExpr) (*SpendingDynamicEntry, error) {
 	collection := Upper.Collection(t.Table())
 	var one SpendingDynamicEntry
 	var res up.Result
 
 	if condition != nil {
-		res = collection.Find(*condition)
+		res = collection.Find(condition)
 	} else {
 		res = collection.Find()
 	}

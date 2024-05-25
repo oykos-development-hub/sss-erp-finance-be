@@ -14,5 +14,6 @@ CREATE TABLE IF NOT EXISTS spending_dynamic_entries (
     october DECIMAL(10, 2) NOT NULL,
     november DECIMAL(10, 2) NOT NULL,
     december DECIMAL(10, 2) NOT NULL,
+    version INTEGER NOT NULL,
     created_at TIMESTAMP
 );

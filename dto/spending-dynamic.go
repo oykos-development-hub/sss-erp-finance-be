@@ -29,13 +29,19 @@ type SpendingDynamicDTO struct {
 type SpendingDynamicHistoryResponseDTO struct {
 	BudgetID  int       `json:"budget_id"`
 	UnitID    int       `json:"unit_id"`
+	Version   int       `json:"version"`
 	CreatedAt time.Time `json:"created_at"`
 	Username  string    `json:"username"`
+}
+
+type SpendingDynamicFilter struct {
+	Version *int `json:"version"`
 }
 
 type SpendingDynamicWithEntryResponseDTO struct {
 	ID              int             `json:"id"`
 	CurrentBudgetID int             `json:"current_budget_id"`
+	AccountID       int             `json:"account_id"`
 	PlannedTotal    decimal.Decimal `json:"actual"`
 	SpendingDynamicEntryResponseDTO
 }

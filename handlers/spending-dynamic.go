@@ -66,7 +66,17 @@ func (h *spendingdynamicHandlerImpl) GetBudgetSpendingDynamic(w http.ResponseWri
 	budgetID, _ := strconv.Atoi(chi.URLParam(r, "budget_id"))
 	unitID, _ := strconv.Atoi(chi.URLParam(r, "unit_id"))
 
-	res, err := h.service.GetSpendingDynamic(budgetID, unitID)
+	var filter dto.SpendingDynamicFilter
+
+	_ = h.App.ReadJSON(w, r, &filter)
+
+	validator := h.App.Validator().ValidateStruct(&filter)
+	if !validator.Valid() {
+		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
+		return
+	}
+
+	res, err := h.service.GetSpendingDynamic(budgetID, unitID, filter.Version)
 	if err != nil {
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
