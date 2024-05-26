@@ -8,7 +8,7 @@ import (
 )
 
 type SpendingDynamicEntryResponseDTO struct {
-	SpendingDynamicID int             `json:"spending_dynamic_id"`
+	SpendingDynamicID int             `json:"-"`
 	Username          string          `json:"username"`
 	January           decimal.Decimal `json:"january"`
 	February          decimal.Decimal `json:"february"`

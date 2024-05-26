@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"time"
 
+	goerrors "errors"
+
 	"github.com/shopspring/decimal"
 	up "github.com/upper/db/v4"
-	"gitlab.sudovi.me/erp/finance-api/errors"
+	"gitlab.sudovi.me/erp/finance-api/pkg/errors"
 )
 
 // CurrentBudget struct
@@ -43,7 +45,7 @@ func (t *CurrentBudget) GetAll(page *int, size *int, condition *up.AndExpr, orde
 	}
 	total, err := res.Count()
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, errors.Wrap(err, "GetAll")
 	}
 
 	if page != nil && size != nil {
@@ -52,10 +54,10 @@ func (t *CurrentBudget) GetAll(page *int, size *int, condition *up.AndExpr, orde
 
 	err = res.OrderBy(orders...).All(&all)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, errors.Wrap(err, "GetAll")
 	}
 
-	return all, &total, err
+	return all, &total, nil
 }
 
 // GetAll gets all records from the database, using upper
@@ -66,8 +68,14 @@ func (t *CurrentBudget) GetBy(condition up.AndExpr) (*CurrentBudget, error) {
 	res := collection.Find(&condition)
 
 	err := res.One(&one)
+	if err != nil {
+		if goerrors.Is(err, up.ErrNoMoreRows) {
+			return nil, errors.WrapNotFoundError(err, "GetBy")
+		}
+		return nil, errors.Wrap(err, "GetBy")
+	}
 
-	return &one, err
+	return &one, nil
 }
 
 // Get gets one record from the database, by id, using upper
@@ -78,7 +86,10 @@ func (t *CurrentBudget) Get(id int) (*CurrentBudget, error) {
 	res := collection.Find(up.Cond{"id": id})
 	err := res.One(&one)
 	if err != nil {
-		return nil, err
+		if goerrors.Is(err, up.ErrNoMoreRows) {
+			return nil, errors.WrapNotFoundError(err, "Get")
+		}
+		return nil, errors.Wrap(err, "Get")
 	}
 	return &one, nil
 }
@@ -93,7 +104,7 @@ func (t *CurrentBudget) UpdateActual(currentBudgetID int, actual decimal.Decimal
 	}
 	rowsAffected, _ := res.RowsAffected()
 	if rowsAffected != 1 {
-		return errors.ErrNotFound
+		return errors.NewNotFoundError("UpdateActual: not found")
 	}
 
 	return nil
@@ -109,7 +120,7 @@ func (t *CurrentBudget) UpdateBalance(currentBudgetID int, balance decimal.Decim
 	}
 	rowsAffected, _ := res.RowsAffected()
 	if rowsAffected != 1 {
-		return errors.ErrNotFound
+		return errors.NewNotFoundError("UpdateBalance")
 	}
 
 	return nil

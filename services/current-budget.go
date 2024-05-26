@@ -22,8 +22,9 @@ func NewCurrentBudgetServiceImpl(
 	spendingService SpendingDynamicService,
 ) CurrentBudgetService {
 	return &CurrentBudgetServiceImpl{
-		App:  app,
-		repo: repo,
+		App:             app,
+		repo:            repo,
+		spendingService: spendingService,
 	}
 }
 

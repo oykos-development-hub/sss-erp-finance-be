@@ -105,7 +105,7 @@ func (h *SpendingDynamicServiceImpl) CreateSpendingDynamic(inputDataDTO []dto.Sp
 			return nil, errors.Wrap(err, "CreateSpendingDynamic")
 		}
 
-		res[i] = *dto.ToSpendingDynamicWithEntryResponseDTO(spendingDynamic, entriesData)
+		res[i] = *dto.ToSpendingDynamicWithEntryResponseDTO(spendingDynamic, entriesData, currentBudget)
 	}
 
 	return res, nil
@@ -205,9 +205,16 @@ func (h *SpendingDynamicServiceImpl) GetSpendingDynamic(budgetID, unitID int, ve
 		return nil, err
 	}
 
-	currentBudgetIDList := make([]int, len(currentBudgets))
-	for i, currentBudget := range currentBudgets {
-		currentBudgetIDList[i] = currentBudget.ID
+	currentBudgetMap := make(map[int]*data.CurrentBudget)
+
+	// Populate the map with the current budgets.
+	for _, currentBudget := range currentBudgets {
+		currentBudgetMap[currentBudget.ID] = currentBudget
+	}
+
+	currentBudgetIDList := make([]int, 0, len(currentBudgetMap))
+	for id := range currentBudgetMap {
+		currentBudgetIDList = append(currentBudgetIDList, id)
 	}
 
 	spendingDynamicList, err := h.repo.List(up.And(
@@ -230,7 +237,7 @@ func (h *SpendingDynamicServiceImpl) GetSpendingDynamic(budgetID, unitID int, ve
 		if err != nil {
 			return nil, errors.Wrap(err, "GetSpendingDynamic")
 		}
-		res[i] = *dto.ToSpendingDynamicWithEntryResponseDTO(&spendingDynamic, entry)
+		res[i] = *dto.ToSpendingDynamicWithEntryResponseDTO(&spendingDynamic, entry, currentBudgetMap[spendingDynamic.CurrentBudgetID])
 	}
 
 	return res, nil
