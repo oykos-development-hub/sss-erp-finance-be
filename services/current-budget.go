@@ -3,7 +3,7 @@ package services
 import (
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
-	"gitlab.sudovi.me/erp/finance-api/errors"
+	"gitlab.sudovi.me/erp/finance-api/pkg/errors"
 
 	"github.com/oykos-development-hub/celeritas"
 	"github.com/shopspring/decimal"
@@ -11,11 +11,16 @@ import (
 )
 
 type CurrentBudgetServiceImpl struct {
-	App  *celeritas.Celeritas
-	repo data.CurrentBudget
+	App             *celeritas.Celeritas
+	repo            data.CurrentBudget
+	spendingService SpendingDynamicService
 }
 
-func NewCurrentBudgetServiceImpl(app *celeritas.Celeritas, repo data.CurrentBudget) CurrentBudgetService {
+func NewCurrentBudgetServiceImpl(
+	app *celeritas.Celeritas,
+	repo data.CurrentBudget,
+	spendingService SpendingDynamicService,
+) CurrentBudgetService {
 	return &CurrentBudgetServiceImpl{
 		App:  app,
 		repo: repo,
@@ -27,15 +32,20 @@ func (h *CurrentBudgetServiceImpl) CreateCurrentBudget(input dto.CurrentBudgetDT
 
 	id, err := h.repo.Insert(*data)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, errors.Wrap(err, "CreateCurrentBudget")
 	}
 
 	data, err = data.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, errors.Wrap(err, "CreateCurrentBudget")
 	}
 
 	res := dto.ToCurrentBudgetResponseDTO(data)
+
+	err = h.spendingService.CreateInititalSpendingDynamicFromCurrentBudget(data)
+	if err != nil {
+		return nil, errors.Wrap(err, "CreateCurrentBudget")
+	}
 
 	return &res, nil
 }
@@ -47,12 +57,12 @@ func (h *CurrentBudgetServiceImpl) UpdateActual(unitID, budgetID, accountID int,
 		up.Cond{"account_id": accountID},
 	))
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, errors.Wrap(err, "UpdateActual")
 	}
 
 	err = h.repo.UpdateActual(currentBudget.ID, actual)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, errors.Wrap(err, "UpdateActual")
 	}
 
 	response := dto.ToCurrentBudgetResponseDTO(currentBudget)
@@ -64,7 +74,7 @@ func (h *CurrentBudgetServiceImpl) GetCurrentBudget(id int) (*dto.CurrentBudgetR
 	data, err := h.repo.Get(id)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrNotFound
+		return nil, errors.WrapNotFoundError(err, "GetCurrentBudget")
 	}
 	response := dto.ToCurrentBudgetResponseDTO(data)
 
@@ -92,8 +102,7 @@ func (h *CurrentBudgetServiceImpl) GetCurrentBudgetList(filter dto.CurrentBudget
 
 	data, total, err := h.repo.GetAll(filter.Page, filter.Size, conditionAndExp, orders)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, nil, errors.ErrInternalServer
+		return nil, nil, errors.Wrap(err, "GetCurrentBudgetList")
 	}
 	response := dto.ToCurrentBudgetListResponseDTO(data)
 

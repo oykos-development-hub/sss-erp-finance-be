@@ -5,7 +5,7 @@ import (
 
 	"github.com/shopspring/decimal"
 	up "github.com/upper/db/v4"
-	"gitlab.sudovi.me/erp/finance-api/errors"
+	"gitlab.sudovi.me/erp/finance-api/pkg/errors"
 )
 
 // SpendingDynamic struct
@@ -33,7 +33,7 @@ func (t *SpendingDynamic) List(cond *up.AndExpr, orders []any) ([]SpendingDynami
 		All(&all)
 	if err != nil {
 		if goerrors.Is(err, up.ErrNoMoreRows) {
-			return nil, errors.ErrNotFound
+			return nil, errors.WrapNotFoundError(err, "List")
 		}
 		return nil, err
 	}
@@ -54,7 +54,7 @@ func (t *SpendingDynamic) GetBy(cond *up.AndExpr, orders []any) (*SpendingDynami
 		One(&one)
 	if err != nil {
 		if goerrors.Is(err, up.ErrNoMoreRows) {
-			return nil, errors.ErrNotFound
+			return nil, errors.WrapNotFoundError(err, "GetBy")
 		}
 		return nil, err
 	}

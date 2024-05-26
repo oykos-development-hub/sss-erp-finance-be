@@ -1,12 +1,9 @@
 package services
 
 import (
-	goerrors "errors"
-	"log"
-
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
-	"gitlab.sudovi.me/erp/finance-api/errors"
+	"gitlab.sudovi.me/erp/finance-api/pkg/errors"
 
 	"github.com/shopspring/decimal"
 	up "github.com/upper/db/v4"
@@ -44,14 +41,14 @@ func (h *SpendingDynamicServiceImpl) CreateSpendingDynamic(inputDataDTO []dto.Sp
 			up.Cond{"account_id": inputDTO.AccountID},
 		))
 		if err != nil {
-			return nil, errors.ErrInternalServer
+			return nil, errors.Wrap(err, "CreateSpendingDynamic")
 		}
 
 		spendingDynamic, err := h.repo.GetBy(up.And(
 			up.Cond{"current_budget_id": currentBudget.ID},
 		), nil)
 		if err != nil {
-			if !goerrors.Is(err, errors.ErrNotFound) {
+			if !errors.IsErr(err, errors.NotFoundCode) {
 				return nil, err
 			}
 
@@ -62,12 +59,12 @@ func (h *SpendingDynamicServiceImpl) CreateSpendingDynamic(inputDataDTO []dto.Sp
 
 			id, err := h.repo.Insert(inputData)
 			if err != nil {
-				return nil, errors.ErrInternalServer
+				return nil, errors.Wrap(err, "CreateSpendingDynamic")
 			}
 
 			spendingDynamic, err = h.repo.Get(id)
 			if err != nil {
-				return nil, errors.ErrInternalServer
+				return nil, errors.Wrap(err, "CreateSpendingDynamic")
 			}
 		}
 
@@ -75,12 +72,12 @@ func (h *SpendingDynamicServiceImpl) CreateSpendingDynamic(inputDataDTO []dto.Sp
 
 		// Validate that the sum of the months matches the planned total
 		if !entriesInputData.SumOfMonths().Equal(spendingDynamic.PlannedTotal) {
-			return nil, errors.ErrInvalidInput
+			return nil, errors.NewBadRequestError("sum must match actual of current budget")
 		}
 
 		entries, err := h.repoEntries.FindAll(&up.Cond{"spending_dynamic_id": spendingDynamic.ID})
 		if err != nil {
-			if !goerrors.Is(err, up.ErrNoMoreRows) {
+			if !errors.IsErr(err, errors.NotFoundCode) {
 				return nil, err
 			}
 		}
@@ -91,8 +88,7 @@ func (h *SpendingDynamicServiceImpl) CreateSpendingDynamic(inputDataDTO []dto.Sp
 		if len(entries) > 0 {
 			ok := entriesInputData.ValidateNewEntry(&entries[0])
 			if !ok {
-				log.Println("cannot change months in past")
-				return nil, errors.ErrBadRequest
+				return nil, errors.NewBadRequestError("cannot change months in past")
 			}
 		}
 
@@ -101,18 +97,67 @@ func (h *SpendingDynamicServiceImpl) CreateSpendingDynamic(inputDataDTO []dto.Sp
 
 		_, err = h.repoEntries.Insert(*entriesInputData)
 		if err != nil {
-			return nil, errors.ErrInternalServer
+			return nil, errors.Wrap(err, "CreateSpendingDynamic")
 		}
 
 		entriesData, err := h.repoEntries.FindBy(up.And(up.Cond{"spending_dynamic_id": spendingDynamic.ID}))
 		if err != nil {
-			return nil, errors.ErrInternalServer
+			return nil, errors.Wrap(err, "CreateSpendingDynamic")
 		}
 
 		res[i] = *dto.ToSpendingDynamicWithEntryResponseDTO(spendingDynamic, entriesData)
 	}
 
 	return res, nil
+}
+
+func (h *SpendingDynamicServiceImpl) CreateInititalSpendingDynamicFromCurrentBudget(currentBudget *data.CurrentBudget) error {
+	inputData := data.SpendingDynamic{
+		CurrentBudgetID: currentBudget.ID,
+		PlannedTotal:    currentBudget.Actual,
+	}
+
+	spendingDynamicID, err := h.repo.Insert(inputData)
+	if err != nil {
+		return errors.Wrap(err, "CreateInititalSpendingDynamicFromCurrentBudget")
+	}
+
+	spendingDynamicEntry := h.generateInitialSpendingDynamicEntry(currentBudget)
+
+	spendingDynamicEntry.SpendingDynamicID = spendingDynamicID
+
+	_, err = h.repoEntries.Insert(*spendingDynamicEntry)
+	if err != nil {
+		return errors.Wrap(err, "CreateInititalSpendingDynamicFromCurrentBudget")
+	}
+
+	return err
+}
+
+func (h *SpendingDynamicServiceImpl) generateInitialSpendingDynamicEntry(currentBudget *data.CurrentBudget) *data.SpendingDynamicEntry {
+	monthlyAmount := currentBudget.Actual.Div(decimal.NewFromInt(12)).Round(2)
+
+	// Sum of the first 11 rounded months
+	totalForFirst11Months := monthlyAmount.Mul(decimal.NewFromInt(11))
+
+	// Adjust the December amount to account for rounding differences
+	decemberAmount := currentBudget.Actual.Sub(totalForFirst11Months).Round(2)
+
+	return &data.SpendingDynamicEntry{
+		January:   monthlyAmount,
+		February:  monthlyAmount,
+		March:     monthlyAmount,
+		April:     monthlyAmount,
+		May:       monthlyAmount,
+		June:      monthlyAmount,
+		July:      monthlyAmount,
+		August:    monthlyAmount,
+		September: monthlyAmount,
+		October:   monthlyAmount,
+		November:  monthlyAmount,
+		December:  decemberAmount,
+		Version:   1,
+	}
 }
 
 func (h *SpendingDynamicServiceImpl) GetSpendingDynamicHistory(budgetID, unitID int) ([]dto.SpendingDynamicHistoryResponseDTO, error) {
@@ -128,12 +173,12 @@ func (h *SpendingDynamicServiceImpl) GetSpendingDynamicHistory(budgetID, unitID 
 		up.Cond{"current_budget_id": currentBudget.ID},
 	), nil)
 	if err != nil {
-		return nil, errors.ErrNotFound
+		return nil, errors.Wrap(err, "GetSpendingDynamicHistory")
 	}
 
 	history, err := h.repoEntries.FindAll(&up.Cond{"spending_dynamic_id": spendingDynamic.ID})
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "GetSpendingDynamicHistory")
 	}
 
 	res := make([]dto.SpendingDynamicHistoryResponseDTO, len(history))
@@ -169,7 +214,7 @@ func (h *SpendingDynamicServiceImpl) GetSpendingDynamic(budgetID, unitID int, ve
 		up.Cond{"current_budget_id IN": currentBudgetIDList},
 	), nil)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "GetSpendingDynamic")
 	}
 
 	res := make([]dto.SpendingDynamicWithEntryResponseDTO, len(spendingDynamicList))
@@ -183,7 +228,7 @@ func (h *SpendingDynamicServiceImpl) GetSpendingDynamic(budgetID, unitID int, ve
 
 		entry, err := h.repoEntries.FindBy(conditionAndExp)
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "GetSpendingDynamic")
 		}
 		res[i] = *dto.ToSpendingDynamicWithEntryResponseDTO(&spendingDynamic, entry)
 	}
@@ -198,7 +243,7 @@ func (h *SpendingDynamicServiceImpl) GetActual(budgetID, unitID, accountID int) 
 		up.Cond{"account_id": accountID},
 	))
 	if err != nil {
-		return decimal.Zero, errors.ErrInternalServer
+		return decimal.Zero, errors.Wrap(err, "GetActual")
 	}
 
 	return currentBudget.Actual, nil
