@@ -64,11 +64,10 @@ type Models struct {
 	ModelsOfAccounting       ModelsOfAccounting
 	ModelOfAccountingItem    ModelOfAccountingItem
 	AccountingEntryItem      AccountingEntryItem
-	SpendingDynamic          SpendingDynamic
 	SpendingDynamicEntry     SpendingDynamicEntry
-	CurrentBudget CurrentBudget
-		SpendingRelease SpendingRelease
-	}
+	CurrentBudget            CurrentBudget
+	SpendingRelease          SpendingRelease
+}
 
 func New(databasePool *sql.DB) Models {
 	//db = databasePool
@@ -121,10 +120,9 @@ func New(databasePool *sql.DB) Models {
 		ModelsOfAccounting:       ModelsOfAccounting{},
 		ModelOfAccountingItem:    ModelOfAccountingItem{},
 		AccountingEntryItem:      AccountingEntryItem{},
-		SpendingDynamic:          SpendingDynamic{},
 		SpendingDynamicEntry:     SpendingDynamicEntry{},
-		CurrentBudget: CurrentBudget{},
-		SpendingRelease: SpendingRelease{},
+		CurrentBudget:            CurrentBudget{},
+		SpendingRelease:          SpendingRelease{},
 	}
 }
 

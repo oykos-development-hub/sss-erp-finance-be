@@ -40,7 +40,13 @@ func (h *spendingdynamicHandlerImpl) CreateSpendingDynamic(w http.ResponseWriter
 		return
 	}
 
-	res, err := h.service.CreateSpendingDynamic(input)
+	err = h.service.CreateSpendingDynamic(input)
+	if err != nil {
+		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
+		return
+	}
+
+	res, err := h.service.GetSpendingDynamic(input[0].BudgetID, input[0].UnitID, nil)
 	if err != nil {
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
