@@ -183,6 +183,10 @@ func (h *InvoiceServiceImpl) GetInvoice(id int) (*dto.InvoiceResponseDTO, error)
 
 	response.AdditionalExpenses = additionaExpenses
 
+	if len(additionaExpenses) > 0 {
+		response.Status = additionaExpenses[len(additionaExpenses)-1].Status
+	}
+
 	return &response, nil
 }
 
@@ -260,6 +264,8 @@ func (h *InvoiceServiceImpl) GetInvoiceList(input dto.InvoicesFilter) ([]dto.Inv
 
 		if len(additionalExpenses) > 0 {
 			response[i].NetPrice = float64(additionalExpenses[len(additionalExpenses)-1].Price)
+			response[i].Status = additionalExpenses[len(additionalExpenses)-1].Status
+
 		}
 	}
 
