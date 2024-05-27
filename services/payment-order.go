@@ -419,7 +419,7 @@ func updateInvoiceStatus(id int, amount float64, lenOfArray int, tx up.Session, 
 		amount += paymentOrder.Amount
 	}
 
-	if amount >= price+0.09999 || lenOfArray > 1 {
+	if amount >= price || lenOfArray > 1 {
 		invoice.Status = data.InvoiceStatusFull
 	} else {
 		invoice.Status = data.InvoiceStatusPart
@@ -459,7 +459,7 @@ func updateAdditionalExpenseStatus(id int, amount float64, lenOfArray int, tx up
 		amount += paymentOrder.Amount
 	}
 
-	if amount >= float64(item.Price+0.009999) || lenOfArray > 1 {
+	if amount >= float64(item.Price) || lenOfArray > 1 {
 		item.Status = data.InvoiceStatusFull
 	} else {
 		item.Status = data.InvoiceStatusPart
@@ -499,7 +499,7 @@ func updateSalaryAdditionalExpenseStatus(id int, amount float64, lenOfArray int,
 		amount += paymentOrder.Amount
 	}
 
-	if amount >= item.Amount+0.009999 || lenOfArray > 1 {
+	if amount >= item.Amount || lenOfArray > 1 {
 		item.Status = data.InvoiceStatusFull
 	} else {
 		item.Status = data.InvoiceStatusPart
