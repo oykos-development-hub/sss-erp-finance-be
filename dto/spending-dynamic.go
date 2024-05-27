@@ -46,19 +46,24 @@ type SpendingDynamicWithEntryResponseDTO struct {
 	CurrentBudgetID int             `json:"current_budget_id"`
 	Actual          decimal.Decimal `json:"actual"`
 	Username        string          `json:"username"`
-	January         decimal.Decimal `json:"january"`
-	February        decimal.Decimal `json:"february"`
-	March           decimal.Decimal `json:"march"`
-	April           decimal.Decimal `json:"april"`
-	May             decimal.Decimal `json:"may"`
-	June            decimal.Decimal `json:"june"`
-	July            decimal.Decimal `json:"july"`
-	August          decimal.Decimal `json:"august"`
-	September       decimal.Decimal `json:"september"`
-	October         decimal.Decimal `json:"october"`
-	November        decimal.Decimal `json:"november"`
-	December        decimal.Decimal `json:"december"`
+	January         MonthEntry      `json:"january"`
+	February        MonthEntry      `json:"february"`
+	March           MonthEntry      `json:"march"`
+	April           MonthEntry      `json:"april"`
+	May             MonthEntry      `json:"may"`
+	June            MonthEntry      `json:"june"`
+	July            MonthEntry      `json:"july"`
+	August          MonthEntry      `json:"august"`
+	September       MonthEntry      `json:"september"`
+	October         MonthEntry      `json:"october"`
+	November        MonthEntry      `json:"november"`
+	December        MonthEntry      `json:"december"`
 	CreatedAt       time.Time       `json:"created_at"`
+}
+
+type MonthEntry struct {
+	Value   decimal.Decimal `json:"value"`
+	Savings decimal.Decimal `json:"savings"`
 }
 
 func (dto SpendingDynamicDTO) ToSpendingDynamicEntry() *data.SpendingDynamicEntry {
@@ -76,37 +81,5 @@ func (dto SpendingDynamicDTO) ToSpendingDynamicEntry() *data.SpendingDynamicEntr
 		October:   dto.October,
 		November:  dto.November,
 		December:  dto.December,
-	}
-}
-
-func ToSpendingDynamicWithEntryListResponseDTO(entries []data.SpendingDynamicEntryWithCurrentBudget) []SpendingDynamicWithEntryResponseDTO {
-	dtoList := make([]SpendingDynamicWithEntryResponseDTO, len(entries))
-	for i, x := range entries {
-		dtoList[i] = *ToSpendingDynamicWithEntryResponseDTO(&x)
-	}
-	return dtoList
-}
-func ToSpendingDynamicWithEntryResponseDTO(entry *data.SpendingDynamicEntryWithCurrentBudget) *SpendingDynamicWithEntryResponseDTO {
-	return &SpendingDynamicWithEntryResponseDTO{
-		ID:              entry.ID,
-		CurrentBudgetID: entry.CurrentBudgetID,
-		AccountID:       entry.AccountID,
-		BudgetID:        entry.BudgetID,
-		UnitID:          entry.UnitID,
-		Actual:          entry.Actual,
-		Username:        entry.Username,
-		CreatedAt:       entry.CreatedAt,
-		January:         entry.January,
-		February:        entry.February,
-		March:           entry.March,
-		April:           entry.April,
-		May:             entry.May,
-		June:            entry.June,
-		July:            entry.July,
-		August:          entry.August,
-		September:       entry.September,
-		October:         entry.October,
-		November:        entry.November,
-		December:        entry.December,
 	}
 }

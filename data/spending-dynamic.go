@@ -1,7 +1,6 @@
 package data
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/shopspring/decimal"
@@ -112,8 +111,6 @@ func (t *SpendingDynamicEntry) FindAll(currentBudgetID, version, budgetID, unitI
 		}
 		query = query.Where("sd.version = ?", latestVersion)
 	}
-
-	fmt.Println(query)
 
 	err := query.OrderBy("-sd.created_at").All(&all)
 	if err != nil {
