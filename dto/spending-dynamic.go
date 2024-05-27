@@ -45,6 +45,7 @@ type SpendingDynamicWithEntryResponseDTO struct {
 	UnitID          int             `json:"unit_id"`
 	CurrentBudgetID int             `json:"current_budget_id"`
 	Actual          decimal.Decimal `json:"actual"`
+	TotalSavings    decimal.Decimal `json:"total_savings"`
 	Username        string          `json:"username"`
 	January         MonthEntry      `json:"january"`
 	February        MonthEntry      `json:"february"`
@@ -59,6 +60,23 @@ type SpendingDynamicWithEntryResponseDTO struct {
 	November        MonthEntry      `json:"november"`
 	December        MonthEntry      `json:"december"`
 	CreatedAt       time.Time       `json:"created_at"`
+}
+
+func (t *SpendingDynamicWithEntryResponseDTO) GetTotalSavings() decimal.Decimal {
+	return decimal.Sum(
+		t.January.Savings,
+		t.February.Savings,
+		t.March.Savings,
+		t.April.Savings,
+		t.May.Savings,
+		t.June.Savings,
+		t.July.Savings,
+		t.August.Savings,
+		t.September.Savings,
+		t.October.Savings,
+		t.November.Savings,
+		t.December.Savings,
+	)
 }
 
 type MonthEntry struct {

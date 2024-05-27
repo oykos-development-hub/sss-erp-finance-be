@@ -43,10 +43,21 @@ func (h *SpendingDynamicServiceImpl) CreateSpendingDynamic(inputDataDTO []dto.Sp
 
 		entriesInputData := inputDTO.ToSpendingDynamicEntry()
 
-		// Validate that the sum of the months matches the planned total
-		if !entriesInputData.SumOfMonths().Equal(currentBudget.Actual) {
-			return errors.NewBadRequestError("sum must match actual of current budget")
+		oldDynamic, err := h.GetSpendingDynamic(&currentBudget.ID, nil, nil, nil)
+		if err != nil {
+			return errors.Wrap(err, "CreateSpendingDynamic")
 		}
+		if len(oldDynamic) > 0 {
+			if !entriesInputData.SumOfMonths().Equal(currentBudget.Actual.Add(oldDynamic[0].TotalSavings)) {
+				return errors.NewBadRequestError("sum must match actual of current budget")
+			}
+		} else {
+			if !entriesInputData.SumOfMonths().Equal(currentBudget.Actual) {
+				return errors.NewBadRequestError("sum must match actual of current budget")
+			}
+		}
+
+		// Validate that the sum of the months matches the planned total
 
 		entries, err := h.repoEntries.FindAll(&currentBudget.ID, nil, nil, nil)
 		if err != nil {
@@ -134,8 +145,8 @@ func (h *SpendingDynamicServiceImpl) GetSpendingDynamicHistory(budgetID, unitID 
 	return res, nil
 }
 
-func (h *SpendingDynamicServiceImpl) GetSpendingDynamic(budgetID, unitID int, version *int) ([]dto.SpendingDynamicWithEntryResponseDTO, error) {
-	entries, err := h.repoEntries.FindAll(nil, version, &budgetID, &unitID)
+func (h *SpendingDynamicServiceImpl) GetSpendingDynamic(currentBudgetID, budgetID, unitID *int, version *int) ([]dto.SpendingDynamicWithEntryResponseDTO, error) {
+	entries, err := h.repoEntries.FindAll(currentBudgetID, version, budgetID, unitID)
 	if err != nil {
 		return nil, errors.Wrap(err, "GetSpendingDynamic")
 	}
@@ -197,6 +208,8 @@ func (h *SpendingDynamicServiceImpl) GetSpendingDynamic(budgetID, unitID int, ve
 				entryRes.December.Savings = entryRes.December.Value.Sub(release.Value)
 			}
 		}
+
+		entryRes.TotalSavings = entryRes.GetTotalSavings()
 
 		entriesListRes = append(entriesListRes, entryRes)
 	}
