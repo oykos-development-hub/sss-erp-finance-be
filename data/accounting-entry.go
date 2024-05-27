@@ -204,7 +204,6 @@ func (t *AccountingEntry) GetObligationsForAccounting(filter ObligationsFilter) 
 						left join articles a on a.invoice_id = i.id
 						where 
 						i.organization_unit_id = $1 and i.type = $2 and i.registred = false 
-						and i.invoice_number is not null and i.invoice_number <> ''
 						and (COALESCE($3, '') = '' OR i.invoice_number LIKE '%' || $3 || '%')
 						group by i.id;`
 

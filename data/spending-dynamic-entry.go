@@ -105,12 +105,6 @@ func (t *SpendingDynamicEntry) FindAll(currentBudgetID, version, budgetID, unitI
 	}
 	if version != nil {
 		query = query.Where("sd.version = ?", *version)
-	} else {
-		latestVersion, err := t.FindLatestVersion()
-		if err != nil {
-			return nil, errors.Wrap(err, "FindAll")
-		}
-		query = query.Where("sd.version = ?", latestVersion)
 	}
 
 	fmt.Println(query)
