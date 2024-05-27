@@ -9,7 +9,7 @@ import (
 )
 
 // SpendingDynamic struct
-type SpendingDynamicEntry struct {
+type SpendingDynamicEntryTest struct {
 	ID              int             `db:"id,omitempty"`
 	CurrentBudgetID int             `db:"current_budget_id"`
 	Username        string          `db:"username"`
@@ -29,8 +29,8 @@ type SpendingDynamicEntry struct {
 	CreatedAt       time.Time       `db:"created_at,omitempty"`
 }
 
-type SpendingDynamicEntryWithCurrentBudget struct {
-	SpendingDynamicEntry
+type SpendingDynamicEntryTestWithCurrentBudget struct {
+	SpendingDynamicEntryTest
 	BudgetID  int             `db:"budget_id"`
 	UnitID    int             `db:"unit_id"`
 	AccountID int             `db:"account_id"`
@@ -38,15 +38,15 @@ type SpendingDynamicEntryWithCurrentBudget struct {
 }
 
 // Table returns the table name
-func (t *SpendingDynamicEntry) Table() string {
+func (t *SpendingDynamicEntryTest) Table() string {
 	return "spending_dynamic_entries"
 }
 
-func (t *SpendingDynamicEntry) SumOfMonths() decimal.Decimal {
+func (t *SpendingDynamicEntryTest) SumOfMonths() decimal.Decimal {
 	return decimal.Sum(t.January, t.February, t.March, t.April, t.May, t.June, t.July, t.August, t.September, t.October, t.November, t.December)
 }
 
-func (t *SpendingDynamicEntry) FindLatestVersion() (int, error) {
+func (t *SpendingDynamicEntryTest) FindLatestVersion() (int, error) {
 	var version int
 
 	row, err := Upper.SQL().QueryRow("SELECT MAX(version) AS version FROM spending_dynamic_entries")
@@ -64,7 +64,7 @@ func (t *SpendingDynamicEntry) FindLatestVersion() (int, error) {
 }
 
 // GetAll gets all records from the database, using upper
-func (t *SpendingDynamicEntry) FindAll(currentBudgetID, version, budgetID, unitID *int) ([]SpendingDynamicEntryWithCurrentBudget, error) {
+func (t *SpendingDynamicEntryTest) FindAll(currentBudgetID, version, budgetID, unitID *int) ([]SpendingDynamicEntryTestWithCurrentBudget, error) {
 	query := Upper.SQL().Select(
 		"sd.id",
 		"sd.current_budget_id",
@@ -92,7 +92,7 @@ func (t *SpendingDynamicEntry) FindAll(currentBudgetID, version, budgetID, unitI
 		From("spending_dynamic_entries AS sd").
 		Join("current_budgets AS cb").On("cb.id = sd.current_budget_id")
 
-	var all []SpendingDynamicEntryWithCurrentBudget
+	var all []SpendingDynamicEntryTestWithCurrentBudget
 
 	if currentBudgetID != nil {
 		query = query.Where("sd.current_budget_id = ?", *currentBudgetID)
@@ -129,7 +129,7 @@ type SpendingDynamicHistory struct {
 	Username  string
 }
 
-func (t *SpendingDynamicEntry) FindHistoryChanges(budgetID, unitID int) ([]SpendingDynamicHistory, error) {
+func (t *SpendingDynamicEntryTest) FindHistoryChanges(budgetID, unitID int) ([]SpendingDynamicHistory, error) {
 	query := `SELECT MIN(sd.created_at), MIN(username), version FROM spending_dynamic_entries sd 
 	JOIN current_budgets AS cb ON cb.id = sd.current_budget_id
 	WHERE cb.budget_id = $1 AND cb.unit_id = $2
@@ -156,7 +156,7 @@ func (t *SpendingDynamicEntry) FindHistoryChanges(budgetID, unitID int) ([]Spend
 }
 
 // ValidateNewEntry validates the new entry against the old entry up to the end of the previous month.
-func (t *SpendingDynamicEntry) ValidateNewEntry(oldEntry *SpendingDynamicEntryWithCurrentBudget) bool {
+func (t *SpendingDynamicEntryTest) ValidateNewEntry(oldEntry *SpendingDynamicEntryTestWithCurrentBudget) bool {
 	now := time.Now()
 	currentMonth := now.Month()
 
@@ -179,7 +179,7 @@ func (t *SpendingDynamicEntry) ValidateNewEntry(oldEntry *SpendingDynamicEntryWi
 	return true
 }
 
-func (s *SpendingDynamicEntry) monthValues() map[time.Month]decimal.Decimal {
+func (s *SpendingDynamicEntryTest) monthValues() map[time.Month]decimal.Decimal {
 	return map[time.Month]decimal.Decimal{
 		time.January:   s.January,
 		time.February:  s.February,
@@ -197,7 +197,7 @@ func (s *SpendingDynamicEntry) monthValues() map[time.Month]decimal.Decimal {
 }
 
 // Insert inserts a model into the database, using upper
-func (t *SpendingDynamicEntry) Insert(m SpendingDynamicEntry) (int, error) {
+func (t *SpendingDynamicEntryTest) Insert(m SpendingDynamicEntryTest) (int, error) {
 	m.CreatedAt = time.Now()
 
 	collection := Upper.Collection(t.Table())
