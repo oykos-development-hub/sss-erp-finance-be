@@ -134,7 +134,7 @@ func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation
 	var items []Obligation
 
 	queryForInvoices := `select i.id, sum((a.net_price +a.net_price*a.vat_percentage/100)*a.amount) as sum, 
-						i.invoice_number, i.status, i.created_at
+						i.invoice_number, i.pro_forma_invoice_number, i.status, i.created_at
 						from invoices i
 						left join articles a on a.invoice_id = i.id
 						where i.supplier_id = $1 and
@@ -177,7 +177,8 @@ func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation
 		for rows.Next() {
 			var obligation Obligation
 			var paid *float64
-			err = rows.Scan(&obligation.InvoiceID, &obligation.TotalPrice, &obligation.Title, &obligation.Status, &obligation.CreatedAt)
+			var invoiceNumber *string
+			err = rows.Scan(&obligation.InvoiceID, &obligation.TotalPrice, &obligation.Title, &invoiceNumber, &obligation.Status, &obligation.CreatedAt)
 
 			if err != nil {
 				return nil, nil, err
@@ -203,7 +204,11 @@ func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation
 				}
 			}
 			obligation.Type = TypeInvoice
-			obligation.Title = "Račun broj " + obligation.Title
+			if obligation.Title != "" {
+				obligation.Title = "Račun broj " + obligation.Title
+			} else if invoiceNumber != nil {
+				obligation.Title = "Predračun broj " + *invoiceNumber
+			}
 			items = append(items, obligation)
 		}
 	}

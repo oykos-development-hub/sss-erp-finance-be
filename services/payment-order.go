@@ -202,7 +202,11 @@ func (h *PaymentOrderServiceImpl) GetPaymentOrder(id int) (*dto.PaymentOrderResp
 				return nil, err
 			}
 
-			builtItem.Title = "Račun broj " + item.InvoiceNumber
+			if item.InvoiceNumber != "" {
+				builtItem.Title = "Račun broj " + item.InvoiceNumber
+			} else {
+				builtItem.Title = "Predračun broj " + item.ProFormaInvoiceNumber
+			}
 
 			conditionAndExp = &up.AndExpr{}
 			conditionAndExp = up.And(conditionAndExp, &up.Cond{"invoice_id": item.ID})
