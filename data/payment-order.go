@@ -203,7 +203,7 @@ func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation
 				}
 			}
 			obligation.Type = TypeInvoice
-			obligation.Title = "Račun broj " + obligation.Title + " Neto"
+			obligation.Title = "Račun broj " + obligation.Title
 			items = append(items, obligation)
 		}
 	}
