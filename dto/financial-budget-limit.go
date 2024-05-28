@@ -26,6 +26,7 @@ type FinancialBudgetLimitFilterDTO struct {
 	Size        *int    `json:"size"`
 	SortByTitle *string `json:"sort_by_title"`
 	BudgetID    int     `json:"budget_id"`
+	UnitID      *int    `json:"unit_id"`
 }
 
 func (dto FinancialBudgetLimitDTO) ToFinancialBudgetLimit() *data.FinancialBudgetLimit {
