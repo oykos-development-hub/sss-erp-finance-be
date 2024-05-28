@@ -18,22 +18,21 @@ type SpendingReleaseDTO struct {
 type SpendingReleaseResponseDTO struct {
 	ID              int             `json:"id"`
 	CurrentBudgetID int             `json:"current_budget_id"`
+	BudgetID        int             `json:"budget_id"`
+	UnitID          int             `json:"unit_id"`
+	AccountID       int             `json:"account_id"`
 	Year            int             `json:"year"`
 	Month           int             `json:"month"`
 	Value           decimal.Decimal `json:"value"`
 	CreatedAt       time.Time       `json:"created_at"`
 }
 
-type SpendingReleaseFilterDTO struct {
-	Page  *int `json:"page"`
-	Size  *int `json:"size"`
-	Year  *int `json:"year"`
-	Month *int `json:"month"`
-}
-
-func ToSpendingReleaseResponseDTO(data data.SpendingRelease) SpendingReleaseResponseDTO {
+func ToSpendingReleaseResponseDTO(data *data.SpendingReleaseWithCurrentBudget) SpendingReleaseResponseDTO {
 	return SpendingReleaseResponseDTO{
 		ID:              data.ID,
+		BudgetID:        data.BudgetID,
+		UnitID:          data.UnitID,
+		AccountID:       data.AccountID,
 		CurrentBudgetID: data.CurrentBudgetID,
 		Year:            data.Year,
 		Month:           data.Month,
@@ -42,10 +41,10 @@ func ToSpendingReleaseResponseDTO(data data.SpendingRelease) SpendingReleaseResp
 	}
 }
 
-func ToSpendingReleaseListResponseDTO(spendingreleases []*data.SpendingRelease) []SpendingReleaseResponseDTO {
+func ToSpendingReleaseListResponseDTO(spendingreleases []data.SpendingReleaseWithCurrentBudget) []SpendingReleaseResponseDTO {
 	dtoList := make([]SpendingReleaseResponseDTO, len(spendingreleases))
 	for i, x := range spendingreleases {
-		dtoList[i] = ToSpendingReleaseResponseDTO(*x)
+		dtoList[i] = ToSpendingReleaseResponseDTO(&x)
 	}
 	return dtoList
 }

@@ -75,7 +75,7 @@ func (h *SpendingReleaseServiceImpl) CreateSpendingRelease(inputDTO dto.Spending
 		return nil, errors.Wrap(err, "service.spending-release.CreateSpendingRelease")
 	}
 
-	res := dto.ToSpendingReleaseResponseDTO(*item)
+	res := dto.ToSpendingReleaseResponseDTO(item)
 
 	return &res, nil
 }
@@ -109,29 +109,17 @@ func (h *SpendingReleaseServiceImpl) GetSpendingRelease(id int) (*dto.SpendingRe
 	if err != nil {
 		return nil, errors.Wrap(err, "service.spending-release.GetSpendingRelease")
 	}
-	response := dto.ToSpendingReleaseResponseDTO(*data)
+	response := dto.ToSpendingReleaseResponseDTO(data)
 
 	return &response, nil
 }
 
-func (h *SpendingReleaseServiceImpl) GetSpendingReleaseList(filter dto.SpendingReleaseFilterDTO) ([]dto.SpendingReleaseResponseDTO, *uint64, error) {
-	conditionAndExp := &up.AndExpr{}
-	var orders []interface{}
-
-	if filter.Year != nil {
-		conditionAndExp = up.And(conditionAndExp, &up.Cond{"year": *filter.Year})
-	}
-	if filter.Month != nil {
-		conditionAndExp = up.And(conditionAndExp, &up.Cond{"month": *filter.Month})
-	}
-
-	orders = append(orders, "-created_at")
-
-	data, total, err := h.repo.GetAll(filter.Page, filter.Size, conditionAndExp, orders)
+func (h *SpendingReleaseServiceImpl) GetSpendingReleaseList(filter data.SpendingReleaseFilterDTO) ([]dto.SpendingReleaseResponseDTO, error) {
+	data, err := h.repo.GetAll(filter)
 	if err != nil {
-		return nil, nil, errors.Wrap(err, "service.spending-release.GetSpendingReleaseList")
+		return nil, errors.Wrap(err, "service.spending-release.GetSpendingReleaseList")
 	}
 	response := dto.ToSpendingReleaseListResponseDTO(data)
 
-	return response, total, nil
+	return response, nil
 }

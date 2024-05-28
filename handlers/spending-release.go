@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
 	"gitlab.sudovi.me/erp/finance-api/pkg/errors"
 	"gitlab.sudovi.me/erp/finance-api/services"
@@ -82,7 +83,7 @@ func (h *spendingreleaseHandlerImpl) GetSpendingReleaseById(w http.ResponseWrite
 }
 
 func (h *spendingreleaseHandlerImpl) GetSpendingReleaseList(w http.ResponseWriter, r *http.Request) {
-	var filter dto.SpendingReleaseFilterDTO
+	var filter data.SpendingReleaseFilterDTO
 
 	_ = h.App.ReadJSON(w, r, &filter)
 
@@ -92,11 +93,11 @@ func (h *spendingreleaseHandlerImpl) GetSpendingReleaseList(w http.ResponseWrite
 		return
 	}
 
-	res, total, err := h.service.GetSpendingReleaseList(filter)
+	res, err := h.service.GetSpendingReleaseList(filter)
 	if err != nil {
 		_ = h.App.WriteErrorResponse(w, errors.InternalCode, err)
 		return
 	}
 
-	_ = h.App.WriteDataResponseWithTotal(w, http.StatusOK, "", res, int(*total))
+	_ = h.App.WriteDataResponse(w, http.StatusOK, "", res)
 }

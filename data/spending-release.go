@@ -9,6 +9,15 @@ import (
 	"gitlab.sudovi.me/erp/finance-api/pkg/errors"
 )
 
+type SpendingReleaseFilterDTO struct {
+	CurrentBudgetID *int `json:"current_budget_id"`
+	BudgetID        *int `json:"budget_id"`
+	UnitID          *int `json:"unit_id"`
+	AccountID       *int `json:"account_id"`
+	Year            *int `json:"year"`
+	Month           *int `json:"month"`
+}
+
 // SpendingRelease struct
 type SpendingRelease struct {
 	ID              int             `db:"id,omitempty"`
@@ -17,6 +26,14 @@ type SpendingRelease struct {
 	Month           int             `db:"month"`
 	Value           decimal.Decimal `db:"value"`
 	CreatedAt       time.Time       `db:"created_at,omitempty"`
+}
+
+type SpendingReleaseWithCurrentBudget struct {
+	SpendingRelease
+	BudgetID  int `db:"budget_id"`
+	UnitID    int `db:"unit_id"`
+	AccountID int `db:"account_id"`
+	Actual    int `db:"actual"`
 }
 
 // Table returns the table name
@@ -37,31 +54,45 @@ func (t *SpendingRelease) ValidateNewRelease() bool {
 }
 
 // GetAll gets all records from the database, using upper
-func (t *SpendingRelease) GetAll(page *int, size *int, condition *up.AndExpr, orders []interface{}) ([]*SpendingRelease, *uint64, error) {
-	collection := Upper.Collection(t.Table())
-	var all []*SpendingRelease
-	var res up.Result
+func (t *SpendingRelease) GetAll(filter SpendingReleaseFilterDTO) ([]SpendingReleaseWithCurrentBudget, error) {
+	query := Upper.SQL().Select(
+		"sr.id",
+		"sr.current_budget_id",
+		"sr.year",
+		"sr.month",
+		"sr.value",
+		"sr.created_at",
+		"cb.budget_id",
+		"cb.unit_id",
+		"cb.account_id",
+	).
+		From("spending_releases AS sr").
+		Join("current_budgets AS cb").On("cb.id = sr.current_budget_id")
 
-	if condition != nil {
-		res = collection.Find(condition)
-	} else {
-		res = collection.Find()
+	var all []SpendingReleaseWithCurrentBudget
+
+	if filter.CurrentBudgetID != nil {
+		query = query.Where("sd.current_budget_id = ?", *filter.CurrentBudgetID)
 	}
-	total, err := res.Count()
+	if filter.BudgetID != nil {
+		query = query.Where("cb.budget_id = ?", *filter.BudgetID)
+	}
+	if filter.UnitID != nil {
+		query = query.Where("cb.unit_id = ?", *filter.UnitID)
+	}
+	if filter.Year != nil {
+		query = query.Where("sr.year = ?", *filter.Year)
+	}
+	if filter.Month != nil {
+		query = query.Where("sr.month = ?", *filter.Month)
+	}
+
+	err := query.OrderBy("-sr.created_at").All(&all)
 	if err != nil {
-		return nil, nil, errors.Wrap(err, "repo spending-release get all")
+		return nil, err
 	}
 
-	if page != nil && size != nil {
-		res = paginateResult(res, *page, *size)
-	}
-
-	err = res.OrderBy(orders...).All(&all)
-	if err != nil {
-		return nil, nil, errors.Wrap(err, "repo spending-release getAll")
-	}
-
-	return all, &total, err
+	return all, err
 }
 
 // GetAll gets all records from the database, using upper
@@ -83,19 +114,30 @@ func (t *SpendingRelease) GetBy(condition up.AndExpr) (*SpendingRelease, error) 
 }
 
 // Get gets one record from the database, by id, using upper
-func (t *SpendingRelease) Get(id int) (*SpendingRelease, error) {
-	var one SpendingRelease
-	collection := Upper.Collection(t.Table())
+func (t *SpendingRelease) Get(id int) (*SpendingReleaseWithCurrentBudget, error) {
+	query := Upper.SQL().Select(
+		"sr.id",
+		"sr.current_budget_id",
+		"sr.year",
+		"sr.month",
+		"sr.value",
+		"sr.created_at",
+		"cb.budget_id",
+		"cb.unit_id",
+		"cb.account_id",
+	).
+		From("spending_releases AS sr").
+		Join("current_budgets AS cb").On("cb.id = sr.current_budget_id").
+		Where("sr.id = ?", id)
 
-	res := collection.Find(up.Cond{"id": id})
-	err := res.One(&one)
+	var one SpendingReleaseWithCurrentBudget
+
+	err := query.OrderBy("-sr.created_at").One(&one)
 	if err != nil {
-		if goerrors.Is(err, up.ErrNoMoreRows) {
-			return nil, errors.WrapNotFoundError(err, "repo spending-release get")
-		}
-		return nil, errors.Wrap(err, "repo spending-release get")
+		return nil, err
 	}
-	return &one, nil
+
+	return &one, err
 }
 
 // Update updates a record in the database, using upper

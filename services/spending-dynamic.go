@@ -155,7 +155,10 @@ func (h *SpendingDynamicServiceImpl) GetSpendingDynamic(currentBudgetID, budgetI
 	entriesListRes := make([]dto.SpendingDynamicWithEntryResponseDTO, 0)
 
 	for _, entry := range entries {
-		releases, _, err := h.repoRelease.GetAll(nil, nil, up.And(up.Cond{"current_budget_id": entry.CurrentBudgetID}), nil)
+		filter := data.SpendingReleaseFilterDTO{
+			CurrentBudgetID: &entry.CurrentBudgetID,
+		}
+		releases, err := h.repoRelease.GetAll(filter)
 		if err != nil {
 			return nil, errors.Wrap(err, "GetSpendingDynamic")
 		}
