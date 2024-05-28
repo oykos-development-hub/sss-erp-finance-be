@@ -6,7 +6,6 @@ CREATE TABLE IF NOT EXISTS filled_financial_budgets (
     next_year DECIMAL(10, 2) NOT NULL,
     year_after_next DECIMAL(10, 2) NOT NULL,
     actual DECIMAL(10, 2),
-    balance DECIMAL(10, 2),
     description TEXT NOT NULL,
     created_at TIMESTAMP,
     updated_at TIMESTAMP

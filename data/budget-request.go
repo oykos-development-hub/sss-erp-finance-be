@@ -88,26 +88,25 @@ func (t *BudgetRequest) Get(id int) (*BudgetRequest, error) {
 	return &one, nil
 }
 
-func (t *BudgetRequest) GetActualAndBalance(budgetID, unitID, accountID int) (decimal.NullDecimal, decimal.NullDecimal, error) {
+func (t *BudgetRequest) GetActual(budgetID, unitID, accountID int) (decimal.NullDecimal, error) {
 	var actual decimal.NullDecimal
-	var balance decimal.NullDecimal
 
-	query := `SELECT FFb.actual, FFB.balance
+	query := `SELECT FFb.actual
 		FROM budget_requests BR
 		JOIN filled_financial_budgets FFB ON BR.id = FFB.budget_request_id 
 		WHERE BR.budget_id = $1 AND BR.organization_unit_id = $2 AND FFB.account_id = $3 AND BR.request_type = $4;`
 
 	row, err := Upper.SQL().QueryRow(query, budgetID, unitID, accountID, RequestTypeCurrentFinancial)
 	if err != nil {
-		return actual, balance, err
+		return actual, err
 	}
 
-	err = row.Scan(&actual, &balance)
+	err = row.Scan(&actual)
 	if err != nil {
-		return actual, balance, err
+		return actual, err
 	}
 
-	return actual, balance, nil
+	return actual, nil
 }
 
 // Update updates a record in the database, using upper
