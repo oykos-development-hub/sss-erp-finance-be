@@ -80,21 +80,12 @@ func (h *FinancialBudgetLimitServiceImpl) GetFinancialBudgetLimit(id int) (*dto.
 }
 
 func (h *FinancialBudgetLimitServiceImpl) GetFinancialBudgetLimitList(filter dto.FinancialBudgetLimitFilterDTO) ([]dto.FinancialBudgetLimitResponseDTO, *uint64, error) {
-	conditionAndExp := &up.AndExpr{}
 	var orders []interface{}
 
-	conditionAndExp = up.And(conditionAndExp, &up.Cond{"budget_id": filter.BudgetID})
+	conditionAndExp := up.And(&up.Cond{"budget_id": filter.BudgetID})
 
 	if filter.UnitID != nil {
-		conditionAndExp.And(conditionAndExp, &up.Cond{"organization_unit_id": *filter.UnitID})
-	}
-
-	if filter.SortByTitle != nil {
-		if *filter.SortByTitle == "asc" {
-			orders = append(orders, "-title")
-		} else {
-			orders = append(orders, "title")
-		}
+		conditionAndExp = conditionAndExp.And(conditionAndExp, &up.Cond{"organization_unit_id": *filter.UnitID})
 	}
 
 	orders = append(orders, "-created_at")
