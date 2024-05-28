@@ -72,7 +72,7 @@ func (t *SpendingRelease) GetAll(filter SpendingReleaseFilterDTO) ([]SpendingRel
 	var all []SpendingReleaseWithCurrentBudget
 
 	if filter.CurrentBudgetID != nil {
-		query = query.Where("sd.current_budget_id = ?", *filter.CurrentBudgetID)
+		query = query.Where("sr.current_budget_id = ?", *filter.CurrentBudgetID)
 	}
 	if filter.BudgetID != nil {
 		query = query.Where("cb.budget_id = ?", *filter.BudgetID)

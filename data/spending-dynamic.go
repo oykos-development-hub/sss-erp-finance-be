@@ -112,7 +112,7 @@ func (t *SpendingDynamicEntry) FindAll(currentBudgetID, version, budgetID, unitI
 		query = query.Where("sd.version = ?", latestVersion)
 	}
 
-	err := query.OrderBy("-sd.created_at").All(&all)
+	err := query.All(&all)
 	if err != nil {
 		return nil, err
 	}
