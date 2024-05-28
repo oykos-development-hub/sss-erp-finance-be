@@ -7,12 +7,12 @@ import (
 )
 
 type PaymentOrderItemDTO struct {
-	PaymentOrderID            int  `json:"payment_order_id"`
-	InvoiceID                 *int `json:"invoice_id"`
-	AdditionalExpenseID       *int `json:"additional_expense_id"`
-	SalaryAdditionalExpenseID *int `json:"salary_additional_expense_id"`
-	AccountID                 int  `json:"account_id"`
-	SourceAccountID           int  `json:"source_account_id"`
+	PaymentOrderID            int    `json:"payment_order_id"`
+	InvoiceID                 *int   `json:"invoice_id"`
+	AdditionalExpenseID       *int   `json:"additional_expense_id"`
+	SalaryAdditionalExpenseID *int   `json:"salary_additional_expense_id"`
+	AccountID                 int    `json:"account_id"`
+	SourceAccount             string `json:"source_account"`
 }
 
 type PaymentOrderItemResponseDTO struct {
@@ -23,7 +23,7 @@ type PaymentOrderItemResponseDTO struct {
 	SalaryAdditionalExpenseID *int                   `json:"salary_additional_expense_id"`
 	Type                      data.TypesOfObligation `json:"type"`
 	AccountID                 int                    `json:"account_id"`
-	SourceAccountID           int                    `json:"source_account_id"`
+	SourceAccount             string                 `json:"source_account"`
 	Amount                    float64                `json:"amount"`
 	Title                     string                 `json:"title"`
 	CreatedAt                 time.Time              `json:"created_at"`
@@ -47,7 +47,7 @@ func (dto PaymentOrderItemDTO) ToPaymentOrderItem() *data.PaymentOrderItem {
 		AccountID:                 dto.AccountID,
 		AdditionalExpenseID:       dto.AdditionalExpenseID,
 		SalaryAdditionalExpenseID: dto.SalaryAdditionalExpenseID,
-		SourceAccountID:           dto.SourceAccountID,
+		SourceAccount:             dto.SourceAccount,
 	}
 }
 
@@ -59,7 +59,7 @@ func ToPaymentOrderItemResponseDTO(data data.PaymentOrderItem) PaymentOrderItemR
 		AdditionalExpenseID:       data.AdditionalExpenseID,
 		SalaryAdditionalExpenseID: data.SalaryAdditionalExpenseID,
 		AccountID:                 data.AccountID,
-		SourceAccountID:           data.SourceAccountID,
+		SourceAccount:             data.SourceAccount,
 		CreatedAt:                 data.CreatedAt,
 		UpdatedAt:                 data.UpdatedAt,
 	}
