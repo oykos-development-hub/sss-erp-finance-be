@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS payment_order_items (
     additional_expense_id INTEGER REFERENCES additional_expenses(id),
     salary_additional_expense_id INTEGER REFERENCES salary_additional_expenses(id),
     account_id INTEGER,
+    source_account_id INTEGER,
     created_at TIMESTAMP,
     updated_at TIMESTAMP
 );
