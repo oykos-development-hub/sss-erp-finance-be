@@ -38,7 +38,7 @@ type Invoice struct {
 	MunicipalityID         int               `db:"municipality_id"`
 	TypeOfDecision         int               `db:"type_of_decision"`
 	ActivityID             int               `db:"activity_id"`
-	OrderID                int               `db:"order_id"`
+	OrderID                *int              `db:"order_id,omitempty"`
 	OrganizationUnitID     int               `db:"organization_unit_id"`
 	DateOfInvoice          time.Time         `db:"date_of_invoice"`
 	ReceiptDate            time.Time         `db:"receipt_date"`

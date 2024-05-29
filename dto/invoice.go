@@ -101,6 +101,12 @@ type InvoiceResponseDTO struct {
 }
 
 func (dto InvoiceDTO) ToInvoice() *data.Invoice {
+
+	var orderID *int
+	if dto.OrderID != 0 {
+		orderID = &dto.OrderID
+	}
+
 	return &data.Invoice{
 		InvoiceNumber:          dto.InvoiceNumber,
 		PassedToInventory:      dto.PassedToInventory,
@@ -114,7 +120,7 @@ func (dto InvoiceDTO) ToInvoice() *data.Invoice {
 		ActivityID:             dto.ActivityID,
 		SupplierID:             dto.SupplierID,
 		MunicipalityID:         dto.MunicipalityID,
-		OrderID:                dto.OrderID,
+		OrderID:                orderID,
 		Issuer:                 dto.Issuer,
 		OrganizationUnitID:     dto.OrganizationUnitID,
 		ProFormaInvoiceNumber:  dto.ProFormaInvoiceNumber,
@@ -139,6 +145,11 @@ func (dto InvoiceDTO) ToInvoice() *data.Invoice {
 }
 
 func ToInvoiceResponseDTO(data data.Invoice) InvoiceResponseDTO {
+
+	var orderID int
+	if data.OrderID != nil {
+		orderID = *data.OrderID
+	}
 	return InvoiceResponseDTO{
 		ID:                     data.ID,
 		PassedToInventory:      data.PassedToInventory,
@@ -154,7 +165,7 @@ func ToInvoiceResponseDTO(data data.Invoice) InvoiceResponseDTO {
 		ActivityID:             data.ActivityID,
 		SupplierID:             data.SupplierID,
 		MunicipalityID:         data.MunicipalityID,
-		OrderID:                data.OrderID,
+		OrderID:                orderID,
 		OrganizationUnitID:     data.OrganizationUnitID,
 		DateOfInvoice:          data.DateOfInvoice,
 		ReceiptDate:            data.ReceiptDate,
