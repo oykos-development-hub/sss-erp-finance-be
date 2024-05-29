@@ -19,17 +19,20 @@ type AdditionalExpenseDTO struct {
 }
 
 type AdditionalExpenseResponseDTO struct {
-	ID                 int                   `json:"id"`
-	Title              data.ObligationTitles `json:"title"`
-	AccountID          int                   `json:"account_id"`
-	Price              float32               `json:"price"`
-	SubjectID          int                   `json:"subject_id"`
-	OrganizationUnitID int                   `json:"organization_unit_id"`
-	BankAccount        string                `json:"bank_account"`
-	InvoiceID          int                   `json:"invoice_id"`
-	Status             data.InvoiceStatus    `json:"status"`
-	CreatedAt          time.Time             `json:"created_at"`
-	UpdatedAt          time.Time             `json:"updated_at"`
+	ID                   int                    `json:"id"`
+	Title                data.ObligationTitles  `json:"title"`
+	ObligationType       data.TypesOfObligation `json:"obligation_type"`
+	ObligationNumber     string                 `json:"obligation_number"`
+	ObligationSupplierID int                    `json:"obligation_supplier"`
+	AccountID            int                    `json:"account_id"`
+	Price                float32                `json:"price"`
+	SubjectID            int                    `json:"subject_id"`
+	OrganizationUnitID   int                    `json:"organization_unit_id"`
+	BankAccount          string                 `json:"bank_account"`
+	InvoiceID            int                    `json:"invoice_id"`
+	Status               data.InvoiceStatus     `json:"status"`
+	CreatedAt            time.Time              `json:"created_at"`
+	UpdatedAt            time.Time              `json:"updated_at"`
 }
 
 type AdditionalExpenseFilterDTO struct {

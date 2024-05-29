@@ -13,14 +13,16 @@ import (
 )
 
 type AdditionalExpenseServiceImpl struct {
-	App  *celeritas.Celeritas
-	repo data.AdditionalExpense
+	App         *celeritas.Celeritas
+	repo        data.AdditionalExpense
+	invoiceRepo data.Invoice
 }
 
-func NewAdditionalExpenseServiceImpl(app *celeritas.Celeritas, repo data.AdditionalExpense) AdditionalExpenseService {
+func NewAdditionalExpenseServiceImpl(app *celeritas.Celeritas, repo data.AdditionalExpense, invoiceRepo data.Invoice) AdditionalExpenseService {
 	return &AdditionalExpenseServiceImpl{
-		App:  app,
-		repo: repo,
+		App:         app,
+		repo:        repo,
+		invoiceRepo: invoiceRepo,
 	}
 }
 
@@ -93,12 +95,26 @@ func (h *AdditionalExpenseServiceImpl) GetAdditionalExpenseList(filter dto.Addit
 
 	orders = append(orders, "-created_at")
 
-	data, total, err := h.repo.GetAll(filter.Page, filter.Size, conditionAndExp, orders)
+	items, total, err := h.repo.GetAll(filter.Page, filter.Size, conditionAndExp, orders)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return nil, nil, errors.ErrInternalServer
 	}
-	response := dto.ToAdditionalExpenseListResponseDTO(data)
+	response := dto.ToAdditionalExpenseListResponseDTO(items)
+
+	for i := 0; i < len(response); i++ {
+		invoice, err := h.invoiceRepo.Get(response[i].InvoiceID)
+
+		if err != nil {
+			h.App.ErrorLog.Println(err)
+			return nil, nil, errors.ErrInternalServer
+		}
+
+		response[i].ObligationType = invoice.Type
+		response[i].ObligationNumber = invoice.InvoiceNumber
+		response[i].ObligationSupplierID = invoice.SupplierID
+
+	}
 
 	return response, total, nil
 }

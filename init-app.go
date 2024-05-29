@@ -33,7 +33,7 @@ func initApplication() *celeritas.Celeritas {
 	ArticleHandler := handlers.NewArticleHandler(cel, ArticleService)
 
 	//obligations and demands
-	AdditionalExpenseService := services.NewAdditionalExpenseServiceImpl(cel, models.AdditionalExpense)
+	AdditionalExpenseService := services.NewAdditionalExpenseServiceImpl(cel, models.AdditionalExpense, models.Invoice)
 	AdditionalExpenseHandler := handlers.NewAdditionalExpenseHandler(cel, AdditionalExpenseService)
 
 	InvoiceService := services.NewInvoiceServiceImpl(cel, models.Invoice, models.AdditionalExpense, ArticleService, AdditionalExpenseService)
