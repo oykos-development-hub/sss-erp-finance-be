@@ -317,8 +317,11 @@ func (h *PaymentOrderServiceImpl) GetPaymentOrderList(filter dto.PaymentOrderFil
 	}
 
 	if filter.Status == nil || *filter.Status != "Storniran" {
-		conditionAndExp = up.And(conditionAndExp, &up.Cond{"status <>": "Storniran"})
-		conditionAndExp = up.And(conditionAndExp, &up.Cond{"status is": nil})
+		cond := up.Or(
+			&up.Cond{"status <>": "Storniran"},
+			&up.Cond{"status is": nil},
+		)
+		conditionAndExp = up.And(conditionAndExp, cond)
 	}
 
 	//if filter.SortByTitle != nil {
