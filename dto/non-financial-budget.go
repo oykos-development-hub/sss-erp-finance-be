@@ -18,6 +18,8 @@ type NonFinancialBudgetDTO struct {
 	ContactWorkingPlace string `json:"contact_working_place" validate:"required"`
 	ContactPhone        string `json:"contact_phone" validate:"required"`
 	ContactEmail        string `json:"contact_email" validate:"required"`
+
+	Statement string `json:"statement"`
 }
 
 type NonFinancialBudgetResponseDTO struct {
@@ -33,6 +35,8 @@ type NonFinancialBudgetResponseDTO struct {
 	ContactWorkingPlace string `json:"contact_working_place"`
 	ContactPhone        string `json:"contact_phone"`
 	ContactEmail        string `json:"contact_email"`
+
+	Statement string `json:"statement"`
 
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
@@ -56,6 +60,7 @@ func (dto NonFinancialBudgetDTO) ToNonFinancialBudget() *data.NonFinancialBudget
 		ContactWorkingPlace:     dto.ContactWorkingPlace,
 		ContactPhone:            dto.ContactPhone,
 		ContactEmail:            dto.ContactEmail,
+		Statement:               dto.Statement,
 	}
 }
 
@@ -71,6 +76,7 @@ func ToNonFinancialBudgetResponseDTO(data data.NonFinancialBudget) NonFinancialB
 		ContactWorkingPlace:     data.ContactWorkingPlace,
 		ContactPhone:            data.ContactPhone,
 		ContactEmail:            data.ContactEmail,
+		Statement:               data.Statement,
 		CreatedAt:               data.CreatedAt,
 		UpdatedAt:               data.UpdatedAt,
 	}

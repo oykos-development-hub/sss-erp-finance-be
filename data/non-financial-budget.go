@@ -21,6 +21,8 @@ type NonFinancialBudget struct {
 	ContactPhone        string `db:"contact_phone"`
 	ContactEmail        string `db:"contact_email"`
 
+	Statement string `db:"statement"`
+
 	CreatedAt time.Time `db:"created_at,omitempty"`
 	UpdatedAt time.Time `db:"updated_at"`
 }

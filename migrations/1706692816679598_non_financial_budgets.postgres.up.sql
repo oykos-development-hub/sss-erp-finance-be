@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS non_financial_budgets (
     contact_working_place TEXT NOT NULL,
     contact_phone TEXT NOT NULL,
     contact_email TEXT NOT NULL,
+    statement TEXT NOT NULL DEFAULT '',
     created_at TIMESTAMP,
     updated_at TIMESTAMP
 );
