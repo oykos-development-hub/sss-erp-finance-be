@@ -12,7 +12,7 @@ type EnforcedPaymentDTO struct {
 	BankAccount        string                     `json:"bank_account"`
 	DateOfPayment      time.Time                  `json:"date_of_payment"`
 	DateOfOrder        *time.Time                 `json:"date_of_order"`
-	IDOfStatement      *string                    `json:"id_of_statement"`
+	IDOfStatement      *int                       `json:"id_of_statement"`
 	SAPID              *string                    `json:"sap_id"`
 	Registred          *bool                      `json:"registred"`
 	RegistredReturn    *bool                      `json:"registred_return"`
@@ -36,7 +36,7 @@ type EnforcedPaymentResponseDTO struct {
 	BankAccount        string                           `json:"bank_account"`
 	DateOfPayment      time.Time                        `json:"date_of_payment"`
 	DateOfOrder        *time.Time                       `json:"date_of_order"`
-	IDOfStatement      *string                          `json:"id_of_statement"`
+	IDOfStatement      *int                             `json:"id_of_statement"`
 	SAPID              *string                          `json:"sap_id"`
 	Description        string                           `json:"description"`
 	Status             data.EnforcedPaymentStatus       `json:"status"`

@@ -2,7 +2,6 @@ CREATE TABLE IF NOT EXISTS payment_orders (
     id serial PRIMARY KEY,
     organization_unit_id INTEGER NOT NULL,
     supplier_id INTEGER NOT NULL,
-    id_of_statement TEXT,
     sap_id TEXT,
     source_of_funding TEXT,
     date_of_sap TIMESTAMP,

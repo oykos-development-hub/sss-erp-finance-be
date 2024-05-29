@@ -21,7 +21,7 @@ type EnforcedPayment struct {
 	BankAccount        string                `db:"bank_account"`
 	DateOfPayment      time.Time             `db:"date_of_payment"`
 	DateOfOrder        *time.Time            `db:"date_of_order"`
-	IDOfStatement      *string               `db:"id_of_statement"`
+	IDOfStatement      *int                  `db:"id_of_statement"`
 	SAPID              *string               `db:"sap_id"`
 	Status             EnforcedPaymentStatus `db:"status"`
 	Registred          *bool                 `db:"registred,omitempty"`
