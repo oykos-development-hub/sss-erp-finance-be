@@ -384,6 +384,53 @@ func (h *PaymentOrderServiceImpl) PayPaymentOrder(id int, input dto.PaymentOrder
 	return nil
 }
 
+func (h *PaymentOrderServiceImpl) CancelPaymentOrder(id int) error {
+	err := data.Upper.Tx(func(tx up.Session) error {
+		input, err := h.GetPaymentOrder(id)
+
+		if err != nil {
+			return err
+		}
+
+		for _, item := range input.Items {
+			if item.InvoiceID != nil {
+				err = updateInvoiceStatusOnDelete(*item.InvoiceID, input.Amount, len(input.Items), tx, h)
+
+				if err != nil {
+					h.App.ErrorLog.Println(err)
+					return err
+				}
+			} else if item.AdditionalExpenseID != nil {
+				err = updateAdditionalExpenseStatusOnDelete(*item.AdditionalExpenseID, input.Amount, len(input.Items), tx, h)
+
+				if err != nil {
+					h.App.ErrorLog.Println(err)
+					return err
+				}
+			} else if item.SalaryAdditionalExpenseID != nil {
+				err = updateSalaryAdditionalExpenseStatusOnDelete(*item.SalaryAdditionalExpenseID, input.Amount, len(input.Items), tx, h)
+
+				if err != nil {
+					h.App.ErrorLog.Println(err)
+					return err
+				}
+			}
+		}
+
+		err = h.repo.CancelPaymentOrder(tx, id)
+		if err != nil {
+			return errors.ErrInternalServer
+		}
+		return nil
+	})
+
+	if err != nil {
+		return errors.ErrInternalServer
+	}
+
+	return nil
+}
+
 func updateInvoiceStatus(id int, amount float64, lenOfArray int, tx up.Session, h *PaymentOrderServiceImpl) error {
 	invoice, err := h.invoiceRepo.Get(id)
 

@@ -162,3 +162,15 @@ func (h *paymentorderHandlerImpl) PayPaymentOrder(w http.ResponseWriter, r *http
 
 	_ = h.App.WriteDataResponse(w, http.StatusOK, "PaymentOrder paid successfuly", nil)
 }
+
+func (h *paymentorderHandlerImpl) CancelPaymentOrder(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.Atoi(chi.URLParam(r, "id"))
+
+	err := h.service.CancelPaymentOrder(id)
+	if err != nil {
+		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
+		return
+	}
+
+	_ = h.App.WriteDataResponse(w, http.StatusOK, "PaymentOrder canceled successfuly", nil)
+}

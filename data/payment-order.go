@@ -21,6 +21,7 @@ type PaymentOrder struct {
 	FileID             *int       `db:"file_id"`
 	Amount             float64    `db:"amount"`
 	Description        string     `db:"description"`
+	Status             string     `db:"status,omitempty"`
 	CreatedAt          time.Time  `db:"created_at,omitempty"`
 	UpdatedAt          time.Time  `db:"updated_at"`
 }
@@ -319,6 +320,18 @@ func (t *PaymentOrder) PayPaymentOrder(tx up.Session, id int, SAPID string, Date
 	query := `update payment_orders set sap_id = $1, date_of_sap = $2 where id = $3`
 
 	rows, err := tx.SQL().Query(query, SAPID, DateOfSAP, id)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	return nil
+}
+
+func (t *PaymentOrder) CancelPaymentOrder(tx up.Session, id int) error {
+	query := `update payment_orders set sap_id = $1, date_of_sap = $2 where id = $3`
+
+	rows, err := tx.SQL().Query(query, id)
 	if err != nil {
 		return err
 	}
