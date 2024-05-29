@@ -7,33 +7,35 @@ import (
 )
 
 type SalaryAdditionalExpenseDTO struct {
-	ID                 int                              `json:"id"`
-	Title              data.AccountingOrderItemsTitle   `json:"title"`
-	SalaryID           int                              `json:"salary_id"`
-	AccountID          int                              `json:"account_id"`
-	Amount             float64                          `json:"amount"`
-	SubjectID          int                              `json:"subject_id"`
-	BankAccount        string                           `json:"bank_account"`
-	Status             data.InvoiceStatus               `json:"status"`
-	OrganizationUnitID int                              `json:"organization_unit_id"`
-	DebtorID           int                              `json:"debtor_id"`
-	Type               data.SalaryAdditionalExpenseType `json:"type"`
+	ID                  int                              `json:"id"`
+	Title               data.AccountingOrderItemsTitle   `json:"title"`
+	SalaryID            int                              `json:"salary_id"`
+	AccountID           int                              `json:"account_id"`
+	Amount              float64                          `json:"amount"`
+	SubjectID           int                              `json:"subject_id"`
+	BankAccount         string                           `json:"bank_account"`
+	Status              data.InvoiceStatus               `json:"status"`
+	OrganizationUnitID  int                              `json:"organization_unit_id"`
+	DebtorID            int                              `json:"debtor_id"`
+	IdentificatorNumber string                           `json:"identificator_number"`
+	Type                data.SalaryAdditionalExpenseType `json:"type"`
 }
 
 type SalaryAdditionalExpenseResponseDTO struct {
-	ID                 int                              `json:"id"`
-	Title              data.AccountingOrderItemsTitle   `json:"title"`
-	SalaryID           int                              `json:"salary_id"`
-	AccountID          int                              `json:"account_id"`
-	Amount             float64                          `json:"amount"`
-	SubjectID          int                              `json:"subject_id"`
-	BankAccount        string                           `json:"bank_account"`
-	Status             data.InvoiceStatus               `json:"status"`
-	OrganizationUnitID int                              `json:"organization_unit_id"`
-	Type               data.SalaryAdditionalExpenseType `json:"type"`
-	DebtorID           int                              `json:"debtor_id"`
-	CreatedAt          time.Time                        `json:"created_at"`
-	UpdatedAt          time.Time                        `json:"updated_at"`
+	ID                  int                              `json:"id"`
+	Title               data.AccountingOrderItemsTitle   `json:"title"`
+	SalaryID            int                              `json:"salary_id"`
+	AccountID           int                              `json:"account_id"`
+	Amount              float64                          `json:"amount"`
+	SubjectID           int                              `json:"subject_id"`
+	BankAccount         string                           `json:"bank_account"`
+	Status              data.InvoiceStatus               `json:"status"`
+	OrganizationUnitID  int                              `json:"organization_unit_id"`
+	Type                data.SalaryAdditionalExpenseType `json:"type"`
+	DebtorID            int                              `json:"debtor_id"`
+	IdentificatorNumber string                           `json:"identificator_number"`
+	CreatedAt           time.Time                        `json:"created_at"`
+	UpdatedAt           time.Time                        `json:"updated_at"`
 }
 
 type SalaryAdditionalExpenseFilterDTO struct {
@@ -47,34 +49,36 @@ type SalaryAdditionalExpenseFilterDTO struct {
 
 func (dto SalaryAdditionalExpenseDTO) ToSalaryAdditionalExpense() *data.SalaryAdditionalExpense {
 	return &data.SalaryAdditionalExpense{
-		SalaryID:           dto.SalaryID,
-		Title:              dto.Title,
-		AccountID:          dto.AccountID,
-		Amount:             dto.Amount,
-		DebtorID:           dto.DebtorID,
-		SubjectID:          dto.SubjectID,
-		BankAccount:        dto.BankAccount,
-		Status:             dto.Status,
-		OrganizationUnitID: dto.OrganizationUnitID,
-		Type:               dto.Type,
+		SalaryID:            dto.SalaryID,
+		Title:               dto.Title,
+		AccountID:           dto.AccountID,
+		Amount:              dto.Amount,
+		DebtorID:            dto.DebtorID,
+		SubjectID:           dto.SubjectID,
+		BankAccount:         dto.BankAccount,
+		Status:              dto.Status,
+		IdentificatorNumber: dto.IdentificatorNumber,
+		OrganizationUnitID:  dto.OrganizationUnitID,
+		Type:                dto.Type,
 	}
 }
 
 func ToSalaryAdditionalExpenseResponseDTO(data data.SalaryAdditionalExpense) SalaryAdditionalExpenseResponseDTO {
 	return SalaryAdditionalExpenseResponseDTO{
-		ID:                 data.ID,
-		Title:              data.Title,
-		SalaryID:           data.SalaryID,
-		AccountID:          data.AccountID,
-		Amount:             data.Amount,
-		SubjectID:          data.SubjectID,
-		BankAccount:        data.BankAccount,
-		Status:             data.Status,
-		DebtorID:           data.DebtorID,
-		OrganizationUnitID: data.OrganizationUnitID,
-		Type:               data.Type,
-		CreatedAt:          data.CreatedAt,
-		UpdatedAt:          data.UpdatedAt,
+		ID:                  data.ID,
+		Title:               data.Title,
+		SalaryID:            data.SalaryID,
+		AccountID:           data.AccountID,
+		Amount:              data.Amount,
+		SubjectID:           data.SubjectID,
+		BankAccount:         data.BankAccount,
+		Status:              data.Status,
+		DebtorID:            data.DebtorID,
+		OrganizationUnitID:  data.OrganizationUnitID,
+		Type:                data.Type,
+		IdentificatorNumber: data.IdentificatorNumber,
+		CreatedAt:           data.CreatedAt,
+		UpdatedAt:           data.UpdatedAt,
 	}
 }
 
