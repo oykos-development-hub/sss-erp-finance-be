@@ -47,7 +47,6 @@ func (h *SpendingDynamicServiceImpl) CreateSpendingDynamic(inputDataDTO []dto.Sp
 		if err != nil {
 			return errors.Wrap(err, "CreateSpendingDynamic")
 		}
-		// TODO: create repo method to get all savings instead of fetching here
 		if len(oldDynamic) > 0 {
 			if entriesInputData.SumOfMonths().GreaterThan(currentBudget.Actual.Add(oldDynamic[0].TotalSavings)) {
 				return errors.NewBadRequestError("sum cannot be greater than actual plus all the savings")
@@ -59,7 +58,6 @@ func (h *SpendingDynamicServiceImpl) CreateSpendingDynamic(inputDataDTO []dto.Sp
 		}
 
 		// Validate that the sum of the months matches the planned total
-
 		entries, err := h.repoEntries.FindAll(&currentBudget.ID, nil, nil, nil)
 		if err != nil {
 			if !errors.IsErr(err, errors.NotFoundCode) {
