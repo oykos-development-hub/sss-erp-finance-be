@@ -18,7 +18,6 @@ type PaymentOrderDTO struct {
 	SourceOfFunding    string                `json:"source_of_funding"`
 	Description        string                `json:"description"`
 	DateOfSAP          *time.Time            `json:"date_of_sap"`
-	Status             string                `json:"status"`
 	Items              []PaymentOrderItemDTO `json:"items"`
 	Amount             float64               `json:"amount"`
 	FileID             *int                  `json:"file_id"`
@@ -99,7 +98,7 @@ func (dto PaymentOrderDTO) ToPaymentOrder() *data.PaymentOrder {
 func ToPaymentOrderResponseDTO(data data.PaymentOrder) PaymentOrderResponseDTO {
 
 	var status string
-	if data.Status == "Storniran" {
+	if data.Status != nil && *data.Status == "Storniran" {
 		status = "Storniran"
 	} else if data.SAPID != nil {
 		status = "Plaćen"

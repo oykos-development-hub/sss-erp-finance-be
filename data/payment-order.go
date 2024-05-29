@@ -21,7 +21,7 @@ type PaymentOrder struct {
 	FileID             *int       `db:"file_id"`
 	Amount             float64    `db:"amount"`
 	Description        string     `db:"description"`
-	Status             string     `db:"status,omitempty"`
+	Status             *string    `db:"status,omitempty"`
 	CreatedAt          time.Time  `db:"created_at,omitempty"`
 	UpdatedAt          time.Time  `db:"updated_at"`
 }
