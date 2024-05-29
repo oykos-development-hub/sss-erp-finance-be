@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS tax_authority_codebooks (
     tax_percentage FLOAT,
     tax_supplier_id INTEGER,
     release_percentage FLOAT,
+    release_amount FLOAT,
     pio_percentage FLOAT,
     pio_supplier_id INTEGER,
     pio_percentage_employer_percentage FLOAT,

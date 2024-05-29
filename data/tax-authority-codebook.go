@@ -15,6 +15,7 @@ type TaxAuthorityCodebook struct {
 	TaxPercentage                        float64   `db:"tax_percentage"`
 	TaxSupplierID                        int       `db:"tax_supplier_id"`
 	ReleasePercentage                    float64   `db:"release_percentage"`
+	ReleaseAmount                        float64   `db:"release_amount"`
 	PioPercentage                        float64   `db:"pio_percentage"`
 	PioSupplierID                        int       `db:"pio_supplier_id"`
 	PioPercentageEmployerPercentage      float64   `db:"pio_percentage_employer_percentage"`

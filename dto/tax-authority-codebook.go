@@ -13,6 +13,7 @@ type TaxAuthorityCodebookDTO struct {
 	TaxPercentage                        float64 `json:"tax_percentage"`
 	TaxSupplierID                        int     `json:"tax_supplier_id"`
 	ReleasePercentage                    float64 `json:"release_percentage"`
+	ReleaseAmount                        float64 `json:"release_amount"`
 	PioPercentage                        float64 `json:"pio_percentage"`
 	PioSupplierID                        int     `json:"pio_supplier_id"`
 	PioPercentageEmployerPercentage      float64 `json:"pio_percentage_employer_percentage"`
@@ -48,6 +49,7 @@ type TaxAuthorityCodebookResponseDTO struct {
 	TaxPercentage                        float64   `json:"tax_percentage"`
 	TaxSupplierID                        int       `json:"tax_supplier_id"`
 	ReleasePercentage                    float64   `json:"release_percentage"`
+	ReleaseAmount                        float64   `json:"release_amount"`
 	PioPercentage                        float64   `json:"pio_percentage"`
 	PioSupplierID                        int       `json:"pio_supplier_id"`
 	PioPercentageEmployerPercentage      float64   `json:"pio_percentage_employer_percentage"`
@@ -92,6 +94,7 @@ func (dto TaxAuthorityCodebookDTO) ToTaxAuthorityCodebook() *data.TaxAuthorityCo
 		TaxPercentage:                        dto.TaxPercentage,
 		TaxSupplierID:                        dto.TaxSupplierID,
 		ReleasePercentage:                    dto.ReleasePercentage,
+		ReleaseAmount:                        dto.ReleaseAmount,
 		PioPercentage:                        dto.PioPercentage,
 		PioSupplierID:                        dto.PioSupplierID,
 		PioPercentageEmployerPercentage:      dto.PioPercentageEmployerPercentage,
@@ -129,6 +132,7 @@ func ToTaxAuthorityCodebookResponseDTO(data data.TaxAuthorityCodebook) TaxAuthor
 		TaxPercentage:                        data.TaxPercentage,
 		TaxSupplierID:                        data.TaxSupplierID,
 		ReleasePercentage:                    data.ReleasePercentage,
+		ReleaseAmount:                        data.ReleaseAmount,
 		PioPercentage:                        data.PioPercentage,
 		PioSupplierID:                        data.PioSupplierID,
 		PioPercentageEmployerPercentage:      data.PioPercentageEmployerPercentage,
