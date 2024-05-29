@@ -302,6 +302,8 @@ func (h *PaymentOrderServiceImpl) GetPaymentOrderList(filter dto.PaymentOrderFil
 			conditionAndExp = up.And(conditionAndExp, &up.Cond{"sap_id is not ": nil})
 		case "Na čekanju":
 			conditionAndExp = up.And(conditionAndExp, &up.Cond{"sap_id is ": nil})
+		case "Storniran":
+			conditionAndExp = up.And(conditionAndExp, &up.Cond{"status": filter.Status})
 		}
 	}
 
@@ -312,6 +314,10 @@ func (h *PaymentOrderServiceImpl) GetPaymentOrderList(filter dto.PaymentOrderFil
 			up.Cond{"sap_id ILIKE": likeCondition},
 		)
 		conditionAndExp = up.And(conditionAndExp, search)
+	}
+
+	if filter.Status == nil || *filter.Status != "Storniran" {
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"status <>": "Storniran"})
 	}
 
 	//if filter.SortByTitle != nil {
