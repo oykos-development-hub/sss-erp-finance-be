@@ -21,7 +21,7 @@ type EnforcedPayment struct {
 	BankAccount        string                `db:"bank_account"`
 	DateOfPayment      time.Time             `db:"date_of_payment"`
 	DateOfOrder        *time.Time            `db:"date_of_order"`
-	IDOfStatement      *int                  `db:"id_of_statement"`
+	IDOfStatement      *int                  `db:"id_of_statement, omitempty"`
 	SAPID              *string               `db:"sap_id"`
 	Status             EnforcedPaymentStatus `db:"status"`
 	Registred          *bool                 `db:"registred,omitempty"`
@@ -90,6 +90,7 @@ func (t *EnforcedPayment) Update(tx up.Session, m EnforcedPayment) error {
 	m.UpdatedAt = time.Now()
 	collection := tx.Collection(t.Table())
 	res := collection.Find(m.ID)
+	m.IDOfStatement = nil
 	err := res.Update(&m)
 	if err != nil {
 		return err
