@@ -15,6 +15,7 @@ type PaymentOrderItem struct {
 	SalaryAdditionalExpenseID *int      `db:"salary_additional_expense_id"`
 	AccountID                 int       `db:"account_id"`
 	SourceAccount             string    `db:"source_account"`
+	Amount                    float64   `db:"amount"`
 	CreatedAt                 time.Time `db:"created_at,omitempty"`
 	UpdatedAt                 time.Time `db:"updated_at"`
 }

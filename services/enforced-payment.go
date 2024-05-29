@@ -233,6 +233,15 @@ func (h *EnforcedPaymentServiceImpl) GetEnforcedPaymentList(filter dto.EnforcedP
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"status": *filter.Status})
 	}
 
+	if filter.Search != nil && *filter.Search != "" {
+		likeCondition := fmt.Sprintf("%%%s%%", *filter.Search)
+		search := up.Or(
+			up.Cond{"id_of_statement ILIKE": likeCondition},
+			up.Cond{"sap_id ILIKE": likeCondition},
+		)
+		conditionAndExp = up.And(conditionAndExp, search)
+	}
+
 	if filter.SortByTitle != nil {
 		if *filter.SortByTitle == "asc" {
 			orders = append(orders, "-title")
