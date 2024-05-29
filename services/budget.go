@@ -93,7 +93,7 @@ func (h *BudgetServiceImpl) GetBudgetList(input dto.GetBudgetListInput) ([]dto.B
 		cond["budget_status"] = input.BudgetStatus
 	}
 
-	orders = append(orders, "year")
+	orders = append(orders, "-year")
 
 	data, err := h.repo.GetAll(&cond, orders)
 	if err != nil {
