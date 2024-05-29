@@ -329,7 +329,7 @@ func (t *PaymentOrder) PayPaymentOrder(tx up.Session, id int, SAPID string, Date
 }
 
 func (t *PaymentOrder) CancelPaymentOrder(tx up.Session, id int) error {
-	query := `update payment_orders set status = 'Storniran' where id = $1`
+	query := `update payment_orders set sap_id = $1, date_of_sap = $2 where id = $3`
 
 	rows, err := tx.SQL().Query(query, id)
 	if err != nil {
