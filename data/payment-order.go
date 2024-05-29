@@ -13,7 +13,7 @@ type PaymentOrder struct {
 	BankAccount        string     `db:"bank_account"`
 	DateOfPayment      time.Time  `db:"date_of_payment"`
 	DateOfOrder        *time.Time `db:"date_of_order"`
-	IDOfStatement      *int       `db:"id_of_statement, omitempty"`
+	IDOfStatement      *int       `db:"id_of_statement,omitempty"`
 	SAPID              *string    `db:"sap_id"`
 	Registred          *bool      `db:"registred,omitempty"`
 	DateOfSAP          *time.Time `db:"date_of_sap"`
@@ -97,9 +97,17 @@ func (t *PaymentOrder) Get(id int) (*PaymentOrder, error) {
 func (t *PaymentOrder) Update(tx up.Session, m PaymentOrder) error {
 	m.UpdatedAt = time.Now()
 	collection := tx.Collection(t.Table())
-	m.IDOfStatement = nil
+
+	order, err := t.Get(m.ID)
+
+	if err != nil {
+		return err
+	}
+
+	m.IDOfStatement = order.IDOfStatement
+
 	res := collection.Find(m.ID)
-	err := res.Update(&m)
+	err = res.Update(&m)
 	if err != nil {
 		return err
 	}
