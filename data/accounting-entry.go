@@ -86,6 +86,7 @@ type AnalyticalCardFilter struct {
 	DateOfEnd          *time.Time `json:"date_of_end"`
 	DateOfStartBooking *time.Time `json:"date_of_start_booking"`
 	DateOfEndBooking   *time.Time `json:"date_of_end_booking"`
+	AccountID          []int      `json:"account_id"`
 }
 
 type AnalyticalCard struct {
@@ -422,7 +423,8 @@ func (t *AccountingEntry) GetAnalyticalCard(filter AnalyticalCardFilter) (*Analy
     						 LEFT JOIN accounting_entries ae ON ae.id = a.entry_id
     						 WHERE a.supplier_id = $1 AND ae.organization_unit_id = $2 
     						 AND ((cast($3 AS timestamp) IS NOT NULL AND a.date <  cast($3 AS timestamp)) OR 
-    						      (cast($4 AS timestamp) IS NOT NULL AND ae.date_of_booking < cast($4 AS timestamp)));`
+    						      (cast($4 AS timestamp) IS NOT NULL AND ae.date_of_booking < cast($4 AS timestamp)))
+							 AND (array_length($5::int[], 1) IS NULL OR a.account_id = ANY($5::int[]));`
 
 	queryForItems := `select a.date, a.title, ae.date_of_booking, a.debit_amount, a.credit_amount, 
 						COALESCE(i.invoice_number, s.month, p.sap_id, e.sap_id, ep.sap_id) as document_number, a.type, ae.id_of_entry
@@ -435,9 +437,10 @@ func (t *AccountingEntry) GetAnalyticalCard(filter AnalyticalCardFilter) (*Analy
 						left join enforced_payments ep on ep.id = a.return_enforced_payment_id
 						where a.supplier_id = $1 and ae.organization_unit_id = $2 and
 						((cast($3 AS timestamp) is not null and a.date >= cast($3 AS timestamp) and cast($4 AS timestamp) is not null and a.date <= cast($4 AS timestamp)) or
-						(cast($5 AS timestamp) is not null and ae.date_of_booking >= cast($5 AS timestamp) and cast($6 AS timestamp) is not null and ae.date_of_booking <= cast($6 AS timestamp)));`
+						(cast($5 AS timestamp) is not null and ae.date_of_booking >= cast($5 AS timestamp) and cast($6 AS timestamp) is not null and ae.date_of_booking <= cast($6 AS timestamp)))
+						AND (array_length($7::int[], 1) IS NULL OR a.account_id = ANY($7::int[]));;`
 
-	rows, err := Upper.SQL().Query(queryForInitialState, filter.SupplierID, filter.OrganizationUnitID, filter.DateOfStart, filter.DateOfStartBooking)
+	rows, err := Upper.SQL().Query(queryForInitialState, filter.SupplierID, filter.OrganizationUnitID, filter.DateOfStart, filter.DateOfStartBooking, filter.AccountID)
 	if err != nil {
 		return nil, err
 	}
@@ -477,7 +480,7 @@ func (t *AccountingEntry) GetAnalyticalCard(filter AnalyticalCardFilter) (*Analy
 		id++
 	}
 
-	rows, err = Upper.SQL().Query(queryForItems, filter.SupplierID, filter.OrganizationUnitID, filter.DateOfStart, filter.DateOfEnd, filter.DateOfStartBooking, filter.DateOfEndBooking)
+	rows, err = Upper.SQL().Query(queryForItems, filter.SupplierID, filter.OrganizationUnitID, filter.DateOfStart, filter.DateOfEnd, filter.DateOfStartBooking, filter.DateOfEndBooking, filter.AccountID)
 	if err != nil {
 		return nil, err
 	}
