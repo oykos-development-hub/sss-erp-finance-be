@@ -185,6 +185,11 @@ func (h *InvoiceServiceImpl) GetInvoice(id int) (*dto.InvoiceResponseDTO, error)
 
 	if len(additionaExpenses) > 0 {
 		response.Status = additionaExpenses[len(additionaExpenses)-1].Status
+		response.NetPrice = float64(additionaExpenses[len(additionaExpenses)-1].Price)
+	}
+
+	for j := 0; j < len(additionaExpenses)-1; j++ {
+		response.VATPrice += float64(additionaExpenses[j].Price)
 	}
 
 	return &response, nil
@@ -267,8 +272,8 @@ func (h *InvoiceServiceImpl) GetInvoiceList(input dto.InvoicesFilter) ([]dto.Inv
 			response[i].Status = additionalExpenses[len(additionalExpenses)-1].Status
 		}
 
-		for i := 0; i < len(additionalExpenses)-1; i++ {
-			response[i].VATPrice += float64(additionalExpenses[i].Price)
+		for j := 0; j < len(additionalExpenses)-1; j++ {
+			response[i].VATPrice += float64(additionalExpenses[j].Price)
 		}
 	}
 
