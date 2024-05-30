@@ -207,6 +207,8 @@ func (t *AccountingEntry) GetObligationsForAccounting(filter ObligationsFilter) 
 						i.organization_unit_id = $1 and i.type = $2 and i.registred = false 
 						and i.invoice_number is not null and i.invoice_number <> ''
 						and (COALESCE($3, '') = '' OR i.invoice_number LIKE '%' || $3 || '%')
+						AND (COALESCE($4::date, NULL) IS NULL OR i.date_of_invoice >= $4)
+						AND (COALESCE($5::date, NULL) IS NULL OR i.date_of_invoice <= $5)
 						group by i.id;`
 
 	queryForAdditionalExpenses := `select i.id, sum(a.price), i.type, i.invoice_number, i.supplier_id, i.date_of_invoice

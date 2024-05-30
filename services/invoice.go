@@ -174,17 +174,22 @@ func (h *InvoiceServiceImpl) GetInvoice(id int) (*dto.InvoiceResponseDTO, error)
 
 	response.Articles = articles
 
-	additionaExpenses, _, err := h.additionalExpenses.GetAdditionalExpenseList(dto.AdditionalExpenseFilterDTO{InvoiceID: &id})
+	additionalExpenses, _, err := h.additionalExpenses.GetAdditionalExpenseList(dto.AdditionalExpenseFilterDTO{InvoiceID: &id})
 
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return nil, err
 	}
 
-	response.AdditionalExpenses = additionaExpenses
+	response.AdditionalExpenses = additionalExpenses
 
-	if len(additionaExpenses) > 0 {
-		response.Status = additionaExpenses[len(additionaExpenses)-1].Status
+	if len(additionalExpenses) > 0 {
+		response.Status = additionalExpenses[len(additionalExpenses)-1].Status
+		response.NetPrice = float64(additionalExpenses[len(additionalExpenses)-1].Price)
+	}
+
+	for j := 0; j < len(additionalExpenses)-1; j++ {
+		response.VATPrice += float64(additionalExpenses[j].Price)
 	}
 
 	return &response, nil
