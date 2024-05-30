@@ -289,7 +289,7 @@ func routes(app *celeritas.Celeritas, middleware *middleware.Middleware, handler
 		rt.Delete("/accounting-entry-items/{id}", handlers.AccountingEntryItemHandler.DeleteAccountingEntryItem)
 
 		rt.Get("/budgets/{budget_id}/units/{unit_id}/accounts/{account_id}/actual", handlers.SpendingDynamicHandler.GetActual)
-		rt.Post("/spending-dynamics", handlers.SpendingDynamicHandler.CreateSpendingDynamic)
+		rt.Post("/budgets/{budget_id}/units/{unit_id}/spending-dynamics", handlers.SpendingDynamicHandler.CreateSpendingDynamic)
 		rt.Get("/budgets/{budget_id}/units/{unit_id}/spending-dynamics", handlers.SpendingDynamicHandler.GetBudgetSpendingDynamic)
 		rt.Get("/budgets/{budget_id}/units/{unit_id}/spending-dynamics/history", handlers.SpendingDynamicHandler.GetBudgetSpendingDynamicHistory)
 

@@ -8,8 +8,6 @@ import (
 )
 
 type SpendingDynamicDTO struct {
-	BudgetID  int             `json:"budget_id" validate:"required"`
-	UnitID    int             `json:"unit_id" validate:"required"`
 	AccountID int             `json:"account_id" validate:"required"`
 	Username  string          `json:"username" validate:"required"`
 	January   decimal.Decimal `json:"january" validate:"required"`

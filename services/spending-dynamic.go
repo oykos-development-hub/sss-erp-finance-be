@@ -30,11 +30,11 @@ func NewSpendingDynamicServiceImpl(
 	}
 }
 
-func (h *SpendingDynamicServiceImpl) CreateSpendingDynamic(inputDataDTO []dto.SpendingDynamicDTO) error {
+func (h *SpendingDynamicServiceImpl) CreateSpendingDynamic(budgetID, unitID int, inputDataDTO []dto.SpendingDynamicDTO) error {
 	for _, inputDTO := range inputDataDTO {
 		currentBudget, err := h.repoCurrentBudget.GetBy(*up.And(
-			up.Cond{"budget_id": inputDTO.BudgetID},
-			up.Cond{"unit_id": inputDTO.UnitID},
+			up.Cond{"budget_id": budgetID},
+			up.Cond{"unit_id": unitID},
 			up.Cond{"account_id": inputDTO.AccountID},
 		))
 		if err != nil {
