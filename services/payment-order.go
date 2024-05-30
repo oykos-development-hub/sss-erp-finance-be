@@ -348,6 +348,53 @@ func (h *PaymentOrderServiceImpl) GetAllObligations(filter dto.GetObligationsFil
 
 	var response []dto.ObligationResponse
 	for _, item := range items {
+		var invoiceItems []dto.InvoiceItems
+
+		if item.InvoiceID != nil && *item.InvoiceID != 0 {
+			conditionAndExp := &up.AndExpr{}
+			conditionAndExp = up.And(conditionAndExp, &up.Cond{"invoice_id": *item.InvoiceID})
+			articles, _, err := h.invoiceArticlesRepo.GetAll(nil, nil, conditionAndExp, nil)
+
+			if err != nil {
+				return nil, nil, err
+			}
+
+			accountMap := make(map[int]float64)
+			totalAccountMap := make(map[int]float64)
+
+			for _, item := range articles {
+				if currentAmount, exists := accountMap[item.AccountID]; exists {
+					accountMap[item.AccountID] = currentAmount + float64(float64(item.Amount)*(item.NetPrice+item.NetPrice*float64(item.VatPercentage)/100))
+					totalAccountMap[item.AccountID] = currentAmount + float64(float64(item.Amount)*(item.NetPrice+item.NetPrice*float64(item.VatPercentage)/100))
+				} else {
+					accountMap[item.AccountID] = float64(float64(item.Amount) * (item.NetPrice + item.NetPrice*float64(item.VatPercentage)/100))
+					totalAccountMap[item.AccountID] = float64(float64(item.Amount) * (item.NetPrice + item.NetPrice*float64(item.VatPercentage)/100))
+				}
+			}
+
+			conditionAndExp = &up.AndExpr{}
+			conditionAndExp = up.And(conditionAndExp, &up.Cond{"invoice_id": *item.InvoiceID})
+			paidItems, _, err := h.itemsRepo.GetAll(nil, nil, conditionAndExp, nil)
+
+			if err != nil {
+				return nil, nil, err
+			}
+
+			for _, item := range paidItems {
+				accountMap[item.SourceAccountID] -= item.Amount
+			}
+
+			for account, amount := range accountMap {
+				if amount > 0 {
+					invoiceItems = append(invoiceItems, dto.InvoiceItems{
+						AccountID:   account,
+						RemainPrice: amount,
+						TotalPrice:  totalAccountMap[account],
+					})
+				}
+			}
+		}
+
 		response = append(response, dto.ObligationResponse{
 			InvoiceID:                 item.InvoiceID,
 			AdditionalExpenseID:       item.AdditionalExpenseID,
@@ -357,6 +404,7 @@ func (h *PaymentOrderServiceImpl) GetAllObligations(filter dto.GetObligationsFil
 			Status:                    item.Status,
 			TotalPrice:                item.TotalPrice,
 			RemainPrice:               item.RemainPrice,
+			InvoiceItems:              invoiceItems,
 			CreatedAt:                 item.CreatedAt,
 		})
 	}

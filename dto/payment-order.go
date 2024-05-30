@@ -53,7 +53,14 @@ type ObligationResponse struct {
 	Status                    string                 `json:"status"`
 	TotalPrice                float64                `json:"total_price"`
 	RemainPrice               float64                `json:"remain_price"`
+	InvoiceItems              []InvoiceItems         `json:"invoice_items"`
 	CreatedAt                 time.Time              `json:"created_at"`
+}
+
+type InvoiceItems struct {
+	AccountID   int     `json:"account_id"`
+	TotalPrice  float64 `json:"total_price"`
+	RemainPrice float64 `json:"remain_price"`
 }
 
 type PaymentOrderFilterDTO struct {

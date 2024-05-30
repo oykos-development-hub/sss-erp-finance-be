@@ -12,7 +12,7 @@ type PaymentOrderItemDTO struct {
 	AdditionalExpenseID       *int    `json:"additional_expense_id"`
 	SalaryAdditionalExpenseID *int    `json:"salary_additional_expense_id"`
 	AccountID                 int     `json:"account_id"`
-	SourceAccount             string  `json:"source_account"`
+	SourceAccountID           int     `json:"source_account_id"`
 	Amount                    float64 `json:"amount"`
 }
 
@@ -24,7 +24,7 @@ type PaymentOrderItemResponseDTO struct {
 	SalaryAdditionalExpenseID *int                   `json:"salary_additional_expense_id"`
 	Type                      data.TypesOfObligation `json:"type"`
 	AccountID                 int                    `json:"account_id"`
-	SourceAccount             string                 `json:"source_account"`
+	SourceAccountID           int                    `json:"source_account_id"`
 	Amount                    float64                `json:"amount"`
 	Title                     string                 `json:"title"`
 	CreatedAt                 time.Time              `json:"created_at"`
@@ -49,7 +49,7 @@ func (dto PaymentOrderItemDTO) ToPaymentOrderItem() *data.PaymentOrderItem {
 		AdditionalExpenseID:       dto.AdditionalExpenseID,
 		SalaryAdditionalExpenseID: dto.SalaryAdditionalExpenseID,
 		Amount:                    dto.Amount,
-		SourceAccount:             dto.SourceAccount,
+		SourceAccountID:           dto.SourceAccountID,
 	}
 }
 
@@ -62,7 +62,7 @@ func ToPaymentOrderItemResponseDTO(data data.PaymentOrderItem) PaymentOrderItemR
 		SalaryAdditionalExpenseID: data.SalaryAdditionalExpenseID,
 		AccountID:                 data.AccountID,
 		Amount:                    data.Amount,
-		SourceAccount:             data.SourceAccount,
+		SourceAccountID:           data.SourceAccountID,
 		CreatedAt:                 data.CreatedAt,
 		UpdatedAt:                 data.UpdatedAt,
 	}
