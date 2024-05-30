@@ -185,11 +185,6 @@ func (h *InvoiceServiceImpl) GetInvoice(id int) (*dto.InvoiceResponseDTO, error)
 
 	if len(additionaExpenses) > 0 {
 		response.Status = additionaExpenses[len(additionaExpenses)-1].Status
-		response.NetPrice = float64(additionaExpenses[len(additionaExpenses)-1].Price)
-	}
-
-	for j := 0; j < len(additionaExpenses)-1; j++ {
-		response.VATPrice += float64(additionaExpenses[j].Price)
 	}
 
 	return &response, nil
