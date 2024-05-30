@@ -66,6 +66,7 @@ INSERT INTO model_of_accounting_items(title, model_id, debit_account_id, credit_
 ('Dobavljač', 6, 1310, 0, NOW(), NOW()),
 ('Trošak izvršenja', 6, 1310, 0, NOW(), NOW()),
 ('Trošak advokata', 6, 1310, 0, NOW(), NOW()),
+('Naknada za Centralnu banku', 6, 1310, 0, NOW(), NOW()),
 ('Prinudna naplata', 6, 0, 1310, NOW(), NOW()),
 --knjizenje povracaja
 ('Prinudna naplata', 7, 1310, 0, NOW(), NOW()),

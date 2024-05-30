@@ -34,6 +34,9 @@ type EnforcedPayment struct {
 	Amount             float64               `db:"amount"`
 	AmountForLawyer    float64               `db:"amount_for_lawyer"`
 	AmountForAgent     float64               `db:"amount_for_agent"`
+	AmountForBank      float64               `db:"amount_for_bank"`
+	AgentID            int                   `db:"agent_id"`
+	ExecutionNumber    string                `db:"execution_number"`
 	Description        string                `db:"description"`
 	CreatedAt          time.Time             `db:"created_at,omitempty"`
 	UpdatedAt          time.Time             `db:"updated_at"`

@@ -26,6 +26,9 @@ type EnforcedPaymentDTO struct {
 	Amount             float64                    `json:"amount"`
 	AmountForLawyer    float64                    `json:"amount_for_lawyer"`
 	AmountForAgent     float64                    `json:"amount_for_agent"`
+	AmountForBank      float64                    `json:"amount_for_bank"`
+	AgentID            int                        `json:"agent_id"`
+	ExecutionNumber    string                     `json:"execution_number"`
 	FileID             *int                       `json:"file_id"`
 }
 
@@ -50,7 +53,10 @@ type EnforcedPaymentResponseDTO struct {
 	Amount             float64                          `json:"amount"`
 	AmountForLawyer    float64                          `json:"amount_for_lawyer"`
 	AmountForAgent     float64                          `json:"amount_for_agent"`
+	AmountForBank      float64                          `json:"amount_for_bank"`
 	FileID             *int                             `json:"file_id"`
+	AgentID            int                              `json:"agent_id"`
+	ExecutionNumber    string                           `json:"execution_number"`
 	CreatedAt          time.Time                        `json:"created_at"`
 	UpdatedAt          time.Time                        `json:"updated_at"`
 }
@@ -84,6 +90,9 @@ func (dto EnforcedPaymentDTO) ToEnforcedPayment() *data.EnforcedPayment {
 		Amount:             dto.Amount,
 		AmountForLawyer:    dto.AmountForLawyer,
 		AmountForAgent:     dto.AmountForAgent,
+		AmountForBank:      dto.AmountForBank,
+		AgentID:            dto.AgentID,
+		ExecutionNumber:    dto.ExecutionNumber,
 		ReturnDate:         dto.ReturnDate,
 		ReturnAmount:       dto.ReturnAmount,
 		Status:             dto.Status,
@@ -109,6 +118,9 @@ func ToEnforcedPaymentResponseDTO(data data.EnforcedPayment) EnforcedPaymentResp
 		Amount:             data.Amount,
 		AmountForLawyer:    data.AmountForLawyer,
 		AmountForAgent:     data.AmountForAgent,
+		AmountForBank:      data.AmountForBank,
+		AgentID:            data.AgentID,
+		ExecutionNumber:    data.ExecutionNumber,
 		ReturnDate:         data.ReturnDate,
 		ReturnAmount:       data.ReturnAmount,
 		Status:             data.Status,
