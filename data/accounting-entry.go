@@ -311,9 +311,12 @@ func (t *AccountingEntry) GetPaymentOrdersForAccounting(filter ObligationsFilter
 	query := `select id, supplier_id, sap_id, date_of_sap, amount
 			  from payment_orders 
 			  where registred = false and status <> 'Storniran' and sap_id is not null and date_of_sap is not null and sap_id <> '' and date_of_sap <> '0001-01-01'
-			  and organization_unit_id = $1 and (COALESCE($2, '') = '' OR sap_id LIKE '%' || $2 || '%');`
+			  and organization_unit_id = $1 
+			  and (COALESCE($2, '') = '' OR sap_id LIKE '%' || $2 || '%')
+			  AND (COALESCE($3::date, NULL) IS NULL OR date_of_sap >= $3)
+			  AND (COALESCE($4::date, NULL) IS NULL OR date_of_sap <= $4);`
 
-	rows, err := Upper.SQL().Query(query, filter.OrganizationUnitID, filter.Search)
+	rows, err := Upper.SQL().Query(query, filter.OrganizationUnitID, filter.Search, filter.DateOfStart, filter.DateOfEnd)
 
 	if err != nil {
 		return nil, nil, err
@@ -339,10 +342,14 @@ func (t *AccountingEntry) GetPaymentOrdersForAccounting(filter ObligationsFilter
 func (t *AccountingEntry) GetEnforcedPaymentsForAccounting(filter ObligationsFilter) ([]PaymentOrdersForAccounting, *uint64, error) {
 	var items []PaymentOrdersForAccounting
 
-	query := `select id, supplier_id, sap_id, date_of_sap, amount + amount_for_lawyer + amount_for_agent
+	query := `select id, supplier_id, sap_id, date_of_sap, amount + amount_for_lawyer + amount_for_agent + amount_for_bank
 			  from enforced_payments 
 			  where registred = false 
-			  and organization_unit_id = $1 and (COALESCE($2, '') = '' OR sap_id LIKE '%' || $2 || '%');`
+			  and organization_unit_id = $1 
+			  and (COALESCE($2, '') = '' OR sap_id LIKE '%' || $2 || '%')
+			  AND (COALESCE($3::date, NULL) IS NULL OR date_of_sap >= $3)
+			  AND (COALESCE($4::date, NULL) IS NULL OR date_of_sap <= $4)
+			  ;`
 
 	rows, err := Upper.SQL().Query(query, filter.OrganizationUnitID, filter.Search)
 
@@ -370,12 +377,15 @@ func (t *AccountingEntry) GetEnforcedPaymentsForAccounting(filter ObligationsFil
 func (t *AccountingEntry) GetReturnedEnforcedPaymentsForAccounting(filter ObligationsFilter) ([]PaymentOrdersForAccounting, *uint64, error) {
 	var items []PaymentOrdersForAccounting
 
-	query := `select id, supplier_id, sap_id, date_of_sap, return_amount
+	query := `select id, supplier_id, sap_id, return_date, return_amount
 			  from enforced_payments 
 			  where registred_return = false 
 			  and return_date is not null and return_date <> '0001-01-01' 
 			  and return_file_id is not null and return_file_id <> 0 
-			  and organization_unit_id = $1 and (COALESCE($2, '') = '' OR sap_id LIKE '%' || $2 || '%');`
+			  and organization_unit_id = $1 
+			  and (COALESCE($2, '') = '' OR sap_id LIKE '%' || $2 || '%')
+			  AND (COALESCE($3::date, NULL) IS NULL OR return_date >= $3)
+			  AND (COALESCE($4::date, NULL) IS NULL OR return_date <= $4);`
 
 	rows, err := Upper.SQL().Query(query, filter.OrganizationUnitID, filter.Search)
 

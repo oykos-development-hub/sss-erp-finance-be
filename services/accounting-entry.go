@@ -1584,7 +1584,7 @@ func buildAccountingOrderForEnforcedPayment(id int, h *AccountingEntryServiceImp
 		case data.EnforcedPaymentTitle:
 			response = append(response, dto.AccountingOrderItemsForObligations{
 				AccountID:    modelItem.CreditAccountID,
-				CreditAmount: float32(enforcedPayment.Amount + enforcedPayment.AmountForAgent + enforcedPayment.AmountForLawyer),
+				CreditAmount: float32(enforcedPayment.Amount + enforcedPayment.AmountForAgent + enforcedPayment.AmountForLawyer + enforcedPayment.AmountForBank),
 				Title:        modelItem.Title,
 				Type:         data.TypeEnforcedPayment,
 				Date:         *enforcedPayment.DateOfSAP,
