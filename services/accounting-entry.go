@@ -1,6 +1,8 @@
 package services
 
 import (
+	"fmt"
+
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
 	"gitlab.sudovi.me/erp/finance-api/errors"
@@ -385,6 +387,13 @@ func (h *AccountingEntryServiceImpl) GetAccountingEntryList(filter dto.Accountin
 
 		var debitAmount float64
 		var creditAmount float64
+
+		year := response[i].DateOfBooking.Year()
+		yearLastTwoDigits := year % 100
+
+		// Format the string
+		formatedIDOfEntry := fmt.Sprintf("%02d-%03d", yearLastTwoDigits, response[i].IDOfEntry)
+
 		for _, item := range items {
 			responseItem := dto.AccountingEntryItemResponseDTO{
 				ID:                      item.ID,
@@ -401,6 +410,8 @@ func (h *AccountingEntryServiceImpl) GetAccountingEntryList(filter dto.Accountin
 				ReturnEnforcedPaymentID: item.ReturnEnforcedPaymentID,
 				Date:                    item.Date,
 				Type:                    item.Type,
+				EntryNumber:             formatedIDOfEntry,
+				EntryDate:               response[i].DateOfBooking,
 			}
 
 			debitAmount += item.DebitAmount

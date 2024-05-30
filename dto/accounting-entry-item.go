@@ -27,6 +27,8 @@ type AccountingEntryItemResponseDTO struct {
 	Title                   string    `json:"title"`
 	SupplierID              int       `json:"supplier_id"`
 	EntryID                 int       `json:"entry_id"`
+	EntryNumber             string    `json:"entry_number"`
+	EntryDate               time.Time `json:"entry_date"`
 	AccountID               int       `json:"account_id"`
 	CreditAmount            float64   `json:"credit_amount"`
 	DebitAmount             float64   `json:"debit_amount"`
