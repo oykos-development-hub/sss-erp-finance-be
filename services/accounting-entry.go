@@ -1559,6 +1559,20 @@ func buildAccountingOrderForEnforcedPayment(id int, h *AccountingEntryServiceImp
 					},
 				})
 			}
+		case data.BankCostTitle:
+			if enforcedPayment.AmountForBank > 0 {
+				response = append(response, dto.AccountingOrderItemsForObligations{
+					AccountID:   modelItem.DebitAccountID,
+					DebitAmount: float32(enforcedPayment.AmountForBank),
+					Title:       modelItem.Title,
+					Type:        data.TypeEnforcedPayment,
+					Date:        *enforcedPayment.DateOfSAP,
+					EnforcedPayment: dto.DropdownSimple{
+						ID:    enforcedPayment.ID,
+						Title: *enforcedPayment.SAPID,
+					},
+				})
+			}
 		case data.EnforcedPaymentTitle:
 			response = append(response, dto.AccountingOrderItemsForObligations{
 				AccountID:    modelItem.CreditAccountID,

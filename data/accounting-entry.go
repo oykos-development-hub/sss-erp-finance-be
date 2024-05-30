@@ -26,6 +26,7 @@ var (
 	AllocatedAmountTitle                    AccountingOrderItemsTitle = "Rezervisana sredstva"
 	ProcessCostTitle                        AccountingOrderItemsTitle = "Trošak izvršenja"
 	LawyerCostTitle                         AccountingOrderItemsTitle = "Trošak advokata"
+	BankCostTitle                           AccountingOrderItemsTitle = "Naknada za Centralnu banku"
 	EnforcedPaymentTitle                    AccountingOrderItemsTitle = "Prinudna naplata"
 )
 
