@@ -265,7 +265,10 @@ func (h *InvoiceServiceImpl) GetInvoiceList(input dto.InvoicesFilter) ([]dto.Inv
 		if len(additionalExpenses) > 0 {
 			response[i].NetPrice = float64(additionalExpenses[len(additionalExpenses)-1].Price)
 			response[i].Status = additionalExpenses[len(additionalExpenses)-1].Status
+		}
 
+		for i := 0; i < len(additionalExpenses)-1; i++ {
+			response[i].VATPrice += float64(additionalExpenses[i].Price)
 		}
 	}
 
