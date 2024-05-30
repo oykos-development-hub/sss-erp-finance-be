@@ -227,8 +227,8 @@ func (t *AccountingEntry) GetObligationsForAccounting(filter ObligationsFilter) 
 	                                     left join salaries s on s.id = a.salary_id
 	                                     where s.organization_unit_id = $1 and s.registred = false
 										 and (COALESCE($2, '') = '' OR s.month LIKE '%' || $2 || '%')
-										 AND (COALESCE($4::date, NULL) IS NULL OR s.date_of_calculation >= $4)
-										 AND (COALESCE($5::date, NULL) IS NULL OR s.date_of_calculation <= $5)
+										 AND (COALESCE($3::date, NULL) IS NULL OR s.date_of_calculation >= $3)
+										 AND (COALESCE($4::date, NULL) IS NULL OR s.date_of_calculation <= $4)
 	                                     group by s.id, s.month order by s.id;`
 
 	if filter.Type == nil || *filter.Type == TypeInvoice {
