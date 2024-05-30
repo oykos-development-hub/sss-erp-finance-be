@@ -218,6 +218,8 @@ func (t *AccountingEntry) GetObligationsForAccounting(filter ObligationsFilter) 
 	                               i.organization_unit_id = $1 and i.registred = false 
 								   and (COALESCE($2, '') = '' OR i.type = $2)
 								   and (COALESCE($3, '') = '' OR i.invoice_number LIKE '%' || $3 || '%')
+								   AND (COALESCE($4::date, NULL) IS NULL OR i.date_of_invoice >= $4)
+								   AND (COALESCE($5::date, NULL) IS NULL OR i.date_of_invoice <= $5)
 	                               group by i.id, i.invoice_number order by i.id;`
 
 	queryForSalaryAdditionalExpenses := `select s.id, sum(a.amount), s.month, s.date_of_calculation
@@ -225,10 +227,12 @@ func (t *AccountingEntry) GetObligationsForAccounting(filter ObligationsFilter) 
 	                                     left join salaries s on s.id = a.salary_id
 	                                     where s.organization_unit_id = $1 and s.registred = false
 										 and (COALESCE($2, '') = '' OR s.month LIKE '%' || $2 || '%')
+										 AND (COALESCE($4::date, NULL) IS NULL OR s.date_of_calculation >= $4)
+										 AND (COALESCE($5::date, NULL) IS NULL OR s.date_of_calculation <= $5)
 	                                     group by s.id, s.month order by s.id;`
 
 	if filter.Type == nil || *filter.Type == TypeInvoice {
-		rows, err := Upper.SQL().Query(queryForInvoices, filter.OrganizationUnitID, TypeInvoice, filter.Search)
+		rows, err := Upper.SQL().Query(queryForInvoices, filter.OrganizationUnitID, TypeInvoice, filter.Search, filter.DateOfStart, filter.DateOfEnd)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -248,7 +252,7 @@ func (t *AccountingEntry) GetObligationsForAccounting(filter ObligationsFilter) 
 		}
 	}
 
-	rows, err := Upper.SQL().Query(queryForAdditionalExpenses, filter.OrganizationUnitID, filter.Type, filter.Search)
+	rows, err := Upper.SQL().Query(queryForAdditionalExpenses, filter.OrganizationUnitID, filter.Type, filter.Search, filter.DateOfStart, filter.DateOfEnd)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -274,7 +278,7 @@ func (t *AccountingEntry) GetObligationsForAccounting(filter ObligationsFilter) 
 	}
 
 	if filter.Type == nil || *filter.Type == TypeSalary {
-		rows, err = Upper.SQL().Query(queryForSalaryAdditionalExpenses, filter.OrganizationUnitID, filter.Search)
+		rows, err = Upper.SQL().Query(queryForSalaryAdditionalExpenses, filter.OrganizationUnitID, filter.Search, filter.DateOfStart, filter.DateOfEnd)
 		if err != nil {
 			return nil, nil, err
 		}
