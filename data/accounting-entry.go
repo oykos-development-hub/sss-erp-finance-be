@@ -353,7 +353,7 @@ func (t *AccountingEntry) GetEnforcedPaymentsForAccounting(filter ObligationsFil
 			  AND (COALESCE($4::date, NULL) IS NULL OR date_of_sap <= $4)
 			  ;`
 
-	rows, err := Upper.SQL().Query(query, filter.OrganizationUnitID, filter.Search)
+	rows, err := Upper.SQL().Query(query, filter.OrganizationUnitID, filter.Search, filter.DateOfStart, filter.DateOfEnd)
 
 	if err != nil {
 		return nil, nil, err
@@ -389,7 +389,7 @@ func (t *AccountingEntry) GetReturnedEnforcedPaymentsForAccounting(filter Obliga
 			  AND (COALESCE($3::date, NULL) IS NULL OR return_date >= $3)
 			  AND (COALESCE($4::date, NULL) IS NULL OR return_date <= $4);`
 
-	rows, err := Upper.SQL().Query(query, filter.OrganizationUnitID, filter.Search)
+	rows, err := Upper.SQL().Query(query, filter.OrganizationUnitID, filter.Search, filter.DateOfStart, filter.DateOfEnd)
 
 	if err != nil {
 		return nil, nil, err
