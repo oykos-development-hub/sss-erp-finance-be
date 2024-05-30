@@ -310,7 +310,9 @@ func (t *AccountingEntry) GetPaymentOrdersForAccounting(filter ObligationsFilter
 
 	query := `select id, supplier_id, sap_id, date_of_sap, amount
 			  from payment_orders 
-			  where registred = false and status <> 'Storniran' and sap_id is not null and date_of_sap is not null and sap_id <> '' and date_of_sap <> '0001-01-01'
+			  where registred = false and (status is null or status <> 'Storniran') 
+			  and sap_id is not null and date_of_sap is not null 
+			  and sap_id <> '' and date_of_sap <> '0001-01-01'
 			  and organization_unit_id = $1 
 			  and (COALESCE($2, '') = '' OR sap_id LIKE '%' || $2 || '%')
 			  AND (COALESCE($3::date, NULL) IS NULL OR date_of_sap >= $3)
