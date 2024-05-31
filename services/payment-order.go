@@ -484,6 +484,11 @@ func updateInvoiceStatus(id int, amount float64, lenOfArray int, tx up.Session, 
 
 	conditionAndExp := &up.AndExpr{}
 	conditionAndExp = up.And(conditionAndExp, &up.Cond{"invoice_id": id})
+	cond := up.Or(
+		&up.Cond{"status <>": "Storniran"},
+		&up.Cond{"status is": nil},
+	)
+	conditionAndExp = up.And(conditionAndExp, cond)
 
 	articles, _, err := h.invoiceArticlesRepo.GetAll(nil, nil, conditionAndExp, nil)
 
@@ -538,6 +543,13 @@ func updateAdditionalExpenseStatus(id int, amount float64, lenOfArray int, tx up
 
 	conditionAndExp := &up.AndExpr{}
 	conditionAndExp = up.And(conditionAndExp, &up.Cond{"additional_expense_id": id})
+
+	cond := up.Or(
+		&up.Cond{"status <>": "Storniran"},
+		&up.Cond{"status is": nil},
+	)
+	conditionAndExp = up.And(conditionAndExp, cond)
+
 	items, _, err := h.itemsRepo.GetAll(nil, nil, conditionAndExp, nil)
 
 	if err != nil {
@@ -578,6 +590,13 @@ func updateSalaryAdditionalExpenseStatus(id int, amount float64, lenOfArray int,
 
 	conditionAndExp := &up.AndExpr{}
 	conditionAndExp = up.And(conditionAndExp, &up.Cond{"salary_additional_expense_id": id})
+
+	cond := up.Or(
+		&up.Cond{"status <>": "Storniran"},
+		&up.Cond{"status is": nil},
+	)
+	conditionAndExp = up.And(conditionAndExp, cond)
+
 	items, _, err := h.itemsRepo.GetAll(nil, nil, conditionAndExp, nil)
 
 	if err != nil {
@@ -618,6 +637,13 @@ func updateInvoiceStatusOnDelete(id int, amount float64, lenOfArray int, tx up.S
 
 	conditionAndExp := &up.AndExpr{}
 	conditionAndExp = up.And(conditionAndExp, &up.Cond{"invoice_id": id})
+
+	cond := up.Or(
+		&up.Cond{"status <>": "Storniran"},
+		&up.Cond{"status is": nil},
+	)
+	conditionAndExp = up.And(conditionAndExp, cond)
+
 	items, _, err := h.itemsRepo.GetAll(nil, nil, conditionAndExp, nil)
 
 	if err != nil {
@@ -649,6 +675,13 @@ func updateAdditionalExpenseStatusOnDelete(id int, amount float64, lenOfArray in
 
 	conditionAndExp := &up.AndExpr{}
 	conditionAndExp = up.And(conditionAndExp, &up.Cond{"additional_expense_id": id})
+
+	cond := up.Or(
+		&up.Cond{"status <>": "Storniran"},
+		&up.Cond{"status is": nil},
+	)
+	conditionAndExp = up.And(conditionAndExp, cond)
+
 	items, _, err := h.itemsRepo.GetAll(nil, nil, conditionAndExp, nil)
 
 	if err != nil {
@@ -679,6 +712,13 @@ func updateSalaryAdditionalExpenseStatusOnDelete(id int, amount float64, lenOfAr
 
 	conditionAndExp := &up.AndExpr{}
 	conditionAndExp = up.And(conditionAndExp, &up.Cond{"salary_additional_expense_id": id})
+
+	cond := up.Or(
+		&up.Cond{"status <>": "Storniran"},
+		&up.Cond{"status is": nil},
+	)
+	conditionAndExp = up.And(conditionAndExp, cond)
+
 	items, _, err := h.itemsRepo.GetAll(nil, nil, conditionAndExp, nil)
 
 	if err != nil {
