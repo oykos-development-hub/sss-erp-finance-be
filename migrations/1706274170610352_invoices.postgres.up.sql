@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS invoices (
     receipt_date TIMESTAMP,                --datum prijema,
     date_of_payment TIMESTAMP,             --datum placanja,
     sss_invoice_receipt_date TIMESTAMP,    --datum sss, 
+    sss_pro_forma_invoice_receipt_date TIMESTAMP, --datum prijema predracuna
     date_of_start TIMESTAMP,               --datum pocetka ugovora
     file_id INTEGER,
     pro_forma_invoice_file_id INTEGER,
