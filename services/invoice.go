@@ -80,6 +80,19 @@ func (h *InvoiceServiceImpl) UpdateInvoice(id int, input dto.InvoiceDTO) (*dto.I
 		return nil, err
 	}
 
+	if input.Type == data.TypeInvoice && oldData.Status == data.InvoiceStatusIncomplete {
+		statusCreated := true
+		for _, article := range oldData.Articles {
+			if article.AccountID == 0 {
+				statusCreated = false
+			}
+		}
+
+		if statusCreated {
+			input.Status = data.InvoiceStatusCreated
+		}
+	}
+
 	err = data.Upper.Tx(func(tx up.Session) error {
 		var err error
 		err = h.repo.Update(tx, *invoice)

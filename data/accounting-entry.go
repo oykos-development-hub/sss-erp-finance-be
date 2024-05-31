@@ -210,6 +210,7 @@ func (t *AccountingEntry) GetObligationsForAccounting(filter ObligationsFilter) 
 						and (COALESCE($3, '') = '' OR i.invoice_number LIKE '%' || $3 || '%')
 						AND (COALESCE($4::date, NULL) IS NULL OR i.date_of_invoice >= $4)
 						AND (COALESCE($5::date, NULL) IS NULL OR i.date_of_invoice <= $5)
+						AND i.status <> $6
 						group by i.id;`
 
 	queryForAdditionalExpenses := `select i.id, sum(a.price), i.type, i.invoice_number, i.supplier_id, i.date_of_invoice
@@ -233,7 +234,7 @@ func (t *AccountingEntry) GetObligationsForAccounting(filter ObligationsFilter) 
 	                                     group by s.id, s.month order by s.id;`
 
 	if filter.Type == nil || *filter.Type == TypeInvoice {
-		rows, err := Upper.SQL().Query(queryForInvoices, filter.OrganizationUnitID, TypeInvoice, filter.Search, filter.DateOfStart, filter.DateOfEnd)
+		rows, err := Upper.SQL().Query(queryForInvoices, filter.OrganizationUnitID, TypeInvoice, filter.Search, filter.DateOfStart, filter.DateOfEnd, InvoiceStatusIncomplete)
 		if err != nil {
 			return nil, nil, err
 		}

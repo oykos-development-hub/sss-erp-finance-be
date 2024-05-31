@@ -9,9 +9,10 @@ import (
 type InvoiceStatus string
 
 var (
-	InvoiceStatusCreated InvoiceStatus = "Kreiran"
-	InvoiceStatusPart    InvoiceStatus = "Djelimično na nalogu"
-	InvoiceStatusFull    InvoiceStatus = "Na nalogu"
+	InvoiceStatusIncomplete InvoiceStatus = "Nepotpun"
+	InvoiceStatusCreated    InvoiceStatus = "Kreiran"
+	InvoiceStatusPart       InvoiceStatus = "Djelimično na nalogu"
+	InvoiceStatusFull       InvoiceStatus = "Na nalogu"
 )
 
 // Invoice struct
