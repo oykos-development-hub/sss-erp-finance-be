@@ -513,7 +513,7 @@ func updateInvoiceStatus(id int, amount float64, lenOfArray int, tx up.Session, 
 			return err
 		}
 
-		if paymentOrder.Status != nil || *paymentOrder.Status != statusCanceled {
+		if paymentOrder.Status == nil || *paymentOrder.Status != statusCanceled {
 			amount += paymentOrder.Amount
 		}
 	}
@@ -557,7 +557,7 @@ func updateAdditionalExpenseStatus(id int, amount float64, lenOfArray int, tx up
 		if err != nil {
 			return err
 		}
-		if paymentOrder.Status != nil || *paymentOrder.Status != statusCanceled {
+		if paymentOrder.Status == nil || *paymentOrder.Status != statusCanceled {
 			amount += paymentOrder.Amount
 		}
 	}
@@ -601,7 +601,7 @@ func updateSalaryAdditionalExpenseStatus(id int, amount float64, lenOfArray int,
 			return err
 		}
 
-		if paymentOrder.Status != nil || *paymentOrder.Status != statusCanceled {
+		if paymentOrder.Status == nil || *paymentOrder.Status != statusCanceled {
 			amount += paymentOrder.Amount
 		}
 	}
