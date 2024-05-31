@@ -381,7 +381,16 @@ func (h *PaymentOrderServiceImpl) GetAllObligations(filter dto.GetObligationsFil
 			}
 
 			for _, item := range paidItems {
-				accountMap[item.SourceAccountID] -= item.Amount
+
+				paymentOrder, err := h.repo.Get(item.PaymentOrderID)
+
+				if err != nil {
+					return nil, nil, err
+				}
+
+				if paymentOrder.Status == nil || *paymentOrder.Status != "Storniran" {
+					accountMap[item.SourceAccountID] -= item.Amount
+				}
 			}
 
 			for account, amount := range accountMap {
