@@ -155,7 +155,7 @@ func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation
 
 	queryForPaidInvoices := `select sum(p.amount) from payment_order_items pi 
 							left join payment_orders p on p.id = pi.payment_order_id
-							where pi.invoice_id = $1`
+							where pi.invoice_id = $1 and p.status <> 'Storniran'`
 
 	queryForAdditionalExpenses := `select a.id, a.price, a.title, i.type, i.invoice_number, a.status, a.created_at
 	                               from additional_expenses a
