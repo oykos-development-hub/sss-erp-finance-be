@@ -150,12 +150,19 @@ func ToInvoiceResponseDTO(data data.Invoice) InvoiceResponseDTO {
 	if data.OrderID != nil {
 		orderID = *data.OrderID
 	}
+
+	isInvoice := false
+
+	if data.InvoiceNumber != "" {
+		isInvoice = true
+	}
+
 	return InvoiceResponseDTO{
 		ID:                     data.ID,
 		PassedToInventory:      data.PassedToInventory,
 		PassedToAccounting:     data.PassedToAccounting,
 		Registred:              data.Registred,
-		IsInvoice:              data.IsInvoice,
+		IsInvoice:              isInvoice,
 		InvoiceNumber:          data.InvoiceNumber,
 		Status:                 data.Status,
 		Issuer:                 data.Issuer,

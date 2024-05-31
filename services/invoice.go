@@ -81,7 +81,6 @@ func (h *InvoiceServiceImpl) UpdateInvoice(id int, input dto.InvoiceDTO) (*dto.I
 	if err != nil {
 		return nil, err
 	}
-
 	if input.Type == data.TypeInvoice && oldData.Status == data.InvoiceStatusIncomplete {
 		statusCreated := true
 		for _, article := range oldData.Articles {
