@@ -499,18 +499,13 @@ func updateInvoiceStatus(id int, amount float64, lenOfArray int, tx up.Session, 
 	conditionAndExp = &up.AndExpr{}
 	conditionAndExp = up.And(conditionAndExp, &up.Cond{"invoice_id": id})
 
-	cond := up.Or(
-		&up.Cond{"status <>": "Storniran"},
-		&up.Cond{"status is": nil},
-	)
-	conditionAndExp = up.And(conditionAndExp, cond)
-
 	items, _, err := h.itemsRepo.GetAll(nil, nil, conditionAndExp, nil)
 
 	if err != nil {
 		return err
 	}
 
+	statusCanceled := "Storniran"
 	for _, item := range items {
 		paymentOrder, err := h.repo.Get(item.PaymentOrderID)
 
@@ -518,7 +513,9 @@ func updateInvoiceStatus(id int, amount float64, lenOfArray int, tx up.Session, 
 			return err
 		}
 
-		amount += paymentOrder.Amount
+		if paymentOrder.Status != nil || *paymentOrder.Status != statusCanceled {
+			amount += paymentOrder.Amount
+		}
 	}
 
 	if amount+0.09999 >= price || lenOfArray > 1 {
@@ -546,17 +543,13 @@ func updateAdditionalExpenseStatus(id int, amount float64, lenOfArray int, tx up
 	conditionAndExp := &up.AndExpr{}
 	conditionAndExp = up.And(conditionAndExp, &up.Cond{"additional_expense_id": id})
 
-	cond := up.Or(
-		&up.Cond{"status <>": "Storniran"},
-		&up.Cond{"status is": nil},
-	)
-	conditionAndExp = up.And(conditionAndExp, cond)
-
 	items, _, err := h.itemsRepo.GetAll(nil, nil, conditionAndExp, nil)
 
 	if err != nil {
 		return err
 	}
+
+	statusCanceled := "Storniran"
 
 	for _, item := range items {
 		paymentOrder, err := h.repo.Get(item.PaymentOrderID)
@@ -564,8 +557,9 @@ func updateAdditionalExpenseStatus(id int, amount float64, lenOfArray int, tx up
 		if err != nil {
 			return err
 		}
-
-		amount += paymentOrder.Amount
+		if paymentOrder.Status != nil || *paymentOrder.Status != statusCanceled {
+			amount += paymentOrder.Amount
+		}
 	}
 
 	if amount+0.09999 >= float64(item.Price) || lenOfArray > 1 {
@@ -593,18 +587,13 @@ func updateSalaryAdditionalExpenseStatus(id int, amount float64, lenOfArray int,
 	conditionAndExp := &up.AndExpr{}
 	conditionAndExp = up.And(conditionAndExp, &up.Cond{"salary_additional_expense_id": id})
 
-	cond := up.Or(
-		&up.Cond{"status <>": "Storniran"},
-		&up.Cond{"status is": nil},
-	)
-	conditionAndExp = up.And(conditionAndExp, cond)
-
 	items, _, err := h.itemsRepo.GetAll(nil, nil, conditionAndExp, nil)
 
 	if err != nil {
 		return err
 	}
 
+	statusCanceled := "Storniran"
 	for _, item := range items {
 		paymentOrder, err := h.repo.Get(item.PaymentOrderID)
 
@@ -612,7 +601,9 @@ func updateSalaryAdditionalExpenseStatus(id int, amount float64, lenOfArray int,
 			return err
 		}
 
-		amount += paymentOrder.Amount
+		if paymentOrder.Status != nil || *paymentOrder.Status != statusCanceled {
+			amount += paymentOrder.Amount
+		}
 	}
 
 	if amount+0.09999 >= item.Amount || lenOfArray > 1 {
@@ -640,12 +631,6 @@ func updateInvoiceStatusOnDelete(id int, amount float64, lenOfArray int, tx up.S
 	conditionAndExp := &up.AndExpr{}
 	conditionAndExp = up.And(conditionAndExp, &up.Cond{"invoice_id": id})
 
-	cond := up.Or(
-		&up.Cond{"status <>": "Storniran"},
-		&up.Cond{"status is": nil},
-	)
-	conditionAndExp = up.And(conditionAndExp, cond)
-
 	items, _, err := h.itemsRepo.GetAll(nil, nil, conditionAndExp, nil)
 
 	if err != nil {
@@ -656,7 +641,25 @@ func updateInvoiceStatusOnDelete(id int, amount float64, lenOfArray int, tx up.S
 	if len(items) == 1 || lenOfArray > 1 {
 		invoice.Status = data.InvoiceStatusCreated
 	} else {
-		invoice.Status = data.InvoiceStatusPart
+
+		numberOfItems := 0
+		for _, item := range items {
+			paymentOrder, err := h.repo.Get(item.PaymentOrderID)
+
+			if err != nil {
+				return err
+			}
+
+			if paymentOrder.Status == nil || *paymentOrder.Status != "Storniran" {
+				numberOfItems++
+			}
+		}
+
+		if numberOfItems > 1 {
+			invoice.Status = data.InvoiceStatusPart
+		} else {
+			invoice.Status = data.InvoiceStatusCreated
+		}
 	}
 
 	err = h.invoiceRepo.Update(tx, *invoice)
@@ -678,12 +681,6 @@ func updateAdditionalExpenseStatusOnDelete(id int, amount float64, lenOfArray in
 	conditionAndExp := &up.AndExpr{}
 	conditionAndExp = up.And(conditionAndExp, &up.Cond{"additional_expense_id": id})
 
-	cond := up.Or(
-		&up.Cond{"status <>": "Storniran"},
-		&up.Cond{"status is": nil},
-	)
-	conditionAndExp = up.And(conditionAndExp, cond)
-
 	items, _, err := h.itemsRepo.GetAll(nil, nil, conditionAndExp, nil)
 
 	if err != nil {
@@ -693,7 +690,24 @@ func updateAdditionalExpenseStatusOnDelete(id int, amount float64, lenOfArray in
 	if len(items) == 1 || lenOfArray > 1 {
 		item.Status = data.InvoiceStatusCreated
 	} else {
-		item.Status = data.InvoiceStatusPart
+		numberOfItems := 0
+		for _, item := range items {
+			paymentOrder, err := h.repo.Get(item.PaymentOrderID)
+
+			if err != nil {
+				return err
+			}
+
+			if paymentOrder.Status == nil || *paymentOrder.Status != "Storniran" {
+				numberOfItems++
+			}
+		}
+
+		if numberOfItems > 1 {
+			item.Status = data.InvoiceStatusPart
+		} else {
+			item.Status = data.InvoiceStatusCreated
+		}
 	}
 
 	err = h.additionalExpensesRepo.Update(tx, *item)
@@ -715,12 +729,6 @@ func updateSalaryAdditionalExpenseStatusOnDelete(id int, amount float64, lenOfAr
 	conditionAndExp := &up.AndExpr{}
 	conditionAndExp = up.And(conditionAndExp, &up.Cond{"salary_additional_expense_id": id})
 
-	cond := up.Or(
-		&up.Cond{"status <>": "Storniran"},
-		&up.Cond{"status is": nil},
-	)
-	conditionAndExp = up.And(conditionAndExp, cond)
-
 	items, _, err := h.itemsRepo.GetAll(nil, nil, conditionAndExp, nil)
 
 	if err != nil {
@@ -730,7 +738,24 @@ func updateSalaryAdditionalExpenseStatusOnDelete(id int, amount float64, lenOfAr
 	if len(items) == 1 || lenOfArray > 1 {
 		item.Status = data.InvoiceStatusCreated
 	} else {
-		item.Status = data.InvoiceStatusPart
+		numberOfItems := 0
+		for _, item := range items {
+			paymentOrder, err := h.repo.Get(item.PaymentOrderID)
+
+			if err != nil {
+				return err
+			}
+
+			if paymentOrder.Status == nil || *paymentOrder.Status != "Storniran" {
+				numberOfItems++
+			}
+		}
+
+		if numberOfItems > 1 {
+			item.Status = data.InvoiceStatusPart
+		} else {
+			item.Status = data.InvoiceStatusCreated
+		}
 	}
 
 	err = h.salaryAdditionalExpensesRepo.Update(tx, *item)
