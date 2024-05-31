@@ -484,11 +484,6 @@ func updateInvoiceStatus(id int, amount float64, lenOfArray int, tx up.Session, 
 
 	conditionAndExp := &up.AndExpr{}
 	conditionAndExp = up.And(conditionAndExp, &up.Cond{"invoice_id": id})
-	cond := up.Or(
-		&up.Cond{"status <>": "Storniran"},
-		&up.Cond{"status is": nil},
-	)
-	conditionAndExp = up.And(conditionAndExp, cond)
 
 	articles, _, err := h.invoiceArticlesRepo.GetAll(nil, nil, conditionAndExp, nil)
 
@@ -503,6 +498,13 @@ func updateInvoiceStatus(id int, amount float64, lenOfArray int, tx up.Session, 
 
 	conditionAndExp = &up.AndExpr{}
 	conditionAndExp = up.And(conditionAndExp, &up.Cond{"invoice_id": id})
+
+	cond := up.Or(
+		&up.Cond{"status <>": "Storniran"},
+		&up.Cond{"status is": nil},
+	)
+	conditionAndExp = up.And(conditionAndExp, cond)
+
 	items, _, err := h.itemsRepo.GetAll(nil, nil, conditionAndExp, nil)
 
 	if err != nil {
