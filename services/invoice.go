@@ -36,7 +36,9 @@ func (h *InvoiceServiceImpl) CreateInvoice(input dto.InvoiceDTO) (*dto.InvoiceRe
 	var id int
 	err := data.Upper.Tx(func(tx up.Session) error {
 		var err error
-		invoice.Status = data.InvoiceStatusCreated
+		if invoice.Status != data.InvoiceStatusIncomplete {
+			invoice.Status = data.InvoiceStatusCreated
+		}
 		id, err = h.repo.Insert(tx, *invoice)
 		if err != nil {
 			return errors.ErrInternalServer
