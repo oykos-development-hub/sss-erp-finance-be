@@ -31,6 +31,11 @@ func NewSpendingDynamicServiceImpl(
 }
 
 func (h *SpendingDynamicServiceImpl) CreateSpendingDynamic(budgetID, unitID int, inputDataDTO []dto.SpendingDynamicDTO) error {
+	latestVersion, err := h.repoEntries.FindLatestVersion()
+	if err != nil {
+		return errors.Wrap(err, "find latest version")
+	}
+
 	for _, inputDTO := range inputDataDTO {
 		currentBudget, err := h.repoCurrentBudget.GetBy(*up.And(
 			up.Cond{"budget_id": budgetID},
@@ -57,24 +62,8 @@ func (h *SpendingDynamicServiceImpl) CreateSpendingDynamic(budgetID, unitID int,
 			}
 		}
 
-		// Validate that the sum of the months matches the planned total
-		entries, err := h.repoEntries.FindAll(&currentBudget.ID, nil, nil, nil)
-		if err != nil {
-			if !errors.IsErr(err, errors.NotFoundCode) {
-				return errors.Wrap(err, "CreateSpendingDynamic")
-			}
-		}
-
-		// validate months if there are entries already
-		if len(entries) > 0 {
-			ok := entriesInputData.ValidateNewEntry(&entries[0])
-			if !ok {
-				return errors.NewBadRequestError("cannot change months in past")
-			}
-		}
-
 		entriesInputData.CurrentBudgetID = currentBudget.ID
-		entriesInputData.Version = len(entries) + 1
+		entriesInputData.Version = latestVersion
 
 		_, err = h.repoEntries.Insert(*entriesInputData)
 		if err != nil {

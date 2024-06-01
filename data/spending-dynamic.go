@@ -107,7 +107,7 @@ func (t *SpendingDynamicEntry) FindAll(currentBudgetID, version, budgetID, unitI
 	} else {
 		latestVersion, err := t.FindLatestVersion()
 		if err != nil {
-			return nil, errors.Wrap(err, "FindAll")
+			return nil, errors.Wrap(err, "repo find latest version")
 		}
 		query = query.Where("sd.version = ?", latestVersion)
 	}
