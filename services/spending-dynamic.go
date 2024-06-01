@@ -63,7 +63,7 @@ func (h *SpendingDynamicServiceImpl) CreateSpendingDynamic(budgetID, unitID int,
 		}
 
 		entriesInputData.CurrentBudgetID = currentBudget.ID
-		entriesInputData.Version = latestVersion
+		entriesInputData.Version = latestVersion + 1
 
 		_, err = h.repoEntries.Insert(*entriesInputData)
 		if err != nil {
