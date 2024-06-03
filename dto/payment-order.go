@@ -3,7 +3,6 @@ package dto
 import (
 	"time"
 
-	"github.com/shopspring/decimal"
 	"gitlab.sudovi.me/erp/finance-api/data"
 )
 
@@ -20,7 +19,7 @@ type PaymentOrderDTO struct {
 	Description        string                `json:"description"`
 	DateOfSAP          *time.Time            `json:"date_of_sap"`
 	Items              []PaymentOrderItemDTO `json:"items"`
-	Amount             decimal.Decimal       `json:"amount"`
+	Amount             float64               `json:"amount"`
 	FileID             *int                  `json:"file_id"`
 }
 
@@ -39,7 +38,7 @@ type PaymentOrderResponseDTO struct {
 	DateOfSAP          *time.Time                    `json:"date_of_sap"`
 	FileID             *int                          `json:"file_id"`
 	Items              []PaymentOrderItemResponseDTO `json:"items"`
-	Amount             decimal.Decimal               `json:"amount"`
+	Amount             float64                       `json:"amount"`
 	Status             string                        `json:"status"`
 	CreatedAt          time.Time                     `json:"created_at"`
 	UpdatedAt          time.Time                     `json:"updated_at"`
@@ -52,16 +51,16 @@ type ObligationResponse struct {
 	Type                      data.TypesOfObligation `json:"type"`
 	Title                     string                 `json:"title"`
 	Status                    string                 `json:"status"`
-	TotalPrice                decimal.Decimal        `json:"total_price"`
-	RemainPrice               decimal.Decimal        `json:"remain_price"`
+	TotalPrice                float64                `json:"total_price"`
+	RemainPrice               float64                `json:"remain_price"`
 	InvoiceItems              []InvoiceItems         `json:"invoice_items"`
 	CreatedAt                 time.Time              `json:"created_at"`
 }
 
 type InvoiceItems struct {
-	AccountID   int             `json:"account_id"`
-	TotalPrice  decimal.Decimal `json:"total_price"`
-	RemainPrice decimal.Decimal `json:"remain_price"`
+	AccountID   int     `json:"account_id"`
+	TotalPrice  float64 `json:"total_price"`
+	RemainPrice float64 `json:"remain_price"`
 }
 
 type PaymentOrderFilterDTO struct {

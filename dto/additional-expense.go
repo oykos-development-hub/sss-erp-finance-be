@@ -3,7 +3,6 @@ package dto
 import (
 	"time"
 
-	"github.com/shopspring/decimal"
 	"gitlab.sudovi.me/erp/finance-api/data"
 )
 
@@ -12,7 +11,7 @@ type AdditionalExpenseDTO struct {
 	Title              data.ObligationTitles `json:"title"`
 	AccountID          int                   `json:"account_id"`
 	OrganizationUnitID int                   `json:"organization_unit_id"`
-	Price              decimal.Decimal       `json:"price"`
+	Price              float32               `json:"price"`
 	SubjectID          int                   `json:"subject_id"`
 	BankAccount        string                `json:"bank_account"`
 	InvoiceID          int                   `json:"invoice_id"`
@@ -26,7 +25,7 @@ type AdditionalExpenseResponseDTO struct {
 	ObligationNumber     string                 `json:"obligation_number"`
 	ObligationSupplierID int                    `json:"obligation_supplier_id"`
 	AccountID            int                    `json:"account_id"`
-	Price                decimal.Decimal        `json:"price"`
+	Price                float32                `json:"price"`
 	SubjectID            int                    `json:"subject_id"`
 	OrganizationUnitID   int                    `json:"organization_unit_id"`
 	BankAccount          string                 `json:"bank_account"`

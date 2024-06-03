@@ -3,27 +3,26 @@ package data
 import (
 	"time"
 
-	"github.com/shopspring/decimal"
 	up "github.com/upper/db/v4"
 )
 
 // DepositPayment struct
 type DepositPayment struct {
-	ID                        int             `db:"id,omitempty"`
-	OrganizationUnitID        int             `db:"organization_unit_id"`
-	Payer                     string          `db:"payer"`
-	CaseNumber                string          `db:"case_number"`
-	PartyName                 string          `db:"party_name"`
-	NumberOfBankStatement     string          `db:"number_of_bank_statement"`
-	DateOfBankStatement       string          `db:"date_of_bank_statement"`
-	AccountID                 int             `db:"account_id"`
-	Amount                    decimal.Decimal `db:"amount"`
-	MainBankAccount           bool            `db:"main_bank_account"`
-	CurrentBankAccount        string          `db:"current_bank_account"`
-	DateOfTransferMainAccount *time.Time      `db:"date_of_transfer_main_account"`
-	FileID                    *int            `db:"file_id"`
-	CreatedAt                 time.Time       `db:"created_at,omitempty"`
-	UpdatedAt                 time.Time       `db:"updated_at"`
+	ID                        int        `db:"id,omitempty"`
+	OrganizationUnitID        int        `db:"organization_unit_id"`
+	Payer                     string     `db:"payer"`
+	CaseNumber                string     `db:"case_number"`
+	PartyName                 string     `db:"party_name"`
+	NumberOfBankStatement     string     `db:"number_of_bank_statement"`
+	DateOfBankStatement       string     `db:"date_of_bank_statement"`
+	AccountID                 int        `db:"account_id"`
+	Amount                    float64    `db:"amount"`
+	MainBankAccount           bool       `db:"main_bank_account"`
+	CurrentBankAccount        string     `db:"current_bank_account"`
+	DateOfTransferMainAccount *time.Time `db:"date_of_transfer_main_account"`
+	FileID                    *int       `db:"file_id"`
+	CreatedAt                 time.Time  `db:"created_at,omitempty"`
+	UpdatedAt                 time.Time  `db:"updated_at"`
 }
 
 type DepositInitialStateFilter struct {
@@ -131,7 +130,7 @@ func (t *DepositPayment) GetDepositPaymentByCaseNumber(caseNumber string, source
 	}
 	defer rows1.Close()
 
-	var amountPayments decimal.Decimal
+	var amountPayments float64
 	for rows1.Next() {
 		err = rows1.Scan(&amountPayments)
 
@@ -146,7 +145,7 @@ func (t *DepositPayment) GetDepositPaymentByCaseNumber(caseNumber string, source
 	}
 	defer rows2.Close()
 
-	var amountSpending *decimal.Decimal
+	var amountSpending *float64
 	for rows2.Next() {
 		err = rows2.Scan(&amountSpending)
 
@@ -156,7 +155,7 @@ func (t *DepositPayment) GetDepositPaymentByCaseNumber(caseNumber string, source
 	}
 
 	if amountSpending != nil {
-		response.Amount = amountPayments.Sub(*amountSpending)
+		response.Amount = amountPayments - *amountSpending
 	} else {
 		response.Amount = amountPayments
 	}
@@ -180,7 +179,7 @@ func (t *DepositPayment) GetCaseNumber(orgUnitID int, sourceBankAccount string) 
 	for rows1.Next() {
 		var item DepositPayment
 		var caseNumber string
-		var amount decimal.Decimal
+		var amount float64
 		err = rows1.Scan(&caseNumber, &amount)
 
 		item.CaseNumber = caseNumber
@@ -197,7 +196,7 @@ func (t *DepositPayment) GetCaseNumber(orgUnitID int, sourceBankAccount string) 
 		}
 		defer rows2.Close()
 
-		var amountSpending *decimal.Decimal
+		var amountSpending *float64
 		for rows2.Next() {
 			err = rows2.Scan(&amountSpending)
 
@@ -207,10 +206,10 @@ func (t *DepositPayment) GetCaseNumber(orgUnitID int, sourceBankAccount string) 
 		}
 
 		if amountSpending != nil {
-			item.Amount = item.Amount.Sub(*amountSpending)
+			item.Amount -= *amountSpending
 		}
 
-		if item.Amount.Cmp(decimal.NewFromInt(0)) > 0 {
+		if item.Amount > 0 {
 			response = append(response, &item)
 		}
 	}
@@ -263,7 +262,7 @@ func getAmountByBankAccount(bankAccount string, date time.Time) (*DepositPayment
 	var item DepositPayment
 	item.CurrentBankAccount = bankAccount
 	for rows1.Next() {
-		var amount *decimal.Decimal
+		var amount *float64
 		err = rows1.Scan(&amount)
 
 		if err != nil {
@@ -280,7 +279,7 @@ func getAmountByBankAccount(bankAccount string, date time.Time) (*DepositPayment
 		}
 		defer rows2.Close()
 
-		var amountSpending *decimal.Decimal
+		var amountSpending *float64
 		for rows2.Next() {
 			err = rows2.Scan(&amountSpending)
 
@@ -290,7 +289,7 @@ func getAmountByBankAccount(bankAccount string, date time.Time) (*DepositPayment
 		}
 
 		if amountSpending != nil {
-			item.Amount = item.Amount.Sub(*amountSpending)
+			item.Amount -= *amountSpending
 		}
 
 		rows3, err := Upper.SQL().Query(query3, bankAccount, formattedDate)
@@ -308,7 +307,7 @@ func getAmountByBankAccount(bankAccount string, date time.Time) (*DepositPayment
 		}
 
 		if amountSpending != nil {
-			item.Amount = item.Amount.Sub(*amountSpending)
+			item.Amount -= *amountSpending
 		}
 
 	}
@@ -331,7 +330,7 @@ func getAmountOnTransitionalBankAccount(orgUnit int, date time.Time) (*DepositPa
 
 	var item DepositPayment
 	for rows1.Next() {
-		var amount *decimal.Decimal
+		var amount *float64
 		err = rows1.Scan(&amount)
 
 		if err != nil {

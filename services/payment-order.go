@@ -9,7 +9,6 @@ import (
 	"gitlab.sudovi.me/erp/finance-api/errors"
 
 	"github.com/oykos-development-hub/celeritas"
-	"github.com/shopspring/decimal"
 	up "github.com/upper/db/v4"
 )
 
@@ -360,31 +359,16 @@ func (h *PaymentOrderServiceImpl) GetAllObligations(filter dto.GetObligationsFil
 				return nil, nil, err
 			}
 
-			accountMap := make(map[int]decimal.Decimal)
-			totalAccountMap := make(map[int]decimal.Decimal)
+			accountMap := make(map[int]float64)
+			totalAccountMap := make(map[int]float64)
 
 			for _, item := range articles {
 				if currentAmount, exists := accountMap[item.AccountID]; exists {
-					amountDecimal := decimal.NewFromInt(int64(item.Amount))
-					vatPercentageDecimal := decimal.NewFromInt(int64(item.VatPercentage))
-
-					// Izračunavanje novog iznosa
-					newAmount := amountDecimal.Mul(item.NetPrice.Add(
-						item.NetPrice.Mul(vatPercentageDecimal).Div(decimal.NewFromInt(100))))
-
-					accountMap[item.AccountID] = newAmount
-					totalAccountMap[item.AccountID] = newAmount
+					accountMap[item.AccountID] = currentAmount + float64(float64(item.Amount)*(item.NetPrice+item.NetPrice*float64(item.VatPercentage)/100))
+					totalAccountMap[item.AccountID] = currentAmount + float64(float64(item.Amount)*(item.NetPrice+item.NetPrice*float64(item.VatPercentage)/100))
 				} else {
-					amountDecimal := decimal.NewFromInt(int64(item.Amount))
-					vatPercentageDecimal := decimal.NewFromInt(int64(item.VatPercentage))
-
-					// Izračunavanje novog iznosa
-					newAmount := currentAmount.Add(amountDecimal).Mul(item.NetPrice.Add(
-						item.NetPrice.Mul(vatPercentageDecimal).Div(decimal.NewFromInt(100)),
-					))
-
-					accountMap[item.AccountID] = newAmount
-					totalAccountMap[item.AccountID] = newAmount
+					accountMap[item.AccountID] = float64(float64(item.Amount) * (item.NetPrice + item.NetPrice*float64(item.VatPercentage)/100))
+					totalAccountMap[item.AccountID] = float64(float64(item.Amount) * (item.NetPrice + item.NetPrice*float64(item.VatPercentage)/100))
 				}
 			}
 
@@ -405,12 +389,12 @@ func (h *PaymentOrderServiceImpl) GetAllObligations(filter dto.GetObligationsFil
 				}
 
 				if paymentOrder.Status == nil || *paymentOrder.Status != "Storniran" {
-					accountMap[item.SourceAccountID] = accountMap[item.SourceAccountID].Sub(item.Amount)
+					accountMap[item.SourceAccountID] -= item.Amount
 				}
 			}
 
 			for account, amount := range accountMap {
-				if amount.Cmp(decimal.NewFromInt(0)) > 0 {
+				if amount > 0 {
 					invoiceItems = append(invoiceItems, dto.InvoiceItems{
 						AccountID:   account,
 						RemainPrice: amount,
@@ -500,7 +484,7 @@ func (h *PaymentOrderServiceImpl) CancelPaymentOrder(id int) error {
 	return nil
 }
 
-func updateInvoiceStatus(id int, amount decimal.Decimal, lenOfArray int, tx up.Session, h *PaymentOrderServiceImpl) error {
+func updateInvoiceStatus(id int, amount float64, lenOfArray int, tx up.Session, h *PaymentOrderServiceImpl) error {
 	invoice, err := h.invoiceRepo.Get(id)
 
 	if err != nil {
@@ -516,14 +500,9 @@ func updateInvoiceStatus(id int, amount decimal.Decimal, lenOfArray int, tx up.S
 		return err
 	}
 
-	var price decimal.Decimal
+	var price float64
 	for _, article := range articles {
-		amountDecimal := decimal.NewFromInt(int64(article.Amount))
-
-		priceComponent := article.NetPrice.Add(
-			article.NetPrice.Mul(article.VatPrice).Div(decimal.NewFromInt(100))).Mul(amountDecimal)
-
-		price = price.Add(priceComponent)
+		price += float64((article.NetPrice + article.NetPrice*article.VatPrice/100) * float64(article.Amount))
 	}
 
 	conditionAndExp = &up.AndExpr{}
@@ -544,15 +523,11 @@ func updateInvoiceStatus(id int, amount decimal.Decimal, lenOfArray int, tx up.S
 		}
 
 		if paymentOrder.Status == nil || *paymentOrder.Status != statusCanceled {
-			amount = amount.Add(paymentOrder.Amount)
+			amount += paymentOrder.Amount
 		}
 	}
 
-	tolerance := decimal.NewFromFloat(0.0099999)
-
-	adjustedAmount := amount.Add(tolerance)
-
-	if adjustedAmount.Cmp(price) >= 0 || lenOfArray > 1 {
+	if amount+0.09999 >= price || lenOfArray > 1 {
 		invoice.Status = data.InvoiceStatusFull
 	} else {
 		invoice.Status = data.InvoiceStatusPart
@@ -567,7 +542,7 @@ func updateInvoiceStatus(id int, amount decimal.Decimal, lenOfArray int, tx up.S
 	return nil
 }
 
-func updateAdditionalExpenseStatus(id int, amount decimal.Decimal, lenOfArray int, tx up.Session, h *PaymentOrderServiceImpl) error {
+func updateAdditionalExpenseStatus(id int, amount float64, lenOfArray int, tx up.Session, h *PaymentOrderServiceImpl) error {
 	item, err := h.additionalExpensesRepo.Get(id)
 
 	if err != nil {
@@ -592,15 +567,11 @@ func updateAdditionalExpenseStatus(id int, amount decimal.Decimal, lenOfArray in
 			return err
 		}
 		if paymentOrder.Status == nil || *paymentOrder.Status != statusCanceled {
-			amount = amount.Add(paymentOrder.Amount)
+			amount += paymentOrder.Amount
 		}
 	}
 
-	tolerance := decimal.NewFromFloat(0.0099999)
-
-	adjustedAmount := amount.Add(tolerance)
-
-	if adjustedAmount.Cmp(item.Price) >= 0 || lenOfArray > 1 {
+	if amount+0.09999 >= float64(item.Price) || lenOfArray > 1 {
 		item.Status = data.InvoiceStatusFull
 	} else {
 		item.Status = data.InvoiceStatusPart
@@ -615,7 +586,7 @@ func updateAdditionalExpenseStatus(id int, amount decimal.Decimal, lenOfArray in
 	return nil
 }
 
-func updateSalaryAdditionalExpenseStatus(id int, amount decimal.Decimal, lenOfArray int, tx up.Session, h *PaymentOrderServiceImpl) error {
+func updateSalaryAdditionalExpenseStatus(id int, amount float64, lenOfArray int, tx up.Session, h *PaymentOrderServiceImpl) error {
 	item, err := h.salaryAdditionalExpensesRepo.Get(id)
 
 	if err != nil {
@@ -640,15 +611,11 @@ func updateSalaryAdditionalExpenseStatus(id int, amount decimal.Decimal, lenOfAr
 		}
 
 		if paymentOrder.Status == nil || *paymentOrder.Status != statusCanceled {
-			amount = amount.Add(paymentOrder.Amount)
+			amount += paymentOrder.Amount
 		}
 	}
 
-	tolerance := decimal.NewFromFloat(0.0099999)
-
-	adjustedAmount := amount.Add(tolerance)
-
-	if adjustedAmount.Cmp(item.Amount) >= 0 || lenOfArray > 1 {
+	if amount+0.09999 >= item.Amount || lenOfArray > 1 {
 		item.Status = data.InvoiceStatusFull
 	} else {
 		item.Status = data.InvoiceStatusPart
@@ -663,7 +630,7 @@ func updateSalaryAdditionalExpenseStatus(id int, amount decimal.Decimal, lenOfAr
 	return nil
 }
 
-func updateInvoiceStatusOnDelete(id int, amount decimal.Decimal, lenOfArray int, tx up.Session, h *PaymentOrderServiceImpl) error {
+func updateInvoiceStatusOnDelete(id int, amount float64, lenOfArray int, tx up.Session, h *PaymentOrderServiceImpl) error {
 	invoice, err := h.invoiceRepo.Get(id)
 
 	if err != nil {
@@ -713,7 +680,7 @@ func updateInvoiceStatusOnDelete(id int, amount decimal.Decimal, lenOfArray int,
 	return nil
 }
 
-func updateAdditionalExpenseStatusOnDelete(id int, amount decimal.Decimal, lenOfArray int, tx up.Session, h *PaymentOrderServiceImpl) error {
+func updateAdditionalExpenseStatusOnDelete(id int, amount float64, lenOfArray int, tx up.Session, h *PaymentOrderServiceImpl) error {
 	item, err := h.additionalExpensesRepo.Get(id)
 
 	if err != nil {
@@ -761,7 +728,7 @@ func updateAdditionalExpenseStatusOnDelete(id int, amount decimal.Decimal, lenOf
 	return nil
 }
 
-func updateSalaryAdditionalExpenseStatusOnDelete(id int, amount decimal.Decimal, lenOfArray int, tx up.Session, h *PaymentOrderServiceImpl) error {
+func updateSalaryAdditionalExpenseStatusOnDelete(id int, amount float64, lenOfArray int, tx up.Session, h *PaymentOrderServiceImpl) error {
 	item, err := h.salaryAdditionalExpensesRepo.Get(id)
 
 	if err != nil {

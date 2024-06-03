@@ -8,7 +8,6 @@ import (
 	"gitlab.sudovi.me/erp/finance-api/errors"
 
 	"github.com/oykos-development-hub/celeritas"
-	"github.com/shopspring/decimal"
 	up "github.com/upper/db/v4"
 )
 
@@ -44,7 +43,7 @@ func (h *DepositPaymentOrderServiceImpl) CreateDepositPaymentOrder(input dto.Dep
 			itemToInsert.PaymentOrderID = id
 			itemToInsert.SourceBankAccount = item.SourceBankAccount
 			itemToInsert.Status = "Kreiran"
-			if itemToInsert.Price.Cmp(decimal.NewFromInt(0)) > 0 {
+			if itemToInsert.Price > 0 {
 				_, err = h.additionalExpensesRepo.Insert(tx, *itemToInsert)
 				if err != nil {
 					return err

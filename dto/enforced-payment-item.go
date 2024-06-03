@@ -3,27 +3,26 @@ package dto
 import (
 	"time"
 
-	"github.com/shopspring/decimal"
 	"gitlab.sudovi.me/erp/finance-api/data"
 )
 
 type EnforcedPaymentItemDTO struct {
-	PaymentOrderID int             `json:"payment_order_id"`
-	Title          string          `json:"title"`
-	Amount         decimal.Decimal `json:"amount"`
-	InvoiceID      *int            `json:"invoice_id"`
-	AccountID      int             `json:"account_id"`
+	PaymentOrderID int     `json:"payment_order_id"`
+	Title          string  `json:"title"`
+	Amount         float32 `json:"amount"`
+	InvoiceID      *int    `json:"invoice_id"`
+	AccountID      int     `json:"account_id"`
 }
 
 type EnforcedPaymentItemResponseDTO struct {
-	ID             int             `json:"id"`
-	PaymentOrderID int             `json:"payment_order_id"`
-	Title          string          `json:"title"`
-	Amount         decimal.Decimal `json:"amount"`
-	InvoiceID      *int            `json:"invoice_id"`
-	AccountID      int             `json:"account_id"`
-	CreatedAt      time.Time       `json:"created_at"`
-	UpdatedAt      time.Time       `json:"updated_at"`
+	ID             int       `json:"id"`
+	PaymentOrderID int       `json:"payment_order_id"`
+	Title          string    `json:"title"`
+	Amount         float32   `json:"amount"`
+	InvoiceID      *int      `json:"invoice_id"`
+	AccountID      int       `json:"account_id"`
+	CreatedAt      time.Time `json:"created_at"`
+	UpdatedAt      time.Time `json:"updated_at"`
 }
 
 type EnforcedPaymentItemFilterDTO struct {

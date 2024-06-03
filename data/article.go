@@ -3,24 +3,23 @@ package data
 import (
 	"time"
 
-	"github.com/shopspring/decimal"
 	up "github.com/upper/db/v4"
 )
 
 // Article struct
 type Article struct {
-	ID            int             `db:"id,omitempty"`
-	Title         string          `db:"title"`
-	NetPrice      decimal.Decimal `db:"net_price"`
-	VatPrice      decimal.Decimal `db:"vat_price"`
-	VatPercentage int             `db:"vat_percentage"`
-	Description   string          `db:"description"`
-	Amount        int             `db:"amount"`
-	InvoiceID     int             `db:"invoice_id"`
-	AccountID     int             `db:"account_id"`
-	CostAccountID int             `db:"cost_account_id"`
-	CreatedAt     time.Time       `db:"created_at,omitempty"`
-	UpdatedAt     time.Time       `db:"updated_at"`
+	ID            int       `db:"id,omitempty"`
+	Title         string    `db:"title"`
+	NetPrice      float64   `db:"net_price"`
+	VatPrice      float64   `db:"vat_price"`
+	VatPercentage int       `db:"vat_percentage"`
+	Description   string    `db:"description"`
+	Amount        int       `db:"amount"`
+	InvoiceID     int       `db:"invoice_id"`
+	AccountID     int       `db:"account_id"`
+	CostAccountID int       `db:"cost_account_id"`
+	CreatedAt     time.Time `db:"created_at,omitempty"`
+	UpdatedAt     time.Time `db:"updated_at"`
 }
 
 // Table returns the table name

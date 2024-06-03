@@ -8,7 +8,6 @@ import (
 	"gitlab.sudovi.me/erp/finance-api/errors"
 
 	"github.com/oykos-development-hub/celeritas"
-	"github.com/shopspring/decimal"
 	up "github.com/upper/db/v4"
 )
 
@@ -316,8 +315,8 @@ func (h *AccountingEntryServiceImpl) GetAccountingEntry(id int) (*dto.Accounting
 		return nil, errors.ErrNotFound
 	}
 
-	var debitAmount decimal.Decimal
-	var creditAmount decimal.Decimal
+	var debitAmount float64
+	var creditAmount float64
 	for _, item := range items {
 		responseItem := dto.AccountingEntryItemResponseDTO{
 			ID:                      item.ID,
@@ -336,8 +335,8 @@ func (h *AccountingEntryServiceImpl) GetAccountingEntry(id int) (*dto.Accounting
 			Type:                    item.Type,
 		}
 
-		debitAmount = debitAmount.Add(item.DebitAmount)
-		creditAmount = creditAmount.Add(item.CreditAmount)
+		debitAmount += item.DebitAmount
+		creditAmount += item.CreditAmount
 
 		response.Items = append(response.Items, responseItem)
 	}
@@ -386,8 +385,8 @@ func (h *AccountingEntryServiceImpl) GetAccountingEntryList(filter dto.Accountin
 			return nil, nil, errors.ErrNotFound
 		}
 
-		var debitAmount decimal.Decimal
-		var creditAmount decimal.Decimal
+		var debitAmount float64
+		var creditAmount float64
 
 		year := response[i].DateOfBooking.Year()
 		yearLastTwoDigits := year % 100
@@ -415,8 +414,8 @@ func (h *AccountingEntryServiceImpl) GetAccountingEntryList(filter dto.Accountin
 				EntryDate:               response[i].DateOfBooking,
 			}
 
-			debitAmount = debitAmount.Add(item.DebitAmount)
-			creditAmount = creditAmount.Add(item.CreditAmount)
+			debitAmount += item.DebitAmount
+			creditAmount += item.CreditAmount
 
 			response[i].Items = append(response[i].Items, responseItem)
 		}
@@ -676,8 +675,8 @@ func (h *AccountingEntryServiceImpl) BuildAccountingOrderForObligations(orderDat
 	}
 
 	for _, item := range response.Items {
-		response.CreditAmount = response.CreditAmount.Add(item.CreditAmount)
-		response.DebitAmount = response.DebitAmount.Add(item.DebitAmount)
+		response.CreditAmount += item.CreditAmount
+		response.DebitAmount += item.DebitAmount
 	}
 
 	return &response, nil
@@ -700,16 +699,9 @@ func buildAccountingOrderForInvoice(id int, h *AccountingEntryServiceImpl) ([]dt
 		return nil, err
 	}
 
-	var price decimal.Decimal
-
+	var price float64
 	for _, article := range articles {
-		vatPercentageDecimal := decimal.NewFromInt(int64(article.VatPercentage))
-		amountDecimal := decimal.NewFromInt(int64(article.Amount))
-
-		vatAmount := article.NetPrice.Mul(vatPercentageDecimal).Div(decimal.NewFromInt(100))
-		totalAmount := article.NetPrice.Add(vatAmount).Mul(amountDecimal)
-
-		price = price.Add(totalAmount)
+		price += (article.NetPrice + float64(article.VatPercentage)/100*article.NetPrice) * float64(article.Amount)
 	}
 
 	model, _, err := h.modelOfAccountingRepo.GetModelsOfAccountingList(dto.ModelsOfAccountingFilterDTO{
@@ -730,7 +722,7 @@ func buildAccountingOrderForInvoice(id int, h *AccountingEntryServiceImpl) ([]dt
 		case data.MainBillTitle:
 			response = append(response, dto.AccountingOrderItemsForObligations{
 				AccountID:   modelItem.DebitAccountID,
-				DebitAmount: price,
+				DebitAmount: float32(price),
 				Title:       modelItem.Title,
 				Type:        data.TypeInvoice,
 				Date:        invoice.DateOfInvoice,
@@ -742,7 +734,7 @@ func buildAccountingOrderForInvoice(id int, h *AccountingEntryServiceImpl) ([]dt
 		case data.SupplierTitle:
 			response = append(response, dto.AccountingOrderItemsForObligations{
 				AccountID:    modelItem.CreditAccountID,
-				CreditAmount: decimal.Decimal(price),
+				CreditAmount: float32(price),
 				Title:        modelItem.Title,
 				Type:         data.TypeInvoice,
 				Date:         invoice.DateOfInvoice,
@@ -776,17 +768,17 @@ func buildAccountingOrderForDecisions(id int, h *AccountingEntryServiceImpl) ([]
 		return nil, err
 	}
 
-	var price decimal.Decimal
-	var netPrice decimal.Decimal
-	var taxPrice decimal.Decimal
-	var subTaxPrice decimal.Decimal
-	var contributionForPIO decimal.Decimal
-	var contributionForUnemployment decimal.Decimal
-	var contributionForPIOEmployee decimal.Decimal
-	var contributionForPIOEmployer decimal.Decimal
-	var contributionForUnemploymentEmployee decimal.Decimal
-	var contributionForUnemploymentEmployer decimal.Decimal
-	var contributionForLaborFund decimal.Decimal
+	var price float64
+	var netPrice float64
+	var taxPrice float64
+	var subTaxPrice float64
+	var contributionForPIO float64
+	var contributionForUnemployment float64
+	var contributionForPIOEmployee float64
+	var contributionForPIOEmployer float64
+	var contributionForUnemploymentEmployee float64
+	var contributionForUnemploymentEmployer float64
+	var contributionForLaborFund float64
 	var taxSupplierID int
 	var subTaxSupplierID int
 	var PIOSupplierID int
@@ -798,36 +790,36 @@ func buildAccountingOrderForDecisions(id int, h *AccountingEntryServiceImpl) ([]
 	var LaborFundSupplierID int
 
 	for _, item := range additionalExpenses {
-		price = price.Add(item.Price)
+		price += float64(item.Price)
 		switch item.Title {
 		case data.NetTitle:
-			netPrice = netPrice.Add(item.Price)
+			netPrice += float64(item.Price)
 		case data.ObligationTaxTitle:
-			taxPrice = taxPrice.Add(item.Price)
+			taxPrice += float64(item.Price)
 			taxSupplierID = item.SubjectID
 		case data.ObligationSubTaxTitle:
-			subTaxPrice = subTaxPrice.Add(item.Price)
+			subTaxPrice += float64(item.Price)
 			subTaxSupplierID = item.SubjectID
 		case data.ContributionForPIOTitle:
-			contributionForPIO = contributionForPIO.Add(item.Price)
+			contributionForPIO += float64(item.Price)
 			PIOSupplierID = item.SubjectID
 		case data.ContributionForUnemploymentTitle:
-			contributionForUnemployment = contributionForUnemployment.Add(item.Price)
+			contributionForUnemployment += float64(item.Price)
 			UnemploymentSupplierID = item.SubjectID
 		case data.ContributionForPIOEmployeeTitle:
-			contributionForPIOEmployee = contributionForPIOEmployee.Add(item.Price)
+			contributionForPIOEmployee += float64(item.Price)
 			PIOEmployeeSupplierID = item.SubjectID
 		case data.ContributionForPIOEmployerTitle:
-			contributionForPIOEmployer = contributionForPIOEmployer.Add(item.Price)
+			contributionForPIOEmployer += float64(item.Price)
 			PIOEmployerSupplierID = item.SubjectID
 		case data.ContributionForUnemploymentEmployeeTitle:
-			contributionForUnemploymentEmployee = contributionForUnemploymentEmployee.Add(item.Price)
+			contributionForUnemploymentEmployee += float64(item.Price)
 			UnemploymentEmployeeSupplierID = item.SubjectID
 		case data.ContributionForUnemploymentEmployerTitle:
-			contributionForUnemploymentEmployer = contributionForUnemploymentEmployer.Add(item.Price)
+			contributionForUnemploymentEmployer += float64(item.Price)
 			UnemploymentEmployerSupplierID = item.SubjectID
 		case data.LaborFundTitle:
-			contributionForLaborFund = contributionForLaborFund.Add(item.Price)
+			contributionForLaborFund += float64(item.Price)
 			LaborFundSupplierID = item.SubjectID
 		}
 	}
@@ -850,7 +842,7 @@ func buildAccountingOrderForDecisions(id int, h *AccountingEntryServiceImpl) ([]
 		case data.MainBillTitle:
 			response = append(response, dto.AccountingOrderItemsForObligations{
 				AccountID:   modelItem.DebitAccountID,
-				DebitAmount: decimal.Decimal(price),
+				DebitAmount: float32(price),
 				Title:       modelItem.Title,
 				Type:        data.TypeDecision,
 				Date:        invoice.DateOfInvoice,
@@ -862,7 +854,7 @@ func buildAccountingOrderForDecisions(id int, h *AccountingEntryServiceImpl) ([]
 		case data.SupplierTitle:
 			response = append(response, dto.AccountingOrderItemsForObligations{
 				AccountID:    modelItem.CreditAccountID,
-				CreditAmount: decimal.Decimal(netPrice),
+				CreditAmount: float32(netPrice),
 				Title:        modelItem.Title,
 				Type:         data.TypeDecision,
 				Date:         invoice.DateOfInvoice,
@@ -873,10 +865,10 @@ func buildAccountingOrderForDecisions(id int, h *AccountingEntryServiceImpl) ([]
 				SupplierID: invoice.SupplierID,
 			})
 		case data.TaxTitle:
-			if taxPrice.Cmp(decimal.NewFromInt(0)) > 0 {
+			if taxPrice > 0 {
 				response = append(response, dto.AccountingOrderItemsForObligations{
 					AccountID:    modelItem.CreditAccountID,
-					CreditAmount: decimal.Decimal(taxPrice),
+					CreditAmount: float32(taxPrice),
 					Title:        modelItem.Title,
 					Type:         data.TypeDecision,
 					Date:         invoice.DateOfInvoice,
@@ -888,10 +880,10 @@ func buildAccountingOrderForDecisions(id int, h *AccountingEntryServiceImpl) ([]
 				})
 			}
 		case data.SubTaxTitle:
-			if subTaxPrice.Cmp(decimal.NewFromInt(0)) > 0 {
+			if subTaxPrice > 0 {
 				response = append(response, dto.AccountingOrderItemsForObligations{
 					AccountID:    modelItem.CreditAccountID,
-					CreditAmount: decimal.Decimal(subTaxPrice),
+					CreditAmount: float32(subTaxPrice),
 					Title:        modelItem.Title,
 					Type:         data.TypeDecision,
 					Date:         invoice.DateOfInvoice,
@@ -903,10 +895,10 @@ func buildAccountingOrderForDecisions(id int, h *AccountingEntryServiceImpl) ([]
 				})
 			}
 		case data.LaborContributionsTitle:
-			if contributionForLaborFund.Cmp(decimal.NewFromInt(0)) > 0 {
+			if contributionForLaborFund > 0 {
 				response = append(response, dto.AccountingOrderItemsForObligations{
 					AccountID:    modelItem.CreditAccountID,
-					CreditAmount: decimal.Decimal(contributionForLaborFund),
+					CreditAmount: float32(contributionForLaborFund),
 					Title:        modelItem.Title,
 					Type:         data.TypeDecision,
 					Date:         invoice.DateOfInvoice,
@@ -918,10 +910,10 @@ func buildAccountingOrderForDecisions(id int, h *AccountingEntryServiceImpl) ([]
 				})
 			}
 		case data.PIOContributionsTitle:
-			if contributionForPIO.Cmp(decimal.NewFromInt(0)) > 0 {
+			if contributionForPIO > 0 {
 				response = append(response, dto.AccountingOrderItemsForObligations{
 					AccountID:    modelItem.CreditAccountID,
-					CreditAmount: decimal.Decimal(contributionForPIO),
+					CreditAmount: float32(contributionForPIO),
 					Title:        modelItem.Title,
 					Type:         data.TypeDecision,
 					Date:         invoice.DateOfInvoice,
@@ -933,10 +925,10 @@ func buildAccountingOrderForDecisions(id int, h *AccountingEntryServiceImpl) ([]
 				})
 			}
 		case data.UnemployementContributionsTitle:
-			if contributionForUnemployment.Cmp(decimal.NewFromInt(0)) > 0 {
+			if contributionForUnemployment > 0 {
 				response = append(response, dto.AccountingOrderItemsForObligations{
 					AccountID:    modelItem.CreditAccountID,
-					CreditAmount: decimal.Decimal(contributionForUnemployment),
+					CreditAmount: float32(contributionForUnemployment),
 					Title:        modelItem.Title,
 					Type:         data.TypeDecision,
 					Date:         invoice.DateOfInvoice,
@@ -948,10 +940,10 @@ func buildAccountingOrderForDecisions(id int, h *AccountingEntryServiceImpl) ([]
 				})
 			}
 		case data.PIOEmployeeContributionsTitle:
-			if contributionForPIOEmployee.Cmp(decimal.NewFromInt(0)) > 0 {
+			if contributionForPIOEmployee > 0 {
 				response = append(response, dto.AccountingOrderItemsForObligations{
 					AccountID:    modelItem.CreditAccountID,
-					CreditAmount: decimal.Decimal(contributionForPIOEmployee),
+					CreditAmount: float32(contributionForPIOEmployee),
 					Title:        modelItem.Title,
 					Type:         data.TypeDecision,
 					Date:         invoice.DateOfInvoice,
@@ -963,10 +955,10 @@ func buildAccountingOrderForDecisions(id int, h *AccountingEntryServiceImpl) ([]
 				})
 			}
 		case data.PIOEmployerContributionsTitle:
-			if contributionForPIOEmployer.Cmp(decimal.NewFromInt(0)) > 0 {
+			if contributionForPIOEmployer > 0 {
 				response = append(response, dto.AccountingOrderItemsForObligations{
 					AccountID:    modelItem.CreditAccountID,
-					CreditAmount: decimal.Decimal(contributionForPIOEmployer),
+					CreditAmount: float32(contributionForPIOEmployer),
 					Title:        modelItem.Title,
 					Type:         data.TypeDecision,
 					Date:         invoice.DateOfInvoice,
@@ -978,10 +970,10 @@ func buildAccountingOrderForDecisions(id int, h *AccountingEntryServiceImpl) ([]
 				})
 			}
 		case data.UnemployementEmployeeContributionsTitle:
-			if contributionForUnemploymentEmployee.Cmp(decimal.NewFromInt(0)) > 0 {
+			if contributionForUnemploymentEmployee > 0 {
 				response = append(response, dto.AccountingOrderItemsForObligations{
 					AccountID:    modelItem.CreditAccountID,
-					CreditAmount: decimal.Decimal(contributionForUnemploymentEmployee),
+					CreditAmount: float32(contributionForUnemploymentEmployee),
 					Title:        modelItem.Title,
 					Type:         data.TypeDecision,
 					Date:         invoice.DateOfInvoice,
@@ -993,10 +985,10 @@ func buildAccountingOrderForDecisions(id int, h *AccountingEntryServiceImpl) ([]
 				})
 			}
 		case data.UnemployementEmployerContributionsTitle:
-			if contributionForUnemploymentEmployer.Cmp(decimal.NewFromInt(0)) > 0 {
+			if contributionForUnemploymentEmployer > 0 {
 				response = append(response, dto.AccountingOrderItemsForObligations{
 					AccountID:    modelItem.CreditAccountID,
-					CreditAmount: decimal.Decimal(contributionForUnemploymentEmployer),
+					CreditAmount: float32(contributionForUnemploymentEmployer),
 					Title:        modelItem.Title,
 					Type:         data.TypeDecision,
 					Date:         invoice.DateOfInvoice,
@@ -1031,17 +1023,17 @@ func buildAccountingOrderForContracts(id int, h *AccountingEntryServiceImpl) ([]
 		return nil, err
 	}
 
-	var price decimal.Decimal
-	var netPrice decimal.Decimal
-	var taxPrice decimal.Decimal
-	var subTaxPrice decimal.Decimal
-	var contributionForPIO decimal.Decimal
-	var contributionForUnemployment decimal.Decimal
-	var contributionForPIOEmployee decimal.Decimal
-	var contributionForPIOEmployer decimal.Decimal
-	var contributionForUnemploymentEmployee decimal.Decimal
-	var contributionForUnemploymentEmployer decimal.Decimal
-	var contributionForLaborFund decimal.Decimal
+	var price float64
+	var netPrice float64
+	var taxPrice float64
+	var subTaxPrice float64
+	var contributionForPIO float64
+	var contributionForUnemployment float64
+	var contributionForPIOEmployee float64
+	var contributionForPIOEmployer float64
+	var contributionForUnemploymentEmployee float64
+	var contributionForUnemploymentEmployer float64
+	var contributionForLaborFund float64
 
 	var taxSupplierID int
 	var subTaxSupplierID int
@@ -1054,36 +1046,36 @@ func buildAccountingOrderForContracts(id int, h *AccountingEntryServiceImpl) ([]
 	var LaborFundSupplierID int
 
 	for _, item := range additionalExpenses {
-		price = price.Add(item.Price)
+		price += float64(item.Price)
 		switch item.Title {
 		case data.NetTitle:
-			netPrice = netPrice.Add(item.Price)
+			netPrice += float64(item.Price)
 		case data.ObligationTaxTitle:
-			taxPrice = taxPrice.Add(item.Price)
+			taxPrice += float64(item.Price)
 			taxSupplierID = item.SubjectID
 		case data.ObligationSubTaxTitle:
-			subTaxPrice = subTaxPrice.Add(item.Price)
+			subTaxPrice += float64(item.Price)
 			subTaxSupplierID = item.SubjectID
 		case data.ContributionForPIOTitle:
-			contributionForPIO = contributionForPIO.Add(item.Price)
+			contributionForPIO += float64(item.Price)
 			PIOSupplierID = item.SubjectID
 		case data.ContributionForUnemploymentTitle:
-			contributionForUnemployment = contributionForUnemployment.Add(item.Price)
+			contributionForUnemployment += float64(item.Price)
 			UnemploymentSupplierID = item.SubjectID
 		case data.ContributionForPIOEmployeeTitle:
-			contributionForPIOEmployee = contributionForPIOEmployee.Add(item.Price)
+			contributionForPIOEmployee += float64(item.Price)
 			PIOEmployeeSupplierID = item.SubjectID
 		case data.ContributionForPIOEmployerTitle:
-			contributionForPIOEmployer = contributionForPIOEmployer.Add(item.Price)
+			contributionForPIOEmployer += float64(item.Price)
 			PIOEmployerSupplierID = item.SubjectID
 		case data.ContributionForUnemploymentEmployeeTitle:
-			contributionForUnemploymentEmployee = contributionForUnemploymentEmployee.Add(item.Price)
+			contributionForUnemploymentEmployee += float64(item.Price)
 			UnemploymentEmployeeSupplierID = item.SubjectID
 		case data.ContributionForUnemploymentEmployerTitle:
-			contributionForUnemploymentEmployer = contributionForUnemploymentEmployer.Add(item.Price)
+			contributionForUnemploymentEmployer += float64(item.Price)
 			UnemploymentEmployerSupplierID = item.SubjectID
 		case data.LaborFundTitle:
-			contributionForLaborFund = contributionForLaborFund.Add(item.Price)
+			contributionForLaborFund += float64(item.Price)
 			LaborFundSupplierID = item.SubjectID
 		}
 	}
@@ -1105,7 +1097,7 @@ func buildAccountingOrderForContracts(id int, h *AccountingEntryServiceImpl) ([]
 		case data.MainBillTitle:
 			response = append(response, dto.AccountingOrderItemsForObligations{
 				AccountID:   modelItem.DebitAccountID,
-				DebitAmount: decimal.Decimal(price),
+				DebitAmount: float32(price),
 				Title:       modelItem.Title,
 				Type:        data.TypeContract,
 				Date:        invoice.DateOfInvoice,
@@ -1117,7 +1109,7 @@ func buildAccountingOrderForContracts(id int, h *AccountingEntryServiceImpl) ([]
 		case data.SupplierTitle:
 			response = append(response, dto.AccountingOrderItemsForObligations{
 				AccountID:    modelItem.CreditAccountID,
-				CreditAmount: decimal.Decimal(netPrice),
+				CreditAmount: float32(netPrice),
 				Title:        modelItem.Title,
 				Type:         data.TypeContract,
 				Date:         invoice.DateOfInvoice,
@@ -1128,10 +1120,10 @@ func buildAccountingOrderForContracts(id int, h *AccountingEntryServiceImpl) ([]
 				SupplierID: invoice.SupplierID,
 			})
 		case data.TaxTitle:
-			if taxPrice.Cmp(decimal.NewFromInt(0)) > 0 {
+			if taxPrice > 0 {
 				response = append(response, dto.AccountingOrderItemsForObligations{
 					AccountID:    modelItem.CreditAccountID,
-					CreditAmount: decimal.Decimal(taxPrice),
+					CreditAmount: float32(taxPrice),
 					Title:        modelItem.Title,
 					Type:         data.TypeContract,
 					Date:         invoice.DateOfInvoice,
@@ -1143,10 +1135,10 @@ func buildAccountingOrderForContracts(id int, h *AccountingEntryServiceImpl) ([]
 				})
 			}
 		case data.SubTaxTitle:
-			if subTaxPrice.Cmp(decimal.NewFromInt(0)) > 0 {
+			if subTaxPrice > 0 {
 				response = append(response, dto.AccountingOrderItemsForObligations{
 					AccountID:    modelItem.CreditAccountID,
-					CreditAmount: decimal.Decimal(subTaxPrice),
+					CreditAmount: float32(subTaxPrice),
 					Title:        modelItem.Title,
 					Type:         data.TypeContract,
 					Date:         invoice.DateOfInvoice,
@@ -1158,10 +1150,10 @@ func buildAccountingOrderForContracts(id int, h *AccountingEntryServiceImpl) ([]
 				})
 			}
 		case data.LaborContributionsTitle:
-			if contributionForLaborFund.Cmp(decimal.NewFromInt(0)) > 0 {
+			if contributionForLaborFund > 0 {
 				response = append(response, dto.AccountingOrderItemsForObligations{
 					AccountID:    modelItem.CreditAccountID,
-					CreditAmount: decimal.Decimal(contributionForLaborFund),
+					CreditAmount: float32(contributionForLaborFund),
 					Title:        modelItem.Title,
 					Type:         data.TypeContract,
 					Date:         invoice.DateOfInvoice,
@@ -1173,10 +1165,10 @@ func buildAccountingOrderForContracts(id int, h *AccountingEntryServiceImpl) ([]
 				})
 			}
 		case data.PIOContributionsTitle:
-			if contributionForPIO.Cmp(decimal.NewFromInt(0)) > 0 {
+			if contributionForPIO > 0 {
 				response = append(response, dto.AccountingOrderItemsForObligations{
 					AccountID:    modelItem.CreditAccountID,
-					CreditAmount: decimal.Decimal(contributionForPIO),
+					CreditAmount: float32(contributionForPIO),
 					Title:        modelItem.Title,
 					Type:         data.TypeContract,
 					Date:         invoice.DateOfInvoice,
@@ -1188,10 +1180,10 @@ func buildAccountingOrderForContracts(id int, h *AccountingEntryServiceImpl) ([]
 				})
 			}
 		case data.UnemployementContributionsTitle:
-			if contributionForUnemployment.Cmp(decimal.NewFromInt(0)) > 0 {
+			if contributionForUnemployment > 0 {
 				response = append(response, dto.AccountingOrderItemsForObligations{
 					AccountID:    modelItem.CreditAccountID,
-					CreditAmount: decimal.Decimal(contributionForUnemployment),
+					CreditAmount: float32(contributionForUnemployment),
 					Title:        modelItem.Title,
 					Type:         data.TypeContract,
 					Date:         invoice.DateOfInvoice,
@@ -1203,10 +1195,10 @@ func buildAccountingOrderForContracts(id int, h *AccountingEntryServiceImpl) ([]
 				})
 			}
 		case data.PIOEmployeeContributionsTitle:
-			if contributionForPIOEmployee.Cmp(decimal.NewFromInt(0)) > 0 {
+			if contributionForPIOEmployee > 0 {
 				response = append(response, dto.AccountingOrderItemsForObligations{
 					AccountID:    modelItem.CreditAccountID,
-					CreditAmount: decimal.Decimal(contributionForPIOEmployee),
+					CreditAmount: float32(contributionForPIOEmployee),
 					Title:        modelItem.Title,
 					Type:         data.TypeContract,
 					Date:         invoice.DateOfInvoice,
@@ -1218,10 +1210,10 @@ func buildAccountingOrderForContracts(id int, h *AccountingEntryServiceImpl) ([]
 				})
 			}
 		case data.PIOEmployerContributionsTitle:
-			if contributionForPIOEmployer.Cmp(decimal.NewFromInt(0)) > 0 {
+			if contributionForPIOEmployer > 0 {
 				response = append(response, dto.AccountingOrderItemsForObligations{
 					AccountID:    modelItem.CreditAccountID,
-					CreditAmount: decimal.Decimal(contributionForPIOEmployer),
+					CreditAmount: float32(contributionForPIOEmployer),
 					Title:        modelItem.Title,
 					Type:         data.TypeContract,
 					Date:         invoice.DateOfInvoice,
@@ -1233,10 +1225,10 @@ func buildAccountingOrderForContracts(id int, h *AccountingEntryServiceImpl) ([]
 				})
 			}
 		case data.UnemployementEmployeeContributionsTitle:
-			if contributionForUnemploymentEmployee.Cmp(decimal.NewFromInt(0)) > 0 {
+			if contributionForUnemploymentEmployee > 0 {
 				response = append(response, dto.AccountingOrderItemsForObligations{
 					AccountID:    modelItem.CreditAccountID,
-					CreditAmount: decimal.Decimal(contributionForUnemploymentEmployee),
+					CreditAmount: float32(contributionForUnemploymentEmployee),
 					Title:        modelItem.Title,
 					Type:         data.TypeContract,
 					Date:         invoice.DateOfInvoice,
@@ -1248,10 +1240,10 @@ func buildAccountingOrderForContracts(id int, h *AccountingEntryServiceImpl) ([]
 				})
 			}
 		case data.UnemployementEmployerContributionsTitle:
-			if contributionForUnemploymentEmployer.Cmp(decimal.NewFromInt(0)) > 0 {
+			if contributionForUnemploymentEmployer > 0 {
 				response = append(response, dto.AccountingOrderItemsForObligations{
 					AccountID:    modelItem.CreditAccountID,
-					CreditAmount: decimal.Decimal(contributionForUnemploymentEmployer),
+					CreditAmount: float32(contributionForUnemploymentEmployer),
 					Title:        modelItem.Title,
 					Type:         data.TypeContract,
 					Date:         invoice.DateOfInvoice,
@@ -1299,50 +1291,50 @@ func buildAccountingOrderForSalaries(id int, h *AccountingEntryServiceImpl) ([]d
 		return nil, errors.ErrInvalidInput
 	}
 
-	var price decimal.Decimal
-	var taxPrice decimal.Decimal
+	var price float64
+	var taxPrice float64
 	var taxSupplierID int
 
 	for _, item := range additionalExpenses {
-		price = price.Add(item.Amount)
+		price += float64(item.Amount)
 		bookedItem := &dto.AccountingOrderItemsForObligations{}
 		switch item.Type {
 		case data.SalaryAdditionalExpenseType(data.ContributionsSalaryExpenseType):
 			switch item.Title {
 			case data.PIOEmployeeContributionsTitle:
-				if item.Amount.Cmp(decimal.NewFromInt(0)) > 0 {
+				if item.Amount > 0 {
 					bookedItem = buildBookedItemForSalary(item, models[0].Items, data.PIOEmployeeContributionsTitle)
 				}
 			case data.PIOEmployerContributionsTitle:
-				if item.Amount.Cmp(decimal.NewFromInt(0)) > 0 {
+				if item.Amount > 0 {
 					bookedItem = buildBookedItemForSalary(item, models[0].Items, data.PIOEmployerContributionsTitle)
 				}
 			case data.UnemployementEmployeeContributionsTitle:
-				if item.Amount.Cmp(decimal.NewFromInt(0)) > 0 {
+				if item.Amount > 0 {
 					bookedItem = buildBookedItemForSalary(item, models[0].Items, data.UnemployementEmployeeContributionsTitle)
 				}
 			case data.UnemployementEmployerContributionsTitle:
-				if item.Amount.Cmp(decimal.NewFromInt(0)) > 0 {
+				if item.Amount > 0 {
 					bookedItem = buildBookedItemForSalary(item, models[0].Items, data.UnemployementEmployerContributionsTitle)
 				}
 			case data.LaborContributionsTitle:
-				if item.Amount.Cmp(decimal.NewFromInt(0)) > 0 {
+				if item.Amount > 0 {
 					bookedItem = buildBookedItemForSalary(item, models[0].Items, data.LaborContributionsTitle)
 				}
 			}
 		case data.SalaryAdditionalExpenseType(data.TaxesSalaryExpenseType):
-			taxPrice = taxPrice.Add(item.Amount)
+			taxPrice += item.Amount
 			taxSupplierID = item.SubjectID
 		case data.SalaryAdditionalExpenseType(data.SubTaxesSalaryExpenseType):
-			if item.Amount.Cmp(decimal.NewFromInt(0)) > 0 {
+			if item.Amount > 0 {
 				bookedItem = buildBookedItemForSalary(item, models[0].Items, data.SubTaxTitle)
 			}
 		case data.SalaryAdditionalExpenseType(data.BanksSalaryExpenseType):
-			if item.Amount.Cmp(decimal.NewFromInt(0)) > 0 {
+			if item.Amount > 0 {
 				bookedItem = buildBookedItemForSalaryForBanks(item, models[0].Items, data.BankTitle)
 			}
 		case data.SalaryAdditionalExpenseType(data.SuspensionsSalaryExpenseType):
-			if item.Amount.Cmp(decimal.NewFromInt(0)) > 0 {
+			if item.Amount > 0 {
 				bookedItem = buildBookedItemForSalaryForBanks(item, models[0].Items, data.SuspensionsTitle)
 			}
 		}
@@ -1363,7 +1355,7 @@ func buildAccountingOrderForSalaries(id int, h *AccountingEntryServiceImpl) ([]d
 
 			newSlice = append(newSlice, dto.AccountingOrderItemsForObligations{
 				AccountID:   model.DebitAccountID,
-				DebitAmount: decimal.Decimal(price),
+				DebitAmount: float32(price),
 				Title:       model.Title,
 				Type:        data.TypeSalary,
 				Date:        salary.DateOfCalculation,
@@ -1378,7 +1370,7 @@ func buildAccountingOrderForSalaries(id int, h *AccountingEntryServiceImpl) ([]d
 		}
 
 		if model.Title == data.TaxTitle {
-			if taxPrice.Cmp(decimal.NewFromInt(0)) > 0 {
+			if taxPrice > 0 {
 				bookedItem := buildBookedItemForSalary(&data.SalaryAdditionalExpense{Amount: taxPrice, SubjectID: taxSupplierID}, models[0].Items, data.TaxTitle)
 
 				index := 0
@@ -1411,7 +1403,7 @@ func buildBookedItemForSalary(item *data.SalaryAdditionalExpense, models []dto.M
 			}
 			response := dto.AccountingOrderItemsForObligations{
 				AccountID:    model.CreditAccountID,
-				CreditAmount: decimal.Decimal(item.Amount),
+				CreditAmount: float32(item.Amount),
 				Title:        title,
 				Type:         data.TypeSalary,
 				SupplierID:   item.SubjectID,
@@ -1429,7 +1421,7 @@ func buildBookedItemForSalaryForBanks(item *data.SalaryAdditionalExpense, models
 		if string(model.Title) == string(title) {
 			response := dto.AccountingOrderItemsForObligations{
 				AccountID:    model.CreditAccountID,
-				CreditAmount: decimal.Decimal(item.Amount),
+				CreditAmount: float32(item.Amount),
 				Title:        item.Title + " - " + title,
 				Type:         data.TypeSalary,
 				SupplierID:   item.SubjectID,
@@ -1468,7 +1460,7 @@ func buildAccountingOrderForPaymentOrder(id int, h *AccountingEntryServiceImpl) 
 		case data.SupplierTitle:
 			response = append(response, dto.AccountingOrderItemsForObligations{
 				AccountID:   modelItem.DebitAccountID,
-				DebitAmount: decimal.Decimal(paymentOrder.Amount),
+				DebitAmount: float32(paymentOrder.Amount),
 				Title:       modelItem.Title,
 				Type:        data.TypePaymentOrder,
 				Date:        *paymentOrder.DateOfSAP,
@@ -1481,7 +1473,7 @@ func buildAccountingOrderForPaymentOrder(id int, h *AccountingEntryServiceImpl) 
 		case data.MainBillTitle:
 			response = append(response, dto.AccountingOrderItemsForObligations{
 				AccountID:    modelItem.CreditAccountID,
-				CreditAmount: decimal.Decimal(paymentOrder.Amount),
+				CreditAmount: float32(paymentOrder.Amount),
 				Title:        modelItem.Title,
 				Type:         data.TypePaymentOrder,
 				Date:         *paymentOrder.DateOfSAP,
@@ -1493,7 +1485,7 @@ func buildAccountingOrderForPaymentOrder(id int, h *AccountingEntryServiceImpl) 
 		case data.CostTitle:
 			response = append(response, dto.AccountingOrderItemsForObligations{
 				AccountID:   modelItem.DebitAccountID,
-				DebitAmount: decimal.Decimal(paymentOrder.Amount),
+				DebitAmount: float32(paymentOrder.Amount),
 				Title:       modelItem.Title,
 				Date:        *paymentOrder.DateOfSAP,
 				Type:        data.TypePaymentOrder,
@@ -1505,7 +1497,7 @@ func buildAccountingOrderForPaymentOrder(id int, h *AccountingEntryServiceImpl) 
 		case data.AllocatedAmountTitle:
 			response = append(response, dto.AccountingOrderItemsForObligations{
 				AccountID:    modelItem.CreditAccountID,
-				CreditAmount: decimal.Decimal(paymentOrder.Amount),
+				CreditAmount: float32(paymentOrder.Amount),
 				Title:        modelItem.Title,
 				Date:         *paymentOrder.DateOfSAP,
 				Type:         data.TypePaymentOrder,
@@ -1548,7 +1540,7 @@ func buildAccountingOrderForEnforcedPayment(id int, h *AccountingEntryServiceImp
 		case data.SupplierTitle:
 			response = append(response, dto.AccountingOrderItemsForObligations{
 				AccountID:   modelItem.DebitAccountID,
-				DebitAmount: decimal.Decimal(enforcedPayment.Amount),
+				DebitAmount: float32(enforcedPayment.Amount),
 				Title:       modelItem.Title,
 				Date:        *enforcedPayment.DateOfSAP,
 				Type:        data.TypeEnforcedPayment,
@@ -1559,10 +1551,10 @@ func buildAccountingOrderForEnforcedPayment(id int, h *AccountingEntryServiceImp
 				SupplierID: enforcedPayment.SupplierID,
 			})
 		case data.ProcessCostTitle:
-			if enforcedPayment.AmountForAgent.Cmp(decimal.NewFromInt(0)) > 0 {
+			if enforcedPayment.AmountForAgent > 0 {
 				response = append(response, dto.AccountingOrderItemsForObligations{
 					AccountID:   modelItem.DebitAccountID,
-					DebitAmount: decimal.Decimal(enforcedPayment.AmountForAgent),
+					DebitAmount: float32(enforcedPayment.AmountForAgent),
 					Title:       modelItem.Title,
 					Type:        data.TypeEnforcedPayment,
 					Date:        *enforcedPayment.DateOfSAP,
@@ -1573,10 +1565,10 @@ func buildAccountingOrderForEnforcedPayment(id int, h *AccountingEntryServiceImp
 				})
 			}
 		case data.LawyerCostTitle:
-			if enforcedPayment.AmountForLawyer.Cmp(decimal.NewFromInt(0)) > 0 {
+			if enforcedPayment.AmountForLawyer > 0 {
 				response = append(response, dto.AccountingOrderItemsForObligations{
 					AccountID:   modelItem.DebitAccountID,
-					DebitAmount: decimal.Decimal(enforcedPayment.AmountForLawyer),
+					DebitAmount: float32(enforcedPayment.AmountForLawyer),
 					Title:       modelItem.Title,
 					Type:        data.TypeEnforcedPayment,
 					Date:        *enforcedPayment.DateOfSAP,
@@ -1587,10 +1579,10 @@ func buildAccountingOrderForEnforcedPayment(id int, h *AccountingEntryServiceImp
 				})
 			}
 		case data.BankCostTitle:
-			if enforcedPayment.AmountForBank.Cmp(decimal.NewFromInt(0)) > 0 {
+			if enforcedPayment.AmountForBank > 0 {
 				response = append(response, dto.AccountingOrderItemsForObligations{
 					AccountID:   modelItem.DebitAccountID,
-					DebitAmount: decimal.Decimal(enforcedPayment.AmountForBank),
+					DebitAmount: float32(enforcedPayment.AmountForBank),
 					Title:       modelItem.Title,
 					Type:        data.TypeEnforcedPayment,
 					Date:        *enforcedPayment.DateOfSAP,
@@ -1603,7 +1595,7 @@ func buildAccountingOrderForEnforcedPayment(id int, h *AccountingEntryServiceImp
 		case data.EnforcedPaymentTitle:
 			response = append(response, dto.AccountingOrderItemsForObligations{
 				AccountID:    modelItem.CreditAccountID,
-				CreditAmount: enforcedPayment.Amount.Add(enforcedPayment.AmountForAgent).Add(enforcedPayment.AmountForLawyer).Add(enforcedPayment.AmountForBank),
+				CreditAmount: float32(enforcedPayment.Amount + enforcedPayment.AmountForAgent + enforcedPayment.AmountForLawyer + enforcedPayment.AmountForBank),
 				Title:        modelItem.Title,
 				Type:         data.TypeEnforcedPayment,
 				Date:         *enforcedPayment.DateOfSAP,
@@ -1646,7 +1638,7 @@ func buildAccountingOrderForReturnEnforcedPayment(id int, h *AccountingEntryServ
 		case data.EnforcedPaymentTitle:
 			response = append(response, dto.AccountingOrderItemsForObligations{
 				AccountID:   modelItem.DebitAccountID,
-				DebitAmount: decimal.Decimal(*enforcedPayment.ReturnAmount),
+				DebitAmount: float32(*enforcedPayment.ReturnAmount),
 				Title:       modelItem.Title,
 				Type:        data.TypeReturnEnforcedPayment,
 				Date:        *enforcedPayment.ReturnDate,
@@ -1658,7 +1650,7 @@ func buildAccountingOrderForReturnEnforcedPayment(id int, h *AccountingEntryServ
 		case data.SupplierTitle:
 			response = append(response, dto.AccountingOrderItemsForObligations{
 				AccountID:    modelItem.CreditAccountID,
-				CreditAmount: decimal.Decimal(*enforcedPayment.ReturnAmount),
+				CreditAmount: float32(*enforcedPayment.ReturnAmount),
 				Title:        modelItem.Title,
 				Date:         *enforcedPayment.DateOfSAP,
 				Type:         data.TypeReturnEnforcedPayment,

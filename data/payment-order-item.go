@@ -3,22 +3,21 @@ package data
 import (
 	"time"
 
-	"github.com/shopspring/decimal"
 	up "github.com/upper/db/v4"
 )
 
 // PaymentOrderItem struct
 type PaymentOrderItem struct {
-	ID                        int             `db:"id,omitempty"`
-	PaymentOrderID            int             `db:"payment_order_id"`
-	InvoiceID                 *int            `db:"invoice_id"`
-	AdditionalExpenseID       *int            `db:"additional_expense_id"`
-	SalaryAdditionalExpenseID *int            `db:"salary_additional_expense_id"`
-	AccountID                 int             `db:"account_id"`
-	SourceAccountID           int             `db:"source_account_id"`
-	Amount                    decimal.Decimal `db:"amount"`
-	CreatedAt                 time.Time       `db:"created_at,omitempty"`
-	UpdatedAt                 time.Time       `db:"updated_at"`
+	ID                        int       `db:"id,omitempty"`
+	PaymentOrderID            int       `db:"payment_order_id"`
+	InvoiceID                 *int      `db:"invoice_id"`
+	AdditionalExpenseID       *int      `db:"additional_expense_id"`
+	SalaryAdditionalExpenseID *int      `db:"salary_additional_expense_id"`
+	AccountID                 int       `db:"account_id"`
+	SourceAccountID           int       `db:"source_account_id"`
+	Amount                    float64   `db:"amount"`
+	CreatedAt                 time.Time `db:"created_at,omitempty"`
+	UpdatedAt                 time.Time `db:"updated_at"`
 }
 
 // Table returns the table name

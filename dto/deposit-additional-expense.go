@@ -3,39 +3,38 @@ package dto
 import (
 	"time"
 
-	"github.com/shopspring/decimal"
 	"gitlab.sudovi.me/erp/finance-api/data"
 )
 
 type DepositAdditionalExpenseDTO struct {
-	ID                   int             `json:"id"`
-	Title                string          `json:"title"`
-	AccountID            int             `json:"account_id"`
-	SubjectID            int             `json:"subject_id"`
-	BankAccount          string          `json:"bank_account"`
-	PaymentOrderID       int             `json:"payment_order_id"`
-	PayingPaymentOrderID *int            `json:"paying_payment_order_id"`
-	SourceBankAccount    string          `json:"source_bank_account"`
-	OrganizationUnitID   int             `json:"organization_unit_id"`
-	Price                decimal.Decimal `json:"price"`
-	Status               string          `json:"status"`
+	ID                   int     `json:"id"`
+	Title                string  `json:"title"`
+	AccountID            int     `json:"account_id"`
+	SubjectID            int     `json:"subject_id"`
+	BankAccount          string  `json:"bank_account"`
+	PaymentOrderID       int     `json:"payment_order_id"`
+	PayingPaymentOrderID *int    `json:"paying_payment_order_id"`
+	SourceBankAccount    string  `json:"source_bank_account"`
+	OrganizationUnitID   int     `json:"organization_unit_id"`
+	Price                float32 `json:"price"`
+	Status               string  `json:"status"`
 }
 
 type DepositAdditionalExpenseResponseDTO struct {
-	ID                   int             `json:"id"`
-	Title                string          `json:"title"`
-	CaseNumber           string          `json:"case_number"`
-	AccountID            int             `json:"account_id"`
-	SubjectID            int             `json:"subject_id"`
-	BankAccount          string          `json:"bank_account"`
-	PaymentOrderID       int             `json:"payment_order_id"`
-	PayingPaymentOrderID *int            `json:"paying_payment_order_id"`
-	OrganizationUnitID   int             `json:"organization_unit_id"`
-	SourceBankAccount    string          `json:"source_bank_account"`
-	Price                decimal.Decimal `json:"price"`
-	Status               string          `json:"status"`
-	CreatedAt            time.Time       `json:"created_at"`
-	UpdatedAt            time.Time       `json:"updated_at"`
+	ID                   int       `json:"id"`
+	Title                string    `json:"title"`
+	CaseNumber           string    `json:"case_number"`
+	AccountID            int       `json:"account_id"`
+	SubjectID            int       `json:"subject_id"`
+	BankAccount          string    `json:"bank_account"`
+	PaymentOrderID       int       `json:"payment_order_id"`
+	PayingPaymentOrderID *int      `json:"paying_payment_order_id"`
+	OrganizationUnitID   int       `json:"organization_unit_id"`
+	SourceBankAccount    string    `json:"source_bank_account"`
+	Price                float32   `json:"price"`
+	Status               string    `json:"status"`
+	CreatedAt            time.Time `json:"created_at"`
+	UpdatedAt            time.Time `json:"updated_at"`
 }
 
 type DepositAdditionalExpenseFilterDTO struct {

@@ -3,7 +3,6 @@ package data
 import (
 	"time"
 
-	"github.com/shopspring/decimal"
 	up "github.com/upper/db/v4"
 )
 
@@ -12,7 +11,7 @@ type SalaryAdditionalExpense struct {
 	ID                  int                         `db:"id,omitempty"`
 	SalaryID            int                         `db:"salary_id"`
 	AccountID           int                         `db:"account_id"`
-	Amount              decimal.Decimal             `db:"amount"`
+	Amount              float64                     `db:"amount"`
 	SubjectID           int                         `db:"subject_id"`
 	BankAccount         string                      `db:"bank_account"`
 	Status              InvoiceStatus               `db:"status"`

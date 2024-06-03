@@ -3,18 +3,17 @@ package dto
 import (
 	"time"
 
-	"github.com/shopspring/decimal"
 	"gitlab.sudovi.me/erp/finance-api/data"
 )
 
 type PaymentOrderItemDTO struct {
-	PaymentOrderID            int             `json:"payment_order_id"`
-	InvoiceID                 *int            `json:"invoice_id"`
-	AdditionalExpenseID       *int            `json:"additional_expense_id"`
-	SalaryAdditionalExpenseID *int            `json:"salary_additional_expense_id"`
-	AccountID                 int             `json:"account_id"`
-	SourceAccountID           int             `json:"source_account_id"`
-	Amount                    decimal.Decimal `json:"amount"`
+	PaymentOrderID            int     `json:"payment_order_id"`
+	InvoiceID                 *int    `json:"invoice_id"`
+	AdditionalExpenseID       *int    `json:"additional_expense_id"`
+	SalaryAdditionalExpenseID *int    `json:"salary_additional_expense_id"`
+	AccountID                 int     `json:"account_id"`
+	SourceAccountID           int     `json:"source_account_id"`
+	Amount                    float64 `json:"amount"`
 }
 
 type PaymentOrderItemResponseDTO struct {
@@ -26,7 +25,7 @@ type PaymentOrderItemResponseDTO struct {
 	Type                      data.TypesOfObligation `json:"type"`
 	AccountID                 int                    `json:"account_id"`
 	SourceAccountID           int                    `json:"source_account_id"`
-	Amount                    decimal.Decimal        `json:"amount"`
+	Amount                    float64                `json:"amount"`
 	Title                     string                 `json:"title"`
 	CreatedAt                 time.Time              `json:"created_at"`
 	UpdatedAt                 time.Time              `json:"updated_at"`

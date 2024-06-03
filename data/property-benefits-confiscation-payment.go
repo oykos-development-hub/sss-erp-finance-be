@@ -3,7 +3,6 @@ package data
 import (
 	"time"
 
-	"github.com/shopspring/decimal"
 	up "github.com/upper/db/v4"
 )
 
@@ -28,7 +27,7 @@ type PropBenConfPayment struct {
 	ID                     int                      `db:"id,omitempty"`
 	PropBenConfID          int                      `db:"property_benefits_confiscation_id"`
 	PaymentMethod          PropBenConfPaymentMethod `db:"payment_method"`
-	Amount                 decimal.Decimal          `db:"amount"`
+	Amount                 float64                  `db:"amount"`
 	PaymentDate            time.Time                `db:"payment_date"`
 	PaymentDueDate         time.Time                `db:"payment_due_date"`
 	ReceiptNumber          string                   `db:"receipt_number"`

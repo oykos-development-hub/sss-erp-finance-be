@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/lib/pq"
-	"github.com/shopspring/decimal"
 	"gitlab.sudovi.me/erp/finance-api/data"
 )
 
@@ -15,7 +14,7 @@ type ProcedureCostDTO struct {
 	Subject                string                    `json:"subject"`
 	JMBG                   string                    `json:"jmbg" validate:"required"`
 	Residence              string                    `json:"residence"`
-	Amount                 decimal.Decimal           `json:"amount"`
+	Amount                 float64                   `json:"amount"`
 	PaymentReferenceNumber string                    `json:"payment_reference_number"`
 	DebitReferenceNumber   string                    `json:"debit_reference_number"`
 	AccountID              int                       `json:"account_id"`
@@ -23,7 +22,7 @@ type ProcedureCostDTO struct {
 	PaymentDeadlineDate    time.Time                 `json:"payment_deadline_date"`
 	Description            string                    `json:"description"`
 	Status                 *data.ProcedureCostStatus `json:"status"`
-	CourtCosts             *decimal.Decimal          `json:"court_costs"`
+	CourtCosts             *float64                  `json:"court_costs"`
 	CourtAccountID         *int                      `json:"court_account_id"`
 	File                   pq.Int64Array             `json:"file"`
 }
@@ -36,7 +35,7 @@ type ProcedureCostResponseDTO struct {
 	Subject                string                   `json:"subject"`
 	JMBG                   string                   `json:"jmbg"`
 	Residence              string                   `json:"residence"`
-	Amount                 decimal.Decimal          `json:"amount"`
+	Amount                 float64                  `json:"amount"`
 	PaymentReferenceNumber string                   `json:"payment_reference_number"`
 	DebitReferenceNumber   string                   `json:"debit_reference_number"`
 	AccountID              int                      `json:"account_id"`
@@ -44,7 +43,7 @@ type ProcedureCostResponseDTO struct {
 	PaymentDeadlineDate    time.Time                `json:"payment_deadline_date"`
 	Description            string                   `json:"description"`
 	Status                 data.ProcedureCostStatus `json:"status"`
-	CourtCosts             *decimal.Decimal         `json:"court_costs"`
+	CourtCosts             *float64                 `json:"court_costs"`
 	CourtAccountID         *int                     `json:"court_account_id"`
 	ProcedureCostDetails   *ProcedureCostDetailsDTO `json:"procedure_cost_details"`
 	File                   []int                    `json:"file"`
@@ -53,14 +52,14 @@ type ProcedureCostResponseDTO struct {
 }
 
 type ProcedureCostDetailsDTO struct {
-	AllPaymentAmount           decimal.Decimal `json:"all_payments_amount"`
-	AmountGracePeriod          decimal.Decimal `json:"amount_grace_period"`
-	AmountGracePeriodDueDate   time.Time       `json:"amount_grace_period_due_date"`
-	AmountGracePeriodAvailable bool            `json:"amount_grace_period_available"`
-	LeftToPayAmount            decimal.Decimal `json:"left_to_pay_amount"`
+	AllPaymentAmount           float64   `json:"all_payments_amount"`
+	AmountGracePeriod          float64   `json:"amount_grace_period"`
+	AmountGracePeriodDueDate   time.Time `json:"amount_grace_period_due_date"`
+	AmountGracePeriodAvailable bool      `json:"amount_grace_period_available"`
+	LeftToPayAmount            float64   `json:"left_to_pay_amount"`
 
-	CourtCostsPaid            decimal.Decimal `json:"court_costs_paid"`
-	CourtCostsLeftToPayAmount decimal.Decimal `json:"court_costs_left_to_pay_amount"`
+	CourtCostsPaid            float64 `json:"court_costs_paid"`
+	CourtCostsLeftToPayAmount float64 `json:"court_costs_left_to_pay_amount"`
 }
 
 type ProcedureCostFilterDTO struct {

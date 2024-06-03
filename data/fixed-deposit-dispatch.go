@@ -3,28 +3,27 @@ package data
 import (
 	"time"
 
-	"github.com/shopspring/decimal"
 	up "github.com/upper/db/v4"
 )
 
 // FixedDepositDispatch struct
 type FixedDepositDispatch struct {
-	ID           int             `db:"id,omitempty"`
-	DepositID    int             `db:"deposit_id"`
-	CategoryID   int             `db:"category_id"`
-	TypeID       int             `db:"type_id"`
-	Unit         string          `db:"unit"`
-	Currency     string          `db:"currency"`
-	Amount       decimal.Decimal `db:"amount"`
-	SerialNumber string          `db:"serial_number"`
-	DateOfAction *time.Time      `db:"date_of_action"`
-	Subject      string          `db:"subject"`
-	Action       string          `db:"action"`
-	CaseNumber   string          `db:"case_number"`
-	JudgeID      int             `db:"judge_id"`
-	FileID       int             `db:"file_id"`
-	CreatedAt    time.Time       `db:"created_at,omitempty"`
-	UpdatedAt    time.Time       `db:"updated_at"`
+	ID           int        `db:"id,omitempty"`
+	DepositID    int        `db:"deposit_id"`
+	CategoryID   int        `db:"category_id"`
+	TypeID       int        `db:"type_id"`
+	Unit         string     `db:"unit"`
+	Currency     string     `db:"currency"`
+	Amount       float32    `db:"amount"`
+	SerialNumber string     `db:"serial_number"`
+	DateOfAction *time.Time `db:"date_of_action"`
+	Subject      string     `db:"subject"`
+	Action       string     `db:"action"`
+	CaseNumber   string     `db:"case_number"`
+	JudgeID      int        `db:"judge_id"`
+	FileID       int        `db:"file_id"`
+	CreatedAt    time.Time  `db:"created_at,omitempty"`
+	UpdatedAt    time.Time  `db:"updated_at"`
 }
 
 // Table returns the table name

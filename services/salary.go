@@ -8,7 +8,6 @@ import (
 	"gitlab.sudovi.me/erp/finance-api/errors"
 
 	"github.com/oykos-development-hub/celeritas"
-	"github.com/shopspring/decimal"
 	up "github.com/upper/db/v4"
 )
 
@@ -42,7 +41,7 @@ func (h *SalaryServiceImpl) CreateSalary(input dto.SalaryDTO) (*dto.SalaryRespon
 		additionalExpenseData := additionalExpense.ToSalaryAdditionalExpense()
 		additionalExpenseData.SalaryID = id
 		additionalExpenseData.Status = "Kreiran"
-		if additionalExpenseData.Amount.Cmp(decimal.NewFromInt(0)) > 0 {
+		if additionalExpenseData.Amount > 0 {
 			_, err = h.salaryAdditionalExpenseRepo.Insert(data.Upper, *additionalExpenseData)
 			if err != nil {
 				return nil, errors.ErrInternalServer
@@ -94,7 +93,7 @@ func (h *SalaryServiceImpl) UpdateSalary(id int, input dto.SalaryDTO) (*dto.Sala
 				additionalExpenseData := item.ToSalaryAdditionalExpense()
 				additionalExpenseData.SalaryID = id
 				additionalExpenseData.Status = "Kreiran"
-				if additionalExpenseData.Amount.Cmp(decimal.NewFromInt(0)) > 0 {
+				if additionalExpenseData.Amount > 0 {
 					_, err = h.salaryAdditionalExpenseRepo.Insert(tx, *additionalExpenseData)
 
 					if err != nil {
@@ -116,7 +115,7 @@ func (h *SalaryServiceImpl) UpdateSalary(id int, input dto.SalaryDTO) (*dto.Sala
 					if item.ID == itemID {
 						additionalExpenseData := item.ToSalaryAdditionalExpense()
 						additionalExpenseData.ID = id
-						if additionalExpenseData.Amount.Cmp(decimal.NewFromInt(0)) > 0 {
+						if additionalExpenseData.Amount > 0 {
 							err := h.salaryAdditionalExpenseRepo.Update(tx, *additionalExpenseData)
 							if err != nil {
 								return err
@@ -179,15 +178,15 @@ func (h *SalaryServiceImpl) GetSalary(id int) (*dto.SalaryResponseDTO, error) {
 
 	for _, additionalExpense := range additionalExpenses {
 		if additionalExpense.Type == "banks" {
-			response.NetPrice = response.NetPrice.Add(additionalExpense.Amount)
+			response.NetPrice += additionalExpense.Amount
 		} else if additionalExpense.Type == "suspensions" {
-			response.ObligationsPrice = response.ObligationsPrice.Add(additionalExpense.Amount)
+			response.ObligationsPrice += additionalExpense.Amount
 		} else {
-			response.VatPrice = response.VatPrice.Add(additionalExpense.Amount)
+			response.VatPrice += additionalExpense.Amount
 		}
 	}
 
-	response.GrossPrice = response.VatPrice.Add(response.NetPrice)
+	response.GrossPrice = response.VatPrice + response.NetPrice
 
 	return &response, nil
 }
@@ -260,11 +259,11 @@ func (h *SalaryServiceImpl) GetSalaryList(filter dto.SalaryFilterDTO) ([]dto.Sal
 			}
 
 			if additionalExpense.Type == "banks" {
-				response[i].NetPrice = response[i].NetPrice.Add(additionalExpense.Amount)
+				response[i].NetPrice += additionalExpense.Amount
 			} else if additionalExpense.Type == "suspensions" {
-				response[i].ObligationsPrice = response[i].ObligationsPrice.Add(additionalExpense.Amount)
+				response[i].ObligationsPrice += additionalExpense.Amount
 			} else {
-				response[i].VatPrice = response[i].VatPrice.Add(additionalExpense.Amount)
+				response[i].VatPrice += additionalExpense.Amount
 			}
 		}
 
@@ -272,7 +271,7 @@ func (h *SalaryServiceImpl) GetSalaryList(filter dto.SalaryFilterDTO) ([]dto.Sal
 			response[i].Deletable = false
 		}
 
-		response[i].GrossPrice = response[i].VatPrice.Add(response[i].NetPrice)
+		response[i].GrossPrice = response[i].VatPrice + response[i].NetPrice
 	}
 
 	return response, total, nil
