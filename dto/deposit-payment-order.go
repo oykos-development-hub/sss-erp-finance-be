@@ -3,6 +3,7 @@ package dto
 import (
 	"time"
 
+	"github.com/shopspring/decimal"
 	"gitlab.sudovi.me/erp/finance-api/data"
 )
 
@@ -11,7 +12,7 @@ type DepositPaymentOrderDTO struct {
 	CaseNumber                  string                        `json:"case_number"`
 	SupplierID                  int                           `json:"supplier_id"`
 	SubjectTypeID               int                           `json:"subject_type_id"`
-	NetAmount                   float64                       `json:"net_amount"`
+	NetAmount                   decimal.Decimal               `json:"net_amount"`
 	BankAccount                 string                        `json:"bank_account"`
 	SourceBankAccount           string                        `json:"source_bank_account"`
 	DateOfPayment               time.Time                     `json:"date_of_payment"`
@@ -30,7 +31,7 @@ type DepositPaymentOrderResponseDTO struct {
 	CaseNumber                  string                                `json:"case_number"`
 	SupplierID                  int                                   `json:"supplier_id"`
 	SubjectTypeID               int                                   `json:"subject_type_id"`
-	NetAmount                   float64                               `json:"net_amount"`
+	NetAmount                   decimal.Decimal                       `json:"net_amount"`
 	SourceBankAccount           string                                `json:"source_bank_account"`
 	BankAccount                 string                                `json:"bank_account"`
 	DateOfPayment               time.Time                             `json:"date_of_payment"`

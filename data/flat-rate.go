@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/lib/pq"
+	"github.com/shopspring/decimal"
 	up "github.com/upper/db/v4"
 )
 
@@ -28,26 +29,26 @@ const (
 
 // FlatRate struct
 type FlatRate struct {
-	ID                     int            `db:"id,omitempty"`
-	FlatRateType           FlatRateType   `db:"flat_rate_type"`
-	DecisionNumber         string         `db:"decision_number"`
-	DecisionDate           time.Time      `db:"decision_date"`
-	Subject                string         `db:"subject"`
-	JMBG                   string         `db:"jmbg"`
-	Residence              string         `db:"residence"`
-	Amount                 float64        `db:"amount"`
-	PaymentReferenceNumber string         `db:"payment_reference_number"`
-	DebitReferenceNumber   string         `db:"debit_reference_number"`
-	AccountID              int            `db:"account_id"`
-	ExecutionDate          time.Time      `db:"execution_date"`
-	PaymentDeadlineDate    time.Time      `db:"payment_deadline_date"`
-	Description            string         `db:"description"`
-	Status                 FlatRateStatus `db:"status"`
-	CourtCosts             *float64       `db:"court_costs"`
-	CourtAccountID         *int           `db:"court_account_id"`
-	File                   pq.Int64Array  `db:"file"`
-	CreatedAt              time.Time      `db:"created_at,omitempty"`
-	UpdatedAt              time.Time      `db:"updated_at"`
+	ID                     int              `db:"id,omitempty"`
+	FlatRateType           FlatRateType     `db:"flat_rate_type"`
+	DecisionNumber         string           `db:"decision_number"`
+	DecisionDate           time.Time        `db:"decision_date"`
+	Subject                string           `db:"subject"`
+	JMBG                   string           `db:"jmbg"`
+	Residence              string           `db:"residence"`
+	Amount                 decimal.Decimal  `db:"amount"`
+	PaymentReferenceNumber string           `db:"payment_reference_number"`
+	DebitReferenceNumber   string           `db:"debit_reference_number"`
+	AccountID              int              `db:"account_id"`
+	ExecutionDate          time.Time        `db:"execution_date"`
+	PaymentDeadlineDate    time.Time        `db:"payment_deadline_date"`
+	Description            string           `db:"description"`
+	Status                 FlatRateStatus   `db:"status"`
+	CourtCosts             *decimal.Decimal `db:"court_costs"`
+	CourtAccountID         *int             `db:"court_account_id"`
+	File                   pq.Int64Array    `db:"file"`
+	CreatedAt              time.Time        `db:"created_at,omitempty"`
+	UpdatedAt              time.Time        `db:"updated_at"`
 }
 
 // Table returns the table name

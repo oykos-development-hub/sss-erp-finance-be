@@ -9,6 +9,7 @@ import (
 	"gitlab.sudovi.me/erp/finance-api/errors"
 
 	"github.com/oykos-development-hub/celeritas"
+	"github.com/shopspring/decimal"
 	up "github.com/upper/db/v4"
 )
 
@@ -49,7 +50,7 @@ func (h *InvoiceServiceImpl) CreateInvoice(input dto.InvoiceDTO) (*dto.InvoiceRe
 			additionalExpenseData.InvoiceID = id
 			additionalExpenseData.OrganizationUnitID = input.OrganizationUnitID
 			additionalExpenseData.Status = data.InvoiceStatusCreated
-			if additionalExpenseData.Price > 0 {
+			if additionalExpenseData.Price.Cmp(decimal.NewFromInt(0)) > 0 {
 				if _, err = h.additionalExpensesRepo.Insert(tx, *additionalExpenseData); err != nil {
 					return err
 				}
@@ -116,7 +117,7 @@ func (h *InvoiceServiceImpl) UpdateInvoice(id int, input dto.InvoiceDTO) (*dto.I
 				additionalExpenseData.InvoiceID = id
 				additionalExpenseData.OrganizationUnitID = input.OrganizationUnitID
 				additionalExpenseData.Status = data.InvoiceStatusCreated
-				if additionalExpenseData.Price > 0 {
+				if additionalExpenseData.Price.Cmp(decimal.NewFromInt(0)) > 0 {
 					_, err = h.additionalExpensesRepo.Insert(tx, *additionalExpenseData)
 
 					if err != nil {
@@ -199,11 +200,11 @@ func (h *InvoiceServiceImpl) GetInvoice(id int) (*dto.InvoiceResponseDTO, error)
 
 	if len(additionalExpenses) > 0 {
 		response.Status = additionalExpenses[len(additionalExpenses)-1].Status
-		response.NetPrice = float64(additionalExpenses[len(additionalExpenses)-1].Price)
+		response.NetPrice = decimal.Decimal(additionalExpenses[len(additionalExpenses)-1].Price)
 	}
 
 	for j := 0; j < len(additionalExpenses)-1; j++ {
-		response.VATPrice += float64(additionalExpenses[j].Price)
+		response.VATPrice = response.VATPrice.Add(additionalExpenses[j].Price)
 	}
 
 	return &response, nil
@@ -282,12 +283,12 @@ func (h *InvoiceServiceImpl) GetInvoiceList(input dto.InvoicesFilter) ([]dto.Inv
 		}
 
 		if len(additionalExpenses) > 0 {
-			response[i].NetPrice = float64(additionalExpenses[len(additionalExpenses)-1].Price)
+			response[i].NetPrice = decimal.Decimal(additionalExpenses[len(additionalExpenses)-1].Price)
 			response[i].Status = additionalExpenses[len(additionalExpenses)-1].Status
 		}
 
 		for j := 0; j < len(additionalExpenses)-1; j++ {
-			response[i].VATPrice += float64(additionalExpenses[j].Price)
+			response[i].VATPrice = response[i].VATPrice.Add(additionalExpenses[j].Price)
 		}
 	}
 

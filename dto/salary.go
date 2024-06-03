@@ -3,6 +3,7 @@ package dto
 import (
 	"time"
 
+	"github.com/shopspring/decimal"
 	"gitlab.sudovi.me/erp/finance-api/data"
 )
 
@@ -27,11 +28,11 @@ type SalaryResponseDTO struct {
 	Status                   string                               `json:"status"`
 	OrganizationUnitID       int                                  `json:"organization_unit_id"`
 	SalaryAdditionalExpenses []SalaryAdditionalExpenseResponseDTO `json:"salary_additional_expenses"`
-	GrossPrice               float64                              `json:"gross_price"`
+	GrossPrice               decimal.Decimal                      `json:"gross_price"`
 	Registred                *bool                                `json:"registred"`
-	VatPrice                 float64                              `json:"vat_price"`
-	ObligationsPrice         float64                              `json:"obligations_price"`
-	NetPrice                 float64                              `json:"net_price"`
+	VatPrice                 decimal.Decimal                      `json:"vat_price"`
+	ObligationsPrice         decimal.Decimal                      `json:"obligations_price"`
+	NetPrice                 decimal.Decimal                      `json:"net_price"`
 	NumberOfEmployees        int                                  `json:"number_of_employees"`
 	Deletable                bool                                 `json:"is_deletable"`
 	CreatedAt                time.Time                            `json:"created_at"`

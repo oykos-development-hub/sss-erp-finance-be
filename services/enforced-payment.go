@@ -9,6 +9,7 @@ import (
 	"gitlab.sudovi.me/erp/finance-api/errors"
 
 	"github.com/oykos-development-hub/celeritas"
+	"github.com/shopspring/decimal"
 	up "github.com/upper/db/v4"
 )
 
@@ -167,8 +168,14 @@ func (h *EnforcedPaymentServiceImpl) GetEnforcedPayment(id int) (*dto.EnforcedPa
 					return nil, err
 				}
 				for _, article := range articles {
-					price := (article.NetPrice + article.NetPrice*float64(article.VatPercentage)/100) * float64(article.Amount)
-					item.Amount += float32(price)
+					vatPercentageDecimal := decimal.NewFromInt(int64(article.VatPercentage))
+					amountDecimal := decimal.NewFromInt(int64(article.Amount))
+
+					price := article.NetPrice.Add(
+						article.NetPrice.Mul(vatPercentageDecimal).Div(decimal.NewFromInt(100)),
+					).Mul(amountDecimal)
+
+					item.Amount.Add(price)
 				}
 				item.Title = "Faktura broj " + invoice.InvoiceNumber
 			} else {
@@ -180,7 +187,7 @@ func (h *EnforcedPaymentServiceImpl) GetEnforcedPayment(id int) (*dto.EnforcedPa
 				}
 				for _, article := range articles {
 					if article.Title == "Neto" {
-						item.Amount += float32(article.Price)
+						item.Amount.Add(article.Price)
 					}
 				}
 
@@ -262,7 +269,7 @@ func (h *EnforcedPaymentServiceImpl) GetEnforcedPaymentList(filter dto.EnforcedP
 	return response, total, nil
 }
 
-func updateInvoiceStatusForEnforcedPayment(id int, amount float64, lenOfArray int, tx up.Session, h *EnforcedPaymentServiceImpl) error {
+func updateInvoiceStatusForEnforcedPayment(id int, amount decimal.Decimal, lenOfArray int, tx up.Session, h *EnforcedPaymentServiceImpl) error {
 	invoice, err := h.invoicesRepo.Get(id)
 
 	if err != nil {

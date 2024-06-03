@@ -1,7 +1,6 @@
 package services
 
 import (
-	"math"
 	"time"
 
 	"gitlab.sudovi.me/erp/finance-api/data"
@@ -9,6 +8,7 @@ import (
 	"gitlab.sudovi.me/erp/finance-api/errors"
 
 	"github.com/oykos-development-hub/celeritas"
+	"github.com/shopspring/decimal"
 	"github.com/upper/db/v4"
 )
 
@@ -45,35 +45,40 @@ func (h *ProcedureCostSharedLogicServiceImpl) CalculateProcedureCostDetailsAndUp
 	for _, payment := range payments {
 		if data.ProcedureCostPaymentStatus(payment.Status) == data.PaidProcedureCostPeymentStatus {
 			if data.ProcedureCostPaymentMethod(payment.PaymentMethod) == data.CourtCostsProcedureCostPeymentMethod {
-				details.CourtCostsPaid += payment.Amount
+				details.CourtCostsPaid = details.CourtCostsPaid.Add(payment.Amount)
 			} else {
-				details.AllPaymentAmount += payment.Amount
+				details.AllPaymentAmount = details.AllPaymentAmount.Add(payment.Amount)
 			}
 		}
 	}
 
-	details.LeftToPayAmount = procedurecost.Amount - details.AllPaymentAmount
+	details.LeftToPayAmount = procedurecost.Amount.Sub(details.AllPaymentAmount)
 	if procedurecost.CourtCosts != nil {
-		details.CourtCostsLeftToPayAmount = *procedurecost.CourtCosts - details.CourtCostsPaid
+		details.CourtCostsLeftToPayAmount = procedurecost.CourtCosts.Sub(details.CourtCostsPaid)
 	}
 
 	details.AmountGracePeriodDueDate = procedurecost.DecisionDate.AddDate(0, 0, data.ProcedureCostGracePeriod)
-	details.AmountGracePeriod = math.Ceil(float64(procedurecost.Amount) * 2 / 3)
+	twoThirds := decimal.NewFromFloat(2.0).Div(decimal.NewFromFloat(3.0))
+	details.AmountGracePeriod = procedurecost.Amount.Mul(twoThirds).Ceil()
 
 	if time.Until(details.AmountGracePeriodDueDate) > 0 {
 		details.AmountGracePeriodAvailable = true
-		details.LeftToPayAmount = details.AmountGracePeriod - details.AllPaymentAmount
+		details.LeftToPayAmount = details.AmountGracePeriod.Sub(details.AllPaymentAmount)
 	}
 
 	var newStatus data.ProcedureCostStatus
-	const tolerance = 0.00001
 
-	leftToPayAmount := math.Max(0, details.LeftToPayAmount)
-	courtCostsLeftToPayAmount := math.Max(0, details.CourtCostsLeftToPayAmount)
+	tolerance := decimal.NewFromFloat(0.00001)
 
-	if math.Abs(leftToPayAmount-0) < tolerance && math.Abs(courtCostsLeftToPayAmount-0) < tolerance {
+	zero := decimal.NewFromInt(0)
+	leftToPayAmount := decimal.Max(zero, details.LeftToPayAmount)
+	courtCostsLeftToPayAmount := decimal.Max(zero, details.CourtCostsLeftToPayAmount)
+
+	// Provera uslova i postavljanje statusa
+	if leftToPayAmount.Abs().Cmp(tolerance) < 0 && courtCostsLeftToPayAmount.Abs().Cmp(tolerance) < 0 {
 		newStatus = data.PaidProcedureCostStatus
-	} else if (leftToPayAmount > 0 || courtCostsLeftToPayAmount > 0) && (details.CourtCostsPaid > 0 || details.AllPaymentAmount > 0) {
+	} else if (leftToPayAmount.Cmp(zero) > 0 || courtCostsLeftToPayAmount.Cmp(zero) > 0) &&
+		(details.CourtCostsPaid.Cmp(zero) > 0 || details.AllPaymentAmount.Cmp(zero) > 0) {
 		newStatus = data.PartProcedureCostStatus
 	} else {
 		newStatus = data.UnpaidProcedureCostStatus

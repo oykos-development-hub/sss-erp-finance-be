@@ -3,46 +3,47 @@ package data
 import (
 	"time"
 
+	"github.com/shopspring/decimal"
 	up "github.com/upper/db/v4"
 )
 
 // TaxAuthorityCodebook struct
 type TaxAuthorityCodebook struct {
-	ID                                   int       `db:"id,omitempty"`
-	Title                                string    `db:"title"`
-	Active                               bool      `db:"active"`
-	Code                                 string    `db:"code"`
-	TaxPercentage                        float64   `db:"tax_percentage"`
-	TaxSupplierID                        int       `db:"tax_supplier_id"`
-	ReleasePercentage                    float64   `db:"release_percentage"`
-	ReleaseAmount                        float64   `db:"release_amount"`
-	PioPercentage                        float64   `db:"pio_percentage"`
-	PioSupplierID                        int       `db:"pio_supplier_id"`
-	PioPercentageEmployerPercentage      float64   `db:"pio_percentage_employer_percentage"`
-	PioEmployerSupplierID                int       `db:"pio_employer_supplier_id"`
-	PioPercentageEmployeePercentage      float64   `db:"pio_percentage_employee_percentage"`
-	PioEmployeeSupplierID                int       `db:"pio_employee_supplier_id"`
-	UnemploymentPercentage               float64   `db:"unemployment_percentage"`
-	UnemploymentSupplierID               int       `db:"unemployment_supplier_id"`
-	UnemploymentEmployerPercentage       float64   `db:"unemployment_employer_percentage"`
-	UnemploymentEmployerSupplierID       int       `db:"unemployment_employer_supplier_id"`
-	UnemploymentEmployeePercentage       float64   `db:"unemployment_employee_percentage"`
-	UnemploymentEmployeeSupplierID       int       `db:"unemployment_employee_supplier_id"`
-	LaborFund                            float64   `db:"labor_fund"`
-	LaborFundSupplierID                  int       `db:"labor_fund_supplier_id"`
-	PreviousIncomePercentageLessThan700  float64   `db:"previous_income_percentage_less_than_700"`
-	PreviousIncomePercentageLessThan1000 float64   `db:"previous_income_percentage_less_than_1000"`
-	PreviousIncomePercentageMoreThan1000 float64   `db:"previous_income_percentage_more_than_1000"`
-	Coefficient                          float64   `db:"coefficient"`
-	CoefficientLess700                   float64   `db:"coefficient_less_700"`
-	CoefficientLess1000                  float64   `db:"coefficient_less_1000"`
-	CoefficientMore1000                  float64   `db:"coefficient_more_1000"`
-	AmountLess700                        float64   `db:"amount_less_700"`
-	AmountLess1000                       float64   `db:"amount_less_1000"`
-	AmountMore1000                       float64   `db:"amount_more_1000"`
-	IncludeSubtax                        bool      `db:"include_subtax"`
-	CreatedAt                            time.Time `db:"created_at,omitempty"`
-	UpdatedAt                            time.Time `db:"updated_at"`
+	ID                                   int             `db:"id,omitempty"`
+	Title                                string          `db:"title"`
+	Active                               bool            `db:"active"`
+	Code                                 string          `db:"code"`
+	TaxPercentage                        decimal.Decimal `db:"tax_percentage"`
+	TaxSupplierID                        int             `db:"tax_supplier_id"`
+	ReleasePercentage                    decimal.Decimal `db:"release_percentage"`
+	ReleaseAmount                        decimal.Decimal `db:"release_amount"`
+	PioPercentage                        decimal.Decimal `db:"pio_percentage"`
+	PioSupplierID                        int             `db:"pio_supplier_id"`
+	PioPercentageEmployerPercentage      decimal.Decimal `db:"pio_percentage_employer_percentage"`
+	PioEmployerSupplierID                int             `db:"pio_employer_supplier_id"`
+	PioPercentageEmployeePercentage      decimal.Decimal `db:"pio_percentage_employee_percentage"`
+	PioEmployeeSupplierID                int             `db:"pio_employee_supplier_id"`
+	UnemploymentPercentage               decimal.Decimal `db:"unemployment_percentage"`
+	UnemploymentSupplierID               int             `db:"unemployment_supplier_id"`
+	UnemploymentEmployerPercentage       decimal.Decimal `db:"unemployment_employer_percentage"`
+	UnemploymentEmployerSupplierID       int             `db:"unemployment_employer_supplier_id"`
+	UnemploymentEmployeePercentage       decimal.Decimal `db:"unemployment_employee_percentage"`
+	UnemploymentEmployeeSupplierID       int             `db:"unemployment_employee_supplier_id"`
+	LaborFund                            decimal.Decimal `db:"labor_fund"`
+	LaborFundSupplierID                  int             `db:"labor_fund_supplier_id"`
+	PreviousIncomePercentageLessThan700  decimal.Decimal `db:"previous_income_percentage_less_than_700"`
+	PreviousIncomePercentageLessThan1000 decimal.Decimal `db:"previous_income_percentage_less_than_1000"`
+	PreviousIncomePercentageMoreThan1000 decimal.Decimal `db:"previous_income_percentage_more_than_1000"`
+	Coefficient                          decimal.Decimal `db:"coefficient"`
+	CoefficientLess700                   decimal.Decimal `db:"coefficient_less_700"`
+	CoefficientLess1000                  decimal.Decimal `db:"coefficient_less_1000"`
+	CoefficientMore1000                  decimal.Decimal `db:"coefficient_more_1000"`
+	AmountLess700                        decimal.Decimal `db:"amount_less_700"`
+	AmountLess1000                       decimal.Decimal `db:"amount_less_1000"`
+	AmountMore1000                       decimal.Decimal `db:"amount_more_1000"`
+	IncludeSubtax                        bool            `db:"include_subtax"`
+	CreatedAt                            time.Time       `db:"created_at,omitempty"`
+	UpdatedAt                            time.Time       `db:"updated_at"`
 }
 
 // Table returns the table name

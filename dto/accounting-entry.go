@@ -3,6 +3,7 @@ package dto
 import (
 	"time"
 
+	"github.com/shopspring/decimal"
 	"gitlab.sudovi.me/erp/finance-api/data"
 )
 
@@ -22,8 +23,8 @@ type AccountingEntryResponseDTO struct {
 	OrganizationUnitID int                              `json:"organization_unit_id"`
 	DateOfBooking      time.Time                        `json:"date_of_booking"`
 	Type               data.TypesOfObligation           `json:"type"`
-	CreditAmount       float64                          `json:"credit_amount"`
-	DebitAmount        float64                          `json:"debit_amount"`
+	CreditAmount       decimal.Decimal                  `json:"credit_amount"`
+	DebitAmount        decimal.Decimal                  `json:"debit_amount"`
 	Items              []AccountingEntryItemResponseDTO `json:"items"`
 	CreatedAt          time.Time                        `json:"created_at"`
 	UpdatedAt          time.Time                        `json:"updated_at"`
@@ -44,18 +45,18 @@ type ObligationForAccounting struct {
 	Date       time.Time              `json:"date"`
 	Type       data.TypesOfObligation `json:"type"`
 	Title      string                 `json:"title"`
-	Price      float64                `json:"price"`
+	Price      decimal.Decimal        `json:"price"`
 	Status     string                 `json:"status"`
 	CreatedAt  time.Time              `json:"created_at"`
 }
 
 type PaymentOrdersForAccounting struct {
-	PaymentOrderID int       `json:"payment_order_id"`
-	SupplierID     *int      `json:"supplier_id"`
-	Date           time.Time `json:"date"`
-	Title          string    `json:"title"`
-	Price          float64   `json:"price"`
-	CreatedAt      time.Time `json:"created_at"`
+	PaymentOrderID int             `json:"payment_order_id"`
+	SupplierID     *int            `json:"supplier_id"`
+	Date           time.Time       `json:"date"`
+	Title          string          `json:"title"`
+	Price          decimal.Decimal `json:"price"`
+	CreatedAt      time.Time       `json:"created_at"`
 }
 
 type AccountingOrderForObligationsData struct {
@@ -71,16 +72,16 @@ type AccountingOrderForObligationsData struct {
 type AccountingOrderForObligations struct {
 	OrganizationUnitID int                                  `json:"organization_unit_id"`
 	DateOfBooking      time.Time                            `json:"date_of_booking"`
-	CreditAmount       float32                              `json:"credit_amount"`
-	DebitAmount        float32                              `json:"debit_amount"`
+	CreditAmount       decimal.Decimal                      `json:"credit_amount"`
+	DebitAmount        decimal.Decimal                      `json:"debit_amount"`
 	Items              []AccountingOrderItemsForObligations `json:"items"`
 }
 
 type AccountingOrderItemsForObligations struct {
 	AccountID             int                            `json:"account_id"`
 	Title                 data.AccountingOrderItemsTitle `json:"title"`
-	CreditAmount          float32                        `json:"credit_amount"`
-	DebitAmount           float32                        `json:"debit_amount"`
+	CreditAmount          decimal.Decimal                `json:"credit_amount"`
+	DebitAmount           decimal.Decimal                `json:"debit_amount"`
 	Type                  data.TypesOfObligation         `json:"type"`
 	SupplierID            int                            `json:"supplier_id"`
 	Date                  time.Time                      `json:"date"`

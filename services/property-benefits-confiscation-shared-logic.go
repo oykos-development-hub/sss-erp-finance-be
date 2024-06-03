@@ -1,7 +1,6 @@
 package services
 
 import (
-	"math"
 	"time"
 
 	"gitlab.sudovi.me/erp/finance-api/data"
@@ -9,6 +8,7 @@ import (
 	"gitlab.sudovi.me/erp/finance-api/errors"
 
 	"github.com/oykos-development-hub/celeritas"
+	"github.com/shopspring/decimal"
 	"github.com/upper/db/v4"
 )
 
@@ -45,36 +45,42 @@ func (h *PropBenConfSharedLogicServiceImpl) CalculatePropBenConfDetailsAndUpdate
 	for _, payment := range payments {
 		if data.PropBenConfPaymentStatus(payment.Status) == data.PaidPropBenConfPeymentStatus {
 			if data.PropBenConfPaymentMethod(payment.PaymentMethod) == data.CourtCostsPropBenConfPeymentMethod {
-				details.CourtCostsPaid += payment.Amount
+				details.CourtCostsPaid = details.CourtCostsPaid.Add(payment.Amount)
 			} else {
-				details.AllPaymentAmount += payment.Amount
+				details.AllPaymentAmount = details.AllPaymentAmount.Add(payment.Amount)
 			}
 		}
 	}
 
 	// calculate the rest of the fees
-	details.LeftToPayAmount = propbenconf.Amount - details.AllPaymentAmount
+	details.LeftToPayAmount = propbenconf.Amount.Sub(details.AllPaymentAmount)
 	if propbenconf.CourtCosts != nil {
-		details.CourtCostsLeftToPayAmount = *propbenconf.CourtCosts - details.CourtCostsPaid
+		details.CourtCostsLeftToPayAmount = propbenconf.CourtCosts.Sub(details.CourtCostsPaid)
 	}
 
 	details.AmountGracePeriodDueDate = propbenconf.DecisionDate.AddDate(0, 0, data.PropBenConfGracePeriod)
-	details.AmountGracePeriod = math.Ceil(float64(propbenconf.Amount) * 2 / 3)
+
+	twoThirds := decimal.NewFromFloat(2.0).Div(decimal.NewFromFloat(3.0))
+	details.AmountGracePeriod = propbenconf.Amount.Mul(twoThirds).Ceil()
 
 	if time.Until(details.AmountGracePeriodDueDate) > 0 {
 		details.AmountGracePeriodAvailable = true
-		details.LeftToPayAmount = details.AmountGracePeriod - details.AllPaymentAmount
+		details.LeftToPayAmount = details.AmountGracePeriod.Sub(details.AllPaymentAmount)
 	}
 
 	var newStatus data.PropBenConfStatus
-	const tolerance = 0.00001
+	tolerance := decimal.NewFromFloat(0.00001)
 
-	feeLeftToPayAmount := math.Max(0, details.LeftToPayAmount)
-	feeCourtCostsLeftToPayAmount := math.Max(0, details.CourtCostsLeftToPayAmount)
+	// Korišćenje decimal.Max za poređenje sa 0
+	zero := decimal.NewFromInt(0)
+	feeLeftToPayAmount := decimal.Max(zero, details.LeftToPayAmount)
+	feeCourtCostsLeftToPayAmount := decimal.Max(zero, details.CourtCostsLeftToPayAmount)
 
-	if math.Abs(feeLeftToPayAmount-0) < tolerance && math.Abs(feeCourtCostsLeftToPayAmount-0) < tolerance {
+	// Provera uslova i postavljanje statusa
+	if feeLeftToPayAmount.Abs().Cmp(tolerance) < 0 && feeCourtCostsLeftToPayAmount.Abs().Cmp(tolerance) < 0 {
 		newStatus = data.PaidPropBenConfStatus
-	} else if (feeLeftToPayAmount > 0 || feeCourtCostsLeftToPayAmount > 0) && (details.AllPaymentAmount > 0 || details.CourtCostsPaid > 0) {
+	} else if (feeLeftToPayAmount.Cmp(zero) > 0 || feeCourtCostsLeftToPayAmount.Cmp(zero) > 0) &&
+		(details.AllPaymentAmount.Cmp(zero) > 0 || details.CourtCostsPaid.Cmp(zero) > 0) {
 		newStatus = data.PartPropBenConfStatus
 	} else {
 		newStatus = data.UnpaidPropBenConfStatus

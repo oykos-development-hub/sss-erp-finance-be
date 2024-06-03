@@ -3,24 +3,25 @@ package data
 import (
 	"time"
 
+	"github.com/shopspring/decimal"
 	up "github.com/upper/db/v4"
 )
 
 // DepositAdditionalExpense struct
 type DepositAdditionalExpense struct {
-	ID                   int       `db:"id,omitempty"`
-	Title                string    `db:"title"`
-	AccountID            int       `db:"account_id"`
-	SubjectID            int       `db:"subject_id"`
-	BankAccount          string    `db:"bank_account"`
-	PaymentOrderID       int       `db:"payment_order_id"`
-	PayingPaymentOrderID *int      `db:"paying_payment_order_id"`
-	OrganizationUnitID   int       `db:"organization_unit_id"`
-	SourceBankAccount    string    `db:"source_bank_account"`
-	Price                float32   `db:"price"`
-	Status               string    `db:"status"`
-	CreatedAt            time.Time `db:"created_at,omitempty"`
-	UpdatedAt            time.Time `db:"updated_at"`
+	ID                   int             `db:"id,omitempty"`
+	Title                string          `db:"title"`
+	AccountID            int             `db:"account_id"`
+	SubjectID            int             `db:"subject_id"`
+	BankAccount          string          `db:"bank_account"`
+	PaymentOrderID       int             `db:"payment_order_id"`
+	PayingPaymentOrderID *int            `db:"paying_payment_order_id"`
+	OrganizationUnitID   int             `db:"organization_unit_id"`
+	SourceBankAccount    string          `db:"source_bank_account"`
+	Price                decimal.Decimal `db:"price"`
+	Status               string          `db:"status"`
+	CreatedAt            time.Time       `db:"created_at,omitempty"`
+	UpdatedAt            time.Time       `db:"updated_at"`
 }
 
 // Table returns the table name

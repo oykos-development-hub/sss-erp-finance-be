@@ -1,13 +1,12 @@
 package services
 
 import (
-	"math"
-
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
 	"gitlab.sudovi.me/erp/finance-api/errors"
 
 	"github.com/oykos-development-hub/celeritas"
+	"github.com/shopspring/decimal"
 	"github.com/upper/db/v4"
 )
 
@@ -43,21 +42,24 @@ func (h *FeeSharedLogicServiceImpl) CalculateFeeDetailsAndUpdateStatus(feeId int
 	// count all payments
 	for _, payment := range payments {
 		if data.FeePaymentStatus(payment.Status) == data.PaidFeePeymentStatus {
-			details.FeeAllPaymentAmount += payment.Amount
+			details.FeeAllPaymentAmount = details.FeeAllPaymentAmount.Add(payment.Amount)
 		}
 	}
 
 	// calculate the rest of the fees
-	details.FeeLeftToPayAmount = fee.Amount - details.FeeAllPaymentAmount
+	details.FeeLeftToPayAmount = fee.Amount.Sub(details.FeeAllPaymentAmount)
 
 	var newStatus data.FeeStatus
-	const tolerance = 0.00001
+	tolerance := decimal.NewFromFloat(0.00001)
 
-	feeLeftToPayAmount := math.Max(0, details.FeeLeftToPayAmount)
+	feeLeftToPayAmount := decimal.Max(decimal.NewFromInt(0), details.FeeLeftToPayAmount)
 
-	if math.Abs(feeLeftToPayAmount-0) < tolerance {
+	absFeeLeftToPayAmount := feeLeftToPayAmount.Abs()
+
+	// Provera da li je apsolutna vrednost feeLeftToPayAmount manja od tolerancije
+	if absFeeLeftToPayAmount.Cmp(tolerance) < 0 {
 		newStatus = data.PaidFeeStatus
-	} else if feeLeftToPayAmount > 0 && details.FeeAllPaymentAmount > 0 {
+	} else if feeLeftToPayAmount.Cmp(decimal.NewFromInt(0)) > 0 && details.FeeAllPaymentAmount.Cmp(decimal.NewFromInt(0)) > 0 {
 		newStatus = data.PartFeeStatus
 	} else {
 		newStatus = data.UnpaidFeeStatus

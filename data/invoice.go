@@ -3,6 +3,7 @@ package data
 import (
 	"time"
 
+	"github.com/shopspring/decimal"
 	up "github.com/upper/db/v4"
 )
 
@@ -33,8 +34,8 @@ type Invoice struct {
 	Supplier                      string            `db:"supplier"`
 	Status                        InvoiceStatus     `db:"status,omitempty"`
 	Registred                     *bool             `db:"registred,omitempty"`
-	GrossPrice                    float64           `db:"gross_price"`
-	VATPrice                      float64           `db:"vat_price"`
+	GrossPrice                    decimal.Decimal   `db:"gross_price"`
+	VATPrice                      decimal.Decimal   `db:"vat_price"`
 	SupplierID                    int               `db:"supplier_id"`
 	MunicipalityID                int               `db:"municipality_id"`
 	TypeOfDecision                int               `db:"type_of_decision"`

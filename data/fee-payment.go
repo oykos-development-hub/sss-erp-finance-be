@@ -3,6 +3,7 @@ package data
 import (
 	"time"
 
+	"github.com/shopspring/decimal"
 	up "github.com/upper/db/v4"
 )
 
@@ -27,7 +28,7 @@ type FeePayment struct {
 	ID                     int              `db:"id,omitempty"`
 	FeeID                  int              `db:"fee_id"`
 	PaymentMethod          FeePaymentMethod `db:"payment_method"`
-	Amount                 float64          `db:"amount"`
+	Amount                 decimal.Decimal  `db:"amount"`
 	PaymentDate            time.Time        `db:"payment_date"`
 	PaymentDueDate         time.Time        `db:"payment_due_date"`
 	ReceiptNumber          string           `db:"receipt_number"`

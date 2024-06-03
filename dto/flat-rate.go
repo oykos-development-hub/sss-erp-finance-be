@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/lib/pq"
+	"github.com/shopspring/decimal"
 	"gitlab.sudovi.me/erp/finance-api/data"
 )
 
@@ -14,7 +15,7 @@ type FlatRateDTO struct {
 	Subject                string               `json:"subject"`
 	JMBG                   string               `json:"jmbg" validate:"required"`
 	Residence              string               `json:"residence"`
-	Amount                 float64              `json:"amount"`
+	Amount                 decimal.Decimal      `json:"amount"`
 	PaymentReferenceNumber string               `json:"payment_reference_number"`
 	DebitReferenceNumber   string               `json:"debit_reference_number"`
 	AccountID              int                  `json:"account_id"`
@@ -22,7 +23,7 @@ type FlatRateDTO struct {
 	PaymentDeadlineDate    time.Time            `json:"payment_deadline_date"`
 	Description            string               `json:"description"`
 	Status                 *data.FlatRateStatus `json:"status"`
-	CourtCosts             *float64             `json:"court_costs"`
+	CourtCosts             *decimal.Decimal     `json:"court_costs"`
 	CourtAccountID         *int                 `json:"court_account_id"`
 	File                   pq.Int64Array        `json:"file"`
 }
@@ -35,7 +36,7 @@ type FlatRateResponseDTO struct {
 	Subject                string              `json:"subject"`
 	JMBG                   string              `json:"jmbg"`
 	Residence              string              `json:"residence"`
-	Amount                 float64             `json:"amount"`
+	Amount                 decimal.Decimal     `json:"amount"`
 	PaymentReferenceNumber string              `json:"payment_reference_number"`
 	DebitReferenceNumber   string              `json:"debit_reference_number"`
 	AccountID              int                 `json:"account_id"`
@@ -43,7 +44,7 @@ type FlatRateResponseDTO struct {
 	PaymentDeadlineDate    time.Time           `json:"payment_deadline_date"`
 	Description            string              `json:"description"`
 	Status                 data.FlatRateStatus `json:"status"`
-	CourtCosts             *float64            `json:"court_costs"`
+	CourtCosts             *decimal.Decimal    `json:"court_costs"`
 	CourtAccountID         *int                `json:"court_account_id"`
 	FlatRateDetails        *FlatRateDetailsDTO `json:"flat_rate_details"`
 	File                   []int               `json:"file"`
@@ -52,14 +53,14 @@ type FlatRateResponseDTO struct {
 }
 
 type FlatRateDetailsDTO struct {
-	AllPaymentAmount           float64   `json:"all_payments_amount"`
-	AmountGracePeriod          float64   `json:"amount_grace_period"`
-	AmountGracePeriodDueDate   time.Time `json:"amount_grace_period_due_date"`
-	AmountGracePeriodAvailable bool      `json:"amount_grace_period_available"`
-	LeftToPayAmount            float64   `json:"left_to_pay_amount"`
+	AllPaymentAmount           decimal.Decimal `json:"all_payments_amount"`
+	AmountGracePeriod          decimal.Decimal `json:"amount_grace_period"`
+	AmountGracePeriodDueDate   time.Time       `json:"amount_grace_period_due_date"`
+	AmountGracePeriodAvailable bool            `json:"amount_grace_period_available"`
+	LeftToPayAmount            decimal.Decimal `json:"left_to_pay_amount"`
 
-	CourtCostsPaid            float64 `json:"court_costs_paid"`
-	CourtCostsLeftToPayAmount float64 `json:"court_costs_left_to_pay_amount"`
+	CourtCostsPaid            decimal.Decimal `json:"court_costs_paid"`
+	CourtCostsLeftToPayAmount decimal.Decimal `json:"court_costs_left_to_pay_amount"`
 }
 
 type FlatRateFilterDTO struct {

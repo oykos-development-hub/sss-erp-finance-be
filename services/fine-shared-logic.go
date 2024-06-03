@@ -1,7 +1,6 @@
 package services
 
 import (
-	"math"
 	"time"
 
 	"gitlab.sudovi.me/erp/finance-api/data"
@@ -9,6 +8,7 @@ import (
 	"gitlab.sudovi.me/erp/finance-api/errors"
 
 	"github.com/oykos-development-hub/celeritas"
+	"github.com/shopspring/decimal"
 	"github.com/upper/db/v4"
 )
 
@@ -45,36 +45,42 @@ func (h *FineSharedLogicServiceImpl) CalculateFineDetailsAndUpdateStatus(fineId 
 	for _, payment := range payments {
 		if data.FinePaymentStatus(payment.Status) == data.PaidFinePeymentStatus {
 			if data.FinePaymentMethod(payment.PaymentMethod) == data.CourtCostsFinePeymentMethod {
-				details.FeeCourtCostsPaid += payment.Amount
+				details.FeeCourtCostsPaid = details.FeeCourtCostsPaid.Add(payment.Amount)
 			} else {
-				details.FeeAllPaymentAmount += payment.Amount
+				details.FeeAllPaymentAmount = details.FeeAllPaymentAmount.Add(payment.Amount)
 			}
 		}
 	}
 
 	// calculate the rest of the fees
-	details.FeeLeftToPayAmount = fine.Amount - details.FeeAllPaymentAmount
+	details.FeeLeftToPayAmount = fine.Amount.Sub(details.FeeAllPaymentAmount)
 	if fine.CourtCosts != nil {
-		details.FeeCourtCostsLeftToPayAmount = *fine.CourtCosts - details.FeeCourtCostsPaid
+		details.FeeCourtCostsLeftToPayAmount = fine.CourtCosts.Sub(details.FeeCourtCostsPaid)
 	}
 
 	details.FeeAmountGracePeriodDueDate = fine.DecisionDate.AddDate(0, 0, data.FineGracePeriod)
-	details.FeeAmountGracePeriod = math.Ceil(float64(fine.Amount) * 2 / 3)
+	twoThirds := decimal.NewFromFloat(2.0).Div(decimal.NewFromFloat(3.0))
+	details.FeeAmountGracePeriod = fine.Amount.Mul(twoThirds).Ceil()
 
 	if time.Until(details.FeeAmountGracePeriodDueDate) > 0 {
 		details.FeeAmountGracePeriodAvailable = true
-		details.FeeLeftToPayAmount = details.FeeAmountGracePeriod - details.FeeAllPaymentAmount
+		details.FeeLeftToPayAmount = details.FeeAmountGracePeriod.Sub(details.FeeAllPaymentAmount)
 	}
 
 	var newStatus data.FineStatus
-	const tolerance = 0.00001
+	tolerance := decimal.NewFromFloat(0.00001)
 
-	feeLeftToPayAmount := math.Max(0, details.FeeLeftToPayAmount)
-	feeCourtCostsLeftToPayAmount := math.Max(0, details.FeeCourtCostsLeftToPayAmount)
+	zero := decimal.NewFromInt(0)
+	feeLeftToPayAmount := decimal.Max(zero, details.FeeLeftToPayAmount)
+	feeCourtCostsLeftToPayAmount := decimal.Max(zero, details.FeeCourtCostsLeftToPayAmount)
 
-	if math.Abs(feeLeftToPayAmount-0) < tolerance && math.Abs(feeCourtCostsLeftToPayAmount-0) < tolerance {
+	absFeeLeftToPayAmount := feeLeftToPayAmount.Abs()
+	absFeeCourtCostsLeftToPayAmount := feeCourtCostsLeftToPayAmount.Abs()
+
+	if absFeeLeftToPayAmount.Cmp(tolerance) < 0 && absFeeCourtCostsLeftToPayAmount.Cmp(tolerance) < 0 {
 		newStatus = data.PaidFineStatus
-	} else if (feeLeftToPayAmount > 0 || feeCourtCostsLeftToPayAmount > 0) && (details.FeeAllPaymentAmount > 0 || details.FeeCourtCostsPaid > 0) {
+	} else if (feeLeftToPayAmount.Cmp(decimal.NewFromInt(0)) > 0 || feeCourtCostsLeftToPayAmount.Cmp(decimal.NewFromInt(0)) > 0) &&
+		(details.FeeAllPaymentAmount.Cmp(decimal.NewFromInt(0)) > 0 || details.FeeCourtCostsPaid.Cmp(decimal.NewFromInt(0)) > 0) {
 		newStatus = data.PartFineStatus
 	} else {
 		newStatus = data.UnpaidFineStatus

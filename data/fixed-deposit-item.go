@@ -3,25 +3,26 @@ package data
 import (
 	"time"
 
+	"github.com/shopspring/decimal"
 	up "github.com/upper/db/v4"
 )
 
 // FixedDepositItem struct
 type FixedDepositItem struct {
-	ID                 int        `db:"id,omitempty"`
-	DepositID          int        `db:"deposit_id"`
-	CategoryID         int        `db:"category_id"`
-	TypeID             int        `db:"type_id"`
-	Unit               string     `db:"unit"`
-	Amount             float32    `db:"amount"`
-	Currency           string     `db:"currency"`
-	SerialNumber       string     `db:"serial_number"`
-	DateOfConfiscation *time.Time `db:"date_of_confiscation"`
-	CaseNumber         string     `db:"case_number"`
-	JudgeID            int        `db:"judge_id"`
-	FileID             int        `db:"file_id"`
-	CreatedAt          time.Time  `db:"created_at,omitempty"`
-	UpdatedAt          time.Time  `db:"updated_at"`
+	ID                 int             `db:"id,omitempty"`
+	DepositID          int             `db:"deposit_id"`
+	CategoryID         int             `db:"category_id"`
+	TypeID             int             `db:"type_id"`
+	Unit               string          `db:"unit"`
+	Amount             decimal.Decimal `db:"amount"`
+	Currency           string          `db:"currency"`
+	SerialNumber       string          `db:"serial_number"`
+	DateOfConfiscation *time.Time      `db:"date_of_confiscation"`
+	CaseNumber         string          `db:"case_number"`
+	JudgeID            int             `db:"judge_id"`
+	FileID             int             `db:"file_id"`
+	CreatedAt          time.Time       `db:"created_at,omitempty"`
+	UpdatedAt          time.Time       `db:"updated_at"`
 }
 
 // Table returns the table name

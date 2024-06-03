@@ -3,6 +3,7 @@ package dto
 import (
 	"time"
 
+	"github.com/shopspring/decimal"
 	"gitlab.sudovi.me/erp/finance-api/data"
 )
 
@@ -34,9 +35,9 @@ type InvoiceDTO struct {
 	TypeOfContract                int                    `json:"type_of_contract"`
 	SourceOfFunding               string                 `json:"source_of_funding"`
 	Supplier                      string                 `json:"supplier"`
-	GrossPrice                    float64                `json:"gross_price"`
+	GrossPrice                    decimal.Decimal        `json:"gross_price"`
 	MunicipalityID                int                    `json:"municipality_id"`
-	VATPrice                      float64                `json:"vat_price"`
+	VATPrice                      decimal.Decimal        `json:"vat_price"`
 	Registred                     *bool                  `json:"registred"`
 	SupplierID                    int                    `json:"supplier_id"`
 	TypeOfDecision                int                    `json:"type_of_decision"`
@@ -75,10 +76,10 @@ type InvoiceResponseDTO struct {
 	Supplier                      string                         `json:"supplier"`
 	Issuer                        string                         `json:"issuer"`
 	Status                        data.InvoiceStatus             `json:"status"`
-	GrossPrice                    float64                        `json:"gross_price"`
+	GrossPrice                    decimal.Decimal                `json:"gross_price"`
 	TypeOfDecision                int                            `json:"type_of_decision"`
-	VATPrice                      float64                        `json:"vat_price"`
-	NetPrice                      float64                        `json:"net_price"`
+	VATPrice                      decimal.Decimal                `json:"vat_price"`
+	NetPrice                      decimal.Decimal                `json:"net_price"`
 	SupplierID                    int                            `json:"supplier_id"`
 	OrderID                       int                            `json:"order_id"`
 	OrganizationUnitID            int                            `json:"organization_unit_id"`

@@ -3,6 +3,7 @@ package data
 import (
 	"time"
 
+	"github.com/shopspring/decimal"
 	up "github.com/upper/db/v4"
 )
 
@@ -65,18 +66,18 @@ type ObligationForAccounting struct {
 	Date       time.Time         `json:"date"`
 	Type       TypesOfObligation `json:"type"`
 	Title      string            `json:"title"`
-	Price      float64           `json:"price"`
+	Price      decimal.Decimal   `json:"price"`
 	Status     string            `json:"status"`
 	CreatedAt  time.Time         `json:"created_at"`
 }
 
 type PaymentOrdersForAccounting struct {
-	PaymentOrderID int       `json:"payment_order_id"`
-	SupplierID     *int      `json:"supplier_id"`
-	Date           time.Time `json:"date"`
-	Title          string    `json:"title"`
-	Price          float64   `json:"price"`
-	CreatedAt      time.Time `json:"created_at"`
+	PaymentOrderID int             `json:"payment_order_id"`
+	SupplierID     *int            `json:"supplier_id"`
+	Date           time.Time       `json:"date"`
+	Title          string          `json:"title"`
+	Price          decimal.Decimal `json:"price"`
+	CreatedAt      time.Time       `json:"created_at"`
 }
 
 type AnalyticalCardFilter struct {
@@ -90,28 +91,28 @@ type AnalyticalCardFilter struct {
 }
 
 type AnalyticalCard struct {
-	InitialState            float64               `json:"initial_state"`
-	SumCreditAmount         float64               `json:"sum_credit_amount"`
-	SumDebitAmount          float64               `json:"sum_debit_amount"`
-	SumCreditAmountInPeriod float64               `json:"sum_credit_amount_in_period"`
-	SumDebitAmountInPeriod  float64               `json:"sum_debit_amount_in_period"`
+	InitialState            decimal.Decimal       `json:"initial_state"`
+	SumCreditAmount         decimal.Decimal       `json:"sum_credit_amount"`
+	SumDebitAmount          decimal.Decimal       `json:"sum_debit_amount"`
+	SumCreditAmountInPeriod decimal.Decimal       `json:"sum_credit_amount_in_period"`
+	SumDebitAmountInPeriod  decimal.Decimal       `json:"sum_debit_amount_in_period"`
 	SupplierID              int                   `json:"supplier_id"`
 	Items                   []AnalyticalCardItems `json:"items"`
 }
 
 type AnalyticalCardItems struct {
-	ID             int       `json:"id"`
-	Title          string    `json:"title"`
-	CreditAmount   float64   `json:"credit_amount"`
-	DebitAmount    float64   `json:"debit_amount"`
-	Balance        float64   `json:"balance"`
-	DateOfBooking  time.Time `json:"date_of_booking"`
-	IDOfEntry      int       `json:"id_of_entry"`
-	Date           time.Time `json:"date"`
-	Type           string    `json:"type"`
-	DocumentNumber string    `json:"document_number"`
-	CreatedAt      time.Time `json:"created_at"`
-	UpdatedAt      time.Time `json:"updated_at"`
+	ID             int             `json:"id"`
+	Title          string          `json:"title"`
+	CreditAmount   decimal.Decimal `json:"credit_amount"`
+	DebitAmount    decimal.Decimal `json:"debit_amount"`
+	Balance        decimal.Decimal `json:"balance"`
+	DateOfBooking  time.Time       `json:"date_of_booking"`
+	IDOfEntry      int             `json:"id_of_entry"`
+	Date           time.Time       `json:"date"`
+	Type           string          `json:"type"`
+	DocumentNumber string          `json:"document_number"`
+	CreatedAt      time.Time       `json:"created_at"`
+	UpdatedAt      time.Time       `json:"updated_at"`
 }
 
 // Table returns the table name
@@ -416,8 +417,8 @@ func (t *AccountingEntry) GetReturnedEnforcedPaymentsForAccounting(filter Obliga
 
 func (t *AccountingEntry) GetAnalyticalCard(filter AnalyticalCardFilter) (*AnalyticalCard, error) {
 	var item AnalyticalCard
-	var sumDebitAmount float64
-	var sumCreditAmount float64
+	var sumDebitAmount decimal.Decimal
+	var sumCreditAmount decimal.Decimal
 
 	queryForInitialState := `SELECT SUM(a.credit_amount) - SUM(a.debit_amount) AS saldo 
     						 FROM accounting_entry_items a
@@ -450,7 +451,7 @@ func (t *AccountingEntry) GetAnalyticalCard(filter AnalyticalCardFilter) (*Analy
 	id := 0
 
 	for rows.Next() {
-		var balance *float64
+		var balance *decimal.Decimal
 		err = rows.Scan(&balance)
 
 		if err != nil {
@@ -458,7 +459,7 @@ func (t *AccountingEntry) GetAnalyticalCard(filter AnalyticalCardFilter) (*Analy
 		}
 
 		if balance == nil {
-			item.InitialState = 0
+			item.InitialState = decimal.NewFromInt(0)
 		} else {
 			item.InitialState = *balance
 		}
@@ -497,9 +498,9 @@ func (t *AccountingEntry) GetAnalyticalCard(filter AnalyticalCardFilter) (*Analy
 		}
 
 		analyticItem.ID = id
-		analyticItem.Balance = item.Items[id-1].Balance + analyticItem.CreditAmount - analyticItem.DebitAmount
-		sumDebitAmount += analyticItem.DebitAmount
-		sumCreditAmount += analyticItem.CreditAmount
+		analyticItem.Balance = item.Items[id-1].Balance.Add(analyticItem.CreditAmount).Sub(analyticItem.DebitAmount)
+		sumDebitAmount = sumDebitAmount.Add(analyticItem.DebitAmount)
+		sumCreditAmount = sumCreditAmount.Add(analyticItem.CreditAmount)
 
 		id++
 
@@ -510,7 +511,7 @@ func (t *AccountingEntry) GetAnalyticalCard(filter AnalyticalCardFilter) (*Analy
 	item.SumDebitAmountInPeriod = sumDebitAmount
 
 	item.SumDebitAmount = sumDebitAmount
-	item.SumCreditAmount = sumCreditAmount + item.InitialState
+	item.SumCreditAmount = sumCreditAmount.Add(item.InitialState)
 
 	return &item, nil
 }

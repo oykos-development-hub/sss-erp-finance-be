@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/lib/pq"
+	"github.com/shopspring/decimal"
 	up "github.com/upper/db/v4"
 )
 
@@ -35,7 +36,7 @@ type PropBenConf struct {
 	Subject                string            `db:"subject"`
 	JMBG                   string            `db:"jmbg"`
 	Residence              string            `db:"residence"`
-	Amount                 float64           `db:"amount"`
+	Amount                 decimal.Decimal   `db:"amount"`
 	PaymentReferenceNumber string            `db:"payment_reference_number"`
 	DebitReferenceNumber   string            `db:"debit_reference_number"`
 	AccountID              int               `db:"account_id"`
@@ -43,7 +44,7 @@ type PropBenConf struct {
 	PaymentDeadlineDate    time.Time         `db:"payment_deadline_date"`
 	Description            string            `db:"description"`
 	Status                 PropBenConfStatus `db:"status"`
-	CourtCosts             *float64          `db:"court_costs"`
+	CourtCosts             *decimal.Decimal  `db:"court_costs"`
 	CourtAccountID         *int              `db:"court_account_id"`
 	File                   pq.Int64Array     `db:"file"`
 	CreatedAt              time.Time         `db:"created_at,omitempty"`

@@ -3,6 +3,7 @@ package dto
 import (
 	"time"
 
+	"github.com/shopspring/decimal"
 	"gitlab.sudovi.me/erp/finance-api/data"
 )
 
@@ -16,17 +17,17 @@ type EnforcedPaymentDTO struct {
 	SAPID              *string                    `json:"sap_id"`
 	Registred          *bool                      `json:"registred"`
 	RegistredReturn    *bool                      `json:"registred_return"`
-	ReturnAmount       *float64                   `json:"return_amount"`
+	ReturnAmount       *decimal.Decimal           `json:"return_amount"`
 	Status             data.EnforcedPaymentStatus `json:"status"`
 	ReturnFileID       *int                       `json:"return_file_id"`
 	Description        string                     `json:"description"`
 	DateOfSAP          *time.Time                 `json:"date_of_sap"`
 	ReturnDate         *time.Time                 `json:"return_date"`
 	Items              []EnforcedPaymentItemDTO   `json:"items"`
-	Amount             float64                    `json:"amount"`
-	AmountForLawyer    float64                    `json:"amount_for_lawyer"`
-	AmountForAgent     float64                    `json:"amount_for_agent"`
-	AmountForBank      float64                    `json:"amount_for_bank"`
+	Amount             decimal.Decimal            `json:"amount"`
+	AmountForLawyer    decimal.Decimal            `json:"amount_for_lawyer"`
+	AmountForAgent     decimal.Decimal            `json:"amount_for_agent"`
+	AmountForBank      decimal.Decimal            `json:"amount_for_bank"`
 	AgentID            int                        `json:"agent_id"`
 	ExecutionNumber    string                     `json:"execution_number"`
 	FileID             *int                       `json:"file_id"`
@@ -48,12 +49,12 @@ type EnforcedPaymentResponseDTO struct {
 	ReturnFileID       *int                             `json:"return_file_id"`
 	DateOfSAP          *time.Time                       `json:"date_of_sap"`
 	ReturnDate         *time.Time                       `json:"return_date"`
-	ReturnAmount       *float64                         `json:"return_amount"`
+	ReturnAmount       *decimal.Decimal                 `json:"return_amount"`
 	Items              []EnforcedPaymentItemResponseDTO `json:"items"`
-	Amount             float64                          `json:"amount"`
-	AmountForLawyer    float64                          `json:"amount_for_lawyer"`
-	AmountForAgent     float64                          `json:"amount_for_agent"`
-	AmountForBank      float64                          `json:"amount_for_bank"`
+	Amount             decimal.Decimal                  `json:"amount"`
+	AmountForLawyer    decimal.Decimal                  `json:"amount_for_lawyer"`
+	AmountForAgent     decimal.Decimal                  `json:"amount_for_agent"`
+	AmountForBank      decimal.Decimal                  `json:"amount_for_bank"`
 	FileID             *int                             `json:"file_id"`
 	AgentID            int                              `json:"agent_id"`
 	ExecutionNumber    string                           `json:"execution_number"`

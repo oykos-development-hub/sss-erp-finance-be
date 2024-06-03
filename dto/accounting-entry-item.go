@@ -3,44 +3,45 @@ package dto
 import (
 	"time"
 
+	"github.com/shopspring/decimal"
 	"gitlab.sudovi.me/erp/finance-api/data"
 )
 
 type AccountingEntryItemDTO struct {
-	Title                   string    `json:"title"`
-	EntryID                 int       `json:"entry_id"`
-	SupplierID              int       `json:"supplier_id"`
-	AccountID               int       `json:"account_id"`
-	CreditAmount            float64   `json:"credit_amount"`
-	DebitAmount             float64   `json:"debit_amount"`
-	InvoiceID               *int      `json:"invoice_id"`
-	SalaryID                *int      `json:"salary_id"`
-	PaymentOrderID          *int      `json:"payment_order_id"`
-	EnforcedPaymentID       *int      `json:"enforced_payment_id"`
-	ReturnEnforcedPaymentID *int      `json:"return_enforced_payment_id"`
-	Type                    string    `json:"type"`
-	Date                    time.Time `json:"date"`
+	Title                   string          `json:"title"`
+	EntryID                 int             `json:"entry_id"`
+	SupplierID              int             `json:"supplier_id"`
+	AccountID               int             `json:"account_id"`
+	CreditAmount            decimal.Decimal `json:"credit_amount"`
+	DebitAmount             decimal.Decimal `json:"debit_amount"`
+	InvoiceID               *int            `json:"invoice_id"`
+	SalaryID                *int            `json:"salary_id"`
+	PaymentOrderID          *int            `json:"payment_order_id"`
+	EnforcedPaymentID       *int            `json:"enforced_payment_id"`
+	ReturnEnforcedPaymentID *int            `json:"return_enforced_payment_id"`
+	Type                    string          `json:"type"`
+	Date                    time.Time       `json:"date"`
 }
 
 type AccountingEntryItemResponseDTO struct {
-	ID                      int       `json:"id"`
-	Title                   string    `json:"title"`
-	SupplierID              int       `json:"supplier_id"`
-	EntryID                 int       `json:"entry_id"`
-	EntryNumber             string    `json:"entry_number"`
-	EntryDate               time.Time `json:"entry_date"`
-	AccountID               int       `json:"account_id"`
-	CreditAmount            float64   `json:"credit_amount"`
-	DebitAmount             float64   `json:"debit_amount"`
-	InvoiceID               *int      `json:"invoice_id"`
-	SalaryID                *int      `json:"salary_id"`
-	PaymentOrderID          *int      `json:"payment_order_id"`
-	EnforcedPaymentID       *int      `json:"enforced_payment_id"`
-	ReturnEnforcedPaymentID *int      `json:"return_enforced_payment_id"`
-	Type                    string    `json:"type"`
-	Date                    time.Time `json:"date"`
-	CreatedAt               time.Time `json:"created_at"`
-	UpdatedAt               time.Time `json:"updated_at"`
+	ID                      int             `json:"id"`
+	Title                   string          `json:"title"`
+	SupplierID              int             `json:"supplier_id"`
+	EntryID                 int             `json:"entry_id"`
+	EntryNumber             string          `json:"entry_number"`
+	EntryDate               time.Time       `json:"entry_date"`
+	AccountID               int             `json:"account_id"`
+	CreditAmount            decimal.Decimal `json:"credit_amount"`
+	DebitAmount             decimal.Decimal `json:"debit_amount"`
+	InvoiceID               *int            `json:"invoice_id"`
+	SalaryID                *int            `json:"salary_id"`
+	PaymentOrderID          *int            `json:"payment_order_id"`
+	EnforcedPaymentID       *int            `json:"enforced_payment_id"`
+	ReturnEnforcedPaymentID *int            `json:"return_enforced_payment_id"`
+	Type                    string          `json:"type"`
+	Date                    time.Time       `json:"date"`
+	CreatedAt               time.Time       `json:"created_at"`
+	UpdatedAt               time.Time       `json:"updated_at"`
 }
 
 type AccountingEntryItemFilterDTO struct {

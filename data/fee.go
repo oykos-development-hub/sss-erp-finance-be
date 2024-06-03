@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/lib/pq"
+	"github.com/shopspring/decimal"
 	up "github.com/upper/db/v4"
 )
 
@@ -30,24 +31,24 @@ const (
 
 // Fee struct
 type Fee struct {
-	ID                     int           `db:"id,omitempty"`
-	FeeTypeID              FeeType       `db:"fee_type_id"`
-	FeeSubcategoryID       FeeCategory   `db:"fee_subcategory_id"`
-	DecisionNumber         string        `db:"decision_number"`
-	DecisionDate           time.Time     `db:"decision_date"`
-	Subject                string        `db:"subject"`
-	JMBG                   string        `db:"jmbg"`
-	Amount                 float64       `db:"amount"`
-	PaymentReferenceNumber string        `db:"payment_reference_number"`
-	DebitReferenceNumber   string        `db:"debit_reference_number"`
-	ExecutionDate          time.Time     `db:"execution_date"`
-	PaymentDeadlineDate    time.Time     `db:"payment_deadline_date"`
-	Description            string        `db:"description"`
-	Status                 FeeStatus     `db:"status"`
-	CourtAccountID         *int          `db:"court_account_id"`
-	File                   pq.Int64Array `db:"file"`
-	CreatedAt              time.Time     `db:"created_at,omitempty"`
-	UpdatedAt              time.Time     `db:"updated_at"`
+	ID                     int             `db:"id,omitempty"`
+	FeeTypeID              FeeType         `db:"fee_type_id"`
+	FeeSubcategoryID       FeeCategory     `db:"fee_subcategory_id"`
+	DecisionNumber         string          `db:"decision_number"`
+	DecisionDate           time.Time       `db:"decision_date"`
+	Subject                string          `db:"subject"`
+	JMBG                   string          `db:"jmbg"`
+	Amount                 decimal.Decimal `db:"amount"`
+	PaymentReferenceNumber string          `db:"payment_reference_number"`
+	DebitReferenceNumber   string          `db:"debit_reference_number"`
+	ExecutionDate          time.Time       `db:"execution_date"`
+	PaymentDeadlineDate    time.Time       `db:"payment_deadline_date"`
+	Description            string          `db:"description"`
+	Status                 FeeStatus       `db:"status"`
+	CourtAccountID         *int            `db:"court_account_id"`
+	File                   pq.Int64Array   `db:"file"`
+	CreatedAt              time.Time       `db:"created_at,omitempty"`
+	UpdatedAt              time.Time       `db:"updated_at"`
 }
 
 // Table returns the table name

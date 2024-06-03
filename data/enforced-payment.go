@@ -3,6 +3,7 @@ package data
 import (
 	"time"
 
+	"github.com/shopspring/decimal"
 	up "github.com/upper/db/v4"
 )
 
@@ -26,15 +27,15 @@ type EnforcedPayment struct {
 	Status             EnforcedPaymentStatus `db:"status"`
 	Registred          *bool                 `db:"registred,omitempty"`
 	RegistredReturn    *bool                 `db:"registred_return,omitempty"`
-	ReturnAmount       *float64              `db:"return_amount"`
+	ReturnAmount       *decimal.Decimal      `db:"return_amount"`
 	DateOfSAP          *time.Time            `db:"date_of_sap"`
 	FileID             *int                  `db:"file_id"`
 	ReturnFileID       *int                  `db:"return_file_id"`
 	ReturnDate         *time.Time            `db:"return_date"`
-	Amount             float64               `db:"amount"`
-	AmountForLawyer    float64               `db:"amount_for_lawyer"`
-	AmountForAgent     float64               `db:"amount_for_agent"`
-	AmountForBank      float64               `db:"amount_for_bank"`
+	Amount             decimal.Decimal       `db:"amount"`
+	AmountForLawyer    decimal.Decimal       `db:"amount_for_lawyer"`
+	AmountForAgent     decimal.Decimal       `db:"amount_for_agent"`
+	AmountForBank      decimal.Decimal       `db:"amount_for_bank"`
 	AgentID            int                   `db:"agent_id"`
 	ExecutionNumber    string                `db:"execution_number"`
 	Description        string                `db:"description"`

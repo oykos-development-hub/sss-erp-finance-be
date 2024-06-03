@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/lib/pq"
+	"github.com/shopspring/decimal"
 	"gitlab.sudovi.me/erp/finance-api/data"
 )
 
@@ -15,7 +16,7 @@ type FeeDTO struct {
 	Subject                string           `json:"subject"`
 	JMBG                   string           `json:"jmbg" validate:"required"`
 	Residence              string           `json:"residence"`
-	Amount                 float64          `json:"amount"`
+	Amount                 decimal.Decimal  `json:"amount"`
 	PaymentReferenceNumber string           `json:"payment_reference_number"`
 	DebitReferenceNumber   string           `json:"debit_reference_number"`
 	ExecutionDate          time.Time        `json:"execution_date"`
@@ -35,7 +36,7 @@ type FeeResponseDTO struct {
 	Subject                string           `json:"subject"`
 	JMBG                   string           `json:"jmbg"`
 	Residence              string           `json:"residence"`
-	Amount                 float64          `json:"amount"`
+	Amount                 decimal.Decimal  `json:"amount"`
 	PaymentReferenceNumber string           `json:"payment_reference_number"`
 	DebitReferenceNumber   string           `json:"debit_reference_number"`
 	ExecutionDate          time.Time        `json:"execution_date"`
@@ -50,8 +51,8 @@ type FeeResponseDTO struct {
 }
 
 type FeeDetailsDTO struct {
-	FeeLeftToPayAmount  float64 `json:"fee_left_to_pay_amount"`
-	FeeAllPaymentAmount float64 `json:"fee_all_payments_amount"`
+	FeeLeftToPayAmount  decimal.Decimal `json:"fee_left_to_pay_amount"`
+	FeeAllPaymentAmount decimal.Decimal `json:"fee_all_payments_amount"`
 }
 
 type FeeFilterDTO struct {

@@ -3,34 +3,35 @@ package dto
 import (
 	"time"
 
+	"github.com/shopspring/decimal"
 	"gitlab.sudovi.me/erp/finance-api/data"
 )
 
 type ArticleDTO struct {
-	Title         string  `json:"title"`
-	NetPrice      float64 `json:"net_price"`
-	VatPrice      float64 `json:"vat_price"`
-	VatPercentage int     `json:"vat_percentage"`
-	Description   string  `json:"description"`
-	Amount        int     `json:"amount"`
-	InvoiceID     int     `json:"invoice_id"`
-	AccountID     int     `json:"account_id"`
-	CostAccountID int     `json:"cost_account_id"`
+	Title         string          `json:"title"`
+	NetPrice      decimal.Decimal `json:"net_price"`
+	VatPrice      decimal.Decimal `json:"vat_price"`
+	VatPercentage int             `json:"vat_percentage"`
+	Description   string          `json:"description"`
+	Amount        int             `json:"amount"`
+	InvoiceID     int             `json:"invoice_id"`
+	AccountID     int             `json:"account_id"`
+	CostAccountID int             `json:"cost_account_id"`
 }
 
 type ArticleResponseDTO struct {
-	ID            int       `json:"id"`
-	Title         string    `json:"title"`
-	NetPrice      float64   `json:"net_price"`
-	VatPrice      float64   `json:"vat_price"`
-	Amount        int       `json:"amount"`
-	VatPercentage int       `json:"vat_percentage"`
-	Description   string    `json:"description"`
-	InvoiceID     int       `json:"invoice_id"`
-	AccountID     int       `json:"account_id"`
-	CostAccountID int       `json:"cost_account_id"`
-	CreatedAt     time.Time `json:"created_at"`
-	UpdatedAt     time.Time `json:"updated_at"`
+	ID            int             `json:"id"`
+	Title         string          `json:"title"`
+	NetPrice      decimal.Decimal `json:"net_price"`
+	VatPrice      decimal.Decimal `json:"vat_price"`
+	Amount        int             `json:"amount"`
+	VatPercentage int             `json:"vat_percentage"`
+	Description   string          `json:"description"`
+	InvoiceID     int             `json:"invoice_id"`
+	AccountID     int             `json:"account_id"`
+	CostAccountID int             `json:"cost_account_id"`
+	CreatedAt     time.Time       `json:"created_at"`
+	UpdatedAt     time.Time       `json:"updated_at"`
 }
 
 type ArticleFilterDTO struct {

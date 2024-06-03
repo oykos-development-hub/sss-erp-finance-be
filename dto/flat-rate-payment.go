@@ -3,13 +3,14 @@ package dto
 import (
 	"time"
 
+	"github.com/shopspring/decimal"
 	"gitlab.sudovi.me/erp/finance-api/data"
 )
 
 type FlatRatePaymentDTO struct {
 	FlatRateID             int                         `json:"flat_rate_id" validate:"required"`
 	PaymentMethod          data.FlatRatePaymentMethod  `json:"payment_method" validate:"required,oneof=1 2 3"`
-	Amount                 float64                     `json:"amount" validate:"required"`
+	Amount                 decimal.Decimal             `json:"amount" validate:"required"`
 	PaymentDate            time.Time                   `json:"payment_date"`
 	PaymentDueDate         time.Time                   `json:"payment_due_date"`
 	ReceiptNumber          string                      `json:"receipt_number"`
@@ -22,7 +23,7 @@ type FlatRatePaymentResponseDTO struct {
 	ID                     int                        `json:"id"`
 	FlatRateID             int                        `json:"flat_rate_id"`
 	PaymentMethod          data.FlatRatePaymentMethod `json:"payment_method"`
-	Amount                 float64                    `json:"amount"`
+	Amount                 decimal.Decimal            `json:"amount"`
 	PaymentDate            time.Time                  `json:"payment_date"`
 	PaymentDueDate         time.Time                  `json:"payment_due_date"`
 	ReceiptNumber          string                     `json:"receipt_number"`

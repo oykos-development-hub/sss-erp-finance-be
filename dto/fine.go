@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/lib/pq"
+	"github.com/shopspring/decimal"
 	"gitlab.sudovi.me/erp/finance-api/data"
 )
 
@@ -14,7 +15,7 @@ type FineDTO struct {
 	Subject                string           `json:"subject"`
 	JMBG                   string           `json:"jmbg" validate:"required"`
 	Residence              string           `json:"residence"`
-	Amount                 float64          `json:"amount"`
+	Amount                 decimal.Decimal  `json:"amount"`
 	PaymentReferenceNumber string           `json:"payment_reference_number"`
 	DebitReferenceNumber   string           `json:"debit_reference_number"`
 	AccountID              int              `json:"account_id"`
@@ -22,7 +23,7 @@ type FineDTO struct {
 	PaymentDeadlineDate    time.Time        `json:"payment_deadline_date"`
 	Description            string           `json:"description"`
 	Status                 *data.FineStatus `json:"status"`
-	CourtCosts             *float64         `json:"court_costs"`
+	CourtCosts             *decimal.Decimal `json:"court_costs"`
 	CourtAccountID         *int             `json:"court_account_id"`
 	File                   pq.Int64Array    `json:"file"`
 }
@@ -35,7 +36,7 @@ type FineResponseDTO struct {
 	Subject                string             `json:"subject"`
 	JMBG                   string             `json:"jmbg"`
 	Residence              string             `json:"residence"`
-	Amount                 float64            `json:"amount"`
+	Amount                 decimal.Decimal    `json:"amount"`
 	PaymentReferenceNumber string             `json:"payment_reference_number"`
 	DebitReferenceNumber   string             `json:"debit_reference_number"`
 	AccountID              int                `json:"account_id"`
@@ -43,7 +44,7 @@ type FineResponseDTO struct {
 	PaymentDeadlineDate    time.Time          `json:"payment_deadline_date"`
 	Description            string             `json:"description"`
 	Status                 data.FineStatus    `json:"status"`
-	CourtCosts             *float64           `json:"court_costs"`
+	CourtCosts             *decimal.Decimal   `json:"court_costs"`
 	CourtAccountID         *int               `json:"court_account_id"`
 	FineFeeDetailsDTO      *FineFeeDetailsDTO `json:"fine_fee_details"`
 	File                   []int              `json:"file"`
@@ -52,14 +53,14 @@ type FineResponseDTO struct {
 }
 
 type FineFeeDetailsDTO struct {
-	FeeAllPaymentAmount           float64   `json:"fee_all_payments_amount"`
-	FeeAmountGracePeriod          float64   `json:"fee_amount_grace_period"`
-	FeeAmountGracePeriodDueDate   time.Time `json:"fee_amount_grace_period_due_date"`
-	FeeAmountGracePeriodAvailable bool      `json:"fee_amount_grace_period_available"`
-	FeeLeftToPayAmount            float64   `json:"fee_left_to_pay_amount"`
+	FeeAllPaymentAmount           decimal.Decimal `json:"fee_all_payments_amount"`
+	FeeAmountGracePeriod          decimal.Decimal `json:"fee_amount_grace_period"`
+	FeeAmountGracePeriodDueDate   time.Time       `json:"fee_amount_grace_period_due_date"`
+	FeeAmountGracePeriodAvailable bool            `json:"fee_amount_grace_period_available"`
+	FeeLeftToPayAmount            decimal.Decimal `json:"fee_left_to_pay_amount"`
 
-	FeeCourtCostsPaid            float64 `json:"fee_court_costs_paid"`
-	FeeCourtCostsLeftToPayAmount float64 `json:"fee_court_costs_left_to_pay_amount"`
+	FeeCourtCostsPaid            decimal.Decimal `json:"fee_court_costs_paid"`
+	FeeCourtCostsLeftToPayAmount decimal.Decimal `json:"fee_court_costs_left_to_pay_amount"`
 }
 
 type FineFilterDTO struct {

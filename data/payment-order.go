@@ -3,27 +3,28 @@ package data
 import (
 	"time"
 
+	"github.com/shopspring/decimal"
 	up "github.com/upper/db/v4"
 )
 
 type PaymentOrder struct {
-	ID                 int        `db:"id,omitempty"`
-	OrganizationUnitID int        `db:"organization_unit_id"`
-	SupplierID         int        `db:"supplier_id"`
-	BankAccount        string     `db:"bank_account"`
-	DateOfPayment      time.Time  `db:"date_of_payment"`
-	DateOfOrder        *time.Time `db:"date_of_order"`
-	IDOfStatement      *int       `db:"id_of_statement,omitempty"`
-	SAPID              *string    `db:"sap_id"`
-	Registred          *bool      `db:"registred,omitempty"`
-	DateOfSAP          *time.Time `db:"date_of_sap"`
-	SourceOfFunding    string     `db:"source_of_funding"`
-	FileID             *int       `db:"file_id"`
-	Amount             float64    `db:"amount"`
-	Description        string     `db:"description"`
-	Status             *string    `db:"status,omitempty"`
-	CreatedAt          time.Time  `db:"created_at,omitempty"`
-	UpdatedAt          time.Time  `db:"updated_at"`
+	ID                 int             `db:"id,omitempty"`
+	OrganizationUnitID int             `db:"organization_unit_id"`
+	SupplierID         int             `db:"supplier_id"`
+	BankAccount        string          `db:"bank_account"`
+	DateOfPayment      time.Time       `db:"date_of_payment"`
+	DateOfOrder        *time.Time      `db:"date_of_order"`
+	IDOfStatement      *int            `db:"id_of_statement,omitempty"`
+	SAPID              *string         `db:"sap_id"`
+	Registred          *bool           `db:"registred,omitempty"`
+	DateOfSAP          *time.Time      `db:"date_of_sap"`
+	SourceOfFunding    string          `db:"source_of_funding"`
+	FileID             *int            `db:"file_id"`
+	Amount             decimal.Decimal `db:"amount"`
+	Description        string          `db:"description"`
+	Status             *string         `db:"status,omitempty"`
+	CreatedAt          time.Time       `db:"created_at,omitempty"`
+	UpdatedAt          time.Time       `db:"updated_at"`
 }
 
 type ObligationsFilter struct {
@@ -43,8 +44,8 @@ type Obligation struct {
 	SalaryAdditionalExpenseID *int              `json:"salary_additional_expense_id"`
 	Type                      TypesOfObligation `json:"type"`
 	Title                     string            `json:"title"`
-	TotalPrice                float64           `json:"total_price"`
-	RemainPrice               float64           `json:"remain_price"`
+	TotalPrice                decimal.Decimal   `json:"total_price"`
+	RemainPrice               decimal.Decimal   `json:"remain_price"`
 	Status                    string            `json:"status"`
 	CreatedAt                 time.Time         `json:"created_at"`
 }
@@ -188,7 +189,7 @@ func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation
 
 		for rows.Next() {
 			var obligation Obligation
-			var paid *float64
+			var paid *decimal.Decimal
 			var invoiceNumber *string
 			err = rows.Scan(&obligation.InvoiceID, &obligation.TotalPrice, &obligation.Title, &invoiceNumber, &obligation.Status, &obligation.CreatedAt)
 
@@ -210,7 +211,7 @@ func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation
 				}
 
 				if paid != nil {
-					obligation.RemainPrice = obligation.TotalPrice - *paid
+					obligation.RemainPrice = obligation.TotalPrice.Sub(*paid)
 				} else {
 					obligation.RemainPrice = obligation.TotalPrice
 				}
@@ -236,7 +237,7 @@ func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation
 
 		for rows.Next() {
 			var obligation Obligation
-			var paid *float64
+			var paid *decimal.Decimal
 			var title string
 			err = rows.Scan(&obligation.AdditionalExpenseID, &obligation.TotalPrice, &obligation.Title, &obligation.Type, &title, &obligation.Status, &obligation.CreatedAt)
 
@@ -258,7 +259,7 @@ func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation
 				}
 
 				if paid != nil {
-					obligation.RemainPrice = obligation.TotalPrice - *paid
+					obligation.RemainPrice = obligation.TotalPrice.Sub(*paid)
 				} else {
 					obligation.RemainPrice = obligation.TotalPrice
 				}
@@ -285,7 +286,7 @@ func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation
 
 		for rows.Next() {
 			var obligation Obligation
-			var paid *float64
+			var paid *decimal.Decimal
 			var title string
 			err = rows.Scan(&obligation.SalaryAdditionalExpenseID, &obligation.TotalPrice, &title, &obligation.Status, &obligation.CreatedAt, &obligation.Title)
 
@@ -307,7 +308,7 @@ func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation
 				}
 
 				if paid != nil {
-					obligation.RemainPrice = obligation.TotalPrice - *paid
+					obligation.RemainPrice = obligation.TotalPrice.Sub(*paid)
 				} else {
 					obligation.RemainPrice = obligation.TotalPrice
 				}
