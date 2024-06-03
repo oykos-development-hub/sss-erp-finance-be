@@ -35,6 +35,7 @@ type BudgetRequestFilterDTO struct {
 	BudgetID           *int              `json:"budget_id"`
 	RequestType        *data.RequestType `json:"request_type"`
 	RequestTypes       *[]interface{}    `json:"request_types"`
+	Statuses           []interface{}     `json:"statuses"`
 }
 
 func (dto BudgetRequestDTO) ToBudgetRequest() *data.BudgetRequest {
