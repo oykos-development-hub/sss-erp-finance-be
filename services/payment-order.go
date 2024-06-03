@@ -388,7 +388,7 @@ func (h *PaymentOrderServiceImpl) GetAllObligations(filter dto.GetObligationsFil
 					return nil, nil, err
 				}
 
-				if paymentOrder.Status == nil && *paymentOrder.Status != "Storniran" {
+				if paymentOrder.Status == nil || *paymentOrder.Status != "Storniran" {
 					accountMap[item.SourceAccountID] -= item.Amount
 				}
 			}
