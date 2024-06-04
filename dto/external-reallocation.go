@@ -7,6 +7,7 @@ import (
 )
 
 type ExternalReallocationDTO struct {
+	ID                            int                           `json:"id"`
 	Title                         string                        `json:"title"`
 	Status                        data.ReallocationStatus       `json:"status"`
 	SourceOrganizationUnitID      int                           `json:"source_organization_unit_id"`

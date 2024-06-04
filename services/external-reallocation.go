@@ -159,7 +159,7 @@ func (h *ExternalReallocationServiceImpl) GetExternalReallocationList(filter dto
 func (h *ExternalReallocationServiceImpl) AcceptOUExternalReallocation(input dto.ExternalReallocationDTO) (*dto.ExternalReallocationResponseDTO, error) {
 	dataToInsert := input.ToExternalReallocation()
 
-	var id int
+	id := input.ID
 	err := data.Upper.Tx(func(tx up.Session) error {
 		var err error
 		err = h.repo.AcceptOUExternalReallocation(tx, *dataToInsert)
