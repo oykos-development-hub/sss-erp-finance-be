@@ -457,6 +457,8 @@ type InternalReallocationItemHandler interface {
 type ExternalReallocationHandler interface {
 	CreateExternalReallocation(w http.ResponseWriter, r *http.Request)
 	DeleteExternalReallocation(w http.ResponseWriter, r *http.Request)
+	AcceptOUExternalReallocation(w http.ResponseWriter, r *http.Request)
+	RejectOUExternalReallocation(w http.ResponseWriter, r *http.Request)
 	GetExternalReallocationById(w http.ResponseWriter, r *http.Request)
 	GetExternalReallocationList(w http.ResponseWriter, r *http.Request)
 }

@@ -92,3 +92,38 @@ func (h *externalreallocationHandlerImpl) GetExternalReallocationList(w http.Res
 
 	_ = h.App.WriteDataResponseWithTotal(w, http.StatusOK, "", res, int(*total))
 }
+
+func (h *externalreallocationHandlerImpl) AcceptOUExternalReallocation(w http.ResponseWriter, r *http.Request) {
+	var input dto.ExternalReallocationDTO
+	err := h.App.ReadJSON(w, r, &input)
+	if err != nil {
+		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
+		return
+	}
+
+	validator := h.App.Validator().ValidateStruct(&input)
+	if !validator.Valid() {
+		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
+		return
+	}
+
+	res, err := h.service.AcceptOUExternalReallocation(input)
+	if err != nil {
+		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
+		return
+	}
+
+	_ = h.App.WriteDataResponse(w, http.StatusOK, "ExternalReallocation accepted successfuly", res)
+}
+
+func (h *externalreallocationHandlerImpl) RejectOUExternalReallocation(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.Atoi(chi.URLParam(r, "id"))
+
+	err := h.service.RejectOUExternalReallocation(id)
+	if err != nil {
+		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
+		return
+	}
+
+	_ = h.App.WriteSuccessResponse(w, http.StatusOK, "ExternalReallocation rejected successfuly")
+}

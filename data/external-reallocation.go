@@ -120,3 +120,29 @@ func (t *ExternalReallocation) Insert(tx up.Session, m ExternalReallocation) (in
 
 	return id, nil
 }
+
+func (t *ExternalReallocation) AcceptOUExternalReallocation(tx up.Session, m ExternalReallocation) error {
+	query := `update external_reallocations
+			  set status = $1, date_of_action_dest_org_unit =$2, accepted_by = $3, destination_org_unit_file_id = $4
+			  where id = $5`
+
+	_, err := Upper.SQL().Query(query, ReallocationStatusOUAccept, m.DateOfActionDestOrgUnit, m.AcceptedBy, m.DestinationOrgUnitFileID, m.ID)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (t *ExternalReallocation) RejectOUExternalReallocation(id int) error {
+	query := `update external_reallocations
+			  set status = $1 where id = $2`
+
+	_, err := Upper.SQL().Query(query, ReallocationStatusOUDecline, id)
+
+	if err != nil {
+		return err
+	}
+	return nil
+}

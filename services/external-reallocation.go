@@ -155,3 +155,74 @@ func (h *ExternalReallocationServiceImpl) GetExternalReallocationList(filter dto
 
 	return response, total, nil
 }
+
+func (h *ExternalReallocationServiceImpl) AcceptOUExternalReallocation(input dto.ExternalReallocationDTO) (*dto.ExternalReallocationResponseDTO, error) {
+	dataToInsert := input.ToExternalReallocation()
+
+	var id int
+	err := data.Upper.Tx(func(tx up.Session) error {
+		var err error
+		err = h.repo.AcceptOUExternalReallocation(tx, *dataToInsert)
+		if err != nil {
+			return errors.ErrInternalServer
+		}
+
+		for _, item := range input.Items {
+			itemToInsert := item.ToExternalReallocationItem()
+			itemToInsert.ReallocationID = id
+
+			_, err = h.itemsRepo.Insert(tx, *itemToInsert)
+
+			if err != nil {
+				return errors.ErrInternalServer
+			}
+
+			if item.DestinationAccountID != 0 {
+
+				currentBudget, err := h.currentBudgetRepo.GetBy(*up.And(
+					up.Cond{"budget_id": dataToInsert.BudgetID},
+					up.Cond{"unit_id": dataToInsert.DestinationOrganizationUnitID},
+					up.Cond{"account_id": itemToInsert.DestinationAccountID},
+				))
+
+				if err != nil {
+					return errors.ErrInternalServer
+				}
+
+				value := currentBudget.Actual.Sub(itemToInsert.Amount)
+
+				err = h.currentBudgetRepo.UpdateActual(currentBudget.ID, value)
+
+				if err != nil {
+					return errors.ErrInternalServer
+				}
+			}
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return nil, errors.ErrInternalServer
+	}
+
+	dataToInsert, err = h.repo.Get(id)
+	if err != nil {
+		return nil, errors.ErrInternalServer
+	}
+
+	res := dto.ToExternalReallocationResponseDTO(*dataToInsert)
+
+	return &res, nil
+}
+
+func (h *ExternalReallocationServiceImpl) RejectOUExternalReallocation(id int) error {
+
+	err := h.repo.RejectOUExternalReallocation(id)
+	if err != nil {
+		h.App.ErrorLog.Println(err)
+		return errors.ErrInternalServer
+	}
+
+	return nil
+}

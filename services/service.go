@@ -431,6 +431,10 @@ type InternalReallocationItemService interface {
 type ExternalReallocationService interface {
 	CreateExternalReallocation(input dto.ExternalReallocationDTO) (*dto.ExternalReallocationResponseDTO, error)
 	DeleteExternalReallocation(id int) error
+
+	AcceptOUExternalReallocation(input dto.ExternalReallocationDTO) (*dto.ExternalReallocationResponseDTO, error)
+	RejectOUExternalReallocation(id int) error
+
 	GetExternalReallocation(id int) (*dto.ExternalReallocationResponseDTO, error)
 	GetExternalReallocationList(filter dto.ExternalReallocationFilterDTO) ([]dto.ExternalReallocationResponseDTO, *uint64, error)
 }
