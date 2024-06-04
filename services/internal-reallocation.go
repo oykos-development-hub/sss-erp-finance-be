@@ -8,6 +8,7 @@ import (
 	"gitlab.sudovi.me/erp/finance-api/errors"
 
 	"github.com/oykos-development-hub/celeritas"
+	"github.com/shopspring/decimal"
 	up "github.com/upper/db/v4"
 )
 
@@ -48,20 +49,21 @@ func (h *InternalReallocationServiceImpl) CreateInternalReallocation(input dto.I
 				return errors.ErrInternalServer
 			}
 
-			currentBudget, err := h.currentBudgetRepo.GetBy(*up.And(
-				up.Cond{"budget_id": dataToInsert.BudgetID},
-				up.Cond{"unit_id": dataToInsert.OrganizationUnitID},
-				up.Cond{"account_id": itemToInsert.SourceAccountID},
-			))
-
-			if err != nil {
-				return errors.ErrInternalServer
-			}
-
 			if item.SourceAccountID != 0 {
-				currentBudget.Balance.Sub(itemToInsert.Amount)
 
-				err = h.currentBudgetRepo.UpdateBalance(currentBudget.ID, currentBudget.Balance)
+				currentBudget, err := h.currentBudgetRepo.GetBy(*up.And(
+					up.Cond{"budget_id": dataToInsert.BudgetID},
+					up.Cond{"unit_id": dataToInsert.OrganizationUnitID},
+					up.Cond{"account_id": itemToInsert.SourceAccountID},
+				))
+
+				if err != nil {
+					return errors.ErrInternalServer
+				}
+
+				currentBudget.Actual.Sub(itemToInsert.Amount)
+
+				err = h.currentBudgetRepo.UpdateActual(currentBudget.ID, currentBudget.Actual)
 
 				if err != nil {
 					return errors.ErrInternalServer
@@ -69,9 +71,19 @@ func (h *InternalReallocationServiceImpl) CreateInternalReallocation(input dto.I
 
 			}
 			if item.DestinationAccountID != 0 {
-				currentBudget.Balance.Add(itemToInsert.Amount)
 
-				err = h.currentBudgetRepo.UpdateBalance(currentBudget.ID, currentBudget.Balance)
+				currentBudget, err := h.currentBudgetRepo.GetBy(*up.And(
+					up.Cond{"budget_id": dataToInsert.BudgetID},
+					up.Cond{"unit_id": dataToInsert.OrganizationUnitID},
+					up.Cond{"account_id": itemToInsert.DestinationAccountID},
+				))
+
+				if err != nil {
+					return errors.ErrInternalServer
+				}
+				currentBudget.Actual.Add(itemToInsert.Amount)
+
+				err = h.currentBudgetRepo.UpdateActual(currentBudget.ID, currentBudget.Actual)
 
 				if err != nil {
 					return errors.ErrInternalServer
@@ -97,10 +109,82 @@ func (h *InternalReallocationServiceImpl) CreateInternalReallocation(input dto.I
 }
 
 func (h *InternalReallocationServiceImpl) DeleteInternalReallocation(id int) error {
-	err := h.repo.Delete(id)
+	reallocation, err := h.GetInternalReallocation(id)
+
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return errors.ErrInternalServer
+	}
+
+	for _, item := range reallocation.Items {
+		if item.DestinationAccountID != 0 {
+
+			currentBudget, err := h.currentBudgetRepo.GetBy(*up.And(
+				up.Cond{"budget_id": reallocation.BudgetID},
+				up.Cond{"unit_id": reallocation.OrganizationUnitID},
+				up.Cond{"account_id": item.DestinationAccountID},
+			))
+
+			if err != nil {
+				return errors.ErrInternalServer
+			}
+
+			value := currentBudget.Actual.Sub(item.Amount)
+
+			if value.Cmp(decimal.NewFromFloat(0)) < 0 {
+				return errors.ErrInvalidInput
+			}
+		}
+	}
+
+	err = h.repo.Delete(id)
+	if err != nil {
+		h.App.ErrorLog.Println(err)
+		return errors.ErrInternalServer
+	}
+
+	for _, item := range reallocation.Items {
+		if item.SourceAccountID != 0 {
+
+			currentBudget, err := h.currentBudgetRepo.GetBy(*up.And(
+				up.Cond{"budget_id": reallocation.BudgetID},
+				up.Cond{"unit_id": reallocation.OrganizationUnitID},
+				up.Cond{"account_id": item.SourceAccountID},
+			))
+
+			if err != nil {
+				return errors.ErrInternalServer
+			}
+
+			currentBudget.Actual.Add(item.Amount)
+
+			err = h.currentBudgetRepo.UpdateActual(currentBudget.ID, currentBudget.Actual)
+
+			if err != nil {
+				return errors.ErrInternalServer
+			}
+
+		}
+		if item.DestinationAccountID != 0 {
+
+			currentBudget, err := h.currentBudgetRepo.GetBy(*up.And(
+				up.Cond{"budget_id": reallocation.BudgetID},
+				up.Cond{"unit_id": reallocation.OrganizationUnitID},
+				up.Cond{"account_id": item.DestinationAccountID},
+			))
+
+			if err != nil {
+				return errors.ErrInternalServer
+			}
+
+			currentBudget.Actual.Sub(item.Amount)
+
+			err = h.currentBudgetRepo.UpdateActual(currentBudget.ID, currentBudget.Actual)
+
+			if err != nil {
+				return errors.ErrInternalServer
+			}
+		}
 	}
 
 	return nil
