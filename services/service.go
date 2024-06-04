@@ -427,3 +427,17 @@ type InternalReallocationItemService interface {
 	GetInternalReallocationItem(id int) (*dto.InternalReallocationItemResponseDTO, error)
 	GetInternalReallocationItemList(filter dto.InternalReallocationItemFilterDTO) ([]dto.InternalReallocationItemResponseDTO, *uint64, error)
 }
+
+type ExternalReallocationService interface {
+	CreateExternalReallocation(input dto.ExternalReallocationDTO) (*dto.ExternalReallocationResponseDTO, error)
+	DeleteExternalReallocation(id int) error
+	GetExternalReallocation(id int) (*dto.ExternalReallocationResponseDTO, error)
+	GetExternalReallocationList(filter dto.ExternalReallocationFilterDTO) ([]dto.ExternalReallocationResponseDTO, *uint64, error)
+}
+
+type ExternalReallocationItemService interface {
+	CreateExternalReallocationItem(input dto.ExternalReallocationItemDTO) (*dto.ExternalReallocationItemResponseDTO, error)
+	DeleteExternalReallocationItem(id int) error
+	GetExternalReallocationItem(id int) (*dto.ExternalReallocationItemResponseDTO, error)
+	GetExternalReallocationItemList(filter dto.ExternalReallocationItemFilterDTO) ([]dto.ExternalReallocationItemResponseDTO, *uint64, error)
+}

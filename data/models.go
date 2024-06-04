@@ -69,6 +69,8 @@ type Models struct {
 	SpendingRelease          SpendingRelease
 	InternalReallocation InternalReallocation
 		InternalReallocationItem InternalReallocationItem
+		ExternalReallocation ExternalReallocation
+		ExternalReallocationItem ExternalReallocationItem
 	}
 
 func New(databasePool *sql.DB) Models {
@@ -127,6 +129,8 @@ func New(databasePool *sql.DB) Models {
 		SpendingRelease:          SpendingRelease{},
 		InternalReallocation: InternalReallocation{},
 		InternalReallocationItem: InternalReallocationItem{},
+		ExternalReallocation: ExternalReallocation{},
+		ExternalReallocationItem: ExternalReallocationItem{},
 	}
 }
 
