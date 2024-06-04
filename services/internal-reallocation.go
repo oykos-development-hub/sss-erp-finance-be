@@ -61,9 +61,9 @@ func (h *InternalReallocationServiceImpl) CreateInternalReallocation(input dto.I
 					return errors.ErrInternalServer
 				}
 
-				currentBudget.Actual.Sub(itemToInsert.Amount)
+				value := currentBudget.Actual.Sub(itemToInsert.Amount)
 
-				err = h.currentBudgetRepo.UpdateActual(currentBudget.ID, currentBudget.Actual)
+				err = h.currentBudgetRepo.UpdateActual(currentBudget.ID, value)
 
 				if err != nil {
 					return errors.ErrInternalServer
@@ -81,9 +81,10 @@ func (h *InternalReallocationServiceImpl) CreateInternalReallocation(input dto.I
 				if err != nil {
 					return errors.ErrInternalServer
 				}
-				currentBudget.Actual.Add(itemToInsert.Amount)
 
-				err = h.currentBudgetRepo.UpdateActual(currentBudget.ID, currentBudget.Actual)
+				value := currentBudget.Actual.Add(itemToInsert.Amount)
+
+				err = h.currentBudgetRepo.UpdateActual(currentBudget.ID, value)
 
 				if err != nil {
 					return errors.ErrInternalServer
@@ -156,9 +157,9 @@ func (h *InternalReallocationServiceImpl) DeleteInternalReallocation(id int) err
 				return errors.ErrInternalServer
 			}
 
-			currentBudget.Actual.Add(item.Amount)
+			value := currentBudget.Actual.Add(item.Amount)
 
-			err = h.currentBudgetRepo.UpdateActual(currentBudget.ID, currentBudget.Actual)
+			err = h.currentBudgetRepo.UpdateActual(currentBudget.ID, value)
 
 			if err != nil {
 				return errors.ErrInternalServer
@@ -177,9 +178,9 @@ func (h *InternalReallocationServiceImpl) DeleteInternalReallocation(id int) err
 				return errors.ErrInternalServer
 			}
 
-			currentBudget.Actual.Sub(item.Amount)
+			value := currentBudget.Actual.Sub(item.Amount)
 
-			err = h.currentBudgetRepo.UpdateActual(currentBudget.ID, currentBudget.Actual)
+			err = h.currentBudgetRepo.UpdateActual(currentBudget.ID, value)
 
 			if err != nil {
 				return errors.ErrInternalServer
