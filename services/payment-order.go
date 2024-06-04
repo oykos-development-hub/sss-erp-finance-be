@@ -133,21 +133,21 @@ func (h *PaymentOrderServiceImpl) DeletePaymentOrder(id int) error {
 
 	for _, item := range input.Items {
 		if item.InvoiceID != nil {
-			err = updateInvoiceStatusOnDelete(*item.InvoiceID, input.Amount, len(input.Items), data.Upper, h)
+			err = updateInvoiceStatusOnDelete(*item.InvoiceID, len(input.Items), data.Upper, h)
 
 			if err != nil {
 				h.App.ErrorLog.Println(err)
 				return err
 			}
 		} else if item.AdditionalExpenseID != nil {
-			err = updateAdditionalExpenseStatusOnDelete(*item.AdditionalExpenseID, input.Amount, len(input.Items), data.Upper, h)
+			err = updateAdditionalExpenseStatusOnDelete(*item.AdditionalExpenseID, len(input.Items), data.Upper, h)
 
 			if err != nil {
 				h.App.ErrorLog.Println(err)
 				return err
 			}
 		} else if item.SalaryAdditionalExpenseID != nil {
-			err = updateSalaryAdditionalExpenseStatusOnDelete(*item.SalaryAdditionalExpenseID, input.Amount, len(input.Items), data.Upper, h)
+			err = updateSalaryAdditionalExpenseStatusOnDelete(*item.SalaryAdditionalExpenseID, len(input.Items), data.Upper, h)
 
 			if err != nil {
 				h.App.ErrorLog.Println(err)
@@ -447,21 +447,21 @@ func (h *PaymentOrderServiceImpl) CancelPaymentOrder(id int) error {
 
 		for _, item := range input.Items {
 			if item.InvoiceID != nil {
-				err = updateInvoiceStatusOnDelete(*item.InvoiceID, input.Amount, len(input.Items), tx, h)
+				err = updateInvoiceStatusOnDelete(*item.InvoiceID, len(input.Items), tx, h)
 
 				if err != nil {
 					h.App.ErrorLog.Println(err)
 					return err
 				}
 			} else if item.AdditionalExpenseID != nil {
-				err = updateAdditionalExpenseStatusOnDelete(*item.AdditionalExpenseID, input.Amount, len(input.Items), tx, h)
+				err = updateAdditionalExpenseStatusOnDelete(*item.AdditionalExpenseID, len(input.Items), tx, h)
 
 				if err != nil {
 					h.App.ErrorLog.Println(err)
 					return err
 				}
 			} else if item.SalaryAdditionalExpenseID != nil {
-				err = updateSalaryAdditionalExpenseStatusOnDelete(*item.SalaryAdditionalExpenseID, input.Amount, len(input.Items), tx, h)
+				err = updateSalaryAdditionalExpenseStatusOnDelete(*item.SalaryAdditionalExpenseID, len(input.Items), tx, h)
 
 				if err != nil {
 					h.App.ErrorLog.Println(err)
@@ -630,7 +630,7 @@ func updateSalaryAdditionalExpenseStatus(id int, amount float64, lenOfArray int,
 	return nil
 }
 
-func updateInvoiceStatusOnDelete(id int, amount float64, lenOfArray int, tx up.Session, h *PaymentOrderServiceImpl) error {
+func updateInvoiceStatusOnDelete(id int, lenOfArray int, tx up.Session, h *PaymentOrderServiceImpl) error {
 	invoice, err := h.invoiceRepo.Get(id)
 
 	if err != nil {
@@ -680,7 +680,7 @@ func updateInvoiceStatusOnDelete(id int, amount float64, lenOfArray int, tx up.S
 	return nil
 }
 
-func updateAdditionalExpenseStatusOnDelete(id int, amount float64, lenOfArray int, tx up.Session, h *PaymentOrderServiceImpl) error {
+func updateAdditionalExpenseStatusOnDelete(id int, lenOfArray int, tx up.Session, h *PaymentOrderServiceImpl) error {
 	item, err := h.additionalExpensesRepo.Get(id)
 
 	if err != nil {
@@ -728,7 +728,7 @@ func updateAdditionalExpenseStatusOnDelete(id int, amount float64, lenOfArray in
 	return nil
 }
 
-func updateSalaryAdditionalExpenseStatusOnDelete(id int, amount float64, lenOfArray int, tx up.Session, h *PaymentOrderServiceImpl) error {
+func updateSalaryAdditionalExpenseStatusOnDelete(id int, lenOfArray int, tx up.Session, h *PaymentOrderServiceImpl) error {
 	item, err := h.salaryAdditionalExpensesRepo.Get(id)
 
 	if err != nil {

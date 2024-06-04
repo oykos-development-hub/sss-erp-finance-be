@@ -49,6 +49,8 @@ type Handlers struct {
 	SpendingDynamicHandler          SpendingDynamicHandler
 	CurrentBudgetHandler            CurrentBudgetHandler
 	SpendingReleaseHandler          SpendingReleaseHandler
+	InternalReallocationHandler     InternalReallocationHandler
+	InternalReallocationItemHandler InternalReallocationItemHandler
 }
 
 type InvoiceHandler interface {
@@ -434,4 +436,18 @@ type SpendingReleaseHandler interface {
 	DeleteSpendingRelease(w http.ResponseWriter, r *http.Request)
 	GetSpendingReleaseById(w http.ResponseWriter, r *http.Request)
 	GetSpendingReleaseList(w http.ResponseWriter, r *http.Request)
+}
+
+type InternalReallocationHandler interface {
+	CreateInternalReallocation(w http.ResponseWriter, r *http.Request)
+	DeleteInternalReallocation(w http.ResponseWriter, r *http.Request)
+	GetInternalReallocationById(w http.ResponseWriter, r *http.Request)
+	GetInternalReallocationList(w http.ResponseWriter, r *http.Request)
+}
+
+type InternalReallocationItemHandler interface {
+	CreateInternalReallocationItem(w http.ResponseWriter, r *http.Request)
+	DeleteInternalReallocationItem(w http.ResponseWriter, r *http.Request)
+	GetInternalReallocationItemById(w http.ResponseWriter, r *http.Request)
+	GetInternalReallocationItemList(w http.ResponseWriter, r *http.Request)
 }

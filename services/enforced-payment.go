@@ -53,7 +53,7 @@ func (h *EnforcedPaymentServiceImpl) CreateEnforcedPayment(input dto.EnforcedPay
 			}
 
 			if item.InvoiceID != nil {
-				err = updateInvoiceStatusForEnforcedPayment(*item.InvoiceID, dataToInsert.Amount, len(input.Items), tx, h)
+				err = updateInvoiceStatusForEnforcedPayment(*item.InvoiceID, tx, h)
 
 				if err != nil {
 					return err
@@ -262,7 +262,7 @@ func (h *EnforcedPaymentServiceImpl) GetEnforcedPaymentList(filter dto.EnforcedP
 	return response, total, nil
 }
 
-func updateInvoiceStatusForEnforcedPayment(id int, amount float64, lenOfArray int, tx up.Session, h *EnforcedPaymentServiceImpl) error {
+func updateInvoiceStatusForEnforcedPayment(id int, tx up.Session, h *EnforcedPaymentServiceImpl) error {
 	invoice, err := h.invoicesRepo.Get(id)
 
 	if err != nil {

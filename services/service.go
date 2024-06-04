@@ -413,3 +413,17 @@ type SpendingReleaseService interface {
 	GetSpendingRelease(id int) (*dto.SpendingReleaseResponseDTO, error)
 	GetSpendingReleaseList(filter data.SpendingReleaseFilterDTO) ([]dto.SpendingReleaseResponseDTO, error)
 }
+
+type InternalReallocationService interface {
+	CreateInternalReallocation(input dto.InternalReallocationDTO) (*dto.InternalReallocationResponseDTO, error)
+	DeleteInternalReallocation(id int) error
+	GetInternalReallocation(id int) (*dto.InternalReallocationResponseDTO, error)
+	GetInternalReallocationList(filter dto.InternalReallocationFilterDTO) ([]dto.InternalReallocationResponseDTO, *uint64, error)
+}
+
+type InternalReallocationItemService interface {
+	CreateInternalReallocationItem(input dto.InternalReallocationItemDTO) (*dto.InternalReallocationItemResponseDTO, error)
+	DeleteInternalReallocationItem(id int) error
+	GetInternalReallocationItem(id int) (*dto.InternalReallocationItemResponseDTO, error)
+	GetInternalReallocationItemList(filter dto.InternalReallocationItemFilterDTO) ([]dto.InternalReallocationItemResponseDTO, *uint64, error)
+}

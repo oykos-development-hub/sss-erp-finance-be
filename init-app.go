@@ -183,6 +183,12 @@ func initApplication() *celeritas.Celeritas {
 	SpendingReleaseService := services.NewSpendingReleaseServiceImpl(cel, models.SpendingRelease, models.CurrentBudget, models.Budget)
 	SpendingReleaseHandler := handlers.NewSpendingReleaseHandler(cel, SpendingReleaseService)
 
+	InternalReallocationService := services.NewInternalReallocationServiceImpl(cel, models.InternalReallocation, models.InternalReallocationItem, models.CurrentBudget)
+	InternalReallocationHandler := handlers.NewInternalReallocationHandler(cel, InternalReallocationService)
+
+	InternalReallocationItemService := services.NewInternalReallocationItemServiceImpl(cel, models.InternalReallocationItem)
+	InternalReallocationItemHandler := handlers.NewInternalReallocationItemHandler(cel, InternalReallocationItemService)
+
 	myHandlers := &handlers.Handlers{
 		InvoiceHandler:                  InvoiceHandler,
 		ArticleHandler:                  ArticleHandler,
@@ -230,6 +236,8 @@ func initApplication() *celeritas.Celeritas {
 		SpendingDynamicHandler:          SpendingDynamicHandler,
 		CurrentBudgetHandler:            CurrentBudgetHandler,
 		SpendingReleaseHandler:          SpendingReleaseHandler,
+		InternalReallocationHandler:     InternalReallocationHandler,
+		InternalReallocationItemHandler: InternalReallocationItemHandler,
 	}
 
 	myMiddleware := &middleware.Middleware{

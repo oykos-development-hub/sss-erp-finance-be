@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS internal_reallocation_items;
