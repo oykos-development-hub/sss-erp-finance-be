@@ -7,6 +7,19 @@ import (
 	"gitlab.sudovi.me/erp/finance-api/data"
 )
 
+type SpendingReleaseOverviewFilterDTO struct {
+	Month    int `json:"month"`
+	Year     int `json:"year" validate:"required"`
+	BudgetID int `json:"budget_id" validate:"required"`
+	UnitID   int `json:"unit_id" validate:"required"`
+}
+
+type SpendingReleaseOverview struct {
+	Month int             `json:"month"`
+	Year  int             `json:"year"`
+	Value decimal.Decimal `json:"value"`
+}
+
 type SpendingReleaseDTO struct {
 	BudgetID  int             `json:"budget_id"`
 	UnitID    int             `json:"unit_id"`
@@ -25,6 +38,22 @@ type SpendingReleaseResponseDTO struct {
 	Month           int             `json:"month"`
 	Value           decimal.Decimal `json:"value"`
 	CreatedAt       time.Time       `json:"created_at"`
+}
+
+func ToSpendingReleaseOverviewItemDTO(data *data.SpendingReleaseOverview) SpendingReleaseOverview {
+	return SpendingReleaseOverview{
+		Year:  data.Year,
+		Month: data.Month,
+		Value: data.Value,
+	}
+}
+
+func ToSpendingReleaseOverviewDTO(overviewData []data.SpendingReleaseOverview) []SpendingReleaseOverview {
+	dtoList := make([]SpendingReleaseOverview, len(overviewData))
+	for i, x := range overviewData {
+		dtoList[i] = ToSpendingReleaseOverviewItemDTO(&x)
+	}
+	return dtoList
 }
 
 func ToSpendingReleaseResponseDTO(data *data.SpendingReleaseWithCurrentBudget) SpendingReleaseResponseDTO {

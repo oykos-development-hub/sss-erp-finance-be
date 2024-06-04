@@ -123,3 +123,15 @@ func (h *SpendingReleaseServiceImpl) GetSpendingReleaseList(filter data.Spending
 
 	return response, nil
 }
+
+// GetSpendingReleaseOverview implements SpendingReleaseService.
+func (h *SpendingReleaseServiceImpl) GetSpendingReleaseOverview(filter dto.SpendingReleaseOverviewFilterDTO) ([]dto.SpendingReleaseOverview, error) {
+	data, err := h.repo.GetAllSum(filter.Month, filter.Year, filter.BudgetID, filter.UnitID)
+	if err != nil {
+		return nil, errors.Wrap(err, "service.spending-release.GetSpendingReleaseList")
+	}
+
+	response := dto.ToSpendingReleaseOverviewDTO(data)
+
+	return response, nil
+}

@@ -438,6 +438,7 @@ type SpendingReleaseHandler interface {
 	DeleteSpendingRelease(w http.ResponseWriter, r *http.Request)
 	GetSpendingReleaseById(w http.ResponseWriter, r *http.Request)
 	GetSpendingReleaseList(w http.ResponseWriter, r *http.Request)
+	GetSpendingReleaseOverview(w http.ResponseWriter, r *http.Request)
 }
 
 type InternalReallocationHandler interface {

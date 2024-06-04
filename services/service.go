@@ -412,6 +412,7 @@ type SpendingReleaseService interface {
 	DeleteSpendingRelease(id int) error
 	GetSpendingRelease(id int) (*dto.SpendingReleaseResponseDTO, error)
 	GetSpendingReleaseList(filter data.SpendingReleaseFilterDTO) ([]dto.SpendingReleaseResponseDTO, error)
+	GetSpendingReleaseOverview(filter dto.SpendingReleaseOverviewFilterDTO) ([]dto.SpendingReleaseOverview, error)
 }
 
 type InternalReallocationService interface {

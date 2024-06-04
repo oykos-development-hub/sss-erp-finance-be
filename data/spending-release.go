@@ -18,6 +18,12 @@ type SpendingReleaseFilterDTO struct {
 	Month           *int `json:"month"`
 }
 
+type SpendingReleaseOverview struct {
+	Month int             `db:"month"`
+	Year  int             `db:"year"`
+	Value decimal.Decimal `db:"value"`
+}
+
 // SpendingRelease struct
 type SpendingRelease struct {
 	ID              int             `db:"id,omitempty"`
@@ -91,6 +97,38 @@ func (t *SpendingRelease) GetAll(filter SpendingReleaseFilterDTO) ([]SpendingRel
 	if err != nil {
 		return nil, err
 	}
+
+	return all, err
+}
+
+// GetAll gets all records from the database, using upper
+func (t *SpendingRelease) GetAllSum(month, year, budgetID, unitID int) ([]SpendingReleaseOverview, error) {
+	var all []SpendingReleaseOverview
+
+	query := Upper.SQL().Select(
+		up.Raw("SUM(sr.value) AS value"),
+		"sr.month",
+		"sr.year",
+	).
+		From("spending_releases AS sr").
+		Join("current_budgets AS cb").On("cb.id = sr.current_budget_id").
+		Where("cb.budget_id", budgetID).And("cb.unit_id", unitID).
+		GroupBy("cb.budget_id", "cb.unit_id", "sr.month", "sr.year")
+
+	if month != 0 {
+		query = query.Where("sr.month = ?", month)
+	}
+
+	if year != 0 {
+		query = query.Where("sr.year = ?", year)
+	}
+
+	err := query.All(&all)
+	if err != nil {
+		return nil, errors.Wrap(err, "get release overview")
+	}
+
+	// TODO: check how to dynamicaly add month if != 0
 
 	return all, err
 }

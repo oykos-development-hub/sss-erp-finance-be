@@ -101,3 +101,24 @@ func (h *spendingreleaseHandlerImpl) GetSpendingReleaseList(w http.ResponseWrite
 
 	_ = h.App.WriteDataResponse(w, http.StatusOK, "", res)
 }
+
+// GetSpendingReleaseOverview implements SpendingReleaseHandler.
+func (h *spendingreleaseHandlerImpl) GetSpendingReleaseOverview(w http.ResponseWriter, r *http.Request) {
+	var filter dto.SpendingReleaseOverviewFilterDTO
+
+	_ = h.App.ReadJSON(w, r, &filter)
+
+	validator := h.App.Validator().ValidateStruct(&filter)
+	if !validator.Valid() {
+		_ = h.App.WriteErrorResponseWithData(w, errors.BadRequestCode, errors.NewBadRequestError("input validation"), validator.Errors)
+		return
+	}
+
+	res, err := h.service.GetSpendingReleaseOverview(filter)
+	if err != nil {
+		_ = h.App.WriteErrorResponse(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	_ = h.App.WriteDataResponse(w, http.StatusOK, "", res)
+}
