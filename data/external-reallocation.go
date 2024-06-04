@@ -109,6 +109,7 @@ func (t *ExternalReallocation) Delete(id int) error {
 func (t *ExternalReallocation) Insert(tx up.Session, m ExternalReallocation) (int, error) {
 	m.CreatedAt = time.Now()
 	m.UpdatedAt = time.Now()
+	m.Status = ReallocationStatusCreated
 	collection := tx.Collection(t.Table())
 	res, err := collection.Insert(m)
 	if err != nil {
