@@ -137,7 +137,7 @@ func (t *ExternalReallocation) AcceptOUExternalReallocation(tx up.Session, m Ext
 
 func (t *ExternalReallocation) RejectOUExternalReallocation(id int) error {
 	query := `update external_reallocations
-			  set status = $1 where id = $2`
+			  set status = $1, date_of_action_dest_org_unit = NOW() where id = $2`
 
 	_, err := Upper.SQL().Query(query, ReallocationStatusOUDecline, id)
 
