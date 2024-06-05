@@ -316,6 +316,8 @@ func routes(app *celeritas.Celeritas, middleware *middleware.Middleware, handler
 		rt.Post("/external-reallocations", handlers.ExternalReallocationHandler.CreateExternalReallocation)
 		rt.Put("/accept-ou-external-reallocations", handlers.ExternalReallocationHandler.AcceptOUExternalReallocation)
 		rt.Put("/reject-ou-external-reallocations/{id}", handlers.ExternalReallocationHandler.RejectOUExternalReallocation)
+		rt.Put("/accept-sss-external-reallocations/{id}", handlers.ExternalReallocationHandler.AcceptSSSExternalReallocation)
+		rt.Put("/reject-sss-external-reallocations/{id}", handlers.ExternalReallocationHandler.RejectSSSExternalReallocation)
 		rt.Get("/external-reallocations/{id}", handlers.ExternalReallocationHandler.GetExternalReallocationById)
 		rt.Get("/external-reallocations", handlers.ExternalReallocationHandler.GetExternalReallocationList)
 		rt.Delete("/external-reallocations/{id}", handlers.ExternalReallocationHandler.DeleteExternalReallocation)

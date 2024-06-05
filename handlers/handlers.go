@@ -460,6 +460,8 @@ type ExternalReallocationHandler interface {
 	DeleteExternalReallocation(w http.ResponseWriter, r *http.Request)
 	AcceptOUExternalReallocation(w http.ResponseWriter, r *http.Request)
 	RejectOUExternalReallocation(w http.ResponseWriter, r *http.Request)
+	AcceptSSSExternalReallocation(w http.ResponseWriter, r *http.Request)
+	RejectSSSExternalReallocation(w http.ResponseWriter, r *http.Request)
 	GetExternalReallocationById(w http.ResponseWriter, r *http.Request)
 	GetExternalReallocationList(w http.ResponseWriter, r *http.Request)
 }

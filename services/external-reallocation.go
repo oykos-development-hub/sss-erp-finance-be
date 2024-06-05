@@ -237,3 +237,103 @@ func (h *ExternalReallocationServiceImpl) RejectOUExternalReallocation(id int) e
 
 	return nil
 }
+
+func (h *ExternalReallocationServiceImpl) AcceptSSSExternalReallocation(id int) error {
+	reallocation, err := h.GetExternalReallocation(id)
+
+	if err != nil {
+		return err
+	}
+
+	if reallocation.Status != data.ReallocationStatusOUAccept {
+		return errors.ErrAlreadyDone
+	}
+
+	err = data.Upper.Tx(func(tx up.Session) error {
+		err := h.repo.AcceptSSSExternalReallocation(tx, id)
+		if err != nil {
+			return errors.ErrInternalServer
+		}
+
+		for _, item := range reallocation.Items {
+
+			if item.SourceAccountID != 0 {
+				currentBudget, err := h.currentBudgetRepo.GetBy(*up.And(
+					up.Cond{"budget_id": reallocation.BudgetID},
+					up.Cond{"unit_id": reallocation.SourceOrganizationUnitID},
+					up.Cond{"account_id": item.SourceAccountID},
+				))
+
+				if err != nil {
+					return errors.ErrInternalServer
+				}
+
+				value := currentBudget.Actual.Sub(item.Amount)
+
+				err = h.currentBudgetRepo.UpdateActual(currentBudget.ID, value)
+
+				if err != nil {
+					return errors.ErrInternalServer
+				}
+			}
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return errors.ErrInternalServer
+	}
+
+	return nil
+}
+
+func (h *ExternalReallocationServiceImpl) RejectSSSExternalReallocation(id int) error {
+	reallocation, err := h.GetExternalReallocation(id)
+
+	if err != nil {
+		return err
+	}
+
+	if reallocation.Status != data.ReallocationStatusOUAccept {
+		return errors.ErrAlreadyDone
+	}
+
+	err = data.Upper.Tx(func(tx up.Session) error {
+		err := h.repo.RejectSSSExternalReallocation(tx, id)
+		if err != nil {
+			return errors.ErrInternalServer
+		}
+
+		for _, item := range reallocation.Items {
+
+			if item.DestinationAccountID != 0 {
+				currentBudget, err := h.currentBudgetRepo.GetBy(*up.And(
+					up.Cond{"budget_id": reallocation.BudgetID},
+					up.Cond{"unit_id": reallocation.DestinationOrganizationUnitID},
+					up.Cond{"account_id": item.DestinationAccountID},
+				))
+
+				if err != nil {
+					return errors.ErrInternalServer
+				}
+
+				value := currentBudget.Actual.Sub(item.Amount)
+
+				err = h.currentBudgetRepo.UpdateActual(currentBudget.ID, value)
+
+				if err != nil {
+					return errors.ErrInternalServer
+				}
+			}
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return errors.ErrInternalServer
+	}
+
+	return nil
+}

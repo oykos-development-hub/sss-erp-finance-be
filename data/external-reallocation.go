@@ -126,7 +126,7 @@ func (t *ExternalReallocation) AcceptOUExternalReallocation(tx up.Session, m Ext
 			  set status = $1, date_of_action_dest_org_unit =$2, accepted_by = $3, destination_org_unit_file_id = $4
 			  where id = $5`
 
-	_, err := Upper.SQL().Query(query, ReallocationStatusOUAccept, m.DateOfActionDestOrgUnit, m.AcceptedBy, m.DestinationOrgUnitFileID, m.ID)
+	_, err := tx.SQL().Query(query, ReallocationStatusOUAccept, m.DateOfActionDestOrgUnit, m.AcceptedBy, m.DestinationOrgUnitFileID, m.ID)
 
 	if err != nil {
 		return err
@@ -140,6 +140,30 @@ func (t *ExternalReallocation) RejectOUExternalReallocation(id int) error {
 			  set status = $1, date_of_action_dest_org_unit = NOW() where id = $2`
 
 	_, err := Upper.SQL().Query(query, ReallocationStatusOUDecline, id)
+
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (t *ExternalReallocation) AcceptSSSExternalReallocation(tx up.Session, id int) error {
+	query := `update external_reallocations
+			  set status = $1, date_of_action_sss = NOW() where id = $2`
+
+	_, err := tx.SQL().Query(query, ReallocationStatusSSSAccept, id)
+
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (t *ExternalReallocation) RejectSSSExternalReallocation(tx up.Session, id int) error {
+	query := `update external_reallocations
+			  set status = $1, date_of_action_sss = NOW() where id = $2`
+
+	_, err := tx.SQL().Query(query, ReallocationStatusSSSDecline, id)
 
 	if err != nil {
 		return err

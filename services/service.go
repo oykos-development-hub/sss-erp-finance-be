@@ -436,6 +436,9 @@ type ExternalReallocationService interface {
 	AcceptOUExternalReallocation(input dto.ExternalReallocationDTO) (*dto.ExternalReallocationResponseDTO, error)
 	RejectOUExternalReallocation(id int) error
 
+	AcceptSSSExternalReallocation(id int) error
+	RejectSSSExternalReallocation(id int) error
+
 	GetExternalReallocation(id int) (*dto.ExternalReallocationResponseDTO, error)
 	GetExternalReallocationList(filter dto.ExternalReallocationFilterDTO) ([]dto.ExternalReallocationResponseDTO, *uint64, error)
 }

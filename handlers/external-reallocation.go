@@ -127,3 +127,27 @@ func (h *externalreallocationHandlerImpl) RejectOUExternalReallocation(w http.Re
 
 	_ = h.App.WriteSuccessResponse(w, http.StatusOK, "ExternalReallocation rejected successfuly")
 }
+
+func (h *externalreallocationHandlerImpl) AcceptSSSExternalReallocation(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.Atoi(chi.URLParam(r, "id"))
+
+	err := h.service.AcceptSSSExternalReallocation(id)
+	if err != nil {
+		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
+		return
+	}
+
+	_ = h.App.WriteSuccessResponse(w, http.StatusOK, "ExternalReallocation accepted successfuly")
+}
+
+func (h *externalreallocationHandlerImpl) RejectSSSExternalReallocation(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.Atoi(chi.URLParam(r, "id"))
+
+	err := h.service.RejectSSSExternalReallocation(id)
+	if err != nil {
+		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
+		return
+	}
+
+	_ = h.App.WriteSuccessResponse(w, http.StatusOK, "ExternalReallocation rejected successfuly")
+}
