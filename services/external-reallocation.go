@@ -268,7 +268,7 @@ func (h *ExternalReallocationServiceImpl) AcceptSSSExternalReallocation(id int) 
 					return errors.ErrInternalServer
 				}
 
-				value := currentBudget.Actual.Sub(item.Amount)
+				value := currentBudget.Actual.Add(item.Amount)
 
 				err = h.currentBudgetRepo.UpdateActual(currentBudget.ID, value)
 
@@ -318,7 +318,7 @@ func (h *ExternalReallocationServiceImpl) RejectSSSExternalReallocation(id int) 
 					return errors.ErrInternalServer
 				}
 
-				value := currentBudget.Actual.Sub(item.Amount)
+				value := currentBudget.Actual.Add(item.Amount)
 
 				err = h.currentBudgetRepo.UpdateActual(currentBudget.ID, value)
 
