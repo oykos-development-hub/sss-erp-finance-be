@@ -130,7 +130,8 @@ func (t *SpendingDynamicEntry) FindHistoryChanges(budgetID, unitID int) ([]Spend
 	query := `SELECT MIN(sd.created_at), MIN(username), version FROM spending_dynamic_entries sd 
 	JOIN current_budgets AS cb ON cb.id = sd.current_budget_id
 	WHERE cb.budget_id = $1 AND cb.unit_id = $2
-	group by version`
+	group by version
+	order by version desc`
 
 	rows, err := Upper.SQL().Query(query, budgetID, unitID)
 	if err != nil {
