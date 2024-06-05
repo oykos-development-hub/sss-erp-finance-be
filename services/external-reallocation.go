@@ -159,31 +159,36 @@ func (h *ExternalReallocationServiceImpl) GetExternalReallocationList(filter dto
 func (h *ExternalReallocationServiceImpl) AcceptOUExternalReallocation(input dto.ExternalReallocationDTO) (*dto.ExternalReallocationResponseDTO, error) {
 	dataToInsert := input.ToExternalReallocation()
 
-	reallocation, err := h.GetExternalReallocation(dataToInsert.ID)
+	reallocation, err := h.GetExternalReallocation(input.ID)
 
 	if err != nil {
 		return nil, err
 	}
 
+	if reallocation.Status != data.ReallocationStatusCreated {
+		return nil, errors.ErrBadRequest
+	}
+
 	id := input.ID
 	err = data.Upper.Tx(func(tx up.Session) error {
 		var err error
+		dataToInsert.ID = id
 		err = h.repo.AcceptOUExternalReallocation(tx, *dataToInsert)
 		if err != nil {
 			return errors.ErrInternalServer
 		}
 
 		for _, item := range input.Items {
-			itemToInsert := item.ToExternalReallocationItem()
-			itemToInsert.ReallocationID = id
-
-			_, err = h.itemsRepo.Insert(tx, *itemToInsert)
-
-			if err != nil {
-				return errors.ErrInternalServer
-			}
 
 			if item.DestinationAccountID != 0 {
+				itemToInsert := item.ToExternalReallocationItem()
+				itemToInsert.ReallocationID = id
+
+				_, err = h.itemsRepo.Insert(tx, *itemToInsert)
+
+				if err != nil {
+					return errors.ErrInternalServer
+				}
 
 				currentBudget, err := h.currentBudgetRepo.GetBy(*up.And(
 					up.Cond{"budget_id": reallocation.BudgetID},
