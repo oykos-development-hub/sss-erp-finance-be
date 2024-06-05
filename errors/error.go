@@ -15,6 +15,7 @@ var (
 	ErrDatabaseError  = errors.New("database error")
 	ErrInternalServer = errors.New("internal server error")
 	ErrBadRequest     = errors.New("invalid input")
+	ErrAlreadyDone    = errors.New("already done")
 	// define more custom errors as needed
 )
 

@@ -166,7 +166,7 @@ func (h *ExternalReallocationServiceImpl) AcceptOUExternalReallocation(input dto
 	}
 
 	if reallocation.Status != data.ReallocationStatusCreated {
-		return nil, errors.ErrBadRequest
+		return nil, errors.ErrAlreadyDone
 	}
 
 	id := input.ID
