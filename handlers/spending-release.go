@@ -28,7 +28,10 @@ func NewSpendingReleaseHandler(app *celeritas.Celeritas, spendingreleaseService 
 }
 
 func (h *spendingreleaseHandlerImpl) CreateSpendingRelease(w http.ResponseWriter, r *http.Request) {
-	var input dto.SpendingReleaseDTO
+	budgetID, _ := strconv.Atoi(chi.URLParam(r, "budget_id"))
+	unitID, _ := strconv.Atoi(chi.URLParam(r, "unit_id"))
+
+	var input []dto.SpendingReleaseDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
@@ -41,7 +44,7 @@ func (h *spendingreleaseHandlerImpl) CreateSpendingRelease(w http.ResponseWriter
 		return
 	}
 
-	res, err := h.service.CreateSpendingRelease(input)
+	res, err := h.service.CreateSpendingRelease(budgetID, unitID, input)
 	if err != nil {
 		if errors.IsErr(err, errors.BadRequestCode) {
 			_ = h.App.WriteErrorResponse(w, errors.BadRequestCode, err)

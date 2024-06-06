@@ -26,58 +26,64 @@ func NewSpendingReleaseServiceImpl(app *celeritas.Celeritas, repo data.SpendingR
 	}
 }
 
-func (h *SpendingReleaseServiceImpl) CreateSpendingRelease(inputDTO dto.SpendingReleaseDTO) (*dto.SpendingReleaseResponseDTO, error) {
-	currentBudget, err := h.repoCurrentBudget.GetBy(*up.And(
-		up.Cond{"budget_id": inputDTO.BudgetID},
-		up.Cond{"unit_id": inputDTO.UnitID},
-		up.Cond{"account_id": inputDTO.AccountID},
-	))
-	if err != nil {
-		return nil, err
+func (h *SpendingReleaseServiceImpl) CreateSpendingRelease(budgetID, unitID int, inputDTOList []dto.SpendingReleaseDTO) ([]dto.SpendingReleaseResponseDTO, error) {
+	res := make([]dto.SpendingReleaseResponseDTO, 0, len(inputDTOList))
+
+	for _, inputDTO := range inputDTOList {
+		currentBudget, err := h.repoCurrentBudget.GetBy(*up.And(
+			up.Cond{"budget_id": budgetID},
+			up.Cond{"unit_id": unitID},
+			up.Cond{"account_id": inputDTO.AccountID},
+		))
+		if err != nil {
+			return nil, err
+		}
+
+		_, err = h.repo.GetBy(*up.And(up.Cond{"current_budget_id": currentBudget.ID}, up.Cond{"month": inputDTO.Month}))
+		if !errors.IsErr(err, errors.NotFoundCode) {
+			return nil, errors.NewWithCode(errors.SingleMonthSpendingReleaseCode, "service.spending-release.CreateSpendingRelease: only single release is allowed per month")
+		}
+
+		budget, err := h.repoBudget.Get(currentBudget.BudgetID)
+		if err != nil {
+			return nil, errors.Wrap(err, "service.spending-release.CreateSpendingRelease")
+		}
+
+		inputData := data.SpendingRelease{
+			CurrentBudgetID: currentBudget.ID,
+			Year:            budget.Year,
+			Month:           inputDTO.Month,
+			Value:           inputDTO.Value,
+		}
+		if !inputData.ValidateNewRelease() {
+			return nil, errors.NewWithCode(errors.ReleaseInCurrentMonthCode, "service.CreateSpendingRelease: release is possible only in the current month")
+		}
+
+		if currentBudget.Vault().Sub(inputData.Value).LessThan(decimal.Zero) {
+			return nil, errors.NewWithCode(errors.NotEnoughFundsCode, "service.CreateSpendingRelease: not enough funds")
+		}
+
+		id, err := h.repo.Insert(inputData)
+		if err != nil {
+			return nil, errors.Wrap(err, "service.spending-release.CreateSpendingRelease")
+		}
+
+		item, err := h.repo.Get(id)
+		if err != nil {
+			return nil, errors.Wrap(err, "service.spending-release.CreateSpendingRelease")
+		}
+
+		err = h.repoCurrentBudget.UpdateBalance(currentBudget.ID, currentBudget.Balance.Add(item.Value))
+		if err != nil {
+			return nil, errors.Wrap(err, "service.spending-release.CreateSpendingRelease")
+		}
+
+		resItem := dto.ToSpendingReleaseResponseDTO(item)
+
+		res = append(res, resItem)
 	}
 
-	_, err = h.repo.GetBy(*up.And(up.Cond{"current_budget_id": currentBudget.ID}, up.Cond{"month": inputDTO.Month}))
-	if !errors.IsErr(err, errors.NotFoundCode) {
-		return nil, errors.NewWithCode(errors.SingleMonthSpendingReleaseCode, "service.spending-release.CreateSpendingRelease: only single release is allowed per month")
-	}
-
-	budget, err := h.repoBudget.Get(currentBudget.BudgetID)
-	if err != nil {
-		return nil, errors.Wrap(err, "service.spending-release.CreateSpendingRelease")
-	}
-
-	inputData := data.SpendingRelease{
-		CurrentBudgetID: currentBudget.ID,
-		Year:            budget.Year,
-		Month:           inputDTO.Month,
-		Value:           inputDTO.Value,
-	}
-	if !inputData.ValidateNewRelease() {
-		return nil, errors.NewWithCode(errors.ReleaseInCurrentMonthCode, "service.CreateSpendingRelease: release is possible only in the current month")
-	}
-
-	if currentBudget.Vault().Sub(inputData.Value).LessThan(decimal.Zero) {
-		return nil, errors.NewWithCode(errors.NotEnoughFundsCode, "service.CreateSpendingRelease: not enough funds")
-	}
-
-	id, err := h.repo.Insert(inputData)
-	if err != nil {
-		return nil, errors.Wrap(err, "service.spending-release.CreateSpendingRelease")
-	}
-
-	item, err := h.repo.Get(id)
-	if err != nil {
-		return nil, errors.Wrap(err, "service.spending-release.CreateSpendingRelease")
-	}
-
-	err = h.repoCurrentBudget.UpdateBalance(currentBudget.ID, currentBudget.Balance.Add(item.Value))
-	if err != nil {
-		return nil, errors.Wrap(err, "service.spending-release.CreateSpendingRelease")
-	}
-
-	res := dto.ToSpendingReleaseResponseDTO(item)
-
-	return &res, nil
+	return res, nil
 }
 
 func (h *SpendingReleaseServiceImpl) DeleteSpendingRelease(id int) error {
