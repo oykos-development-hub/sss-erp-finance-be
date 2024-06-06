@@ -136,12 +136,8 @@ func (h *ExternalReallocationServiceImpl) GetExternalReallocationList(filter dto
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"requested_by": *filter.RequestedBy})
 	}
 
-	if filter.RequestedBy != nil {
-		conditionAndExp = up.And(conditionAndExp, &up.Cond{"requested_by": *filter.RequestedBy})
-	}
-
 	if filter.Status != nil {
-		conditionAndExp = up.And(conditionAndExp, &up.Cond{"status": *filter.RequestedBy})
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"status": *filter.Status})
 	}
 
 	orders = append(orders, "-created_at")
