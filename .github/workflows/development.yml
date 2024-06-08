@@ -1,3 +1,4 @@
+
 # This is a basic workflow to help you get started with Actions
 
 name: Deploy to development server
@@ -49,16 +50,16 @@ jobs:
               docker-compose up -d
               if ! command -v go &> /dev/null; then
                 echo "Go version is 1.20 or higher!"
-              elif [[ "$(go version)" != *"go1.20"* ]]; then
+              elif [[ "$(go version)" != *"go1.22"* ]]; then
                 sudo rm -rf /usr/bin/go
-                echo "Go version is below 1.20. Installing Go 1.20..."
-                wget https://dl.google.com/go/go1.20.linux-amd64.tar.gz
-                sudo tar -C /usr/bin -xzf go1.20.linux-amd64.tar.gz
-                echo 'export PATH=$PATH:/usr/bin/go/bin' >> ~/.bashrc
+                echo "Go version is below 1.22. Installing Go 1.20..."
+                wget https://go.dev/dl/go1.22.4.linux-amd64.tar.gz
+                tar -C /usr/local -xzf go1.22.4.linux-amd64.tar.gz
+                export PATH=$PATH:/usr/local/go/bin
                 source ~/.bashrc
-                rm go1.20.linux-amd64.tar.gz
+                rm go1.22.4.linux-amd64.tar.gz
               fi
-              export PATH="/usr/bin/go/bin:$PATH"
+              export PATH="/usr/local/go/bin:$PATH"
               go mod tidy
               go build -o financeApp
               if [ ! -f ./financeApp ]; then
@@ -68,4 +69,4 @@ jobs:
               rm -rf ../../financeApp
               cp ./financeApp ../../
               cp ./.env-example ../../.env
-              sudo systemctl restart ${{vars.GIT_REPO}}.service
+              sudo systemctl restart ${{vars.GIT_REPO}}.servic
