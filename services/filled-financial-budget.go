@@ -129,6 +129,10 @@ func (h *FilledFinancialBudgetServiceImpl) GetFilledFinancialBudgetList(filter d
 
 	conditionAndExp = up.And(conditionAndExp, &up.Cond{"budget_request_id": filter.BudgetRequestID})
 
+	if len(filter.AccountIdList) > 0 {
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"account_id": up.In(filter.AccountIdList...)})
+	}
+
 	orders = append(orders, "-created_at")
 
 	data, total, err := h.repo.GetAll(filter.Page, filter.Size, conditionAndExp, orders)

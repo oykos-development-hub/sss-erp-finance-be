@@ -38,6 +38,7 @@ type FilledFinancialBudgetFilterDTO struct {
 	Size            *int    `json:"size"`
 	SortByTitle     *string `json:"sort_by_title"`
 	BudgetRequestID int     `json:"budget_request_id" validate:"required"`
+	AccountIdList   []any   `json:"accounts"`
 }
 
 func (dto FilledFinancialBudgetDTO) ToFilledFinancialBudget() *data.FilledFinancialBudget {
