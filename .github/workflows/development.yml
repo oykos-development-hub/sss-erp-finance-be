@@ -69,4 +69,4 @@ jobs:
               rm -rf ../../financeApp
               cp ./financeApp ../../
               cp ./.env-example ../../.env
-              sudo systemctl restart ${{vars.GIT_REPO}}.servic
+              sudo systemctl restart ${{vars.GIT_REPO}}.service
