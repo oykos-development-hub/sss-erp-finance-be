@@ -140,6 +140,7 @@ func (h *FilledFinancialBudgetServiceImpl) GetFilledFinancialBudgetList(filter d
 		h.App.ErrorLog.Println(err)
 		return nil, nil, errors.ErrInternalServer
 	}
+
 	response := dto.ToFilledFinancialBudgetListResponseDTO(data)
 
 	return response, total, nil
