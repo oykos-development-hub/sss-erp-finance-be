@@ -15,9 +15,10 @@ type SpendingReleaseOverviewFilterDTO struct {
 }
 
 type SpendingReleaseOverview struct {
-	Month int             `json:"month"`
-	Year  int             `json:"year"`
-	Value decimal.Decimal `json:"value"`
+	Month     int             `json:"month"`
+	Year      int             `json:"year"`
+	Value     decimal.Decimal `json:"value"`
+	CreatedAt time.Time       `json:"created_at"`
 }
 
 type SpendingReleaseDTO struct {
@@ -40,9 +41,10 @@ type SpendingReleaseResponseDTO struct {
 
 func ToSpendingReleaseOverviewItemDTO(data *data.SpendingReleaseOverview) SpendingReleaseOverview {
 	return SpendingReleaseOverview{
-		Year:  data.Year,
-		Month: data.Month,
-		Value: data.Value,
+		Year:      data.Year,
+		Month:     data.Month,
+		Value:     data.Value,
+		CreatedAt: data.CreatedAt,
 	}
 }
 

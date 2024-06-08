@@ -19,9 +19,10 @@ type SpendingReleaseFilterDTO struct {
 }
 
 type SpendingReleaseOverview struct {
-	Month int             `db:"month"`
-	Year  int             `db:"year"`
-	Value decimal.Decimal `db:"value"`
+	Month     int             `db:"month"`
+	Year      int             `db:"year"`
+	CreatedAt time.Time       `db:"created_at"`
+	Value     decimal.Decimal `db:"value"`
 }
 
 // SpendingRelease struct
@@ -109,6 +110,7 @@ func (t *SpendingRelease) GetAllSum(month, year, budgetID, unitID int) ([]Spendi
 		up.Raw("SUM(sr.value) AS value"),
 		"sr.month",
 		"sr.year",
+		up.Raw("MAX(sr.created_at) AS created_at"),
 	).
 		From("spending_releases AS sr").
 		Join("current_budgets AS cb").On("cb.id = sr.current_budget_id").
