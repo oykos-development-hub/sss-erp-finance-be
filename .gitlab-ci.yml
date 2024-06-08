@@ -14,7 +14,7 @@ stages:
 
 code_tests:
   stage: test
-  image: golang:1.19
+  image: golang:1.22
   before_script:
     - go mod download
   script:

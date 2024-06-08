@@ -77,6 +77,7 @@ func (h *filledfinancialbudgetHandlerImpl) UpdateFilledFinancialBudget(w http.Re
 
 func (h *filledfinancialbudgetHandlerImpl) UpdateActualFilledFinancialBudget(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.Atoi(chi.URLParam(r, "id"))
+
 	var input dto.FilledActualFinancialBudgetDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
