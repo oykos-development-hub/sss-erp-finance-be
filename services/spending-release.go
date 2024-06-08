@@ -1,6 +1,8 @@
 package services
 
 import (
+	"time"
+
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
 	"gitlab.sudovi.me/erp/finance-api/pkg/errors"
@@ -28,7 +30,7 @@ func NewSpendingReleaseServiceImpl(app *celeritas.Celeritas, repo data.SpendingR
 
 func (h *SpendingReleaseServiceImpl) CreateSpendingRelease(budgetID, unitID int, inputDTOList []dto.SpendingReleaseDTO) ([]dto.SpendingReleaseResponseDTO, error) {
 	res := make([]dto.SpendingReleaseResponseDTO, 0, len(inputDTOList))
-
+	currentMonth := time.Now().Month()
 	for _, inputDTO := range inputDTOList {
 		currentBudget, err := h.repoCurrentBudget.GetBy(*up.And(
 			up.Cond{"budget_id": budgetID},
@@ -39,7 +41,7 @@ func (h *SpendingReleaseServiceImpl) CreateSpendingRelease(budgetID, unitID int,
 			return nil, err
 		}
 
-		_, err = h.repo.GetBy(*up.And(up.Cond{"current_budget_id": currentBudget.ID}, up.Cond{"month": inputDTO.Month}))
+		_, err = h.repo.GetBy(*up.And(up.Cond{"current_budget_id": currentBudget.ID}, up.Cond{"month": currentMonth}))
 		if !errors.IsErr(err, errors.NotFoundCode) {
 			return nil, errors.NewWithCode(errors.SingleMonthSpendingReleaseCode, "service.spending-release.CreateSpendingRelease: only single release is allowed per month")
 		}
@@ -52,7 +54,7 @@ func (h *SpendingReleaseServiceImpl) CreateSpendingRelease(budgetID, unitID int,
 		inputData := data.SpendingRelease{
 			CurrentBudgetID: currentBudget.ID,
 			Year:            budget.Year,
-			Month:           inputDTO.Month,
+			Month:           int(currentMonth),
 			Value:           inputDTO.Value,
 		}
 		if !inputData.ValidateNewRelease() {
