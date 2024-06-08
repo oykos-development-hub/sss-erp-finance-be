@@ -1,6 +1,6 @@
 version: '3'
 
-services:
+# services:
 
 #  start Postgres, and ensure that data is stored to a mounted volume
   # postgres:
@@ -16,5 +16,5 @@ services:
   #   volumes:
   #     - postgres:/data/postgres
 
-volumes:
-  postgres:
+# volumes:
+  # postgres:
