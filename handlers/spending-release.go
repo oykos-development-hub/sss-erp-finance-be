@@ -62,9 +62,20 @@ func (h *spendingreleaseHandlerImpl) CreateSpendingRelease(w http.ResponseWriter
 }
 
 func (h *spendingreleaseHandlerImpl) DeleteSpendingRelease(w http.ResponseWriter, r *http.Request) {
-	id, _ := strconv.Atoi(chi.URLParam(r, "id"))
+	var input dto.DeleteSpendingReleaseInput
+	err := h.App.ReadJSON(w, r, &input)
+	if err != nil {
+		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
+		return
+	}
 
-	err := h.service.DeleteSpendingRelease(id)
+	validator := h.App.Validator().ValidateStruct(&input)
+	if !validator.Valid() {
+		_ = h.App.WriteErrorResponseWithData(w, errors.BadRequestCode, errors.NewBadRequestError("input validation"), validator.Errors)
+		return
+	}
+
+	err = h.service.DeleteSpendingRelease(&input)
 	if err != nil {
 		_ = h.App.WriteErrorResponse(w, errors.InternalCode, err)
 		return

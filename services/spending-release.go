@@ -89,25 +89,31 @@ func (h *SpendingReleaseServiceImpl) CreateSpendingRelease(budgetID, unitID int,
 	return res, nil
 }
 
-func (h *SpendingReleaseServiceImpl) DeleteSpendingRelease(id int) error {
-	spendingRelease, err := h.repo.Get(id)
+func (h *SpendingReleaseServiceImpl) DeleteSpendingRelease(input *dto.DeleteSpendingReleaseInput) error {
+	releases, err := h.repo.GetAll(data.SpendingReleaseFilterDTO{
+		BudgetID: &input.BudgetID,
+		UnitID:   &input.UnitID,
+		Month:    &input.Month,
+	})
 	if err != nil {
-		return errors.Wrap(err, "service.spending-release.DeleteSpendingRelease")
+		return errors.Wrap(err, "repo get all")
 	}
 
-	err = h.repo.Delete(id)
-	if err != nil {
-		return errors.Wrap(err, "service.spending-release.DeleteSpendingRelease")
-	}
+	for _, release := range releases {
+		err = h.repo.Delete(release.ID)
+		if err != nil {
+			return errors.Wrap(err, "repo delete")
+		}
 
-	currentBudget, err := h.repoCurrentBudget.Get(spendingRelease.CurrentBudgetID)
-	if err != nil {
-		return errors.Wrap(err, "service.spending-release.DeleteSpendingRelease")
-	}
+		currentBudget, err := h.repoCurrentBudget.Get(release.CurrentBudgetID)
+		if err != nil {
+			return errors.Wrap(err, "repo current budget get")
+		}
 
-	err = h.repoCurrentBudget.UpdateBalance(currentBudget.ID, currentBudget.Balance.Sub(spendingRelease.Value))
-	if err != nil {
-		return errors.Wrap(err, "service.spending-release.DeleteSpendingRelease")
+		err = h.repoCurrentBudget.UpdateBalance(currentBudget.ID, currentBudget.Balance.Sub(release.Value))
+		if err != nil {
+			return errors.Wrap(err, "repo current budget update balance")
+		}
 	}
 
 	return nil

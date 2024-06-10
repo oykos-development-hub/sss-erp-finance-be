@@ -7,6 +7,13 @@ import (
 	"gitlab.sudovi.me/erp/finance-api/data"
 )
 
+type DeleteSpendingReleaseInput struct {
+	Year     int `json:"year"`
+	Month    int `json:"month"`
+	UnitID   int `json:"unit_id"`
+	BudgetID int `json:"budget_id"`
+}
+
 type SpendingReleaseOverviewFilterDTO struct {
 	Month    int `json:"month"`
 	Year     int `json:"year" validate:"required"`

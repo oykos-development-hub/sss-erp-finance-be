@@ -409,7 +409,7 @@ type CurrentBudgetService interface {
 
 type SpendingReleaseService interface {
 	CreateSpendingRelease(budgetID, unitID int, input []dto.SpendingReleaseDTO) ([]dto.SpendingReleaseResponseDTO, error)
-	DeleteSpendingRelease(id int) error
+	DeleteSpendingRelease(input *dto.DeleteSpendingReleaseInput) error
 	GetSpendingRelease(id int) (*dto.SpendingReleaseResponseDTO, error)
 	GetSpendingReleaseList(filter data.SpendingReleaseFilterDTO) ([]dto.SpendingReleaseResponseDTO, error)
 	GetSpendingReleaseOverview(filter dto.SpendingReleaseOverviewFilterDTO) ([]dto.SpendingReleaseOverview, error)
