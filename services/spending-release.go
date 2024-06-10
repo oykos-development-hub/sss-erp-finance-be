@@ -56,6 +56,7 @@ func (h *SpendingReleaseServiceImpl) CreateSpendingRelease(budgetID, unitID int,
 			Year:            budget.Year,
 			Month:           int(currentMonth),
 			Value:           inputDTO.Value,
+			Username:        inputDTO.Username,
 		}
 		if !inputData.ValidateNewRelease() {
 			return nil, errors.NewWithCode(errors.ReleaseInCurrentMonthCode, "service.CreateSpendingRelease: release is possible only in the current month")

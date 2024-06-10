@@ -33,6 +33,7 @@ type SpendingRelease struct {
 	Month           int             `db:"month"`
 	Value           decimal.Decimal `db:"value"`
 	CreatedAt       time.Time       `db:"created_at,omitempty"`
+	Username        string          `db:"username"`
 }
 
 type SpendingReleaseWithCurrentBudget struct {
@@ -69,6 +70,7 @@ func (t *SpendingRelease) GetAll(filter SpendingReleaseFilterDTO) ([]SpendingRel
 		"sr.month",
 		"sr.value",
 		"sr.created_at",
+		"sr.username",
 		"cb.budget_id",
 		"cb.unit_id",
 		"cb.account_id",
@@ -130,8 +132,6 @@ func (t *SpendingRelease) GetAllSum(month, year, budgetID, unitID int) ([]Spendi
 		return nil, errors.Wrap(err, "get release overview")
 	}
 
-	// TODO: check how to dynamicaly add month if != 0
-
 	return all, err
 }
 
@@ -162,6 +162,7 @@ func (t *SpendingRelease) Get(id int) (*SpendingReleaseWithCurrentBudget, error)
 		"sr.month",
 		"sr.value",
 		"sr.created_at",
+		"sr.username",
 		"cb.budget_id",
 		"cb.unit_id",
 		"cb.account_id",

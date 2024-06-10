@@ -358,6 +358,14 @@ func (h *AccountingEntryServiceImpl) GetAccountingEntryList(filter dto.Accountin
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"type": *filter.Type})
 	}
 
+	if filter.DateOfStart != nil {
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"date_of_booking > ": *filter.DateOfStart})
+	}
+
+	if filter.DateOfEnd != nil {
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"date_of_booking < ": *filter.DateOfEnd})
+	}
+
 	if filter.SortByTitle != nil {
 		if *filter.SortByTitle == "asc" {
 			orders = append(orders, "-title")

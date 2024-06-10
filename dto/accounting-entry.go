@@ -35,6 +35,8 @@ type AccountingEntryFilterDTO struct {
 	SortByTitle        *string                 `json:"sort_by_title"`
 	OrganizationUnitID *int                    `json:"organization_unit_id"`
 	Type               *data.TypesOfObligation `json:"type"`
+	DateOfStart        *time.Time              `json:"date_of_start"`
+	DateOfEnd          *time.Time              `json:"date_of_end"`
 }
 
 type ObligationForAccounting struct {

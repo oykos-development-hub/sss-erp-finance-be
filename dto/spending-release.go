@@ -25,6 +25,7 @@ type SpendingReleaseDTO struct {
 	AccountID int             `json:"account_id"`
 	Month     int             `json:"month"`
 	Value     decimal.Decimal `json:"value"`
+	Username  string          `json:"username"`
 }
 
 type SpendingReleaseResponseDTO struct {
@@ -37,6 +38,7 @@ type SpendingReleaseResponseDTO struct {
 	Month           int             `json:"month"`
 	Value           decimal.Decimal `json:"value"`
 	CreatedAt       time.Time       `json:"created_at"`
+	Username        string          `json:"username"`
 }
 
 func ToSpendingReleaseOverviewItemDTO(data *data.SpendingReleaseOverview) SpendingReleaseOverview {
@@ -67,6 +69,7 @@ func ToSpendingReleaseResponseDTO(data *data.SpendingReleaseWithCurrentBudget) S
 		Month:           data.Month,
 		Value:           data.Value,
 		CreatedAt:       data.CreatedAt,
+		Username:        data.Username,
 	}
 }
 
