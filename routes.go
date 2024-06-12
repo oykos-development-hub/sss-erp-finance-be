@@ -326,6 +326,12 @@ func routes(app *celeritas.Celeritas, middleware *middleware.Middleware, handler
 		rt.Get("/external-reallocation-items/{id}", handlers.ExternalReallocationItemHandler.GetExternalReallocationItemById)
 		rt.Get("/external-reallocation-items", handlers.ExternalReallocationItemHandler.GetExternalReallocationItemList)
 		rt.Delete("/external-reallocation-items/{id}", handlers.ExternalReallocationItemHandler.DeleteExternalReallocationItem)
+	
+		rt.Post("/logs", handlers.LogHandler.CreateLog)
+rt.Get("/logs/{id}", handlers.LogHandler.GetLogById)
+rt.Get("/logs", handlers.LogHandler.GetLogList)
+rt.Put("/logs/{id}", handlers.LogHandler.UpdateLog)
+rt.Delete("/logs/{id}", handlers.LogHandler.DeleteLog)
 	})
 
 	return app.Routes

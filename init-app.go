@@ -195,6 +195,10 @@ func initApplication() *celeritas.Celeritas {
 	ExternalReallocationItemService := services.NewExternalReallocationItemServiceImpl(cel, models.ExternalReallocationItem)
 	ExternalReallocationItemHandler := handlers.NewExternalReallocationItemHandler(cel, ExternalReallocationItemService)
 
+		
+	LogService := services.NewLogServiceImpl(cel, models.Log)
+	LogHandler := handlers.NewLogHandler(cel, LogService)
+
 	myHandlers := &handlers.Handlers{
 		InvoiceHandler:                  InvoiceHandler,
 		ArticleHandler:                  ArticleHandler,
@@ -246,6 +250,7 @@ func initApplication() *celeritas.Celeritas {
 		InternalReallocationItemHandler: InternalReallocationItemHandler,
 		ExternalReallocationHandler:     ExternalReallocationHandler,
 		ExternalReallocationItemHandler: ExternalReallocationItemHandler,
+		LogHandler: LogHandler,
 	}
 
 	myMiddleware := &middleware.Middleware{

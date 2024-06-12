@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"fmt"
 
 	"gitlab.sudovi.me/erp/finance-api/data"
@@ -29,13 +30,13 @@ func NewFixedDepositServiceImpl(app *celeritas.Celeritas, repo data.FixedDeposit
 	}
 }
 
-func (h *FixedDepositServiceImpl) CreateFixedDeposit(input dto.FixedDepositDTO) (*dto.FixedDepositResponseDTO, error) {
+func (h *FixedDepositServiceImpl) CreateFixedDeposit(ctx context.Context, input dto.FixedDepositDTO) (*dto.FixedDepositResponseDTO, error) {
 	dataToInsert := input.ToFixedDeposit()
 
 	var id int
 	err := data.Upper.Tx(func(tx up.Session) error {
 		var err error
-		id, err = h.repo.Insert(tx, *dataToInsert)
+		id, err = h.repo.Insert(ctx, tx, *dataToInsert)
 		if err != nil {
 			return errors.ErrInternalServer
 		}
@@ -57,12 +58,12 @@ func (h *FixedDepositServiceImpl) CreateFixedDeposit(input dto.FixedDepositDTO) 
 	return &res, nil
 }
 
-func (h *FixedDepositServiceImpl) UpdateFixedDeposit(id int, input dto.FixedDepositDTO) (*dto.FixedDepositResponseDTO, error) {
+func (h *FixedDepositServiceImpl) UpdateFixedDeposit(ctx context.Context, id int, input dto.FixedDepositDTO) (*dto.FixedDepositResponseDTO, error) {
 	dataToInsert := input.ToFixedDeposit()
 	dataToInsert.ID = id
 
 	err := data.Upper.Tx(func(tx up.Session) error {
-		err := h.repo.Update(tx, *dataToInsert)
+		err := h.repo.Update(ctx, tx, *dataToInsert)
 		if err != nil {
 			return errors.ErrInternalServer
 		}
@@ -82,8 +83,8 @@ func (h *FixedDepositServiceImpl) UpdateFixedDeposit(id int, input dto.FixedDepo
 	return &response, nil
 }
 
-func (h *FixedDepositServiceImpl) DeleteFixedDeposit(id int) error {
-	err := h.repo.Delete(id)
+func (h *FixedDepositServiceImpl) DeleteFixedDeposit(ctx context.Context, id int) error {
+	err := h.repo.Delete(ctx, id)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return errors.ErrInternalServer

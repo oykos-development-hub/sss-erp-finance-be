@@ -1,9 +1,13 @@
 package data
 
 import (
+	"context"
+	"fmt"
 	"time"
 
 	up "github.com/upper/db/v4"
+	"gitlab.sudovi.me/erp/finance-api/contextutil"
+	"gitlab.sudovi.me/erp/finance-api/pkg/errors"
 )
 
 // FixedDepositWill struct
@@ -73,7 +77,7 @@ func (t *FixedDepositWill) Get(id int) (*FixedDepositWill, error) {
 }
 
 // Update updates a record in the database, using upper
-func (t *FixedDepositWill) Update(tx up.Session, m FixedDepositWill) error {
+func (t *FixedDepositWill) Update(ctx context.Context, tx up.Session, m FixedDepositWill) error {
 	m.UpdatedAt = time.Now()
 
 	if m.DateOfEnd != nil {
@@ -90,10 +94,27 @@ func (t *FixedDepositWill) Update(tx up.Session, m FixedDepositWill) error {
 }
 
 // Delete deletes a record from the database by id, using upper
-func (t *FixedDepositWill) Delete(id int) error {
-	collection := Upper.Collection(t.Table())
-	res := collection.Find(id)
-	err := res.Delete()
+func (t *FixedDepositWill) Delete(ctx context.Context, id int) error {
+	userID, ok := contextutil.GetUserIDFromContext(ctx)
+	if !ok {
+		return errors.New("user ID not found in context")
+	}
+
+	err := Upper.Tx(func(sess up.Session) error {
+		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+		if _, err := sess.SQL().Exec(query); err != nil {
+			return err
+		}
+
+		collection := sess.Collection(t.Table())
+		res := collection.Find(id)
+		if err := res.Delete(); err != nil {
+			return err
+		}
+
+		return nil
+	})
+
 	if err != nil {
 		return err
 	}
@@ -101,20 +122,45 @@ func (t *FixedDepositWill) Delete(id int) error {
 }
 
 // Insert inserts a model into the database, using upper
-func (t *FixedDepositWill) Insert(tx up.Session, m FixedDepositWill) (int, error) {
+func (t *FixedDepositWill) Insert(ctx context.Context, tx up.Session, m FixedDepositWill) (int, error) {
+
 	m.CreatedAt = time.Now()
 	m.UpdatedAt = time.Now()
 
 	if m.DateOfEnd != nil {
 		m.Status = "Zaključen"
 	}
-	collection := tx.Collection(t.Table())
-	res, err := collection.Insert(m)
+	userID, ok := contextutil.GetUserIDFromContext(ctx)
+	if !ok {
+		return 0, errors.New("user ID not found in context")
+	}
+
+	var id int
+
+	err := Upper.Tx(func(sess up.Session) error {
+
+		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+		if _, err := sess.SQL().Exec(query); err != nil {
+			return err
+		}
+
+		collection := sess.Collection(t.Table())
+
+		var res up.InsertResult
+		var err error
+
+		if res, err = collection.Insert(m); err != nil {
+			return err
+		}
+
+		id = getInsertId(res.ID())
+
+		return nil
+	})
+
 	if err != nil {
 		return 0, err
 	}
-
-	id := getInsertId(res.ID())
 
 	return id, nil
 }

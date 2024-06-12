@@ -1,9 +1,11 @@
 package handlers
 
 import (
+	"context"
 	"net/http"
 	"strconv"
 
+	"gitlab.sudovi.me/erp/finance-api/contextutil"
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
 	"gitlab.sudovi.me/erp/finance-api/pkg/errors"
@@ -44,7 +46,19 @@ func (h *spendingreleaseHandlerImpl) CreateSpendingRelease(w http.ResponseWriter
 		return
 	}
 
-	res, err := h.service.CreateSpendingRelease(budgetID, unitID, input)
+	userIDString := r.Header.Get("UserID")
+
+	userID, err := strconv.Atoi(userIDString)
+
+	if err != nil {
+		_ = h.App.WriteErrorResponse(w, errors.ErrUnauthorized, err)
+		return
+	}
+
+	ctx := context.Background()
+	ctx = contextutil.SetUserIDInContext(ctx, userID)
+
+	res, err := h.service.CreateSpendingRelease(ctx, budgetID, unitID, input)
 	if err != nil {
 		if errors.IsErr(err, errors.BadRequestCode) {
 			_ = h.App.WriteErrorResponse(w, errors.BadRequestCode, err)
@@ -75,7 +89,19 @@ func (h *spendingreleaseHandlerImpl) DeleteSpendingRelease(w http.ResponseWriter
 		return
 	}
 
-	err = h.service.DeleteSpendingRelease(&input)
+	userIDString := r.Header.Get("UserID")
+
+	userID, err := strconv.Atoi(userIDString)
+
+	if err != nil {
+		_ = h.App.WriteErrorResponse(w, errors.ErrUnauthorized, err)
+		return
+	}
+
+	ctx := context.Background()
+	ctx = contextutil.SetUserIDInContext(ctx, userID)
+
+	err = h.service.DeleteSpendingRelease(ctx, &input)
 	if err != nil {
 		_ = h.App.WriteErrorResponse(w, errors.InternalCode, err)
 		return

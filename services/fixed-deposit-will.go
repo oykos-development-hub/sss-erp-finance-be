@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"fmt"
 
 	"gitlab.sudovi.me/erp/finance-api/data"
@@ -27,13 +28,13 @@ func NewFixedDepositWillServiceImpl(app *celeritas.Celeritas, repo data.FixedDep
 	}
 }
 
-func (h *FixedDepositWillServiceImpl) CreateFixedDepositWill(input dto.FixedDepositWillDTO) (*dto.FixedDepositWillResponseDTO, error) {
+func (h *FixedDepositWillServiceImpl) CreateFixedDepositWill(ctx context.Context, input dto.FixedDepositWillDTO) (*dto.FixedDepositWillResponseDTO, error) {
 	dataToInsert := input.ToFixedDepositWill()
 
 	var id int
 	err := data.Upper.Tx(func(tx up.Session) error {
 		var err error
-		id, err = h.repo.Insert(tx, *dataToInsert)
+		id, err = h.repo.Insert(ctx, tx, *dataToInsert)
 		if err != nil {
 			return errors.ErrInternalServer
 		}
@@ -55,12 +56,12 @@ func (h *FixedDepositWillServiceImpl) CreateFixedDepositWill(input dto.FixedDepo
 	return &res, nil
 }
 
-func (h *FixedDepositWillServiceImpl) UpdateFixedDepositWill(id int, input dto.FixedDepositWillDTO) (*dto.FixedDepositWillResponseDTO, error) {
+func (h *FixedDepositWillServiceImpl) UpdateFixedDepositWill(ctx context.Context, id int, input dto.FixedDepositWillDTO) (*dto.FixedDepositWillResponseDTO, error) {
 	dataToInsert := input.ToFixedDepositWill()
 	dataToInsert.ID = id
 
 	err := data.Upper.Tx(func(tx up.Session) error {
-		err := h.repo.Update(tx, *dataToInsert)
+		err := h.repo.Update(ctx, tx, *dataToInsert)
 		if err != nil {
 			return errors.ErrInternalServer
 		}
@@ -80,8 +81,8 @@ func (h *FixedDepositWillServiceImpl) UpdateFixedDepositWill(id int, input dto.F
 	return &response, nil
 }
 
-func (h *FixedDepositWillServiceImpl) DeleteFixedDepositWill(id int) error {
-	err := h.repo.Delete(id)
+func (h *FixedDepositWillServiceImpl) DeleteFixedDepositWill(ctx context.Context, id int) error {
+	err := h.repo.Delete(ctx, id)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return errors.ErrInternalServer

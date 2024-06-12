@@ -1,9 +1,11 @@
 package handlers
 
 import (
+	"context"
 	"net/http"
 	"strconv"
 
+	"gitlab.sudovi.me/erp/finance-api/contextutil"
 	"gitlab.sudovi.me/erp/finance-api/dto"
 	"gitlab.sudovi.me/erp/finance-api/errors"
 	"gitlab.sudovi.me/erp/finance-api/services"
@@ -40,7 +42,19 @@ func (h *fineHandlerImpl) CreateFine(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res, err := h.service.CreateFine(input)
+	userIDString := r.Header.Get("UserID")
+
+	userID, err := strconv.Atoi(userIDString)
+
+	if err != nil {
+		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
+		return
+	}
+
+	ctx := context.Background()
+	ctx = contextutil.SetUserIDInContext(ctx, userID)
+
+	res, err := h.service.CreateFine(ctx, input)
 	if err != nil {
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -79,7 +93,19 @@ func (h *fineHandlerImpl) UpdateFine(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res, err := h.service.UpdateFine(id, input)
+	userIDString := r.Header.Get("UserID")
+
+	userID, err := strconv.Atoi(userIDString)
+
+	if err != nil {
+		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
+		return
+	}
+
+	ctx := context.Background()
+	ctx = contextutil.SetUserIDInContext(ctx, userID)
+
+	res, err := h.service.UpdateFine(ctx, id, input)
 	if err != nil {
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -92,7 +118,19 @@ func (h *fineHandlerImpl) UpdateFine(w http.ResponseWriter, r *http.Request) {
 func (h *fineHandlerImpl) DeleteFine(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.Atoi(chi.URLParam(r, "id"))
 
-	err := h.service.DeleteFine(id)
+	userIDString := r.Header.Get("UserID")
+
+	userID, err := strconv.Atoi(userIDString)
+
+	if err != nil {
+		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
+		return
+	}
+
+	ctx := context.Background()
+	ctx = contextutil.SetUserIDInContext(ctx, userID)
+
+	err = h.service.DeleteFine(ctx, id)
 	if err != nil {
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return

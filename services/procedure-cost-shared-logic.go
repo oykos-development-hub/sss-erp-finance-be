@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"math"
 	"time"
 
@@ -27,7 +28,7 @@ func NewProcedureCostSharedLogicServiceImpl(app *celeritas.Celeritas, repoProced
 	}
 }
 
-func (h *ProcedureCostSharedLogicServiceImpl) CalculateProcedureCostDetailsAndUpdateStatus(procedurecostId int) (*dto.ProcedureCostDetailsDTO, data.ProcedureCostStatus, error) {
+func (h *ProcedureCostSharedLogicServiceImpl) CalculateProcedureCostDetailsAndUpdateStatus(ctx context.Context, procedurecostId int) (*dto.ProcedureCostDetailsDTO, data.ProcedureCostStatus, error) {
 	procedurecost, err := h.repoProcedureCost.Get(procedurecostId)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
@@ -81,7 +82,7 @@ func (h *ProcedureCostSharedLogicServiceImpl) CalculateProcedureCostDetailsAndUp
 
 	if newStatus != procedurecost.Status {
 		procedurecost.Status = newStatus
-		err = h.repoProcedureCost.Update(*procedurecost)
+		err = h.repoProcedureCost.Update(ctx, *procedurecost)
 		if err != nil {
 			return nil, 0, errors.ErrInternalServer
 		}

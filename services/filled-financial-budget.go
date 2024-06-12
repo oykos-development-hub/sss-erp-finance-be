@@ -1,6 +1,8 @@
 package services
 
 import (
+	"context"
+
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
 	"gitlab.sudovi.me/erp/finance-api/errors"
@@ -31,10 +33,10 @@ func NewFilledFinancialBudgetServiceImpl(
 	}
 }
 
-func (h *FilledFinancialBudgetServiceImpl) CreateFilledFinancialBudget(input dto.FilledFinancialBudgetDTO) (*dto.FilledFinancialBudgetResponseDTO, error) {
+func (h *FilledFinancialBudgetServiceImpl) CreateFilledFinancialBudget(ctx context.Context, input dto.FilledFinancialBudgetDTO) (*dto.FilledFinancialBudgetResponseDTO, error) {
 	data := input.ToFilledFinancialBudget()
 
-	id, err := h.repo.Insert(*data)
+	id, err := h.repo.Insert(ctx, *data)
 	if err != nil {
 		return nil, errors.ErrInternalServer
 	}
@@ -49,11 +51,11 @@ func (h *FilledFinancialBudgetServiceImpl) CreateFilledFinancialBudget(input dto
 	return &res, nil
 }
 
-func (h *FilledFinancialBudgetServiceImpl) UpdateFilledFinancialBudget(id int, input dto.FilledFinancialBudgetDTO) (*dto.FilledFinancialBudgetResponseDTO, error) {
+func (h *FilledFinancialBudgetServiceImpl) UpdateFilledFinancialBudget(ctx context.Context, id int, input dto.FilledFinancialBudgetDTO) (*dto.FilledFinancialBudgetResponseDTO, error) {
 	inputData := input.ToFilledFinancialBudget()
 	inputData.ID = id
 
-	err := h.repo.Update(*inputData)
+	err := h.repo.Update(ctx, *inputData)
 	if err != nil {
 		return nil, errors.ErrInternalServer
 	}
@@ -68,8 +70,8 @@ func (h *FilledFinancialBudgetServiceImpl) UpdateFilledFinancialBudget(id int, i
 	return &response, nil
 }
 
-func (h *FilledFinancialBudgetServiceImpl) UpdateActualFilledFinancialBudget(id int, actual decimal.Decimal) (*dto.FilledFinancialBudgetResponseDTO, error) {
-	err := h.repo.UpdateActual(id, actual)
+func (h *FilledFinancialBudgetServiceImpl) UpdateActualFilledFinancialBudget(ctx context.Context, id int, actual decimal.Decimal) (*dto.FilledFinancialBudgetResponseDTO, error) {
+	err := h.repo.UpdateActual(ctx, id, actual)
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +87,7 @@ func (h *FilledFinancialBudgetServiceImpl) UpdateActualFilledFinancialBudget(id 
 	}
 
 	// TODO: check if there is only one insert. If we allow official to update actual, then we need to update it here too.
-	_, err = h.currentBudgetRepo.Insert(data.CurrentBudget{
+	_, err = h.currentBudgetRepo.Insert(ctx, data.CurrentBudget{
 		BudgetID:      budgetRequest.BudgetID,
 		UnitID:        budgetRequest.OrganizationUnitID,
 		AccountID:     item.AccountID,
@@ -102,8 +104,8 @@ func (h *FilledFinancialBudgetServiceImpl) UpdateActualFilledFinancialBudget(id 
 	return &response, nil
 }
 
-func (h *FilledFinancialBudgetServiceImpl) DeleteFilledFinancialBudget(id int) error {
-	err := h.repo.Delete(id)
+func (h *FilledFinancialBudgetServiceImpl) DeleteFilledFinancialBudget(ctx context.Context, id int) error {
+	err := h.repo.Delete(ctx, id)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return errors.ErrInternalServer

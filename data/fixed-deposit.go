@@ -1,9 +1,13 @@
 package data
 
 import (
+	"context"
+	"fmt"
 	"time"
 
 	up "github.com/upper/db/v4"
+	"gitlab.sudovi.me/erp/finance-api/contextutil"
+	"gitlab.sudovi.me/erp/finance-api/pkg/errors"
 )
 
 // FixedDeposit struct
@@ -72,11 +76,29 @@ func (t *FixedDeposit) Get(id int) (*FixedDeposit, error) {
 }
 
 // Update updates a record in the database, using upper
-func (t *FixedDeposit) Update(tx up.Session, m FixedDeposit) error {
+func (t *FixedDeposit) Update(ctx context.Context, tx up.Session, m FixedDeposit) error {
 	m.UpdatedAt = time.Now()
-	collection := tx.Collection(t.Table())
-	res := collection.Find(m.ID)
-	err := res.Update(&m)
+	userID, ok := contextutil.GetUserIDFromContext(ctx)
+	if !ok {
+		return errors.New("user ID not found in context")
+	}
+
+	err := Upper.Tx(func(sess up.Session) error {
+
+		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+		if _, err := sess.SQL().Exec(query); err != nil {
+			return err
+		}
+
+		collection := sess.Collection(t.Table())
+		res := collection.Find(m.ID)
+		if err := res.Update(&m); err != nil {
+			return err
+		}
+
+		return nil
+	})
+
 	if err != nil {
 		return err
 	}
@@ -84,10 +106,27 @@ func (t *FixedDeposit) Update(tx up.Session, m FixedDeposit) error {
 }
 
 // Delete deletes a record from the database by id, using upper
-func (t *FixedDeposit) Delete(id int) error {
-	collection := Upper.Collection(t.Table())
-	res := collection.Find(id)
-	err := res.Delete()
+func (t *FixedDeposit) Delete(ctx context.Context, id int) error {
+	userID, ok := contextutil.GetUserIDFromContext(ctx)
+	if !ok {
+		return errors.New("user ID not found in context")
+	}
+
+	err := Upper.Tx(func(sess up.Session) error {
+		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+		if _, err := sess.SQL().Exec(query); err != nil {
+			return err
+		}
+
+		collection := sess.Collection(t.Table())
+		res := collection.Find(id)
+		if err := res.Delete(); err != nil {
+			return err
+		}
+
+		return nil
+	})
+
 	if err != nil {
 		return err
 	}
@@ -95,16 +134,40 @@ func (t *FixedDeposit) Delete(id int) error {
 }
 
 // Insert inserts a model into the database, using upper
-func (t *FixedDeposit) Insert(tx up.Session, m FixedDeposit) (int, error) {
+func (t *FixedDeposit) Insert(ctx context.Context, tx up.Session, m FixedDeposit) (int, error) {
 	m.CreatedAt = time.Now()
 	m.UpdatedAt = time.Now()
-	collection := tx.Collection(t.Table())
-	res, err := collection.Insert(m)
+	userID, ok := contextutil.GetUserIDFromContext(ctx)
+	if !ok {
+		return 0, errors.New("user ID not found in context")
+	}
+
+	var id int
+
+	err := Upper.Tx(func(sess up.Session) error {
+
+		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+		if _, err := sess.SQL().Exec(query); err != nil {
+			return err
+		}
+
+		collection := sess.Collection(t.Table())
+
+		var res up.InsertResult
+		var err error
+
+		if res, err = collection.Insert(m); err != nil {
+			return err
+		}
+
+		id = getInsertId(res.ID())
+
+		return nil
+	})
+
 	if err != nil {
 		return 0, err
 	}
-
-	id := getInsertId(res.ID())
 
 	return id, nil
 }

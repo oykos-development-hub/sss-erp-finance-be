@@ -1,6 +1,8 @@
 package services
 
 import (
+	"context"
+
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
 	"gitlab.sudovi.me/erp/finance-api/errors"
@@ -21,13 +23,13 @@ func NewFixedDepositWillDispatchServiceImpl(app *celeritas.Celeritas, repo data.
 	}
 }
 
-func (h *FixedDepositWillDispatchServiceImpl) CreateFixedDepositWillDispatch(input dto.FixedDepositWillDispatchDTO) (*dto.FixedDepositWillDispatchResponseDTO, error) {
+func (h *FixedDepositWillDispatchServiceImpl) CreateFixedDepositWillDispatch(ctx context.Context, input dto.FixedDepositWillDispatchDTO) (*dto.FixedDepositWillDispatchResponseDTO, error) {
 	dataToInsert := input.ToFixedDepositWillDispatch()
 
 	var id int
 	err := data.Upper.Tx(func(tx up.Session) error {
 		var err error
-		id, err = h.repo.Insert(tx, *dataToInsert)
+		id, err = h.repo.Insert(ctx, tx, *dataToInsert)
 		if err != nil {
 			return errors.ErrInternalServer
 		}
@@ -49,12 +51,12 @@ func (h *FixedDepositWillDispatchServiceImpl) CreateFixedDepositWillDispatch(inp
 	return &res, nil
 }
 
-func (h *FixedDepositWillDispatchServiceImpl) UpdateFixedDepositWillDispatch(id int, input dto.FixedDepositWillDispatchDTO) (*dto.FixedDepositWillDispatchResponseDTO, error) {
+func (h *FixedDepositWillDispatchServiceImpl) UpdateFixedDepositWillDispatch(ctx context.Context, id int, input dto.FixedDepositWillDispatchDTO) (*dto.FixedDepositWillDispatchResponseDTO, error) {
 	dataToInsert := input.ToFixedDepositWillDispatch()
 	dataToInsert.ID = id
 
 	err := data.Upper.Tx(func(tx up.Session) error {
-		err := h.repo.Update(tx, *dataToInsert)
+		err := h.repo.Update(ctx, tx, *dataToInsert)
 		if err != nil {
 			return errors.ErrInternalServer
 		}
@@ -74,8 +76,8 @@ func (h *FixedDepositWillDispatchServiceImpl) UpdateFixedDepositWillDispatch(id 
 	return &response, nil
 }
 
-func (h *FixedDepositWillDispatchServiceImpl) DeleteFixedDepositWillDispatch(id int) error {
-	err := h.repo.Delete(id)
+func (h *FixedDepositWillDispatchServiceImpl) DeleteFixedDepositWillDispatch(ctx context.Context, id int) error {
+	err := h.repo.Delete(ctx, id)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return errors.ErrInternalServer

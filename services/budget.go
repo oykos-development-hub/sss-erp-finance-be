@@ -1,6 +1,8 @@
 package services
 
 import (
+	"context"
+
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
 	"gitlab.sudovi.me/erp/finance-api/errors"
@@ -21,10 +23,10 @@ func NewBudgetServiceImpl(app *celeritas.Celeritas, repo data.Budget) BudgetServ
 	}
 }
 
-func (h *BudgetServiceImpl) CreateBudget(input dto.BudgetDTO) (*dto.BudgetResponseDTO, error) {
+func (h *BudgetServiceImpl) CreateBudget(ctx context.Context, input dto.BudgetDTO) (*dto.BudgetResponseDTO, error) {
 	data := input.ToBudget()
 
-	id, err := h.repo.Insert(*data)
+	id, err := h.repo.Insert(ctx, *data)
 	if err != nil {
 		return nil, errors.ErrInternalServer
 	}
@@ -39,11 +41,11 @@ func (h *BudgetServiceImpl) CreateBudget(input dto.BudgetDTO) (*dto.BudgetRespon
 	return &res, nil
 }
 
-func (h *BudgetServiceImpl) UpdateBudget(id int, input dto.BudgetDTO) (*dto.BudgetResponseDTO, error) {
+func (h *BudgetServiceImpl) UpdateBudget(ctx context.Context, id int, input dto.BudgetDTO) (*dto.BudgetResponseDTO, error) {
 	data := input.ToBudget()
 	data.ID = id
 
-	err := h.repo.Update(*data)
+	err := h.repo.Update(ctx, *data)
 	if err != nil {
 		return nil, errors.ErrInternalServer
 	}
@@ -58,8 +60,8 @@ func (h *BudgetServiceImpl) UpdateBudget(id int, input dto.BudgetDTO) (*dto.Budg
 	return &response, nil
 }
 
-func (h *BudgetServiceImpl) DeleteBudget(id int) error {
-	err := h.repo.Delete(id)
+func (h *BudgetServiceImpl) DeleteBudget(ctx context.Context, id int) error {
+	err := h.repo.Delete(ctx, id)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return errors.ErrInternalServer

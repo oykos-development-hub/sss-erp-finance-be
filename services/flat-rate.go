@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"fmt"
 
 	"gitlab.sudovi.me/erp/finance-api/data"
@@ -27,11 +28,11 @@ func NewFlatRateServiceImpl(app *celeritas.Celeritas, repo data.FlatRate, FlatRa
 }
 
 // CreateFlatRate creates a new FlatRate
-func (h *FlatRateServiceImpl) CreateFlatRate(input dto.FlatRateDTO) (*dto.FlatRateResponseDTO, error) {
+func (h *FlatRateServiceImpl) CreateFlatRate(ctx context.Context, input dto.FlatRateDTO) (*dto.FlatRateResponseDTO, error) {
 	FlatRate := input.ToFlatRate()
 	FlatRate.Status = data.UnpaidFlatRateStatus
 
-	id, err := h.repo.Insert(*FlatRate)
+	id, err := h.repo.Insert(ctx, *FlatRate)
 	if err != nil {
 		return nil, errors.ErrInternalServer
 	}
@@ -41,7 +42,7 @@ func (h *FlatRateServiceImpl) CreateFlatRate(input dto.FlatRateDTO) (*dto.FlatRa
 		return nil, errors.ErrInternalServer
 	}
 
-	return h.createFlatRateResponse(FlatRate)
+	return h.createFlatRateResponse(ctx, FlatRate)
 }
 
 // GetFlatRate returns a FlatRate by id
@@ -52,15 +53,15 @@ func (h *FlatRateServiceImpl) GetFlatRate(id int) (*dto.FlatRateResponseDTO, err
 		return nil, errors.ErrNotFound
 	}
 
-	return h.createFlatRateResponse(FlatRate)
+	return h.createFlatRateResponse(context.Background(), FlatRate)
 }
 
 // UpdateFlatRate updates a FlatRate
-func (h *FlatRateServiceImpl) UpdateFlatRate(id int, input dto.FlatRateDTO) (*dto.FlatRateResponseDTO, error) {
+func (h *FlatRateServiceImpl) UpdateFlatRate(ctx context.Context, id int, input dto.FlatRateDTO) (*dto.FlatRateResponseDTO, error) {
 	FlatRate := input.ToFlatRate()
 	FlatRate.ID = id
 
-	err := h.repo.Update(*FlatRate)
+	err := h.repo.Update(ctx, *FlatRate)
 	if err != nil {
 		return nil, errors.ErrInternalServer
 	}
@@ -70,12 +71,12 @@ func (h *FlatRateServiceImpl) UpdateFlatRate(id int, input dto.FlatRateDTO) (*dt
 		return nil, errors.ErrInternalServer
 	}
 
-	return h.createFlatRateResponse(FlatRate)
+	return h.createFlatRateResponse(ctx, FlatRate)
 }
 
 // DeleteFlatRate deletes a FlatRate by its id
-func (h *FlatRateServiceImpl) DeleteFlatRate(id int) error {
-	err := h.repo.Delete(id)
+func (h *FlatRateServiceImpl) DeleteFlatRate(ctx context.Context, id int) error {
+	err := h.repo.Delete(ctx, id)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return errors.ErrInternalServer
@@ -137,7 +138,7 @@ func (h *FlatRateServiceImpl) GetFlatRateList(input dto.FlatRateFilterDTO) ([]dt
 func (h *FlatRateServiceImpl) convertFlatRatesToResponses(FlatRates []data.FlatRate) ([]dto.FlatRateResponseDTO, error) {
 	var responses []dto.FlatRateResponseDTO
 	for _, fee := range FlatRates {
-		response, err := h.createFlatRateResponse(&fee)
+		response, err := h.createFlatRateResponse(context.Background(), &fee)
 		if err != nil {
 			return nil, err
 		}
@@ -147,11 +148,11 @@ func (h *FlatRateServiceImpl) convertFlatRatesToResponses(FlatRates []data.FlatR
 }
 
 // createFlatRateResponse creates a FlatRateResponseDTO from a FlatRate
-func (h *FlatRateServiceImpl) createFlatRateResponse(FlatRate *data.FlatRate) (*dto.FlatRateResponseDTO, error) {
+func (h *FlatRateServiceImpl) createFlatRateResponse(ctx context.Context, FlatRate *data.FlatRate) (*dto.FlatRateResponseDTO, error) {
 	response := dto.ToFlatRateResponseDTO(*FlatRate)
 	var newStatus data.FlatRateStatus
 	var err error
-	response.FlatRateDetails, newStatus, err = h.FlatRateSharedLogicService.CalculateFlatRateDetailsAndUpdateStatus(FlatRate.ID)
+	response.FlatRateDetails, newStatus, err = h.FlatRateSharedLogicService.CalculateFlatRateDetailsAndUpdateStatus(ctx, FlatRate.ID)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return nil, err

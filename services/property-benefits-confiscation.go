@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"fmt"
 
 	"gitlab.sudovi.me/erp/finance-api/data"
@@ -27,11 +28,11 @@ func NewPropBenConfServiceImpl(app *celeritas.Celeritas, repo data.PropBenConf, 
 }
 
 // CreatePropBenConf creates a new propbenconf
-func (h *PropBenConfServiceImpl) CreatePropBenConf(input dto.PropBenConfDTO) (*dto.PropBenConfResponseDTO, error) {
+func (h *PropBenConfServiceImpl) CreatePropBenConf(ctx context.Context, input dto.PropBenConfDTO) (*dto.PropBenConfResponseDTO, error) {
 	propbenconf := input.ToPropBenConf()
 	propbenconf.Status = data.UnpaidPropBenConfStatus
 
-	id, err := h.repo.Insert(*propbenconf)
+	id, err := h.repo.Insert(ctx, *propbenconf)
 	if err != nil {
 		return nil, errors.ErrInternalServer
 	}
@@ -41,7 +42,7 @@ func (h *PropBenConfServiceImpl) CreatePropBenConf(input dto.PropBenConfDTO) (*d
 		return nil, errors.ErrInternalServer
 	}
 
-	return h.createPropBenConfResponse(propbenconf)
+	return h.createPropBenConfResponse(ctx, propbenconf)
 }
 
 // GetPropBenConf returns a propbenconf by id
@@ -52,15 +53,15 @@ func (h *PropBenConfServiceImpl) GetPropBenConf(id int) (*dto.PropBenConfRespons
 		return nil, errors.ErrNotFound
 	}
 
-	return h.createPropBenConfResponse(propbenconf)
+	return h.createPropBenConfResponse(context.Background(), propbenconf)
 }
 
 // UpdatePropBenConf updates a propbenconf
-func (h *PropBenConfServiceImpl) UpdatePropBenConf(id int, input dto.PropBenConfDTO) (*dto.PropBenConfResponseDTO, error) {
+func (h *PropBenConfServiceImpl) UpdatePropBenConf(ctx context.Context, id int, input dto.PropBenConfDTO) (*dto.PropBenConfResponseDTO, error) {
 	propbenconf := input.ToPropBenConf()
 	propbenconf.ID = id
 
-	err := h.repo.Update(*propbenconf)
+	err := h.repo.Update(ctx, *propbenconf)
 	if err != nil {
 		return nil, errors.ErrInternalServer
 	}
@@ -70,12 +71,12 @@ func (h *PropBenConfServiceImpl) UpdatePropBenConf(id int, input dto.PropBenConf
 		return nil, errors.ErrInternalServer
 	}
 
-	return h.createPropBenConfResponse(propbenconf)
+	return h.createPropBenConfResponse(ctx, propbenconf)
 }
 
 // DeletePropBenConf deletes a propbenconf by its id
-func (h *PropBenConfServiceImpl) DeletePropBenConf(id int) error {
-	err := h.repo.Delete(id)
+func (h *PropBenConfServiceImpl) DeletePropBenConf(ctx context.Context, id int) error {
+	err := h.repo.Delete(ctx, id)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return errors.ErrInternalServer
@@ -124,7 +125,7 @@ func (h *PropBenConfServiceImpl) GetPropBenConfList(input dto.PropBenConfFilterD
 		propbenconfsList = append(propbenconfsList, *propbenconf)
 	}
 
-	response, err := h.convertPropBenConfsToResponses(propbenconfsList)
+	response, err := h.convertPropBenConfsToResponses(context.Background(), propbenconfsList)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return nil, nil, err
@@ -134,10 +135,10 @@ func (h *PropBenConfServiceImpl) GetPropBenConfList(input dto.PropBenConfFilterD
 }
 
 // convertPropBenConfsToResponses is a helper method that converts a list of propbenconfs to a list of response DTOs.
-func (h *PropBenConfServiceImpl) convertPropBenConfsToResponses(propbenconfs []data.PropBenConf) ([]dto.PropBenConfResponseDTO, error) {
+func (h *PropBenConfServiceImpl) convertPropBenConfsToResponses(ctx context.Context, propbenconfs []data.PropBenConf) ([]dto.PropBenConfResponseDTO, error) {
 	var responses []dto.PropBenConfResponseDTO
 	for _, fee := range propbenconfs {
-		response, err := h.createPropBenConfResponse(&fee)
+		response, err := h.createPropBenConfResponse(ctx, &fee)
 		if err != nil {
 			return nil, err
 		}
@@ -147,11 +148,11 @@ func (h *PropBenConfServiceImpl) convertPropBenConfsToResponses(propbenconfs []d
 }
 
 // createPropBenConfResponse creates a PropBenConfResponseDTO from a PropBenConf
-func (h *PropBenConfServiceImpl) createPropBenConfResponse(propbenconf *data.PropBenConf) (*dto.PropBenConfResponseDTO, error) {
+func (h *PropBenConfServiceImpl) createPropBenConfResponse(ctx context.Context, propbenconf *data.PropBenConf) (*dto.PropBenConfResponseDTO, error) {
 	response := dto.ToPropBenConfResponseDTO(*propbenconf)
 	var newStatus data.PropBenConfStatus
 	var err error
-	response.PropBenConfDetailsDTO, newStatus, err = h.propbenconfSharedLogicService.CalculatePropBenConfDetailsAndUpdateStatus(propbenconf.ID)
+	response.PropBenConfDetailsDTO, newStatus, err = h.propbenconfSharedLogicService.CalculatePropBenConfDetailsAndUpdateStatus(ctx, propbenconf.ID)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return nil, err

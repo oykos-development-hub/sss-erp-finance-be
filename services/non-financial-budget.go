@@ -1,6 +1,8 @@
 package services
 
 import (
+	"context"
+
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
 	"gitlab.sudovi.me/erp/finance-api/errors"
@@ -21,10 +23,10 @@ func NewNonFinancialBudgetServiceImpl(app *celeritas.Celeritas, repo data.NonFin
 	}
 }
 
-func (h *NonFinancialBudgetServiceImpl) CreateNonFinancialBudget(input dto.NonFinancialBudgetDTO) (*dto.NonFinancialBudgetResponseDTO, error) {
+func (h *NonFinancialBudgetServiceImpl) CreateNonFinancialBudget(ctx context.Context, input dto.NonFinancialBudgetDTO) (*dto.NonFinancialBudgetResponseDTO, error) {
 	data := input.ToNonFinancialBudget()
 
-	id, err := h.repo.Insert(*data)
+	id, err := h.repo.Insert(ctx, *data)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return nil, errors.ErrInternalServer
@@ -41,11 +43,11 @@ func (h *NonFinancialBudgetServiceImpl) CreateNonFinancialBudget(input dto.NonFi
 	return &res, nil
 }
 
-func (h *NonFinancialBudgetServiceImpl) UpdateNonFinancialBudget(id int, input dto.NonFinancialBudgetDTO) (*dto.NonFinancialBudgetResponseDTO, error) {
+func (h *NonFinancialBudgetServiceImpl) UpdateNonFinancialBudget(ctx context.Context, id int, input dto.NonFinancialBudgetDTO) (*dto.NonFinancialBudgetResponseDTO, error) {
 	data := input.ToNonFinancialBudget()
 	data.ID = id
 
-	err := h.repo.Update(*data)
+	err := h.repo.Update(ctx, *data)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return nil, errors.ErrInternalServer
@@ -62,8 +64,8 @@ func (h *NonFinancialBudgetServiceImpl) UpdateNonFinancialBudget(id int, input d
 	return &response, nil
 }
 
-func (h *NonFinancialBudgetServiceImpl) DeleteNonFinancialBudget(id int) error {
-	err := h.repo.Delete(id)
+func (h *NonFinancialBudgetServiceImpl) DeleteNonFinancialBudget(ctx context.Context, id int) error {
+	err := h.repo.Delete(ctx, id)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return errors.ErrInternalServer

@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"math"
 
 	"gitlab.sudovi.me/erp/finance-api/data"
@@ -26,7 +27,7 @@ func NewFeeSharedLogicServiceImpl(app *celeritas.Celeritas, repoFee data.Fee, re
 	}
 }
 
-func (h *FeeSharedLogicServiceImpl) CalculateFeeDetailsAndUpdateStatus(feeId int) (*dto.FeeDetailsDTO, data.FeeStatus, error) {
+func (h *FeeSharedLogicServiceImpl) CalculateFeeDetailsAndUpdateStatus(ctx context.Context, feeId int) (*dto.FeeDetailsDTO, data.FeeStatus, error) {
 	fee, err := h.repoFee.Get(feeId)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
@@ -65,7 +66,7 @@ func (h *FeeSharedLogicServiceImpl) CalculateFeeDetailsAndUpdateStatus(feeId int
 
 	if newStatus != fee.Status {
 		fee.Status = newStatus
-		err = h.repoFee.Update(*fee)
+		err = h.repoFee.Update(ctx, *fee)
 		if err != nil {
 			return nil, 0, errors.ErrInternalServer
 		}

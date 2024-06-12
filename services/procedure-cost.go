@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"fmt"
 
 	"gitlab.sudovi.me/erp/finance-api/data"
@@ -27,11 +28,11 @@ func NewProcedureCostServiceImpl(app *celeritas.Celeritas, repo data.ProcedureCo
 }
 
 // CreateProcedureCost creates a new procedurecost
-func (h *ProcedureCostServiceImpl) CreateProcedureCost(input dto.ProcedureCostDTO) (*dto.ProcedureCostResponseDTO, error) {
+func (h *ProcedureCostServiceImpl) CreateProcedureCost(ctx context.Context, input dto.ProcedureCostDTO) (*dto.ProcedureCostResponseDTO, error) {
 	procedurecost := input.ToProcedureCost()
 	procedurecost.Status = data.UnpaidProcedureCostStatus
 
-	id, err := h.repo.Insert(*procedurecost)
+	id, err := h.repo.Insert(ctx, *procedurecost)
 	if err != nil {
 		return nil, errors.ErrInternalServer
 	}
@@ -41,7 +42,7 @@ func (h *ProcedureCostServiceImpl) CreateProcedureCost(input dto.ProcedureCostDT
 		return nil, errors.ErrInternalServer
 	}
 
-	return h.createProcedureCostResponse(procedurecost)
+	return h.createProcedureCostResponse(context.Background(), procedurecost)
 }
 
 // GetProcedureCost returns a procedurecost by id
@@ -52,15 +53,15 @@ func (h *ProcedureCostServiceImpl) GetProcedureCost(id int) (*dto.ProcedureCostR
 		return nil, errors.ErrNotFound
 	}
 
-	return h.createProcedureCostResponse(procedurecost)
+	return h.createProcedureCostResponse(context.Background(), procedurecost)
 }
 
 // UpdateProcedureCost updates a procedurecost
-func (h *ProcedureCostServiceImpl) UpdateProcedureCost(id int, input dto.ProcedureCostDTO) (*dto.ProcedureCostResponseDTO, error) {
+func (h *ProcedureCostServiceImpl) UpdateProcedureCost(ctx context.Context, id int, input dto.ProcedureCostDTO) (*dto.ProcedureCostResponseDTO, error) {
 	procedurecost := input.ToProcedureCost()
 	procedurecost.ID = id
 
-	err := h.repo.Update(*procedurecost)
+	err := h.repo.Update(ctx, *procedurecost)
 	if err != nil {
 		return nil, errors.ErrInternalServer
 	}
@@ -70,12 +71,12 @@ func (h *ProcedureCostServiceImpl) UpdateProcedureCost(id int, input dto.Procedu
 		return nil, errors.ErrInternalServer
 	}
 
-	return h.createProcedureCostResponse(procedurecost)
+	return h.createProcedureCostResponse(ctx, procedurecost)
 }
 
 // DeleteProcedureCost deletes a procedurecost by its id
-func (h *ProcedureCostServiceImpl) DeleteProcedureCost(id int) error {
-	err := h.repo.Delete(id)
+func (h *ProcedureCostServiceImpl) DeleteProcedureCost(ctx context.Context, id int) error {
+	err := h.repo.Delete(ctx, id)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return errors.ErrInternalServer
@@ -124,7 +125,7 @@ func (h *ProcedureCostServiceImpl) GetProcedureCostList(input dto.ProcedureCostF
 		procedureCostsList = append(procedureCostsList, *procedureCost)
 	}
 
-	response, err := h.convertProcedureCostsToResponses(procedureCostsList)
+	response, err := h.convertProcedureCostsToResponses(context.Background(), procedureCostsList)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return nil, nil, err
@@ -134,10 +135,10 @@ func (h *ProcedureCostServiceImpl) GetProcedureCostList(input dto.ProcedureCostF
 }
 
 // convertProcedureCostsToResponses is a helper method that converts a list of procedurecosts to a list of response DTOs.
-func (h *ProcedureCostServiceImpl) convertProcedureCostsToResponses(procedurecosts []data.ProcedureCost) ([]dto.ProcedureCostResponseDTO, error) {
+func (h *ProcedureCostServiceImpl) convertProcedureCostsToResponses(ctx context.Context, procedurecosts []data.ProcedureCost) ([]dto.ProcedureCostResponseDTO, error) {
 	var responses []dto.ProcedureCostResponseDTO
 	for _, fee := range procedurecosts {
-		response, err := h.createProcedureCostResponse(&fee)
+		response, err := h.createProcedureCostResponse(ctx, &fee)
 		if err != nil {
 			return nil, err
 		}
@@ -147,11 +148,11 @@ func (h *ProcedureCostServiceImpl) convertProcedureCostsToResponses(procedurecos
 }
 
 // createProcedureCostResponse creates a ProcedureCostResponseDTO from a ProcedureCost
-func (h *ProcedureCostServiceImpl) createProcedureCostResponse(procedurecost *data.ProcedureCost) (*dto.ProcedureCostResponseDTO, error) {
+func (h *ProcedureCostServiceImpl) createProcedureCostResponse(ctx context.Context, procedurecost *data.ProcedureCost) (*dto.ProcedureCostResponseDTO, error) {
 	response := dto.ToProcedureCostResponseDTO(*procedurecost)
 	var newStatus data.ProcedureCostStatus
 	var err error
-	response.ProcedureCostDetails, newStatus, err = h.procedurecostSharedLogicService.CalculateProcedureCostDetailsAndUpdateStatus(procedurecost.ID)
+	response.ProcedureCostDetails, newStatus, err = h.procedurecostSharedLogicService.CalculateProcedureCostDetailsAndUpdateStatus(ctx, procedurecost.ID)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return nil, err

@@ -1,9 +1,11 @@
 package handlers
 
 import (
+	"context"
 	"net/http"
 	"strconv"
 
+	"gitlab.sudovi.me/erp/finance-api/contextutil"
 	"gitlab.sudovi.me/erp/finance-api/dto"
 	"gitlab.sudovi.me/erp/finance-api/errors"
 	"gitlab.sudovi.me/erp/finance-api/services"
@@ -40,7 +42,19 @@ func (h *propbenconfPaymentHandlerImpl) CreatePropBenConfPayment(w http.Response
 		return
 	}
 
-	res, err := h.service.CreatePropBenConfPayment(input)
+	userIDString := r.Header.Get("UserID")
+
+	userID, err := strconv.Atoi(userIDString)
+
+	if err != nil {
+		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
+		return
+	}
+
+	ctx := context.Background()
+	ctx = contextutil.SetUserIDInContext(ctx, userID)
+
+	res, err := h.service.CreatePropBenConfPayment(ctx, input)
 	if err != nil {
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -53,7 +67,19 @@ func (h *propbenconfPaymentHandlerImpl) CreatePropBenConfPayment(w http.Response
 func (h *propbenconfPaymentHandlerImpl) DeletePropBenConfPayment(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.Atoi(chi.URLParam(r, "id"))
 
-	err := h.service.DeletePropBenConfPayment(id)
+	userIDString := r.Header.Get("UserID")
+
+	userID, err := strconv.Atoi(userIDString)
+
+	if err != nil {
+		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
+		return
+	}
+
+	ctx := context.Background()
+	ctx = contextutil.SetUserIDInContext(ctx, userID)
+
+	err = h.service.DeletePropBenConfPayment(ctx, id)
 	if err != nil {
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -83,7 +109,19 @@ func (h *propbenconfPaymentHandlerImpl) UpdatePropBenConfPayment(w http.Response
 		return
 	}
 
-	res, err := h.service.UpdatePropBenConfPayment(id, input)
+	userIDString := r.Header.Get("UserID")
+
+	userID, err := strconv.Atoi(userIDString)
+
+	if err != nil {
+		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
+		return
+	}
+
+	ctx := context.Background()
+	ctx = contextutil.SetUserIDInContext(ctx, userID)
+
+	res, err := h.service.UpdatePropBenConfPayment(ctx, id, input)
 	if err != nil {
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return

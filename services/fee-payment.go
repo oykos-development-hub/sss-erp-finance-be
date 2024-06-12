@@ -1,6 +1,8 @@
 package services
 
 import (
+	"context"
+
 	"github.com/oykos-development-hub/celeritas"
 	"github.com/upper/db/v4"
 	"gitlab.sudovi.me/erp/finance-api/data"
@@ -24,11 +26,11 @@ func NewFeePaymentServiceImpl(app *celeritas.Celeritas, repo data.FeePayment, fe
 }
 
 // CreateFeePayment creates a new fee payment
-func (h *FeePaymentServiceImpl) CreateFeePayment(input dto.FeePaymentDTO) (*dto.FeePaymentResponseDTO, error) {
+func (h *FeePaymentServiceImpl) CreateFeePayment(ctx context.Context, input dto.FeePaymentDTO) (*dto.FeePaymentResponseDTO, error) {
 	feePayment := input.ToFeePayment()
 	feePayment.Status = data.PaidFeePeymentStatus
 
-	id, err := h.repo.Insert(*feePayment)
+	id, err := h.repo.Insert(ctx, *feePayment)
 	if err != nil {
 		return nil, errors.ErrInternalServer
 	}
@@ -40,7 +42,7 @@ func (h *FeePaymentServiceImpl) CreateFeePayment(input dto.FeePaymentDTO) (*dto.
 
 	res := dto.ToFeePaymentResponseDTO(*feePayment)
 
-	_, _, err = h.feeSharedLogicService.CalculateFeeDetailsAndUpdateStatus(feePayment.FeeID)
+	_, _, err = h.feeSharedLogicService.CalculateFeeDetailsAndUpdateStatus(ctx, feePayment.FeeID)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return nil, err
@@ -50,20 +52,20 @@ func (h *FeePaymentServiceImpl) CreateFeePayment(input dto.FeePaymentDTO) (*dto.
 }
 
 // GetFeePayment returns a fee payment by its id
-func (h *FeePaymentServiceImpl) DeleteFeePayment(id int) error {
+func (h *FeePaymentServiceImpl) DeleteFeePayment(ctx context.Context, id int) error {
 	feePayment, err := h.repo.Get(id)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return errors.ErrNotFound
 	}
 
-	err = h.repo.Delete(id)
+	err = h.repo.Delete(ctx, id)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return errors.ErrInternalServer
 	}
 
-	_, _, err = h.feeSharedLogicService.CalculateFeeDetailsAndUpdateStatus(feePayment.FeeID)
+	_, _, err = h.feeSharedLogicService.CalculateFeeDetailsAndUpdateStatus(ctx, feePayment.FeeID)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return errors.ErrInternalServer
@@ -73,11 +75,11 @@ func (h *FeePaymentServiceImpl) DeleteFeePayment(id int) error {
 }
 
 // UpdateFeePayment updates a fee payment by its id
-func (h *FeePaymentServiceImpl) UpdateFeePayment(id int, input dto.FeePaymentDTO) (*dto.FeePaymentResponseDTO, error) {
+func (h *FeePaymentServiceImpl) UpdateFeePayment(ctx context.Context, id int, input dto.FeePaymentDTO) (*dto.FeePaymentResponseDTO, error) {
 	data := input.ToFeePayment()
 	data.ID = id
 
-	err := h.repo.Update(*data)
+	err := h.repo.Update(ctx, *data)
 	if err != nil {
 		return nil, errors.ErrInternalServer
 	}
@@ -89,7 +91,7 @@ func (h *FeePaymentServiceImpl) UpdateFeePayment(id int, input dto.FeePaymentDTO
 
 	response := dto.ToFeePaymentResponseDTO(*data)
 
-	_, _, err = h.feeSharedLogicService.CalculateFeeDetailsAndUpdateStatus(data.FeeID)
+	_, _, err = h.feeSharedLogicService.CalculateFeeDetailsAndUpdateStatus(ctx, data.FeeID)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return nil, errors.ErrInternalServer

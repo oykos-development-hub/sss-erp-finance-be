@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"math"
 	"time"
 
@@ -27,7 +28,7 @@ func NewFineSharedLogicServiceImpl(app *celeritas.Celeritas, repoFine data.Fine,
 	}
 }
 
-func (h *FineSharedLogicServiceImpl) CalculateFineDetailsAndUpdateStatus(fineId int) (*dto.FineFeeDetailsDTO, data.FineStatus, error) {
+func (h *FineSharedLogicServiceImpl) CalculateFineDetailsAndUpdateStatus(ctx context.Context, fineId int) (*dto.FineFeeDetailsDTO, data.FineStatus, error) {
 	fine, err := h.repoFine.Get(fineId)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
@@ -82,7 +83,7 @@ func (h *FineSharedLogicServiceImpl) CalculateFineDetailsAndUpdateStatus(fineId 
 
 	if newStatus != fine.Status {
 		fine.Status = newStatus
-		err = h.repoFine.Update(*fine)
+		err = h.repoFine.Update(ctx, *fine)
 		if err != nil {
 			return nil, 0, errors.ErrInternalServer
 		}

@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"fmt"
 
 	"gitlab.sudovi.me/erp/finance-api/data"
@@ -23,10 +24,10 @@ func NewProgramServiceImpl(app *celeritas.Celeritas, repo data.Program) ProgramS
 	}
 }
 
-func (h *ProgramServiceImpl) CreateProgram(input dto.ProgramDTO) (*dto.ProgramResponseDTO, error) {
+func (h *ProgramServiceImpl) CreateProgram(ctx context.Context, input dto.ProgramDTO) (*dto.ProgramResponseDTO, error) {
 	data := input.ToProgram()
 
-	id, err := h.repo.Insert(*data)
+	id, err := h.repo.Insert(ctx, *data)
 	if err != nil {
 		return nil, errors.ErrInternalServer
 	}
@@ -41,11 +42,11 @@ func (h *ProgramServiceImpl) CreateProgram(input dto.ProgramDTO) (*dto.ProgramRe
 	return &res, nil
 }
 
-func (h *ProgramServiceImpl) UpdateProgram(id int, input dto.ProgramDTO) (*dto.ProgramResponseDTO, error) {
+func (h *ProgramServiceImpl) UpdateProgram(ctx context.Context, id int, input dto.ProgramDTO) (*dto.ProgramResponseDTO, error) {
 	data := input.ToProgram()
 	data.ID = id
 
-	err := h.repo.Update(*data)
+	err := h.repo.Update(ctx, *data)
 	if err != nil {
 		return nil, errors.ErrInternalServer
 	}
@@ -60,8 +61,8 @@ func (h *ProgramServiceImpl) UpdateProgram(id int, input dto.ProgramDTO) (*dto.P
 	return &response, nil
 }
 
-func (h *ProgramServiceImpl) DeleteProgram(id int) error {
-	err := h.repo.Delete(id)
+func (h *ProgramServiceImpl) DeleteProgram(ctx context.Context, id int) error {
+	err := h.repo.Delete(ctx, id)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return errors.ErrInternalServer

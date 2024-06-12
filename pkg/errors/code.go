@@ -10,6 +10,8 @@ const (
 	SingleMonthSpendingReleaseCode = 200
 	ReleaseInCurrentMonthCode      = 201
 	NotEnoughFundsCode             = 202
+
+	ErrUnauthorized = 401
 )
 
 func httpStatusCode(code int) int {
@@ -20,6 +22,8 @@ func httpStatusCode(code int) int {
 		return http.StatusNotFound
 	case InternalCode:
 		return http.StatusInternalServerError
+	case ErrUnauthorized:
+		return http.StatusUnauthorized
 	default:
 		return http.StatusInternalServerError
 	}

@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -30,7 +31,7 @@ func NewInvoiceServiceImpl(app *celeritas.Celeritas, repo data.Invoice, addition
 	}
 }
 
-func (h *InvoiceServiceImpl) CreateInvoice(input dto.InvoiceDTO) (*dto.InvoiceResponseDTO, error) {
+func (h *InvoiceServiceImpl) CreateInvoice(ctx context.Context, input dto.InvoiceDTO) (*dto.InvoiceResponseDTO, error) {
 	invoice := input.ToInvoice()
 
 	var id int
@@ -39,7 +40,7 @@ func (h *InvoiceServiceImpl) CreateInvoice(input dto.InvoiceDTO) (*dto.InvoiceRe
 		if invoice.Status != data.InvoiceStatusIncomplete {
 			invoice.Status = data.InvoiceStatusCreated
 		}
-		id, err = h.repo.Insert(tx, *invoice)
+		id, err = h.repo.Insert(ctx, tx, *invoice)
 		if err != nil {
 			return errors.ErrInternalServer
 		}
@@ -72,7 +73,7 @@ func (h *InvoiceServiceImpl) CreateInvoice(input dto.InvoiceDTO) (*dto.InvoiceRe
 	return &res, nil
 }
 
-func (h *InvoiceServiceImpl) UpdateInvoice(id int, input dto.InvoiceDTO) (*dto.InvoiceResponseDTO, error) {
+func (h *InvoiceServiceImpl) UpdateInvoice(ctx context.Context, id int, input dto.InvoiceDTO) (*dto.InvoiceResponseDTO, error) {
 	invoice := input.ToInvoice()
 	invoice.ID = id
 
@@ -96,7 +97,7 @@ func (h *InvoiceServiceImpl) UpdateInvoice(id int, input dto.InvoiceDTO) (*dto.I
 
 	err = data.Upper.Tx(func(tx up.Session) error {
 		var err error
-		err = h.repo.Update(tx, *invoice)
+		err = h.repo.Update(ctx, tx, *invoice)
 		if err != nil {
 			return errors.ErrInternalServer
 		}
@@ -161,8 +162,8 @@ func (h *InvoiceServiceImpl) UpdateInvoice(id int, input dto.InvoiceDTO) (*dto.I
 	return &response, nil
 }
 
-func (h *InvoiceServiceImpl) DeleteInvoice(id int) error {
-	err := h.repo.Delete(id)
+func (h *InvoiceServiceImpl) DeleteInvoice(ctx context.Context, id int) error {
+	err := h.repo.Delete(ctx, id)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return errors.ErrInternalServer

@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"time"
 
 	"gitlab.sudovi.me/erp/finance-api/data"
@@ -27,12 +28,12 @@ func NewSalaryServiceImpl(app *celeritas.Celeritas, repo data.Salary, salaryAddi
 	}
 }
 
-func (h *SalaryServiceImpl) CreateSalary(input dto.SalaryDTO) (*dto.SalaryResponseDTO, error) {
+func (h *SalaryServiceImpl) CreateSalary(ctx context.Context, input dto.SalaryDTO) (*dto.SalaryResponseDTO, error) {
 	dataToInsert := input.ToSalary()
 
 	var id int
 	var err error
-	id, err = h.repo.Insert(data.Upper, *dataToInsert)
+	id, err = h.repo.Insert(ctx, data.Upper, *dataToInsert)
 	if err != nil {
 		return nil, errors.ErrInternalServer
 	}
@@ -63,7 +64,7 @@ func (h *SalaryServiceImpl) CreateSalary(input dto.SalaryDTO) (*dto.SalaryRespon
 	return &res, nil
 }
 
-func (h *SalaryServiceImpl) UpdateSalary(id int, input dto.SalaryDTO) (*dto.SalaryResponseDTO, error) {
+func (h *SalaryServiceImpl) UpdateSalary(ctx context.Context, id int, input dto.SalaryDTO) (*dto.SalaryResponseDTO, error) {
 	dataToInsert := input.ToSalary()
 	dataToInsert.ID = id
 
@@ -74,7 +75,7 @@ func (h *SalaryServiceImpl) UpdateSalary(id int, input dto.SalaryDTO) (*dto.Sala
 	}
 
 	err = data.Upper.Tx(func(tx up.Session) error {
-		err := h.repo.Update(tx, *dataToInsert)
+		err := h.repo.Update(ctx, tx, *dataToInsert)
 		if err != nil {
 			return errors.ErrInternalServer
 		}
@@ -147,8 +148,8 @@ func (h *SalaryServiceImpl) UpdateSalary(id int, input dto.SalaryDTO) (*dto.Sala
 	return &response, nil
 }
 
-func (h *SalaryServiceImpl) DeleteSalary(id int) error {
-	err := h.repo.Delete(id)
+func (h *SalaryServiceImpl) DeleteSalary(ctx context.Context, id int) error {
+	err := h.repo.Delete(ctx, id)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return errors.ErrInternalServer

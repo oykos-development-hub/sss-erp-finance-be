@@ -1,6 +1,8 @@
 package services
 
 import (
+	"context"
+
 	"github.com/oykos-development-hub/celeritas"
 	"github.com/upper/db/v4"
 	"gitlab.sudovi.me/erp/finance-api/data"
@@ -24,11 +26,11 @@ func NewPropBenConfPaymentServiceImpl(app *celeritas.Celeritas, repo data.PropBe
 }
 
 // CreatePropBenConfPayment creates a new propbenconf payment
-func (h *PropBenConfPaymentServiceImpl) CreatePropBenConfPayment(input dto.PropBenConfPaymentDTO) (*dto.PropBenConfPaymentResponseDTO, error) {
+func (h *PropBenConfPaymentServiceImpl) CreatePropBenConfPayment(ctx context.Context, input dto.PropBenConfPaymentDTO) (*dto.PropBenConfPaymentResponseDTO, error) {
 	propbenconfPayment := input.ToPropBenConfPayment()
 	propbenconfPayment.Status = data.PaidPropBenConfPeymentStatus
 
-	id, err := h.repo.Insert(*propbenconfPayment)
+	id, err := h.repo.Insert(ctx, *propbenconfPayment)
 	if err != nil {
 		return nil, errors.ErrInternalServer
 	}
@@ -40,7 +42,7 @@ func (h *PropBenConfPaymentServiceImpl) CreatePropBenConfPayment(input dto.PropB
 
 	res := dto.ToPropBenConfPaymentResponseDTO(*propbenconfPayment)
 
-	_, _, err = h.propbenconfSharedLogicService.CalculatePropBenConfDetailsAndUpdateStatus(propbenconfPayment.PropBenConfID)
+	_, _, err = h.propbenconfSharedLogicService.CalculatePropBenConfDetailsAndUpdateStatus(ctx, propbenconfPayment.PropBenConfID)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return nil, err
@@ -50,20 +52,20 @@ func (h *PropBenConfPaymentServiceImpl) CreatePropBenConfPayment(input dto.PropB
 }
 
 // GetPropBenConfPayment returns a propbenconf payment by its id
-func (h *PropBenConfPaymentServiceImpl) DeletePropBenConfPayment(id int) error {
+func (h *PropBenConfPaymentServiceImpl) DeletePropBenConfPayment(ctx context.Context, id int) error {
 	propbenconfPayment, err := h.repo.Get(id)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return errors.ErrNotFound
 	}
 
-	err = h.repo.Delete(id)
+	err = h.repo.Delete(ctx, id)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return errors.ErrInternalServer
 	}
 
-	_, _, err = h.propbenconfSharedLogicService.CalculatePropBenConfDetailsAndUpdateStatus(propbenconfPayment.PropBenConfID)
+	_, _, err = h.propbenconfSharedLogicService.CalculatePropBenConfDetailsAndUpdateStatus(ctx, propbenconfPayment.PropBenConfID)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return errors.ErrInternalServer
@@ -73,11 +75,11 @@ func (h *PropBenConfPaymentServiceImpl) DeletePropBenConfPayment(id int) error {
 }
 
 // UpdatePropBenConfPayment updates a propbenconf payment by its id
-func (h *PropBenConfPaymentServiceImpl) UpdatePropBenConfPayment(id int, input dto.PropBenConfPaymentDTO) (*dto.PropBenConfPaymentResponseDTO, error) {
+func (h *PropBenConfPaymentServiceImpl) UpdatePropBenConfPayment(ctx context.Context, id int, input dto.PropBenConfPaymentDTO) (*dto.PropBenConfPaymentResponseDTO, error) {
 	data := input.ToPropBenConfPayment()
 	data.ID = id
 
-	err := h.repo.Update(*data)
+	err := h.repo.Update(ctx, *data)
 	if err != nil {
 		return nil, errors.ErrInternalServer
 	}
@@ -89,7 +91,7 @@ func (h *PropBenConfPaymentServiceImpl) UpdatePropBenConfPayment(id int, input d
 
 	response := dto.ToPropBenConfPaymentResponseDTO(*data)
 
-	_, _, err = h.propbenconfSharedLogicService.CalculatePropBenConfDetailsAndUpdateStatus(data.PropBenConfID)
+	_, _, err = h.propbenconfSharedLogicService.CalculatePropBenConfDetailsAndUpdateStatus(ctx, data.PropBenConfID)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return nil, errors.ErrInternalServer

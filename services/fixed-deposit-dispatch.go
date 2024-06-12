@@ -1,6 +1,8 @@
 package services
 
 import (
+	"context"
+
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
 	"gitlab.sudovi.me/erp/finance-api/errors"
@@ -21,13 +23,13 @@ func NewFixedDepositDispatchServiceImpl(app *celeritas.Celeritas, repo data.Fixe
 	}
 }
 
-func (h *FixedDepositDispatchServiceImpl) CreateFixedDepositDispatch(input dto.FixedDepositDispatchDTO) (*dto.FixedDepositDispatchResponseDTO, error) {
+func (h *FixedDepositDispatchServiceImpl) CreateFixedDepositDispatch(ctx context.Context, input dto.FixedDepositDispatchDTO) (*dto.FixedDepositDispatchResponseDTO, error) {
 	dataToInsert := input.ToFixedDepositDispatch()
 
 	var id int
 	err := data.Upper.Tx(func(tx up.Session) error {
 		var err error
-		id, err = h.repo.Insert(tx, *dataToInsert)
+		id, err = h.repo.Insert(ctx, tx, *dataToInsert)
 		if err != nil {
 			return errors.ErrInternalServer
 		}
@@ -49,12 +51,12 @@ func (h *FixedDepositDispatchServiceImpl) CreateFixedDepositDispatch(input dto.F
 	return &res, nil
 }
 
-func (h *FixedDepositDispatchServiceImpl) UpdateFixedDepositDispatch(id int, input dto.FixedDepositDispatchDTO) (*dto.FixedDepositDispatchResponseDTO, error) {
+func (h *FixedDepositDispatchServiceImpl) UpdateFixedDepositDispatch(ctx context.Context, id int, input dto.FixedDepositDispatchDTO) (*dto.FixedDepositDispatchResponseDTO, error) {
 	dataToInsert := input.ToFixedDepositDispatch()
 	dataToInsert.ID = id
 
 	err := data.Upper.Tx(func(tx up.Session) error {
-		err := h.repo.Update(tx, *dataToInsert)
+		err := h.repo.Update(ctx, tx, *dataToInsert)
 		if err != nil {
 			return errors.ErrInternalServer
 		}
@@ -74,8 +76,8 @@ func (h *FixedDepositDispatchServiceImpl) UpdateFixedDepositDispatch(id int, inp
 	return &response, nil
 }
 
-func (h *FixedDepositDispatchServiceImpl) DeleteFixedDepositDispatch(id int) error {
-	err := h.repo.Delete(id)
+func (h *FixedDepositDispatchServiceImpl) DeleteFixedDepositDispatch(ctx context.Context, id int) error {
+	err := h.repo.Delete(ctx, id)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return errors.ErrInternalServer

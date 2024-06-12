@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"math"
 	"time"
 
@@ -27,7 +28,7 @@ func NewFlatRateSharedLogicServiceImpl(app *celeritas.Celeritas, repoFlatRate da
 	}
 }
 
-func (h *FlatRateSharedLogicServiceImpl) CalculateFlatRateDetailsAndUpdateStatus(flatrateId int) (*dto.FlatRateDetailsDTO, data.FlatRateStatus, error) {
+func (h *FlatRateSharedLogicServiceImpl) CalculateFlatRateDetailsAndUpdateStatus(ctx context.Context, flatrateId int) (*dto.FlatRateDetailsDTO, data.FlatRateStatus, error) {
 	flatrate, err := h.repoFlatRate.Get(flatrateId)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
@@ -82,7 +83,7 @@ func (h *FlatRateSharedLogicServiceImpl) CalculateFlatRateDetailsAndUpdateStatus
 
 	if newStatus != flatrate.Status {
 		flatrate.Status = newStatus
-		err = h.repoFlatRate.Update(*flatrate)
+		err = h.repoFlatRate.Update(ctx, *flatrate)
 		if err != nil {
 			return nil, 0, errors.ErrInternalServer
 		}

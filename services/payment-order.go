@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -38,13 +39,13 @@ func NewPaymentOrderServiceImpl(app *celeritas.Celeritas, repo data.PaymentOrder
 	}
 }
 
-func (h *PaymentOrderServiceImpl) CreatePaymentOrder(input dto.PaymentOrderDTO) (*dto.PaymentOrderResponseDTO, error) {
+func (h *PaymentOrderServiceImpl) CreatePaymentOrder(ctx context.Context, input dto.PaymentOrderDTO) (*dto.PaymentOrderResponseDTO, error) {
 	dataToInsert := input.ToPaymentOrder()
 
 	var id int
 	err := data.Upper.Tx(func(tx up.Session) error {
 		var err error
-		id, err = h.repo.Insert(tx, *dataToInsert)
+		id, err = h.repo.Insert(ctx, tx, *dataToInsert)
 		if err != nil {
 			fmt.Println(err)
 			return errors.ErrInternalServer
@@ -59,7 +60,7 @@ func (h *PaymentOrderServiceImpl) CreatePaymentOrder(input dto.PaymentOrderDTO) 
 			}
 
 			if item.InvoiceID != nil {
-				err = updateInvoiceStatus(*item.InvoiceID, dataToInsert.Amount, len(input.Items), tx, h)
+				err = updateInvoiceStatus(ctx, *item.InvoiceID, dataToInsert.Amount, len(input.Items), tx, h)
 
 				if err != nil {
 					return err
@@ -98,12 +99,12 @@ func (h *PaymentOrderServiceImpl) CreatePaymentOrder(input dto.PaymentOrderDTO) 
 	return &res, nil
 }
 
-func (h *PaymentOrderServiceImpl) UpdatePaymentOrder(id int, input dto.PaymentOrderDTO) (*dto.PaymentOrderResponseDTO, error) {
+func (h *PaymentOrderServiceImpl) UpdatePaymentOrder(ctx context.Context, id int, input dto.PaymentOrderDTO) (*dto.PaymentOrderResponseDTO, error) {
 	dataToInsert := input.ToPaymentOrder()
 	dataToInsert.ID = id
 
 	err := data.Upper.Tx(func(tx up.Session) error {
-		err := h.repo.Update(tx, *dataToInsert)
+		err := h.repo.Update(ctx, tx, *dataToInsert)
 		if err != nil {
 			return errors.ErrInternalServer
 		}
@@ -123,7 +124,7 @@ func (h *PaymentOrderServiceImpl) UpdatePaymentOrder(id int, input dto.PaymentOr
 	return &response, nil
 }
 
-func (h *PaymentOrderServiceImpl) DeletePaymentOrder(id int) error {
+func (h *PaymentOrderServiceImpl) DeletePaymentOrder(ctx context.Context, id int) error {
 
 	input, err := h.GetPaymentOrder(id)
 
@@ -133,7 +134,7 @@ func (h *PaymentOrderServiceImpl) DeletePaymentOrder(id int) error {
 
 	for _, item := range input.Items {
 		if item.InvoiceID != nil {
-			err = updateInvoiceStatusOnDelete(*item.InvoiceID, len(input.Items), data.Upper, h)
+			err = updateInvoiceStatusOnDelete(ctx, *item.InvoiceID, len(input.Items), data.Upper, h)
 
 			if err != nil {
 				h.App.ErrorLog.Println(err)
@@ -156,7 +157,7 @@ func (h *PaymentOrderServiceImpl) DeletePaymentOrder(id int) error {
 		}
 	}
 
-	err = h.repo.Delete(id)
+	err = h.repo.Delete(ctx, id)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return errors.ErrInternalServer
@@ -421,9 +422,9 @@ func (h *PaymentOrderServiceImpl) GetAllObligations(filter dto.GetObligationsFil
 	return response, total, nil
 }
 
-func (h *PaymentOrderServiceImpl) PayPaymentOrder(id int, input dto.PaymentOrderDTO) error {
+func (h *PaymentOrderServiceImpl) PayPaymentOrder(ctx context.Context, id int, input dto.PaymentOrderDTO) error {
 	err := data.Upper.Tx(func(tx up.Session) error {
-		err := h.repo.PayPaymentOrder(tx, id, *input.SAPID, *input.DateOfSAP)
+		err := h.repo.PayPaymentOrder(ctx, tx, id, *input.SAPID, *input.DateOfSAP)
 		if err != nil {
 			return errors.ErrInternalServer
 		}
@@ -437,7 +438,7 @@ func (h *PaymentOrderServiceImpl) PayPaymentOrder(id int, input dto.PaymentOrder
 	return nil
 }
 
-func (h *PaymentOrderServiceImpl) CancelPaymentOrder(id int) error {
+func (h *PaymentOrderServiceImpl) CancelPaymentOrder(ctx context.Context, id int) error {
 	err := data.Upper.Tx(func(tx up.Session) error {
 		input, err := h.GetPaymentOrder(id)
 
@@ -447,7 +448,7 @@ func (h *PaymentOrderServiceImpl) CancelPaymentOrder(id int) error {
 
 		for _, item := range input.Items {
 			if item.InvoiceID != nil {
-				err = updateInvoiceStatusOnDelete(*item.InvoiceID, len(input.Items), tx, h)
+				err = updateInvoiceStatusOnDelete(ctx, *item.InvoiceID, len(input.Items), tx, h)
 
 				if err != nil {
 					h.App.ErrorLog.Println(err)
@@ -470,7 +471,7 @@ func (h *PaymentOrderServiceImpl) CancelPaymentOrder(id int) error {
 			}
 		}
 
-		err = h.repo.CancelPaymentOrder(tx, id)
+		err = h.repo.CancelPaymentOrder(ctx, tx, id)
 		if err != nil {
 			return errors.ErrInternalServer
 		}
@@ -484,7 +485,7 @@ func (h *PaymentOrderServiceImpl) CancelPaymentOrder(id int) error {
 	return nil
 }
 
-func updateInvoiceStatus(id int, amount float64, lenOfArray int, tx up.Session, h *PaymentOrderServiceImpl) error {
+func updateInvoiceStatus(ctx context.Context, id int, amount float64, lenOfArray int, tx up.Session, h *PaymentOrderServiceImpl) error {
 	invoice, err := h.invoiceRepo.Get(id)
 
 	if err != nil {
@@ -533,7 +534,7 @@ func updateInvoiceStatus(id int, amount float64, lenOfArray int, tx up.Session, 
 		invoice.Status = data.InvoiceStatusPart
 	}
 
-	err = h.invoiceRepo.Update(tx, *invoice)
+	err = h.invoiceRepo.Update(ctx, tx, *invoice)
 
 	if err != nil {
 		return err
@@ -630,7 +631,7 @@ func updateSalaryAdditionalExpenseStatus(id int, amount float64, lenOfArray int,
 	return nil
 }
 
-func updateInvoiceStatusOnDelete(id int, lenOfArray int, tx up.Session, h *PaymentOrderServiceImpl) error {
+func updateInvoiceStatusOnDelete(ctx context.Context, id int, lenOfArray int, tx up.Session, h *PaymentOrderServiceImpl) error {
 	invoice, err := h.invoiceRepo.Get(id)
 
 	if err != nil {
@@ -671,7 +672,7 @@ func updateInvoiceStatusOnDelete(id int, lenOfArray int, tx up.Session, h *Payme
 		}
 	}
 
-	err = h.invoiceRepo.Update(tx, *invoice)
+	err = h.invoiceRepo.Update(ctx, tx, *invoice)
 
 	if err != nil {
 		return err

@@ -1,6 +1,8 @@
 package services
 
 import (
+	"context"
+
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
 	"gitlab.sudovi.me/erp/finance-api/errors"
@@ -21,10 +23,10 @@ func NewNonFinancialBudgetGoalServiceImpl(app *celeritas.Celeritas, repo data.No
 	}
 }
 
-func (h *NonFinancialBudgetGoalServiceImpl) CreateNonFinancialBudgetGoal(input dto.NonFinancialBudgetGoalDTO) (*dto.NonFinancialBudgetGoalResponseDTO, error) {
+func (h *NonFinancialBudgetGoalServiceImpl) CreateNonFinancialBudgetGoal(ctx context.Context, input dto.NonFinancialBudgetGoalDTO) (*dto.NonFinancialBudgetGoalResponseDTO, error) {
 	data := input.ToNonFinancialBudgetGoal()
 
-	id, err := h.repo.Insert(*data)
+	id, err := h.repo.Insert(ctx, *data)
 	if err != nil {
 		return nil, errors.ErrInternalServer
 	}
@@ -39,11 +41,11 @@ func (h *NonFinancialBudgetGoalServiceImpl) CreateNonFinancialBudgetGoal(input d
 	return &res, nil
 }
 
-func (h *NonFinancialBudgetGoalServiceImpl) UpdateNonFinancialBudgetGoal(id int, input dto.NonFinancialBudgetGoalDTO) (*dto.NonFinancialBudgetGoalResponseDTO, error) {
+func (h *NonFinancialBudgetGoalServiceImpl) UpdateNonFinancialBudgetGoal(ctx context.Context, id int, input dto.NonFinancialBudgetGoalDTO) (*dto.NonFinancialBudgetGoalResponseDTO, error) {
 	data := input.ToNonFinancialBudgetGoal()
 	data.ID = id
 
-	err := h.repo.Update(*data)
+	err := h.repo.Update(ctx, *data)
 	if err != nil {
 		return nil, errors.ErrInternalServer
 	}
@@ -58,8 +60,8 @@ func (h *NonFinancialBudgetGoalServiceImpl) UpdateNonFinancialBudgetGoal(id int,
 	return &response, nil
 }
 
-func (h *NonFinancialBudgetGoalServiceImpl) DeleteNonFinancialBudgetGoal(id int) error {
-	err := h.repo.Delete(id)
+func (h *NonFinancialBudgetGoalServiceImpl) DeleteNonFinancialBudgetGoal(ctx context.Context, id int) error {
+	err := h.repo.Delete(ctx, id)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return errors.ErrInternalServer
@@ -97,7 +99,6 @@ func (h *NonFinancialBudgetGoalServiceImpl) GetNonFinancialBudgetGoalList(filter
 	}
 
 	orders = append(orders, "-created_at")
-	
 
 	data, total, err := h.repo.GetAll(filter.Page, filter.Size, conditionAndExp, orders)
 	if err != nil {

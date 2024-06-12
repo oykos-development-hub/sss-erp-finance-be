@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"fmt"
 
 	"gitlab.sudovi.me/erp/finance-api/data"
@@ -27,11 +28,11 @@ func NewFineServiceImpl(app *celeritas.Celeritas, repo data.Fine, fineSharedLogi
 }
 
 // CreateFine creates a new fine
-func (h *FineServiceImpl) CreateFine(input dto.FineDTO) (*dto.FineResponseDTO, error) {
+func (h *FineServiceImpl) CreateFine(ctx context.Context, input dto.FineDTO) (*dto.FineResponseDTO, error) {
 	fine := input.ToFine()
 	fine.Status = data.UnpaidFineStatus
 
-	id, err := h.repo.Insert(*fine)
+	id, err := h.repo.Insert(ctx, *fine)
 	if err != nil {
 		return nil, errors.ErrInternalServer
 	}
@@ -41,7 +42,7 @@ func (h *FineServiceImpl) CreateFine(input dto.FineDTO) (*dto.FineResponseDTO, e
 		return nil, errors.ErrInternalServer
 	}
 
-	return h.createFineResponse(fine)
+	return h.createFineResponse(ctx, fine)
 }
 
 // GetFine returns a fine by id
@@ -52,15 +53,15 @@ func (h *FineServiceImpl) GetFine(id int) (*dto.FineResponseDTO, error) {
 		return nil, errors.ErrNotFound
 	}
 
-	return h.createFineResponse(fine)
+	return h.createFineResponse(context.Background(), fine)
 }
 
 // UpdateFine updates a fine
-func (h *FineServiceImpl) UpdateFine(id int, input dto.FineDTO) (*dto.FineResponseDTO, error) {
+func (h *FineServiceImpl) UpdateFine(ctx context.Context, id int, input dto.FineDTO) (*dto.FineResponseDTO, error) {
 	fine := input.ToFine()
 	fine.ID = id
 
-	err := h.repo.Update(*fine)
+	err := h.repo.Update(ctx, *fine)
 	if err != nil {
 		return nil, errors.ErrInternalServer
 	}
@@ -70,12 +71,12 @@ func (h *FineServiceImpl) UpdateFine(id int, input dto.FineDTO) (*dto.FineRespon
 		return nil, errors.ErrInternalServer
 	}
 
-	return h.createFineResponse(fine)
+	return h.createFineResponse(ctx, fine)
 }
 
 // DeleteFine deletes a fine by its id
-func (h *FineServiceImpl) DeleteFine(id int) error {
-	err := h.repo.Delete(id)
+func (h *FineServiceImpl) DeleteFine(ctx context.Context, id int) error {
+	err := h.repo.Delete(ctx, id)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return errors.ErrInternalServer
@@ -137,7 +138,7 @@ func (h *FineServiceImpl) GetFineList(input dto.FineFilterDTO) ([]dto.FineRespon
 func (h *FineServiceImpl) convertFinesToResponses(fines []data.Fine) ([]dto.FineResponseDTO, error) {
 	var responses []dto.FineResponseDTO
 	for _, fee := range fines {
-		response, err := h.createFineResponse(&fee)
+		response, err := h.createFineResponse(context.Background(), &fee)
 		if err != nil {
 			return nil, err
 		}
@@ -147,11 +148,11 @@ func (h *FineServiceImpl) convertFinesToResponses(fines []data.Fine) ([]dto.Fine
 }
 
 // createFineResponse creates a FineResponseDTO from a Fine
-func (h *FineServiceImpl) createFineResponse(fine *data.Fine) (*dto.FineResponseDTO, error) {
+func (h *FineServiceImpl) createFineResponse(ctx context.Context, fine *data.Fine) (*dto.FineResponseDTO, error) {
 	response := dto.ToFineResponseDTO(*fine)
 	var newStatus data.FineStatus
 	var err error
-	response.FineFeeDetailsDTO, newStatus, err = h.fineSharedLogicService.CalculateFineDetailsAndUpdateStatus(fine.ID)
+	response.FineFeeDetailsDTO, newStatus, err = h.fineSharedLogicService.CalculateFineDetailsAndUpdateStatus(ctx, fine.ID)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return nil, err

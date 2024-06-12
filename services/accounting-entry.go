@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"fmt"
 
 	"gitlab.sudovi.me/erp/finance-api/data"
@@ -41,7 +42,7 @@ func NewAccountingEntryServiceImpl(app *celeritas.Celeritas, repo data.Accountin
 	}
 }
 
-func (h *AccountingEntryServiceImpl) CreateAccountingEntry(input dto.AccountingEntryDTO) (*dto.AccountingEntryResponseDTO, error) {
+func (h *AccountingEntryServiceImpl) CreateAccountingEntry(ctx context.Context, input dto.AccountingEntryDTO) (*dto.AccountingEntryResponseDTO, error) {
 	dataToInsert := input.ToAccountingEntry()
 
 	var id int
@@ -64,7 +65,7 @@ func (h *AccountingEntryServiceImpl) CreateAccountingEntry(input dto.AccountingE
 			return errors.ErrInvalidInput
 		}
 
-		id, err = h.repo.Insert(tx, *dataToInsert)
+		id, err = h.repo.Insert(ctx, tx, *dataToInsert)
 		if err != nil {
 			return errors.ErrInternalServer
 		}
@@ -89,7 +90,7 @@ func (h *AccountingEntryServiceImpl) CreateAccountingEntry(input dto.AccountingE
 
 				invoice.Registred = &boolTrue
 
-				err = h.invoiceRepo.Update(tx, *invoice)
+				err = h.invoiceRepo.Update(ctx, tx, *invoice)
 
 				if err != nil {
 					return err
@@ -103,7 +104,7 @@ func (h *AccountingEntryServiceImpl) CreateAccountingEntry(input dto.AccountingE
 
 				salary.Registred = &boolTrue
 
-				err = h.salaryRepo.Update(tx, *salary)
+				err = h.salaryRepo.Update(ctx, tx, *salary)
 
 				if err != nil {
 					return err
@@ -117,7 +118,7 @@ func (h *AccountingEntryServiceImpl) CreateAccountingEntry(input dto.AccountingE
 
 				paymentOrder.Registred = &boolTrue
 
-				err = h.paymentOrderRepo.Update(tx, *paymentOrder)
+				err = h.paymentOrderRepo.Update(ctx, tx, *paymentOrder)
 
 				if err != nil {
 					return err
@@ -131,7 +132,7 @@ func (h *AccountingEntryServiceImpl) CreateAccountingEntry(input dto.AccountingE
 
 				enforcedPayment.Registred = &boolTrue
 
-				err = h.enforcedPaymentRepo.Update(tx, *enforcedPayment)
+				err = h.enforcedPaymentRepo.Update(ctx, tx, *enforcedPayment)
 
 				if err != nil {
 					return err
@@ -145,7 +146,7 @@ func (h *AccountingEntryServiceImpl) CreateAccountingEntry(input dto.AccountingE
 
 				enforcedPayment.RegistredReturn = &boolTrue
 
-				err = h.enforcedPaymentRepo.Update(tx, *enforcedPayment)
+				err = h.enforcedPaymentRepo.Update(ctx, tx, *enforcedPayment)
 
 				if err != nil {
 					return err
@@ -171,12 +172,12 @@ func (h *AccountingEntryServiceImpl) CreateAccountingEntry(input dto.AccountingE
 	return &res, nil
 }
 
-func (h *AccountingEntryServiceImpl) UpdateAccountingEntry(id int, input dto.AccountingEntryDTO) (*dto.AccountingEntryResponseDTO, error) {
+func (h *AccountingEntryServiceImpl) UpdateAccountingEntry(ctx context.Context, id int, input dto.AccountingEntryDTO) (*dto.AccountingEntryResponseDTO, error) {
 	dataToInsert := input.ToAccountingEntry()
 	dataToInsert.ID = id
 
 	err := data.Upper.Tx(func(tx up.Session) error {
-		err := h.repo.Update(tx, *dataToInsert)
+		err := h.repo.Update(ctx, tx, *dataToInsert)
 		if err != nil {
 			return errors.ErrInternalServer
 		}
@@ -196,7 +197,7 @@ func (h *AccountingEntryServiceImpl) UpdateAccountingEntry(id int, input dto.Acc
 	return &response, nil
 }
 
-func (h *AccountingEntryServiceImpl) DeleteAccountingEntry(id int) error {
+func (h *AccountingEntryServiceImpl) DeleteAccountingEntry(ctx context.Context, id int) error {
 	err := data.Upper.Tx(func(tx up.Session) error {
 		conditionAndExp := &up.AndExpr{}
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"entry_id": id})
@@ -217,7 +218,7 @@ func (h *AccountingEntryServiceImpl) DeleteAccountingEntry(id int) error {
 
 				invoice.Registred = &boolFalse
 
-				err = h.invoiceRepo.Update(tx, *invoice)
+				err = h.invoiceRepo.Update(ctx, tx, *invoice)
 
 				if err != nil {
 					return err
@@ -231,7 +232,7 @@ func (h *AccountingEntryServiceImpl) DeleteAccountingEntry(id int) error {
 
 				salary.Registred = &boolFalse
 
-				err = h.salaryRepo.Update(tx, *salary)
+				err = h.salaryRepo.Update(ctx, tx, *salary)
 
 				if err != nil {
 					return err
@@ -245,7 +246,7 @@ func (h *AccountingEntryServiceImpl) DeleteAccountingEntry(id int) error {
 
 				paymentOrder.Registred = &boolFalse
 
-				err = h.paymentOrderRepo.Update(tx, *paymentOrder)
+				err = h.paymentOrderRepo.Update(ctx, tx, *paymentOrder)
 
 				if err != nil {
 					return err
@@ -259,7 +260,7 @@ func (h *AccountingEntryServiceImpl) DeleteAccountingEntry(id int) error {
 
 				enforcedPayment.Registred = &boolFalse
 
-				err = h.enforcedPaymentRepo.Update(tx, *enforcedPayment)
+				err = h.enforcedPaymentRepo.Update(ctx, tx, *enforcedPayment)
 
 				if err != nil {
 					return err
@@ -273,7 +274,7 @@ func (h *AccountingEntryServiceImpl) DeleteAccountingEntry(id int) error {
 
 				enforcedPayment.RegistredReturn = &boolFalse
 
-				err = h.enforcedPaymentRepo.Update(tx, *enforcedPayment)
+				err = h.enforcedPaymentRepo.Update(ctx, tx, *enforcedPayment)
 
 				if err != nil {
 					return err
@@ -281,7 +282,7 @@ func (h *AccountingEntryServiceImpl) DeleteAccountingEntry(id int) error {
 			}
 		}
 
-		err = h.repo.Delete(id)
+		err = h.repo.Delete(ctx, id)
 		if err != nil {
 			h.App.ErrorLog.Println(err)
 			return errors.ErrInternalServer

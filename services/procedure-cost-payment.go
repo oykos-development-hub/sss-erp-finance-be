@@ -1,6 +1,8 @@
 package services
 
 import (
+	"context"
+
 	"github.com/oykos-development-hub/celeritas"
 	"github.com/upper/db/v4"
 	"gitlab.sudovi.me/erp/finance-api/data"
@@ -24,11 +26,11 @@ func NewProcedureCostPaymentServiceImpl(app *celeritas.Celeritas, repo data.Proc
 }
 
 // CreateProcedureCostPayment creates a new procedurecost payment
-func (h *ProcedureCostPaymentServiceImpl) CreateProcedureCostPayment(input dto.ProcedureCostPaymentDTO) (*dto.ProcedureCostPaymentResponseDTO, error) {
+func (h *ProcedureCostPaymentServiceImpl) CreateProcedureCostPayment(ctx context.Context, input dto.ProcedureCostPaymentDTO) (*dto.ProcedureCostPaymentResponseDTO, error) {
 	procedurecostPayment := input.ToProcedureCostPayment()
 	procedurecostPayment.Status = data.PaidProcedureCostPeymentStatus
 
-	id, err := h.repo.Insert(*procedurecostPayment)
+	id, err := h.repo.Insert(ctx, *procedurecostPayment)
 	if err != nil {
 		return nil, errors.ErrInternalServer
 	}
@@ -40,7 +42,7 @@ func (h *ProcedureCostPaymentServiceImpl) CreateProcedureCostPayment(input dto.P
 
 	res := dto.ToProcedureCostPaymentResponseDTO(*procedurecostPayment)
 
-	_, _, err = h.procedurecostSharedLogicService.CalculateProcedureCostDetailsAndUpdateStatus(procedurecostPayment.ProcedureCostID)
+	_, _, err = h.procedurecostSharedLogicService.CalculateProcedureCostDetailsAndUpdateStatus(ctx, procedurecostPayment.ProcedureCostID)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return nil, err
@@ -50,20 +52,20 @@ func (h *ProcedureCostPaymentServiceImpl) CreateProcedureCostPayment(input dto.P
 }
 
 // GetProcedureCostPayment returns a procedurecost payment by its id
-func (h *ProcedureCostPaymentServiceImpl) DeleteProcedureCostPayment(id int) error {
+func (h *ProcedureCostPaymentServiceImpl) DeleteProcedureCostPayment(ctx context.Context, id int) error {
 	procedurecostPayment, err := h.repo.Get(id)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return errors.ErrNotFound
 	}
 
-	err = h.repo.Delete(id)
+	err = h.repo.Delete(ctx, id)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return errors.ErrInternalServer
 	}
 
-	_, _, err = h.procedurecostSharedLogicService.CalculateProcedureCostDetailsAndUpdateStatus(procedurecostPayment.ProcedureCostID)
+	_, _, err = h.procedurecostSharedLogicService.CalculateProcedureCostDetailsAndUpdateStatus(ctx, procedurecostPayment.ProcedureCostID)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return errors.ErrInternalServer
@@ -73,11 +75,11 @@ func (h *ProcedureCostPaymentServiceImpl) DeleteProcedureCostPayment(id int) err
 }
 
 // UpdateProcedureCostPayment updates a procedurecost payment by its id
-func (h *ProcedureCostPaymentServiceImpl) UpdateProcedureCostPayment(id int, input dto.ProcedureCostPaymentDTO) (*dto.ProcedureCostPaymentResponseDTO, error) {
+func (h *ProcedureCostPaymentServiceImpl) UpdateProcedureCostPayment(ctx context.Context, id int, input dto.ProcedureCostPaymentDTO) (*dto.ProcedureCostPaymentResponseDTO, error) {
 	data := input.ToProcedureCostPayment()
 	data.ID = id
 
-	err := h.repo.Update(*data)
+	err := h.repo.Update(ctx, *data)
 	if err != nil {
 		return nil, errors.ErrInternalServer
 	}
@@ -89,7 +91,7 @@ func (h *ProcedureCostPaymentServiceImpl) UpdateProcedureCostPayment(id int, inp
 
 	response := dto.ToProcedureCostPaymentResponseDTO(*data)
 
-	_, _, err = h.procedurecostSharedLogicService.CalculateProcedureCostDetailsAndUpdateStatus(data.ProcedureCostID)
+	_, _, err = h.procedurecostSharedLogicService.CalculateProcedureCostDetailsAndUpdateStatus(ctx, data.ProcedureCostID)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return nil, errors.ErrInternalServer

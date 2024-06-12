@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"fmt"
 
 	"gitlab.sudovi.me/erp/finance-api/data"
@@ -23,13 +24,13 @@ func NewDepositPaymentServiceImpl(app *celeritas.Celeritas, repo data.DepositPay
 	}
 }
 
-func (h *DepositPaymentServiceImpl) CreateDepositPayment(input dto.DepositPaymentDTO) (*dto.DepositPaymentResponseDTO, error) {
+func (h *DepositPaymentServiceImpl) CreateDepositPayment(ctx context.Context, input dto.DepositPaymentDTO) (*dto.DepositPaymentResponseDTO, error) {
 	dataToInsert := input.ToDepositPayment()
 
 	var id int
 	err := data.Upper.Tx(func(tx up.Session) error {
 		var err error
-		id, err = h.repo.Insert(tx, *dataToInsert)
+		id, err = h.repo.Insert(ctx, tx, *dataToInsert)
 		if err != nil {
 			return errors.ErrInternalServer
 		}
@@ -51,12 +52,12 @@ func (h *DepositPaymentServiceImpl) CreateDepositPayment(input dto.DepositPaymen
 	return &res, nil
 }
 
-func (h *DepositPaymentServiceImpl) UpdateDepositPayment(id int, input dto.DepositPaymentDTO) (*dto.DepositPaymentResponseDTO, error) {
+func (h *DepositPaymentServiceImpl) UpdateDepositPayment(ctx context.Context, id int, input dto.DepositPaymentDTO) (*dto.DepositPaymentResponseDTO, error) {
 	dataToInsert := input.ToDepositPayment()
 	dataToInsert.ID = id
 
 	err := data.Upper.Tx(func(tx up.Session) error {
-		err := h.repo.Update(tx, *dataToInsert)
+		err := h.repo.Update(ctx, tx, *dataToInsert)
 		if err != nil {
 			return errors.ErrInternalServer
 		}
@@ -76,8 +77,8 @@ func (h *DepositPaymentServiceImpl) UpdateDepositPayment(id int, input dto.Depos
 	return &response, nil
 }
 
-func (h *DepositPaymentServiceImpl) DeleteDepositPayment(id int) error {
-	err := h.repo.Delete(id)
+func (h *DepositPaymentServiceImpl) DeleteDepositPayment(ctx context.Context, id int) error {
+	err := h.repo.Delete(ctx, id)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return errors.ErrInternalServer

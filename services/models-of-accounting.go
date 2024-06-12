@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"fmt"
 
 	"gitlab.sudovi.me/erp/finance-api/data"
@@ -25,13 +26,13 @@ func NewModelsOfAccountingServiceImpl(app *celeritas.Celeritas, repo data.Models
 	}
 }
 
-func (h *ModelsOfAccountingServiceImpl) CreateModelsOfAccounting(input dto.ModelsOfAccountingDTO) (*dto.ModelsOfAccountingResponseDTO, error) {
+func (h *ModelsOfAccountingServiceImpl) CreateModelsOfAccounting(ctx context.Context, input dto.ModelsOfAccountingDTO) (*dto.ModelsOfAccountingResponseDTO, error) {
 	dataToInsert := input.ToModelsOfAccounting()
 
 	var id int
 	err := data.Upper.Tx(func(tx up.Session) error {
 		var err error
-		id, err = h.repo.Insert(tx, *dataToInsert)
+		id, err = h.repo.Insert(ctx, tx, *dataToInsert)
 		if err != nil {
 			return errors.ErrInternalServer
 		}
@@ -63,7 +64,7 @@ func (h *ModelsOfAccountingServiceImpl) CreateModelsOfAccounting(input dto.Model
 	return &res, nil
 }
 
-func (h *ModelsOfAccountingServiceImpl) UpdateModelsOfAccounting(id int, input dto.ModelsOfAccountingDTO) (*dto.ModelsOfAccountingResponseDTO, error) {
+func (h *ModelsOfAccountingServiceImpl) UpdateModelsOfAccounting(ctx context.Context, id int, input dto.ModelsOfAccountingDTO) (*dto.ModelsOfAccountingResponseDTO, error) {
 	err := data.Upper.Tx(func(tx up.Session) error {
 		for _, item := range input.Items {
 			itemToInsert := item.ToModelOfAccountingItem()

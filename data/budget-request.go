@@ -1,10 +1,14 @@
 package data
 
 import (
+	"context"
+	"fmt"
 	"time"
 
 	"github.com/shopspring/decimal"
 	up "github.com/upper/db/v4"
+	"gitlab.sudovi.me/erp/finance-api/contextutil"
+	"gitlab.sudovi.me/erp/finance-api/pkg/errors"
 )
 
 type BudgetRequestStatus int
@@ -110,11 +114,29 @@ func (t *BudgetRequest) GetActual(budgetID, unitID, accountID int) (decimal.Null
 }
 
 // Update updates a record in the database, using upper
-func (t *BudgetRequest) Update(m BudgetRequest) error {
+func (t *BudgetRequest) Update(ctx context.Context, m BudgetRequest) error {
 	m.UpdatedAt = time.Now()
-	collection := Upper.Collection(t.Table())
-	res := collection.Find(m.ID)
-	err := res.Update(&m)
+	userID, ok := contextutil.GetUserIDFromContext(ctx)
+	if !ok {
+		return errors.New("user ID not found in context")
+	}
+
+	err := Upper.Tx(func(sess up.Session) error {
+
+		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+		if _, err := sess.SQL().Exec(query); err != nil {
+			return err
+		}
+
+		collection := sess.Collection(t.Table())
+		res := collection.Find(m.ID)
+		if err := res.Update(&m); err != nil {
+			return err
+		}
+
+		return nil
+	})
+
 	if err != nil {
 		return err
 	}
@@ -122,10 +144,27 @@ func (t *BudgetRequest) Update(m BudgetRequest) error {
 }
 
 // Delete deletes a record from the database by id, using upper
-func (t *BudgetRequest) Delete(id int) error {
-	collection := Upper.Collection(t.Table())
-	res := collection.Find(id)
-	err := res.Delete()
+func (t *BudgetRequest) Delete(ctx context.Context, id int) error {
+	userID, ok := contextutil.GetUserIDFromContext(ctx)
+	if !ok {
+		return errors.New("user ID not found in context")
+	}
+
+	err := Upper.Tx(func(sess up.Session) error {
+		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+		if _, err := sess.SQL().Exec(query); err != nil {
+			return err
+		}
+
+		collection := sess.Collection(t.Table())
+		res := collection.Find(id)
+		if err := res.Delete(); err != nil {
+			return err
+		}
+
+		return nil
+	})
+
 	if err != nil {
 		return err
 	}
@@ -133,16 +172,40 @@ func (t *BudgetRequest) Delete(id int) error {
 }
 
 // Insert inserts a model into the database, using upper
-func (t *BudgetRequest) Insert(m BudgetRequest) (int, error) {
+func (t *BudgetRequest) Insert(ctx context.Context, m BudgetRequest) (int, error) {
 	m.CreatedAt = time.Now()
 	m.UpdatedAt = time.Now()
-	collection := Upper.Collection(t.Table())
-	res, err := collection.Insert(m)
+	userID, ok := contextutil.GetUserIDFromContext(ctx)
+	if !ok {
+		return 0, errors.New("user ID not found in context")
+	}
+
+	var id int
+
+	err := Upper.Tx(func(sess up.Session) error {
+
+		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+		if _, err := sess.SQL().Exec(query); err != nil {
+			return err
+		}
+
+		collection := sess.Collection(t.Table())
+
+		var res up.InsertResult
+		var err error
+
+		if res, err = collection.Insert(m); err != nil {
+			return err
+		}
+
+		id = getInsertId(res.ID())
+
+		return nil
+	})
+
 	if err != nil {
 		return 0, err
 	}
-
-	id := getInsertId(res.ID())
 
 	return id, nil
 }

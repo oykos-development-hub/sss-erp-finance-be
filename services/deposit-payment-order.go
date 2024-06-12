@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"fmt"
 
 	"gitlab.sudovi.me/erp/finance-api/data"
@@ -27,13 +28,13 @@ func NewDepositPaymentOrderServiceImpl(app *celeritas.Celeritas, repo data.Depos
 	}
 }
 
-func (h *DepositPaymentOrderServiceImpl) CreateDepositPaymentOrder(input dto.DepositPaymentOrderDTO) (*dto.DepositPaymentOrderResponseDTO, error) {
+func (h *DepositPaymentOrderServiceImpl) CreateDepositPaymentOrder(ctx context.Context, input dto.DepositPaymentOrderDTO) (*dto.DepositPaymentOrderResponseDTO, error) {
 	dataToInsert := input.ToDepositPaymentOrder()
 
 	var id int
 	err := data.Upper.Tx(func(tx up.Session) error {
 		var err error
-		id, err = h.repo.Insert(tx, *dataToInsert)
+		id, err = h.repo.Insert(ctx, tx, *dataToInsert)
 		if err != nil {
 			return err
 		}
@@ -83,7 +84,7 @@ func (h *DepositPaymentOrderServiceImpl) CreateDepositPaymentOrder(input dto.Dep
 	return &res, nil
 }
 
-func (h *DepositPaymentOrderServiceImpl) UpdateDepositPaymentOrder(id int, input dto.DepositPaymentOrderDTO) (*dto.DepositPaymentOrderResponseDTO, error) {
+func (h *DepositPaymentOrderServiceImpl) UpdateDepositPaymentOrder(ctx context.Context, id int, input dto.DepositPaymentOrderDTO) (*dto.DepositPaymentOrderResponseDTO, error) {
 	dataToInsert := input.ToDepositPaymentOrder()
 	dataToInsert.ID = id
 
@@ -95,7 +96,7 @@ func (h *DepositPaymentOrderServiceImpl) UpdateDepositPaymentOrder(id int, input
 
 	err = data.Upper.Tx(func(tx up.Session) error {
 		var err error
-		err = h.repo.Update(tx, *dataToInsert)
+		err = h.repo.Update(ctx, tx, *dataToInsert)
 		if err != nil {
 			return errors.ErrInternalServer
 		}
@@ -215,10 +216,10 @@ func (h *DepositPaymentOrderServiceImpl) UpdateDepositPaymentOrder(id int, input
 	return &response, nil
 }
 
-func (h *DepositPaymentOrderServiceImpl) PayDepositPaymentOrder(id int, input dto.DepositPaymentOrderDTO) error {
+func (h *DepositPaymentOrderServiceImpl) PayDepositPaymentOrder(ctx context.Context, id int, input dto.DepositPaymentOrderDTO) error {
 	err := data.Upper.Tx(func(tx up.Session) error {
 		var err error
-		err = h.repo.PayDepositPaymentOrder(tx, id, *input.IDOfStatement, *input.DateOfStatement)
+		err = h.repo.PayDepositPaymentOrder(ctx, tx, id, *input.IDOfStatement, *input.DateOfStatement)
 		if err != nil {
 			return errors.ErrInternalServer
 		}
@@ -276,7 +277,7 @@ func (h *DepositPaymentOrderServiceImpl) PayDepositPaymentOrder(id int, input dt
 	return nil
 }
 
-func (h *DepositPaymentOrderServiceImpl) DeleteDepositPaymentOrder(id int) error {
+func (h *DepositPaymentOrderServiceImpl) DeleteDepositPaymentOrder(ctx context.Context, id int) error {
 	err := data.Upper.Tx(func(tx up.Session) error {
 		additionalExpenses, _, err := h.additionalExpenses.GetDepositAdditionalExpenseList(dto.DepositAdditionalExpenseFilterDTO{
 			PayingPaymentOrderID: &id,
@@ -306,7 +307,7 @@ func (h *DepositPaymentOrderServiceImpl) DeleteDepositPaymentOrder(id int) error
 		return err
 	}
 
-	err = h.repo.Delete(id)
+	err = h.repo.Delete(ctx, id)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return errors.ErrInternalServer

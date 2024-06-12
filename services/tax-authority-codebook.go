@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"fmt"
 
 	"gitlab.sudovi.me/erp/finance-api/data"
@@ -23,10 +24,10 @@ func NewTaxAuthorityCodebookServiceImpl(app *celeritas.Celeritas, repo data.TaxA
 	}
 }
 
-func (h *TaxAuthorityCodebookServiceImpl) CreateTaxAuthorityCodebook(input dto.TaxAuthorityCodebookDTO) (*dto.TaxAuthorityCodebookResponseDTO, error) {
+func (h *TaxAuthorityCodebookServiceImpl) CreateTaxAuthorityCodebook(ctx context.Context, input dto.TaxAuthorityCodebookDTO) (*dto.TaxAuthorityCodebookResponseDTO, error) {
 	data := input.ToTaxAuthorityCodebook()
 
-	id, err := h.repo.Insert(*data)
+	id, err := h.repo.Insert(ctx, *data)
 	if err != nil {
 		return nil, errors.ErrInternalServer
 	}
@@ -41,11 +42,11 @@ func (h *TaxAuthorityCodebookServiceImpl) CreateTaxAuthorityCodebook(input dto.T
 	return &res, nil
 }
 
-func (h *TaxAuthorityCodebookServiceImpl) UpdateTaxAuthorityCodebook(id int, input dto.TaxAuthorityCodebookDTO) (*dto.TaxAuthorityCodebookResponseDTO, error) {
+func (h *TaxAuthorityCodebookServiceImpl) UpdateTaxAuthorityCodebook(ctx context.Context, id int, input dto.TaxAuthorityCodebookDTO) (*dto.TaxAuthorityCodebookResponseDTO, error) {
 	data := input.ToTaxAuthorityCodebook()
 	data.ID = id
 
-	err := h.repo.Update(*data)
+	err := h.repo.Update(ctx, *data)
 	if err != nil {
 		return nil, errors.ErrInternalServer
 	}
@@ -60,8 +61,8 @@ func (h *TaxAuthorityCodebookServiceImpl) UpdateTaxAuthorityCodebook(id int, inp
 	return &response, nil
 }
 
-func (h *TaxAuthorityCodebookServiceImpl) DeleteTaxAuthorityCodebook(id int) error {
-	err := h.repo.Delete(id)
+func (h *TaxAuthorityCodebookServiceImpl) DeleteTaxAuthorityCodebook(ctx context.Context, id int) error {
+	err := h.repo.Delete(ctx, id)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return errors.ErrInternalServer
@@ -70,8 +71,8 @@ func (h *TaxAuthorityCodebookServiceImpl) DeleteTaxAuthorityCodebook(id int) err
 	return nil
 }
 
-func (h *TaxAuthorityCodebookServiceImpl) DeactivateTaxAuthorityCodebook(id int, active bool) error {
-	err := h.repo.Deactivate(id, active)
+func (h *TaxAuthorityCodebookServiceImpl) DeactivateTaxAuthorityCodebook(ctx context.Context, id int, active bool) error {
+	err := h.repo.Deactivate(ctx, id, active)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return errors.ErrInternalServer

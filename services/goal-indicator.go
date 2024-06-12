@@ -1,6 +1,8 @@
 package services
 
 import (
+	"context"
+
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
 	"gitlab.sudovi.me/erp/finance-api/errors"
@@ -21,10 +23,10 @@ func NewGoalIndicatorServiceImpl(app *celeritas.Celeritas, repo data.GoalIndicat
 	}
 }
 
-func (h *GoalIndicatorServiceImpl) CreateGoalIndicator(input dto.GoalIndicatorDTO) (*dto.GoalIndicatorResponseDTO, error) {
+func (h *GoalIndicatorServiceImpl) CreateGoalIndicator(ctx context.Context, input dto.GoalIndicatorDTO) (*dto.GoalIndicatorResponseDTO, error) {
 	data := input.ToGoalIndicator()
 
-	id, err := h.repo.Insert(*data)
+	id, err := h.repo.Insert(ctx, *data)
 	if err != nil {
 		return nil, errors.ErrInternalServer
 	}
@@ -39,11 +41,11 @@ func (h *GoalIndicatorServiceImpl) CreateGoalIndicator(input dto.GoalIndicatorDT
 	return &res, nil
 }
 
-func (h *GoalIndicatorServiceImpl) UpdateGoalIndicator(id int, input dto.GoalIndicatorDTO) (*dto.GoalIndicatorResponseDTO, error) {
+func (h *GoalIndicatorServiceImpl) UpdateGoalIndicator(ctx context.Context, id int, input dto.GoalIndicatorDTO) (*dto.GoalIndicatorResponseDTO, error) {
 	data := input.ToGoalIndicator()
 	data.ID = id
 
-	err := h.repo.Update(*data)
+	err := h.repo.Update(ctx, *data)
 	if err != nil {
 		return nil, errors.ErrInternalServer
 	}
@@ -58,8 +60,8 @@ func (h *GoalIndicatorServiceImpl) UpdateGoalIndicator(id int, input dto.GoalInd
 	return &response, nil
 }
 
-func (h *GoalIndicatorServiceImpl) DeleteGoalIndicator(id int) error {
-	err := h.repo.Delete(id)
+func (h *GoalIndicatorServiceImpl) DeleteGoalIndicator(ctx context.Context, id int) error {
+	err := h.repo.Delete(ctx, id)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return errors.ErrInternalServer
@@ -97,7 +99,6 @@ func (h *GoalIndicatorServiceImpl) GetGoalIndicatorList(filter dto.GoalIndicator
 	}
 
 	orders = append(orders, "-created_at")
-	
 
 	data, total, err := h.repo.GetAll(filter.Page, filter.Size, conditionAndExp, orders)
 	if err != nil {

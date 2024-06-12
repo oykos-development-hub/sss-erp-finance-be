@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"fmt"
 
 	"gitlab.sudovi.me/erp/finance-api/data"
@@ -23,10 +24,10 @@ func NewActivityServiceImpl(app *celeritas.Celeritas, repo data.Activity) Activi
 	}
 }
 
-func (h *ActivityServiceImpl) CreateActivity(input dto.ActivityDTO) (*dto.ActivityResponseDTO, error) {
+func (h *ActivityServiceImpl) CreateActivity(ctx context.Context, input dto.ActivityDTO) (*dto.ActivityResponseDTO, error) {
 	data := input.ToActivity()
 
-	id, err := h.repo.Insert(*data)
+	id, err := h.repo.Insert(ctx, *data)
 	if err != nil {
 		return nil, errors.ErrInternalServer
 	}
@@ -41,11 +42,11 @@ func (h *ActivityServiceImpl) CreateActivity(input dto.ActivityDTO) (*dto.Activi
 	return &res, nil
 }
 
-func (h *ActivityServiceImpl) UpdateActivity(id int, input dto.ActivityDTO) (*dto.ActivityResponseDTO, error) {
+func (h *ActivityServiceImpl) UpdateActivity(ctx context.Context, id int, input dto.ActivityDTO) (*dto.ActivityResponseDTO, error) {
 	data := input.ToActivity()
 	data.ID = id
 
-	err := h.repo.Update(*data)
+	err := h.repo.Update(ctx, *data)
 	if err != nil {
 		return nil, errors.ErrInternalServer
 	}
@@ -60,8 +61,8 @@ func (h *ActivityServiceImpl) UpdateActivity(id int, input dto.ActivityDTO) (*dt
 	return &response, nil
 }
 
-func (h *ActivityServiceImpl) DeleteActivity(id int) error {
-	err := h.repo.Delete(id)
+func (h *ActivityServiceImpl) DeleteActivity(ctx context.Context, id int) error {
+	err := h.repo.Delete(ctx, id)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return errors.ErrInternalServer

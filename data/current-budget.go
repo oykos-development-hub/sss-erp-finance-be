@@ -1,6 +1,7 @@
 package data
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -8,6 +9,7 @@ import (
 
 	"github.com/shopspring/decimal"
 	up "github.com/upper/db/v4"
+	"gitlab.sudovi.me/erp/finance-api/contextutil"
 	"gitlab.sudovi.me/erp/finance-api/pkg/errors"
 )
 
@@ -95,19 +97,35 @@ func (t *CurrentBudget) Get(id int) (*CurrentBudget, error) {
 }
 
 // Update updates a record in the database, using upper
-func (t *CurrentBudget) UpdateActual(currentBudgetID int, actual decimal.Decimal) error {
-	updateQuery := fmt.Sprintf("UPDATE %s SET actual = $1 WHERE id = $2", t.Table())
+func (t *CurrentBudget) UpdateActual(ctx context.Context, currentBudgetID int, actual decimal.Decimal) error {
 
-	res, err := Upper.SQL().Exec(updateQuery, actual, currentBudgetID)
-	if err != nil {
-		return err
-	}
-	rowsAffected, _ := res.RowsAffected()
-	if rowsAffected != 1 {
-		return errors.NewNotFoundError("UpdateActual: not found")
+	userID, ok := contextutil.GetUserIDFromContext(ctx)
+	if !ok {
+		return errors.New("user ID not found in context")
 	}
 
-	return nil
+	err := Upper.Tx(func(sess up.Session) error {
+		// Set the user_id variable
+		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+		if _, err := sess.SQL().Exec(query); err != nil {
+			return err
+		}
+
+		updateQuery := fmt.Sprintf("UPDATE %s SET actual = $1 WHERE id = $2", t.Table())
+
+		res, err := sess.SQL().Exec(updateQuery, actual, currentBudgetID)
+		if err != nil {
+			return err
+		}
+		rowsAffected, _ := res.RowsAffected()
+		if rowsAffected != 1 {
+			return errors.NewNotFoundError("UpdateActual: not found")
+		}
+
+		return nil
+	})
+
+	return err
 }
 
 // Update updates a record in the database, using upper
@@ -127,15 +145,39 @@ func (t *CurrentBudget) UpdateBalance(currentBudgetID int, balance decimal.Decim
 }
 
 // Insert inserts a model into the database, using upper
-func (t *CurrentBudget) Insert(m CurrentBudget) (int, error) {
+func (t *CurrentBudget) Insert(ctx context.Context, m CurrentBudget) (int, error) {
 	m.CreatedAt = time.Now()
-	collection := Upper.Collection(t.Table())
-	res, err := collection.Insert(m)
+	userID, ok := contextutil.GetUserIDFromContext(ctx)
+	if !ok {
+		return 0, errors.New("user ID not found in context")
+	}
+
+	var id int
+
+	err := Upper.Tx(func(sess up.Session) error {
+
+		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+		if _, err := sess.SQL().Exec(query); err != nil {
+			return err
+		}
+
+		collection := sess.Collection(t.Table())
+
+		var res up.InsertResult
+		var err error
+
+		if res, err = collection.Insert(m); err != nil {
+			return err
+		}
+
+		id = getInsertId(res.ID())
+
+		return nil
+	})
+
 	if err != nil {
 		return 0, err
 	}
-
-	id := getInsertId(res.ID())
 
 	return id, nil
 }

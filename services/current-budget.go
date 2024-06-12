@@ -1,6 +1,8 @@
 package services
 
 import (
+	"context"
+
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
 	"gitlab.sudovi.me/erp/finance-api/pkg/errors"
@@ -28,10 +30,10 @@ func NewCurrentBudgetServiceImpl(
 	}
 }
 
-func (h *CurrentBudgetServiceImpl) CreateCurrentBudget(input dto.CurrentBudgetDTO) (*dto.CurrentBudgetResponseDTO, error) {
+func (h *CurrentBudgetServiceImpl) CreateCurrentBudget(ctx context.Context, input dto.CurrentBudgetDTO) (*dto.CurrentBudgetResponseDTO, error) {
 	data := input.ToCurrentBudget()
 
-	id, err := h.repo.Insert(*data)
+	id, err := h.repo.Insert(ctx, *data)
 	if err != nil {
 		return nil, errors.Wrap(err, "CreateCurrentBudget")
 	}
@@ -43,7 +45,7 @@ func (h *CurrentBudgetServiceImpl) CreateCurrentBudget(input dto.CurrentBudgetDT
 
 	res := dto.ToCurrentBudgetResponseDTO(data)
 
-	err = h.spendingService.CreateInititalSpendingDynamicFromCurrentBudget(data)
+	err = h.spendingService.CreateInititalSpendingDynamicFromCurrentBudget(ctx, data)
 	if err != nil {
 		return nil, errors.Wrap(err, "CreateCurrentBudget")
 	}
@@ -51,7 +53,7 @@ func (h *CurrentBudgetServiceImpl) CreateCurrentBudget(input dto.CurrentBudgetDT
 	return &res, nil
 }
 
-func (h *CurrentBudgetServiceImpl) UpdateActual(unitID, budgetID, accountID int, actual decimal.Decimal) (*dto.CurrentBudgetResponseDTO, error) {
+func (h *CurrentBudgetServiceImpl) UpdateActual(ctx context.Context, unitID, budgetID, accountID int, actual decimal.Decimal) (*dto.CurrentBudgetResponseDTO, error) {
 	currentBudget, err := h.repo.GetBy(*up.And(
 		up.Cond{"budget_id": budgetID},
 		up.Cond{"unit_id": unitID},
@@ -61,7 +63,7 @@ func (h *CurrentBudgetServiceImpl) UpdateActual(unitID, budgetID, accountID int,
 		return nil, errors.Wrap(err, "UpdateActual")
 	}
 
-	err = h.repo.UpdateActual(currentBudget.ID, actual)
+	err = h.repo.UpdateActual(ctx, currentBudget.ID, actual)
 	if err != nil {
 		return nil, errors.Wrap(err, "UpdateActual")
 	}

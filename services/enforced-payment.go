@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -32,13 +33,13 @@ func NewEnforcedPaymentServiceImpl(app *celeritas.Celeritas, repo data.EnforcedP
 	}
 }
 
-func (h *EnforcedPaymentServiceImpl) CreateEnforcedPayment(input dto.EnforcedPaymentDTO) (*dto.EnforcedPaymentResponseDTO, error) {
+func (h *EnforcedPaymentServiceImpl) CreateEnforcedPayment(ctx context.Context, input dto.EnforcedPaymentDTO) (*dto.EnforcedPaymentResponseDTO, error) {
 	dataToInsert := input.ToEnforcedPayment()
 
 	var id int
 	err := data.Upper.Tx(func(tx up.Session) error {
 		var err error
-		id, err = h.repo.Insert(tx, *dataToInsert)
+		id, err = h.repo.Insert(ctx, tx, *dataToInsert)
 		if err != nil {
 			fmt.Println(err)
 			return errors.ErrInternalServer
@@ -53,7 +54,7 @@ func (h *EnforcedPaymentServiceImpl) CreateEnforcedPayment(input dto.EnforcedPay
 			}
 
 			if item.InvoiceID != nil {
-				err = updateInvoiceStatusForEnforcedPayment(*item.InvoiceID, tx, h)
+				err = updateInvoiceStatusForEnforcedPayment(ctx, *item.InvoiceID, tx, h)
 
 				if err != nil {
 					return err
@@ -80,12 +81,12 @@ func (h *EnforcedPaymentServiceImpl) CreateEnforcedPayment(input dto.EnforcedPay
 	return &res, nil
 }
 
-func (h *EnforcedPaymentServiceImpl) UpdateEnforcedPayment(id int, input dto.EnforcedPaymentDTO) (*dto.EnforcedPaymentResponseDTO, error) {
+func (h *EnforcedPaymentServiceImpl) UpdateEnforcedPayment(ctx context.Context, id int, input dto.EnforcedPaymentDTO) (*dto.EnforcedPaymentResponseDTO, error) {
 	dataToInsert := input.ToEnforcedPayment()
 	dataToInsert.ID = id
 
 	err := data.Upper.Tx(func(tx up.Session) error {
-		err := h.repo.Update(tx, *dataToInsert)
+		err := h.repo.Update(ctx, tx, *dataToInsert)
 		if err != nil {
 			return errors.ErrInternalServer
 		}
@@ -105,12 +106,12 @@ func (h *EnforcedPaymentServiceImpl) UpdateEnforcedPayment(id int, input dto.Enf
 	return &response, nil
 }
 
-func (h *EnforcedPaymentServiceImpl) ReturnEnforcedPayment(id int, input dto.EnforcedPaymentDTO) error {
+func (h *EnforcedPaymentServiceImpl) ReturnEnforcedPayment(ctx context.Context, id int, input dto.EnforcedPaymentDTO) error {
 	dataToInsert := input.ToEnforcedPayment()
 	dataToInsert.ID = id
 
 	err := data.Upper.Tx(func(tx up.Session) error {
-		err := h.repo.ReturnEnforcedPayment(tx, *dataToInsert)
+		err := h.repo.ReturnEnforcedPayment(ctx, tx, *dataToInsert)
 		if err != nil {
 			return errors.ErrInternalServer
 		}
@@ -124,8 +125,8 @@ func (h *EnforcedPaymentServiceImpl) ReturnEnforcedPayment(id int, input dto.Enf
 	return nil
 }
 
-func (h *EnforcedPaymentServiceImpl) DeleteEnforcedPayment(id int) error {
-	err := h.repo.Delete(id)
+func (h *EnforcedPaymentServiceImpl) DeleteEnforcedPayment(ctx context.Context, id int) error {
+	err := h.repo.Delete(ctx, id)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return errors.ErrInternalServer
@@ -262,7 +263,7 @@ func (h *EnforcedPaymentServiceImpl) GetEnforcedPaymentList(filter dto.EnforcedP
 	return response, total, nil
 }
 
-func updateInvoiceStatusForEnforcedPayment(id int, tx up.Session, h *EnforcedPaymentServiceImpl) error {
+func updateInvoiceStatusForEnforcedPayment(ctx context.Context, id int, tx up.Session, h *EnforcedPaymentServiceImpl) error {
 	invoice, err := h.invoicesRepo.Get(id)
 
 	if err != nil {
@@ -290,7 +291,7 @@ func updateInvoiceStatusForEnforcedPayment(id int, tx up.Session, h *EnforcedPay
 
 	invoice.Status = data.InvoiceStatusFull
 
-	err = h.invoicesRepo.Update(tx, *invoice)
+	err = h.invoicesRepo.Update(ctx, tx, *invoice)
 
 	if err != nil {
 		return err

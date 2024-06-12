@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"fmt"
 
 	"gitlab.sudovi.me/erp/finance-api/data"
@@ -27,11 +28,11 @@ func NewFeeServiceImpl(app *celeritas.Celeritas, repo data.Fee, feeSharedLogicSe
 }
 
 // CreateFee creates a new fee
-func (h *FeeServiceImpl) CreateFee(input dto.FeeDTO) (*dto.FeeResponseDTO, error) {
+func (h *FeeServiceImpl) CreateFee(ctx context.Context, input dto.FeeDTO) (*dto.FeeResponseDTO, error) {
 	fee := input.ToFee()
 	fee.Status = data.UnpaidFeeStatus
 
-	id, err := h.repo.Insert(*fee)
+	id, err := h.repo.Insert(ctx, *fee)
 	if err != nil {
 		return nil, errors.ErrInternalServer
 	}
@@ -56,11 +57,11 @@ func (h *FeeServiceImpl) GetFee(id int) (*dto.FeeResponseDTO, error) {
 }
 
 // UpdateFee updates a fee
-func (h *FeeServiceImpl) UpdateFee(id int, input dto.FeeDTO) (*dto.FeeResponseDTO, error) {
+func (h *FeeServiceImpl) UpdateFee(ctx context.Context, id int, input dto.FeeDTO) (*dto.FeeResponseDTO, error) {
 	fee := input.ToFee()
 	fee.ID = id
 
-	err := h.repo.Update(*fee)
+	err := h.repo.Update(ctx, *fee)
 	if err != nil {
 		return nil, errors.ErrInternalServer
 	}
@@ -74,8 +75,8 @@ func (h *FeeServiceImpl) UpdateFee(id int, input dto.FeeDTO) (*dto.FeeResponseDT
 }
 
 // DeleteFee deletes a fee by its id
-func (h *FeeServiceImpl) DeleteFee(id int) error {
-	err := h.repo.Delete(id)
+func (h *FeeServiceImpl) DeleteFee(ctx context.Context, id int) error {
+	err := h.repo.Delete(ctx, id)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return errors.ErrInternalServer
@@ -147,7 +148,7 @@ func (h *FeeServiceImpl) convertFeeToResponse(fee *data.Fee) (*dto.FeeResponseDT
 	response := dto.ToFeeResponseDTO(*fee)
 	var newStatus data.FeeStatus
 	var err error
-	response.FeeDetails, newStatus, err = h.feeSharedLogicService.CalculateFeeDetailsAndUpdateStatus(fee.ID)
+	response.FeeDetails, newStatus, err = h.feeSharedLogicService.CalculateFeeDetailsAndUpdateStatus(context.Background(), fee.ID)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return nil, err

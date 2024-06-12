@@ -1,6 +1,8 @@
 package services
 
 import (
+	"context"
+
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
 	"gitlab.sudovi.me/erp/finance-api/errors"
@@ -21,13 +23,13 @@ func NewFixedDepositItemServiceImpl(app *celeritas.Celeritas, repo data.FixedDep
 	}
 }
 
-func (h *FixedDepositItemServiceImpl) CreateFixedDepositItem(input dto.FixedDepositItemDTO) (*dto.FixedDepositItemResponseDTO, error) {
+func (h *FixedDepositItemServiceImpl) CreateFixedDepositItem(ctx context.Context, input dto.FixedDepositItemDTO) (*dto.FixedDepositItemResponseDTO, error) {
 	dataToInsert := input.ToFixedDepositItem()
 
 	var id int
 	err := data.Upper.Tx(func(tx up.Session) error {
 		var err error
-		id, err = h.repo.Insert(tx, *dataToInsert)
+		id, err = h.repo.Insert(ctx, tx, *dataToInsert)
 		if err != nil {
 			return errors.ErrInternalServer
 		}
@@ -49,12 +51,12 @@ func (h *FixedDepositItemServiceImpl) CreateFixedDepositItem(input dto.FixedDepo
 	return &res, nil
 }
 
-func (h *FixedDepositItemServiceImpl) UpdateFixedDepositItem(id int, input dto.FixedDepositItemDTO) (*dto.FixedDepositItemResponseDTO, error) {
+func (h *FixedDepositItemServiceImpl) UpdateFixedDepositItem(ctx context.Context, id int, input dto.FixedDepositItemDTO) (*dto.FixedDepositItemResponseDTO, error) {
 	dataToInsert := input.ToFixedDepositItem()
 	dataToInsert.ID = id
 
 	err := data.Upper.Tx(func(tx up.Session) error {
-		err := h.repo.Update(tx, *dataToInsert)
+		err := h.repo.Update(ctx, tx, *dataToInsert)
 		if err != nil {
 			return errors.ErrInternalServer
 		}
@@ -74,8 +76,8 @@ func (h *FixedDepositItemServiceImpl) UpdateFixedDepositItem(id int, input dto.F
 	return &response, nil
 }
 
-func (h *FixedDepositItemServiceImpl) DeleteFixedDepositItem(id int) error {
-	err := h.repo.Delete(id)
+func (h *FixedDepositItemServiceImpl) DeleteFixedDepositItem(ctx context.Context, id int) error {
+	err := h.repo.Delete(ctx, id)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return errors.ErrInternalServer

@@ -1,11 +1,14 @@
 package data
 
 import (
+	"context"
 	goerrors "errors"
+	"fmt"
 	"time"
 
 	"github.com/shopspring/decimal"
 	up "github.com/upper/db/v4"
+	"gitlab.sudovi.me/erp/finance-api/contextutil"
 	"gitlab.sudovi.me/erp/finance-api/pkg/errors"
 )
 
@@ -182,7 +185,7 @@ func (t *SpendingRelease) Get(id int) (*SpendingReleaseWithCurrentBudget, error)
 }
 
 // Update updates a record in the database, using upper
-func (t *SpendingRelease) Update(m SpendingRelease) error {
+func (t *SpendingRelease) Update(ctx context.Context, m SpendingRelease) error {
 	collection := Upper.Collection(t.Table())
 	res := collection.Find(m.ID)
 	err := res.Update(&m)
@@ -193,7 +196,7 @@ func (t *SpendingRelease) Update(m SpendingRelease) error {
 }
 
 // Delete deletes a record from the database by id, using upper
-func (t *SpendingRelease) Delete(id int) error {
+func (t *SpendingRelease) Delete(ctx context.Context, id int) error {
 	collection := Upper.Collection(t.Table())
 	res := collection.Find(id)
 	err := res.Delete()
@@ -207,15 +210,40 @@ func (t *SpendingRelease) Delete(id int) error {
 }
 
 // Insert inserts a model into the database, using upper
-func (t *SpendingRelease) Insert(m SpendingRelease) (int, error) {
+func (t *SpendingRelease) Insert(ctx context.Context, m SpendingRelease) (int, error) {
 	m.CreatedAt = time.Now()
-	collection := Upper.Collection(t.Table())
-	res, err := collection.Insert(m)
-	if err != nil {
-		return 0, errors.Wrap(err, "repo spending-release insert")
+
+	userID, ok := contextutil.GetUserIDFromContext(ctx)
+	if !ok {
+		return 0, errors.New("user ID not found in context")
 	}
 
-	id := getInsertId(res.ID())
+	var id int
+
+	err := Upper.Tx(func(sess up.Session) error {
+
+		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+		if _, err := sess.SQL().Exec(query); err != nil {
+			return err
+		}
+
+		collection := sess.Collection(t.Table())
+
+		var res up.InsertResult
+		var err error
+
+		if res, err = collection.Insert(m); err != nil {
+			return err
+		}
+
+		id = getInsertId(res.ID())
+
+		return nil
+	})
+
+	if err != nil {
+		return 0, err
+	}
 
 	return id, nil
 }

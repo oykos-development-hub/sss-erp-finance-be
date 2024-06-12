@@ -1,9 +1,13 @@
 package data
 
 import (
+	"context"
+	"fmt"
 	"time"
 
 	up "github.com/upper/db/v4"
+	"gitlab.sudovi.me/erp/finance-api/contextutil"
+	"gitlab.sudovi.me/erp/finance-api/pkg/errors"
 )
 
 type PaymentOrder struct {
@@ -96,7 +100,7 @@ func (t *PaymentOrder) Get(id int) (*PaymentOrder, error) {
 }
 
 // Update updates a record in the database, using upper
-func (t *PaymentOrder) Update(tx up.Session, m PaymentOrder) error {
+func (t *PaymentOrder) Update(ctx context.Context, tx up.Session, m PaymentOrder) error {
 	m.UpdatedAt = time.Now()
 	collection := tx.Collection(t.Table())
 
@@ -117,10 +121,27 @@ func (t *PaymentOrder) Update(tx up.Session, m PaymentOrder) error {
 }
 
 // Delete deletes a record from the database by id, using upper
-func (t *PaymentOrder) Delete(id int) error {
-	collection := Upper.Collection(t.Table())
-	res := collection.Find(id)
-	err := res.Delete()
+func (t *PaymentOrder) Delete(ctx context.Context, id int) error {
+	userID, ok := contextutil.GetUserIDFromContext(ctx)
+	if !ok {
+		return errors.New("user ID not found in context")
+	}
+
+	err := Upper.Tx(func(sess up.Session) error {
+		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+		if _, err := sess.SQL().Exec(query); err != nil {
+			return err
+		}
+
+		collection := sess.Collection(t.Table())
+		res := collection.Find(id)
+		if err := res.Delete(); err != nil {
+			return err
+		}
+
+		return nil
+	})
+
 	if err != nil {
 		return err
 	}
@@ -128,16 +149,40 @@ func (t *PaymentOrder) Delete(id int) error {
 }
 
 // Insert inserts a model into the database, using upper
-func (t *PaymentOrder) Insert(tx up.Session, m PaymentOrder) (int, error) {
+func (t *PaymentOrder) Insert(ctx context.Context, tx up.Session, m PaymentOrder) (int, error) {
 	m.CreatedAt = time.Now()
 	m.UpdatedAt = time.Now()
-	collection := tx.Collection(t.Table())
-	res, err := collection.Insert(m)
+	userID, ok := contextutil.GetUserIDFromContext(ctx)
+	if !ok {
+		return 0, errors.New("user ID not found in context")
+	}
+
+	var id int
+
+	err := Upper.Tx(func(sess up.Session) error {
+
+		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+		if _, err := sess.SQL().Exec(query); err != nil {
+			return err
+		}
+
+		collection := sess.Collection(t.Table())
+
+		var res up.InsertResult
+		var err error
+
+		if res, err = collection.Insert(m); err != nil {
+			return err
+		}
+
+		id = getInsertId(res.ID())
+
+		return nil
+	})
+
 	if err != nil {
 		return 0, err
 	}
-
-	id := getInsertId(res.ID())
 
 	return id, nil
 }
@@ -326,26 +371,52 @@ func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation
 	return items, &total, nil
 }
 
-func (t *PaymentOrder) PayPaymentOrder(tx up.Session, id int, SAPID string, DateOfSAP time.Time) error {
-	query := `update payment_orders set sap_id = $1, date_of_sap = $2 where id = $3`
+func (t *PaymentOrder) PayPaymentOrder(ctx context.Context, tx up.Session, id int, SAPID string, DateOfSAP time.Time) error {
 
-	rows, err := tx.SQL().Query(query, SAPID, DateOfSAP, id)
-	if err != nil {
-		return err
+	userID, ok := contextutil.GetUserIDFromContext(ctx)
+	if !ok {
+		return errors.New("user ID not found in context")
 	}
-	defer rows.Close()
 
-	return nil
+	err := Upper.Tx(func(sess up.Session) error {
+		// Set the user_id variable
+		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+		if _, err := sess.SQL().Exec(query); err != nil {
+			return err
+		}
+
+		query = `update payment_orders set sap_id = $1, date_of_sap = $2 where id = $3`
+
+		_, err := sess.SQL().Query(query, SAPID, DateOfSAP, id)
+		return err
+
+	})
+
+	return err
 }
 
-func (t *PaymentOrder) CancelPaymentOrder(tx up.Session, id int) error {
-	query := `update payment_orders set status = 'Storniran' where id = $1`
+func (t *PaymentOrder) CancelPaymentOrder(ctx context.Context, tx up.Session, id int) error {
 
-	rows, err := tx.SQL().Query(query, id)
-	if err != nil {
-		return err
+	userID, ok := contextutil.GetUserIDFromContext(ctx)
+	if !ok {
+		return errors.New("user ID not found in context")
 	}
-	defer rows.Close()
 
-	return nil
+	err := Upper.Tx(func(sess up.Session) error {
+		// Set the user_id variable
+		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+		if _, err := sess.SQL().Exec(query); err != nil {
+			return err
+		}
+
+		query = `update payment_orders set status = 'Storniran' where id = $1`
+
+		_, err := sess.SQL().Query(query, id)
+
+		return err
+
+	})
+
+	return err
+
 }

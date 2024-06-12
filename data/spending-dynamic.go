@@ -1,9 +1,13 @@
 package data
 
 import (
+	"context"
+	"fmt"
 	"time"
 
 	"github.com/shopspring/decimal"
+	up "github.com/upper/db/v4"
+	"gitlab.sudovi.me/erp/finance-api/contextutil"
 	"gitlab.sudovi.me/erp/finance-api/pkg/errors"
 )
 
@@ -195,16 +199,40 @@ func (s *SpendingDynamicEntry) monthValues() map[time.Month]decimal.Decimal {
 }
 
 // Insert inserts a model into the database, using upper
-func (t *SpendingDynamicEntry) Insert(m SpendingDynamicEntry) (int, error) {
+func (t *SpendingDynamicEntry) Insert(ctx context.Context, m SpendingDynamicEntry) (int, error) {
 	m.CreatedAt = time.Now()
 
-	collection := Upper.Collection(t.Table())
-	res, err := collection.Insert(m)
+	userID, ok := contextutil.GetUserIDFromContext(ctx)
+	if !ok {
+		return 0, errors.New("user ID not found in context")
+	}
+
+	var id int
+
+	err := Upper.Tx(func(sess up.Session) error {
+
+		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+		if _, err := sess.SQL().Exec(query); err != nil {
+			return err
+		}
+
+		collection := sess.Collection(t.Table())
+
+		var res up.InsertResult
+		var err error
+
+		if res, err = collection.Insert(m); err != nil {
+			return err
+		}
+
+		id = getInsertId(res.ID())
+
+		return nil
+	})
+
 	if err != nil {
 		return 0, err
 	}
-
-	id := getInsertId(res.ID())
 
 	return id, nil
 }

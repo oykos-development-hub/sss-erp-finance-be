@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"time"
 
 	"gitlab.sudovi.me/erp/finance-api/data"
@@ -28,13 +29,13 @@ func NewInternalReallocationServiceImpl(app *celeritas.Celeritas, repo data.Inte
 	}
 }
 
-func (h *InternalReallocationServiceImpl) CreateInternalReallocation(input dto.InternalReallocationDTO) (*dto.InternalReallocationResponseDTO, error) {
+func (h *InternalReallocationServiceImpl) CreateInternalReallocation(ctx context.Context, input dto.InternalReallocationDTO) (*dto.InternalReallocationResponseDTO, error) {
 	dataToInsert := input.ToInternalReallocation()
 
 	var id int
 	err := data.Upper.Tx(func(tx up.Session) error {
 		var err error
-		id, err = h.repo.Insert(tx, *dataToInsert)
+		id, err = h.repo.Insert(ctx, tx, *dataToInsert)
 		if err != nil {
 			return errors.ErrInternalServer
 		}
@@ -63,7 +64,7 @@ func (h *InternalReallocationServiceImpl) CreateInternalReallocation(input dto.I
 
 				value := currentBudget.Actual.Sub(itemToInsert.Amount)
 
-				err = h.currentBudgetRepo.UpdateActual(currentBudget.ID, value)
+				err = h.currentBudgetRepo.UpdateActual(ctx, currentBudget.ID, value)
 
 				if err != nil {
 					return errors.ErrInternalServer
@@ -84,7 +85,7 @@ func (h *InternalReallocationServiceImpl) CreateInternalReallocation(input dto.I
 
 				value := currentBudget.Actual.Add(itemToInsert.Amount)
 
-				err = h.currentBudgetRepo.UpdateActual(currentBudget.ID, value)
+				err = h.currentBudgetRepo.UpdateActual(ctx, currentBudget.ID, value)
 
 				if err != nil {
 					return errors.ErrInternalServer
@@ -109,7 +110,7 @@ func (h *InternalReallocationServiceImpl) CreateInternalReallocation(input dto.I
 	return &res, nil
 }
 
-func (h *InternalReallocationServiceImpl) DeleteInternalReallocation(id int) error {
+func (h *InternalReallocationServiceImpl) DeleteInternalReallocation(ctx context.Context, id int) error {
 	reallocation, err := h.GetInternalReallocation(id)
 
 	if err != nil {
@@ -138,7 +139,7 @@ func (h *InternalReallocationServiceImpl) DeleteInternalReallocation(id int) err
 		}
 	}
 
-	err = h.repo.Delete(id)
+	err = h.repo.Delete(ctx, id)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return errors.ErrInternalServer
@@ -159,7 +160,7 @@ func (h *InternalReallocationServiceImpl) DeleteInternalReallocation(id int) err
 
 			value := currentBudget.Actual.Add(item.Amount)
 
-			err = h.currentBudgetRepo.UpdateActual(currentBudget.ID, value)
+			err = h.currentBudgetRepo.UpdateActual(ctx, currentBudget.ID, value)
 
 			if err != nil {
 				return errors.ErrInternalServer
@@ -180,7 +181,7 @@ func (h *InternalReallocationServiceImpl) DeleteInternalReallocation(id int) err
 
 			value := currentBudget.Actual.Sub(item.Amount)
 
-			err = h.currentBudgetRepo.UpdateActual(currentBudget.ID, value)
+			err = h.currentBudgetRepo.UpdateActual(ctx, currentBudget.ID, value)
 
 			if err != nil {
 				return errors.ErrInternalServer

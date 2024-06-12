@@ -1,6 +1,8 @@
 package services
 
 import (
+	"context"
+
 	"github.com/oykos-development-hub/celeritas"
 	"github.com/upper/db/v4"
 	"gitlab.sudovi.me/erp/finance-api/data"
@@ -24,11 +26,11 @@ func NewFinePaymentServiceImpl(app *celeritas.Celeritas, repo data.FinePayment, 
 }
 
 // CreateFinePayment creates a new fine payment
-func (h *FinePaymentServiceImpl) CreateFinePayment(input dto.FinePaymentDTO) (*dto.FinePaymentResponseDTO, error) {
+func (h *FinePaymentServiceImpl) CreateFinePayment(ctx context.Context, input dto.FinePaymentDTO) (*dto.FinePaymentResponseDTO, error) {
 	finePayment := input.ToFinePayment()
 	finePayment.Status = data.PaidFinePeymentStatus
 
-	id, err := h.repo.Insert(*finePayment)
+	id, err := h.repo.Insert(ctx, *finePayment)
 	if err != nil {
 		return nil, errors.ErrInternalServer
 	}
@@ -40,7 +42,7 @@ func (h *FinePaymentServiceImpl) CreateFinePayment(input dto.FinePaymentDTO) (*d
 
 	res := dto.ToFinePaymentResponseDTO(*finePayment)
 
-	_, _, err = h.fineSharedLogicService.CalculateFineDetailsAndUpdateStatus(finePayment.FineID)
+	_, _, err = h.fineSharedLogicService.CalculateFineDetailsAndUpdateStatus(ctx, finePayment.FineID)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return nil, err
@@ -50,20 +52,20 @@ func (h *FinePaymentServiceImpl) CreateFinePayment(input dto.FinePaymentDTO) (*d
 }
 
 // GetFinePayment returns a fine payment by its id
-func (h *FinePaymentServiceImpl) DeleteFinePayment(id int) error {
+func (h *FinePaymentServiceImpl) DeleteFinePayment(ctx context.Context, id int) error {
 	finePayment, err := h.repo.Get(id)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return errors.ErrNotFound
 	}
 
-	err = h.repo.Delete(id)
+	err = h.repo.Delete(ctx, id)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return errors.ErrInternalServer
 	}
 
-	_, _, err = h.fineSharedLogicService.CalculateFineDetailsAndUpdateStatus(finePayment.FineID)
+	_, _, err = h.fineSharedLogicService.CalculateFineDetailsAndUpdateStatus(ctx, finePayment.FineID)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return errors.ErrInternalServer
@@ -73,11 +75,11 @@ func (h *FinePaymentServiceImpl) DeleteFinePayment(id int) error {
 }
 
 // UpdateFinePayment updates a fine payment by its id
-func (h *FinePaymentServiceImpl) UpdateFinePayment(id int, input dto.FinePaymentDTO) (*dto.FinePaymentResponseDTO, error) {
+func (h *FinePaymentServiceImpl) UpdateFinePayment(ctx context.Context, id int, input dto.FinePaymentDTO) (*dto.FinePaymentResponseDTO, error) {
 	data := input.ToFinePayment()
 	data.ID = id
 
-	err := h.repo.Update(*data)
+	err := h.repo.Update(ctx, *data)
 	if err != nil {
 		return nil, errors.ErrInternalServer
 	}
@@ -89,7 +91,7 @@ func (h *FinePaymentServiceImpl) UpdateFinePayment(id int, input dto.FinePayment
 
 	response := dto.ToFinePaymentResponseDTO(*data)
 
-	_, _, err = h.fineSharedLogicService.CalculateFineDetailsAndUpdateStatus(data.FineID)
+	_, _, err = h.fineSharedLogicService.CalculateFineDetailsAndUpdateStatus(ctx, data.FineID)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return nil, errors.ErrInternalServer

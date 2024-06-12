@@ -1,6 +1,8 @@
 package services
 
 import (
+	"context"
+
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
 	"gitlab.sudovi.me/erp/finance-api/pkg/errors"
@@ -30,7 +32,7 @@ func NewSpendingDynamicServiceImpl(
 	}
 }
 
-func (h *SpendingDynamicServiceImpl) CreateSpendingDynamic(budgetID, unitID int, inputDataDTO []dto.SpendingDynamicDTO) error {
+func (h *SpendingDynamicServiceImpl) CreateSpendingDynamic(ctx context.Context, budgetID, unitID int, inputDataDTO []dto.SpendingDynamicDTO) error {
 	latestVersion, err := h.repoEntries.FindLatestVersion()
 	if err != nil {
 		return errors.Wrap(err, "find latest version")
@@ -65,7 +67,7 @@ func (h *SpendingDynamicServiceImpl) CreateSpendingDynamic(budgetID, unitID int,
 		entriesInputData.CurrentBudgetID = currentBudget.ID
 		entriesInputData.Version = latestVersion + 1
 
-		_, err = h.repoEntries.Insert(*entriesInputData)
+		_, err = h.repoEntries.Insert(ctx, *entriesInputData)
 		if err != nil {
 			return errors.Wrap(err, "CreateSpendingDynamic")
 		}
@@ -74,10 +76,10 @@ func (h *SpendingDynamicServiceImpl) CreateSpendingDynamic(budgetID, unitID int,
 	return nil
 }
 
-func (h *SpendingDynamicServiceImpl) CreateInititalSpendingDynamicFromCurrentBudget(currentBudget *data.CurrentBudget) error {
+func (h *SpendingDynamicServiceImpl) CreateInititalSpendingDynamicFromCurrentBudget(ctx context.Context, currentBudget *data.CurrentBudget) error {
 	spendingDynamicEntry := h.generateInitialSpendingDynamicEntry(currentBudget)
 
-	_, err := h.repoEntries.Insert(*spendingDynamicEntry)
+	_, err := h.repoEntries.Insert(ctx, *spendingDynamicEntry)
 	if err != nil {
 		return errors.Wrap(err, "CreateInititalSpendingDynamicFromCurrentBudget")
 	}

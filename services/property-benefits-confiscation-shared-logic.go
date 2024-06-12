@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"math"
 	"time"
 
@@ -27,7 +28,7 @@ func NewPropBenConfSharedLogicServiceImpl(app *celeritas.Celeritas, repoPropBenC
 	}
 }
 
-func (h *PropBenConfSharedLogicServiceImpl) CalculatePropBenConfDetailsAndUpdateStatus(propbenconfId int) (*dto.PropBenConfDetailsDTO, data.PropBenConfStatus, error) {
+func (h *PropBenConfSharedLogicServiceImpl) CalculatePropBenConfDetailsAndUpdateStatus(ctx context.Context, propbenconfId int) (*dto.PropBenConfDetailsDTO, data.PropBenConfStatus, error) {
 	propbenconf, err := h.repoPropBenConf.Get(propbenconfId)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
@@ -82,7 +83,7 @@ func (h *PropBenConfSharedLogicServiceImpl) CalculatePropBenConfDetailsAndUpdate
 
 	if newStatus != propbenconf.Status {
 		propbenconf.Status = newStatus
-		err = h.repoPropBenConf.Update(*propbenconf)
+		err = h.repoPropBenConf.Update(ctx, *propbenconf)
 		if err != nil {
 			return nil, 0, errors.ErrInternalServer
 		}

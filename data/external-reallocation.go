@@ -1,9 +1,13 @@
 package data
 
 import (
+	"context"
+	"fmt"
 	"time"
 
 	up "github.com/upper/db/v4"
+	"gitlab.sudovi.me/erp/finance-api/contextutil"
+	"gitlab.sudovi.me/erp/finance-api/pkg/errors"
 )
 
 type ReallocationStatus string
@@ -83,11 +87,29 @@ func (t *ExternalReallocation) Get(id int) (*ExternalReallocation, error) {
 }
 
 // Update updates a record in the database, using upper
-func (t *ExternalReallocation) Update(tx up.Session, m ExternalReallocation) error {
+func (t *ExternalReallocation) Update(ctx context.Context, tx up.Session, m ExternalReallocation) error {
 	m.UpdatedAt = time.Now()
-	collection := tx.Collection(t.Table())
-	res := collection.Find(m.ID)
-	err := res.Update(&m)
+	userID, ok := contextutil.GetUserIDFromContext(ctx)
+	if !ok {
+		return errors.New("user ID not found in context")
+	}
+
+	err := Upper.Tx(func(sess up.Session) error {
+
+		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+		if _, err := sess.SQL().Exec(query); err != nil {
+			return err
+		}
+
+		collection := sess.Collection(t.Table())
+		res := collection.Find(m.ID)
+		if err := res.Update(&m); err != nil {
+			return err
+		}
+
+		return nil
+	})
+
 	if err != nil {
 		return err
 	}
@@ -95,10 +117,27 @@ func (t *ExternalReallocation) Update(tx up.Session, m ExternalReallocation) err
 }
 
 // Delete deletes a record from the database by id, using upper
-func (t *ExternalReallocation) Delete(id int) error {
-	collection := Upper.Collection(t.Table())
-	res := collection.Find(id)
-	err := res.Delete()
+func (t *ExternalReallocation) Delete(ctx context.Context, id int) error {
+	userID, ok := contextutil.GetUserIDFromContext(ctx)
+	if !ok {
+		return errors.New("user ID not found in context")
+	}
+
+	err := Upper.Tx(func(sess up.Session) error {
+		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+		if _, err := sess.SQL().Exec(query); err != nil {
+			return err
+		}
+
+		collection := sess.Collection(t.Table())
+		res := collection.Find(id)
+		if err := res.Delete(); err != nil {
+			return err
+		}
+
+		return nil
+	})
+
 	if err != nil {
 		return err
 	}
@@ -106,67 +145,142 @@ func (t *ExternalReallocation) Delete(id int) error {
 }
 
 // Insert inserts a model into the database, using upper
-func (t *ExternalReallocation) Insert(tx up.Session, m ExternalReallocation) (int, error) {
+func (t *ExternalReallocation) Insert(ctx context.Context, tx up.Session, m ExternalReallocation) (int, error) {
 	m.CreatedAt = time.Now()
 	m.UpdatedAt = time.Now()
-	m.Status = ReallocationStatusCreated
-	collection := tx.Collection(t.Table())
-	res, err := collection.Insert(m)
+	userID, ok := contextutil.GetUserIDFromContext(ctx)
+	if !ok {
+		return 0, errors.New("user ID not found in context")
+	}
+
+	var id int
+
+	err := Upper.Tx(func(sess up.Session) error {
+
+		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+		if _, err := sess.SQL().Exec(query); err != nil {
+			return err
+		}
+
+		collection := sess.Collection(t.Table())
+
+		var res up.InsertResult
+		var err error
+
+		if res, err = collection.Insert(m); err != nil {
+			return err
+		}
+
+		id = getInsertId(res.ID())
+
+		return nil
+	})
+
 	if err != nil {
 		return 0, err
 	}
 
-	id := getInsertId(res.ID())
-
 	return id, nil
 }
 
-func (t *ExternalReallocation) AcceptOUExternalReallocation(tx up.Session, m ExternalReallocation) error {
-	query := `update external_reallocations
-			  set status = $1, date_of_action_dest_org_unit =$2, accepted_by = $3, destination_org_unit_file_id = $4
-			  where id = $5`
+func (t *ExternalReallocation) AcceptOUExternalReallocation(ctx context.Context, tx up.Session, m ExternalReallocation) error {
 
-	_, err := tx.SQL().Query(query, ReallocationStatusOUAccept, m.DateOfActionDestOrgUnit, m.AcceptedBy, m.DestinationOrgUnitFileID, m.ID)
-
-	if err != nil {
-		return err
+	userID, ok := contextutil.GetUserIDFromContext(ctx)
+	if !ok {
+		return errors.New("user ID not found in context")
 	}
 
-	return nil
+	err := Upper.Tx(func(sess up.Session) error {
+		// Set the user_id variable
+		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+		if _, err := sess.SQL().Exec(query); err != nil {
+			return err
+		}
+
+		query = `update external_reallocations
+		set status = $1, date_of_action_dest_org_unit =$2, accepted_by = $3, destination_org_unit_file_id = $4
+		where id = $5`
+
+		_, err := sess.SQL().Query(query, ReallocationStatusOUAccept, m.DateOfActionDestOrgUnit, m.AcceptedBy, m.DestinationOrgUnitFileID, m.ID)
+
+		return err
+	})
+
+	return err
+
 }
 
-func (t *ExternalReallocation) RejectOUExternalReallocation(id int) error {
-	query := `update external_reallocations
+func (t *ExternalReallocation) RejectOUExternalReallocation(ctx context.Context, id int) error {
+
+	userID, ok := contextutil.GetUserIDFromContext(ctx)
+	if !ok {
+		return errors.New("user ID not found in context")
+	}
+
+	err := Upper.Tx(func(sess up.Session) error {
+		// Set the user_id variable
+		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+		if _, err := sess.SQL().Exec(query); err != nil {
+			return err
+		}
+
+		query = `update external_reallocations
 			  set status = $1, date_of_action_dest_org_unit = NOW() where id = $2`
 
-	_, err := Upper.SQL().Query(query, ReallocationStatusOUDecline, id)
+		_, err := sess.SQL().Query(query, ReallocationStatusOUDecline, id)
 
-	if err != nil {
 		return err
-	}
-	return nil
+	})
+
+	return err
 }
 
-func (t *ExternalReallocation) AcceptSSSExternalReallocation(tx up.Session, id int) error {
-	query := `update external_reallocations
+func (t *ExternalReallocation) AcceptSSSExternalReallocation(ctx context.Context, tx up.Session, id int) error {
+
+	userID, ok := contextutil.GetUserIDFromContext(ctx)
+	if !ok {
+		return errors.New("user ID not found in context")
+	}
+
+	err := Upper.Tx(func(sess up.Session) error {
+		// Set the user_id variable
+		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+		if _, err := sess.SQL().Exec(query); err != nil {
+			return err
+		}
+
+		query = `update external_reallocations
 			  set status = $1, date_of_action_sss = NOW() where id = $2`
 
-	_, err := tx.SQL().Query(query, ReallocationStatusSSSAccept, id)
+		_, err := sess.SQL().Query(query, ReallocationStatusSSSAccept, id)
 
-	if err != nil {
 		return err
-	}
-	return nil
+	})
+
+	return err
 }
 
-func (t *ExternalReallocation) RejectSSSExternalReallocation(tx up.Session, id int) error {
-	query := `update external_reallocations
+func (t *ExternalReallocation) RejectSSSExternalReallocation(ctx context.Context, tx up.Session, id int) error {
+
+	userID, ok := contextutil.GetUserIDFromContext(ctx)
+	if !ok {
+		return errors.New("user ID not found in context")
+	}
+
+	err := Upper.Tx(func(sess up.Session) error {
+		// Set the user_id variable
+		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+		if _, err := sess.SQL().Exec(query); err != nil {
+			return err
+		}
+
+		query = `update external_reallocations
 			  set status = $1, date_of_action_sss = NOW() where id = $2`
 
-	_, err := tx.SQL().Query(query, ReallocationStatusSSSDecline, id)
+		_, err := sess.SQL().Query(query, ReallocationStatusSSSDecline, id)
 
-	if err != nil {
 		return err
-	}
-	return nil
+	})
+
+	return err
 }

@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"time"
 
 	"gitlab.sudovi.me/erp/finance-api/data"
@@ -28,7 +29,7 @@ func NewSpendingReleaseServiceImpl(app *celeritas.Celeritas, repo data.SpendingR
 	}
 }
 
-func (h *SpendingReleaseServiceImpl) CreateSpendingRelease(budgetID, unitID int, inputDTOList []dto.SpendingReleaseDTO) ([]dto.SpendingReleaseResponseDTO, error) {
+func (h *SpendingReleaseServiceImpl) CreateSpendingRelease(ctx context.Context, budgetID, unitID int, inputDTOList []dto.SpendingReleaseDTO) ([]dto.SpendingReleaseResponseDTO, error) {
 	res := make([]dto.SpendingReleaseResponseDTO, 0, len(inputDTOList))
 	currentMonth := time.Now().Month()
 	for _, inputDTO := range inputDTOList {
@@ -66,7 +67,7 @@ func (h *SpendingReleaseServiceImpl) CreateSpendingRelease(budgetID, unitID int,
 			return nil, errors.NewWithCode(errors.NotEnoughFundsCode, "service.CreateSpendingRelease: not enough funds")
 		}
 
-		id, err := h.repo.Insert(inputData)
+		id, err := h.repo.Insert(ctx, inputData)
 		if err != nil {
 			return nil, errors.Wrap(err, "service.spending-release.CreateSpendingRelease")
 		}
@@ -89,7 +90,7 @@ func (h *SpendingReleaseServiceImpl) CreateSpendingRelease(budgetID, unitID int,
 	return res, nil
 }
 
-func (h *SpendingReleaseServiceImpl) DeleteSpendingRelease(input *dto.DeleteSpendingReleaseInput) error {
+func (h *SpendingReleaseServiceImpl) DeleteSpendingRelease(ctx context.Context, input *dto.DeleteSpendingReleaseInput) error {
 	releases, err := h.repo.GetAll(data.SpendingReleaseFilterDTO{
 		BudgetID: &input.BudgetID,
 		UnitID:   &input.UnitID,
@@ -100,7 +101,7 @@ func (h *SpendingReleaseServiceImpl) DeleteSpendingRelease(input *dto.DeleteSpen
 	}
 
 	for _, release := range releases {
-		err = h.repo.Delete(release.ID)
+		err = h.repo.Delete(ctx, release.ID)
 		if err != nil {
 			return errors.Wrap(err, "repo delete")
 		}

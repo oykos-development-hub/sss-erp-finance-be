@@ -1,9 +1,13 @@
 package data
 
 import (
+	"context"
+	"fmt"
 	"time"
 
 	up "github.com/upper/db/v4"
+	"gitlab.sudovi.me/erp/finance-api/contextutil"
+	"gitlab.sudovi.me/erp/finance-api/pkg/errors"
 )
 
 // TaxAuthorityCodebook struct
@@ -92,11 +96,29 @@ func (t *TaxAuthorityCodebook) Get(id int) (*TaxAuthorityCodebook, error) {
 }
 
 // Update updates a record in the database, using upper
-func (t *TaxAuthorityCodebook) Update(m TaxAuthorityCodebook) error {
+func (t *TaxAuthorityCodebook) Update(ctx context.Context, m TaxAuthorityCodebook) error {
 	m.UpdatedAt = time.Now()
-	collection := Upper.Collection(t.Table())
-	res := collection.Find(m.ID)
-	err := res.Update(&m)
+	userID, ok := contextutil.GetUserIDFromContext(ctx)
+	if !ok {
+		return errors.New("user ID not found in context")
+	}
+
+	err := Upper.Tx(func(sess up.Session) error {
+
+		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+		if _, err := sess.SQL().Exec(query); err != nil {
+			return err
+		}
+
+		collection := sess.Collection(t.Table())
+		res := collection.Find(m.ID)
+		if err := res.Update(&m); err != nil {
+			return err
+		}
+
+		return nil
+	})
+
 	if err != nil {
 		return err
 	}
@@ -104,39 +126,93 @@ func (t *TaxAuthorityCodebook) Update(m TaxAuthorityCodebook) error {
 }
 
 // Delete deletes a record from the database by id, using upper
-func (t *TaxAuthorityCodebook) Delete(id int) error {
-	collection := Upper.Collection(t.Table())
-	res := collection.Find(id)
-	err := res.Delete()
+func (t *TaxAuthorityCodebook) Delete(ctx context.Context, id int) error {
+	userID, ok := contextutil.GetUserIDFromContext(ctx)
+	if !ok {
+		return errors.New("user ID not found in context")
+	}
+
+	err := Upper.Tx(func(sess up.Session) error {
+		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+		if _, err := sess.SQL().Exec(query); err != nil {
+			return err
+		}
+
+		collection := sess.Collection(t.Table())
+		res := collection.Find(id)
+		if err := res.Delete(); err != nil {
+			return err
+		}
+
+		return nil
+	})
+
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (t *TaxAuthorityCodebook) Deactivate(id int, active bool) error {
-	query := `update tax_authority_codebooks set active = $1 where id = $2`
+func (t *TaxAuthorityCodebook) Deactivate(ctx context.Context, id int, active bool) error {
 
-	rows, err := Upper.SQL().Query(query, active, id)
-	if err != nil {
-		return err
+	userID, ok := contextutil.GetUserIDFromContext(ctx)
+	if !ok {
+		return errors.New("user ID not found in context")
 	}
-	defer rows.Close()
 
-	return nil
+	err := Upper.Tx(func(sess up.Session) error {
+		// Set the user_id variable
+		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+		if _, err := sess.SQL().Exec(query); err != nil {
+			return err
+		}
+
+		query = `update tax_authority_codebooks set active = $1 where id = $2`
+
+		_, err := sess.SQL().Query(query, active, id)
+
+		return err
+
+	})
+
+	return err
 }
 
 // Insert inserts a model into the database, using upper
-func (t *TaxAuthorityCodebook) Insert(m TaxAuthorityCodebook) (int, error) {
+func (t *TaxAuthorityCodebook) Insert(ctx context.Context, m TaxAuthorityCodebook) (int, error) {
 	m.CreatedAt = time.Now()
 	m.UpdatedAt = time.Now()
-	collection := Upper.Collection(t.Table())
-	res, err := collection.Insert(m)
+	userID, ok := contextutil.GetUserIDFromContext(ctx)
+	if !ok {
+		return 0, errors.New("user ID not found in context")
+	}
+
+	var id int
+
+	err := Upper.Tx(func(sess up.Session) error {
+
+		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+		if _, err := sess.SQL().Exec(query); err != nil {
+			return err
+		}
+
+		collection := sess.Collection(t.Table())
+
+		var res up.InsertResult
+		var err error
+
+		if res, err = collection.Insert(m); err != nil {
+			return err
+		}
+
+		id = getInsertId(res.ID())
+
+		return nil
+	})
+
 	if err != nil {
 		return 0, err
 	}
-
-	id := getInsertId(res.ID())
 
 	return id, nil
 }

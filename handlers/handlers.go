@@ -53,7 +53,8 @@ type Handlers struct {
 	InternalReallocationItemHandler InternalReallocationItemHandler
 	ExternalReallocationHandler     ExternalReallocationHandler
 	ExternalReallocationItemHandler ExternalReallocationItemHandler
-}
+	LogHandler LogHandler
+	}
 
 type InvoiceHandler interface {
 	CreateInvoice(w http.ResponseWriter, r *http.Request)
@@ -471,4 +472,12 @@ type ExternalReallocationItemHandler interface {
 	DeleteExternalReallocationItem(w http.ResponseWriter, r *http.Request)
 	GetExternalReallocationItemById(w http.ResponseWriter, r *http.Request)
 	GetExternalReallocationItemList(w http.ResponseWriter, r *http.Request)
+}
+
+type LogHandler interface {
+	CreateLog(w http.ResponseWriter, r *http.Request)
+	UpdateLog(w http.ResponseWriter, r *http.Request)
+	DeleteLog(w http.ResponseWriter, r *http.Request)
+	GetLogById(w http.ResponseWriter, r *http.Request)
+	GetLogList(w http.ResponseWriter, r *http.Request)
 }
