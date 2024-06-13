@@ -296,6 +296,7 @@ func routes(app *celeritas.Celeritas, middleware *middleware.Middleware, handler
 		rt.Post("/current-budgets", handlers.CurrentBudgetHandler.CreateCurrentBudget)
 		rt.Get("/current-budgets/{id}", handlers.CurrentBudgetHandler.GetCurrentBudgetById)
 		rt.Get("/current-budgets", handlers.CurrentBudgetHandler.GetCurrentBudgetList)
+		rt.Get("/get-acctual-current-budget/{id}", handlers.CurrentBudgetHandler.GetAcctualCurrentBudget)
 
 		rt.Post("/budgets/{budget_id}/units/{unit_id}/spending-releases", handlers.SpendingReleaseHandler.CreateSpendingRelease)
 		rt.Get("/spending-releases/{id}", handlers.SpendingReleaseHandler.GetSpendingReleaseById)
@@ -326,12 +327,12 @@ func routes(app *celeritas.Celeritas, middleware *middleware.Middleware, handler
 		rt.Get("/external-reallocation-items/{id}", handlers.ExternalReallocationItemHandler.GetExternalReallocationItemById)
 		rt.Get("/external-reallocation-items", handlers.ExternalReallocationItemHandler.GetExternalReallocationItemList)
 		rt.Delete("/external-reallocation-items/{id}", handlers.ExternalReallocationItemHandler.DeleteExternalReallocationItem)
-	
+
 		rt.Post("/logs", handlers.LogHandler.CreateLog)
-rt.Get("/logs/{id}", handlers.LogHandler.GetLogById)
-rt.Get("/logs", handlers.LogHandler.GetLogList)
-rt.Put("/logs/{id}", handlers.LogHandler.UpdateLog)
-rt.Delete("/logs/{id}", handlers.LogHandler.DeleteLog)
+		rt.Get("/logs/{id}", handlers.LogHandler.GetLogById)
+		rt.Get("/logs", handlers.LogHandler.GetLogList)
+		rt.Put("/logs/{id}", handlers.LogHandler.UpdateLog)
+		rt.Delete("/logs/{id}", handlers.LogHandler.DeleteLog)
 	})
 
 	return app.Routes

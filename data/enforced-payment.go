@@ -95,7 +95,21 @@ func (t *EnforcedPayment) Get(id int) (*EnforcedPayment, error) {
 // Update updates a record in the database, using upper
 func (t *EnforcedPayment) Update(ctx context.Context, tx up.Session, m EnforcedPayment) error {
 	m.UpdatedAt = time.Now()
+
+	userID, ok := contextutil.GetUserIDFromContext(ctx)
+	if !ok {
+		return errors.New("user ID not found in context")
+	}
+
+	query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+	if _, err := tx.SQL().Exec(query); err != nil {
+		return err
+	}
+
 	collection := tx.Collection(t.Table())
+
+	res := collection.Find(m.ID)
+
 	order, err := t.Get(m.ID)
 
 	if err != nil {
@@ -103,12 +117,10 @@ func (t *EnforcedPayment) Update(ctx context.Context, tx up.Session, m EnforcedP
 	}
 
 	m.IDOfStatement = order.IDOfStatement
-
-	res := collection.Find(m.ID)
-	err = res.Update(&m)
-	if err != nil {
+	if err := res.Update(&m); err != nil {
 		return err
 	}
+
 	return nil
 }
 
@@ -119,22 +131,18 @@ func (t *EnforcedPayment) ReturnEnforcedPayment(ctx context.Context, tx up.Sessi
 		return errors.New("user ID not found in context")
 	}
 
-	err := Upper.Tx(func(sess up.Session) error {
-		// Set the user_id variable
-		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
-		if _, err := sess.SQL().Exec(query); err != nil {
-			return err
-		}
-
-		m.UpdatedAt = time.Now()
-		m.Status = EnforcedPaymentStatusStatusReturn
-
-		query = `update enforced_payments set status = $2, return_date = $3, return_file_id = $4, return_amount = $5 where id = $1`
-
-		_, err := sess.SQL().Query(query, m.ID, m.Status, m.ReturnDate, m.ReturnFileID, m.ReturnAmount)
-
+	// Set the user_id variable
+	query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+	if _, err := tx.SQL().Exec(query); err != nil {
 		return err
-	})
+	}
+
+	m.UpdatedAt = time.Now()
+	m.Status = EnforcedPaymentStatusStatusReturn
+
+	query = `update enforced_payments set status = $2, return_date = $3, return_file_id = $4, return_amount = $5 where id = $1`
+
+	_, err := tx.SQL().Query(query, m.ID, m.Status, m.ReturnDate, m.ReturnFileID, m.ReturnAmount)
 
 	return err
 
@@ -179,30 +187,21 @@ func (t *EnforcedPayment) Insert(ctx context.Context, tx up.Session, m EnforcedP
 
 	var id int
 
-	err := Upper.Tx(func(sess up.Session) error {
-
-		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
-		if _, err := sess.SQL().Exec(query); err != nil {
-			return err
-		}
-
-		collection := sess.Collection(t.Table())
-
-		var res up.InsertResult
-		var err error
-
-		if res, err = collection.Insert(m); err != nil {
-			return err
-		}
-
-		id = getInsertId(res.ID())
-
-		return nil
-	})
-
-	if err != nil {
+	query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+	if _, err := tx.SQL().Exec(query); err != nil {
 		return 0, err
 	}
 
-	return id, nil
+	collection := tx.Collection(t.Table())
+
+	var res up.InsertResult
+	var err error
+
+	if res, err = collection.Insert(m); err != nil {
+		return 0, err
+	}
+
+	id = getInsertId(res.ID())
+
+	return id, err
 }

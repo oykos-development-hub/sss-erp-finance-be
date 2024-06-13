@@ -111,3 +111,13 @@ func (h *CurrentBudgetServiceImpl) GetCurrentBudgetList(filter dto.CurrentBudget
 
 	return response, total, nil
 }
+
+func (h *CurrentBudgetServiceImpl) GetAcctualCurrentBudget(organizationUnitID int) ([]dto.CurrentBudgetResponseDTO, error) {
+	data, err := h.repo.GetAcctualCurrentBudget(organizationUnitID)
+	if err != nil {
+		return nil, errors.Wrap(err, "GetAcctualCurrentBudget")
+	}
+	response := dto.ToCurrentBudgetListResponseDTO(data)
+
+	return response, nil
+}

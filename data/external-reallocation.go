@@ -94,25 +94,17 @@ func (t *ExternalReallocation) Update(ctx context.Context, tx up.Session, m Exte
 		return errors.New("user ID not found in context")
 	}
 
-	err := Upper.Tx(func(sess up.Session) error {
-
-		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
-		if _, err := sess.SQL().Exec(query); err != nil {
-			return err
-		}
-
-		collection := sess.Collection(t.Table())
-		res := collection.Find(m.ID)
-		if err := res.Update(&m); err != nil {
-			return err
-		}
-
-		return nil
-	})
-
-	if err != nil {
+	query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+	if _, err := tx.SQL().Exec(query); err != nil {
 		return err
 	}
+
+	collection := tx.Collection(t.Table())
+	res := collection.Find(m.ID)
+	if err := res.Update(&m); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -155,30 +147,21 @@ func (t *ExternalReallocation) Insert(ctx context.Context, tx up.Session, m Exte
 
 	var id int
 
-	err := Upper.Tx(func(sess up.Session) error {
-
-		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
-		if _, err := sess.SQL().Exec(query); err != nil {
-			return err
-		}
-
-		collection := sess.Collection(t.Table())
-
-		var res up.InsertResult
-		var err error
-
-		if res, err = collection.Insert(m); err != nil {
-			return err
-		}
-
-		id = getInsertId(res.ID())
-
-		return nil
-	})
-
-	if err != nil {
+	query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+	if _, err := tx.SQL().Exec(query); err != nil {
 		return 0, err
 	}
+
+	collection := tx.Collection(t.Table())
+
+	var res up.InsertResult
+	var err error
+
+	if res, err = collection.Insert(m); err != nil {
+		return 0, err
+	}
+
+	id = getInsertId(res.ID())
 
 	return id, nil
 }
@@ -190,21 +173,17 @@ func (t *ExternalReallocation) AcceptOUExternalReallocation(ctx context.Context,
 		return errors.New("user ID not found in context")
 	}
 
-	err := Upper.Tx(func(sess up.Session) error {
-		// Set the user_id variable
-		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
-		if _, err := sess.SQL().Exec(query); err != nil {
-			return err
-		}
+	// Set the user_id variable
+	query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+	if _, err := tx.SQL().Exec(query); err != nil {
+		return err
+	}
 
-		query = `update external_reallocations
+	query = `update external_reallocations
 		set status = $1, date_of_action_dest_org_unit =$2, accepted_by = $3, destination_org_unit_file_id = $4
 		where id = $5`
 
-		_, err := sess.SQL().Query(query, ReallocationStatusOUAccept, m.DateOfActionDestOrgUnit, m.AcceptedBy, m.DestinationOrgUnitFileID, m.ID)
-
-		return err
-	})
+	_, err := tx.SQL().Query(query, ReallocationStatusOUAccept, m.DateOfActionDestOrgUnit, m.AcceptedBy, m.DestinationOrgUnitFileID, m.ID)
 
 	return err
 
@@ -242,20 +221,16 @@ func (t *ExternalReallocation) AcceptSSSExternalReallocation(ctx context.Context
 		return errors.New("user ID not found in context")
 	}
 
-	err := Upper.Tx(func(sess up.Session) error {
-		// Set the user_id variable
-		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
-		if _, err := sess.SQL().Exec(query); err != nil {
-			return err
-		}
+	// Set the user_id variable
+	query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+	if _, err := tx.SQL().Exec(query); err != nil {
+		return err
+	}
 
-		query = `update external_reallocations
+	query = `update external_reallocations
 			  set status = $1, date_of_action_sss = NOW() where id = $2`
 
-		_, err := sess.SQL().Query(query, ReallocationStatusSSSAccept, id)
-
-		return err
-	})
+	_, err := tx.SQL().Query(query, ReallocationStatusSSSAccept, id)
 
 	return err
 }
@@ -266,21 +241,15 @@ func (t *ExternalReallocation) RejectSSSExternalReallocation(ctx context.Context
 	if !ok {
 		return errors.New("user ID not found in context")
 	}
+	query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+	if _, err := tx.SQL().Exec(query); err != nil {
+		return err
+	}
 
-	err := Upper.Tx(func(sess up.Session) error {
-		// Set the user_id variable
-		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
-		if _, err := sess.SQL().Exec(query); err != nil {
-			return err
-		}
-
-		query = `update external_reallocations
+	query = `update external_reallocations
 			  set status = $1, date_of_action_sss = NOW() where id = $2`
 
-		_, err := sess.SQL().Query(query, ReallocationStatusSSSDecline, id)
-
-		return err
-	})
+	_, err := tx.SQL().Query(query, ReallocationStatusSSSDecline, id)
 
 	return err
 }

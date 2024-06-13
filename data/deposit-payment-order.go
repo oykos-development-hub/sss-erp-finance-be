@@ -84,25 +84,17 @@ func (t *DepositPaymentOrder) Update(ctx context.Context, tx up.Session, m Depos
 		return errors.New("user ID not found in context")
 	}
 
-	err := Upper.Tx(func(sess up.Session) error {
-
-		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
-		if _, err := sess.SQL().Exec(query); err != nil {
-			return err
-		}
-
-		collection := sess.Collection(t.Table())
-		res := collection.Find(m.ID)
-		if err := res.Update(&m); err != nil {
-			return err
-		}
-
-		return nil
-	})
-
-	if err != nil {
+	query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+	if _, err := tx.SQL().Exec(query); err != nil {
 		return err
 	}
+
+	collection := tx.Collection(t.Table())
+	res := collection.Find(m.ID)
+	if err := res.Update(&m); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -145,30 +137,21 @@ func (t *DepositPaymentOrder) Insert(ctx context.Context, tx up.Session, m Depos
 
 	var id int
 
-	err := Upper.Tx(func(sess up.Session) error {
-
-		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
-		if _, err := sess.SQL().Exec(query); err != nil {
-			return err
-		}
-
-		collection := sess.Collection(t.Table())
-
-		var res up.InsertResult
-		var err error
-
-		if res, err = collection.Insert(m); err != nil {
-			return err
-		}
-
-		id = getInsertId(res.ID())
-
-		return nil
-	})
-
-	if err != nil {
+	query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+	if _, err := tx.SQL().Exec(query); err != nil {
 		return 0, err
 	}
+
+	collection := tx.Collection(t.Table())
+
+	var res up.InsertResult
+	var err error
+
+	if res, err = collection.Insert(m); err != nil {
+		return 0, err
+	}
+
+	id = getInsertId(res.ID())
 
 	return id, nil
 }
@@ -180,22 +163,18 @@ func (t *DepositPaymentOrder) PayDepositPaymentOrder(ctx context.Context, tx up.
 		return errors.New("user ID not found in context")
 	}
 
-	err := Upper.Tx(func(sess up.Session) error {
-		// Set the user_id variable
-		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
-		if _, err := sess.SQL().Exec(query); err != nil {
-			return err
-		}
+	// Set the user_id variable
+	query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+	if _, err := tx.SQL().Exec(query); err != nil {
+		return err
+	}
 
-		query = `update deposit_payment_orders set id_of_statement = $1, date_of_statement = $2 where id = $3`
+	query = `update deposit_payment_orders set id_of_statement = $1, date_of_statement = $2 where id = $3`
 
-		_, err := sess.SQL().Query(query, IDOfStatement, DateOfStatement, id)
-		if err != nil {
-			return err
-		}
-
-		return nil
-	})
+	_, err := tx.SQL().Query(query, IDOfStatement, DateOfStatement, id)
+	if err != nil {
+		return err
+	}
 
 	return err
 }

@@ -53,8 +53,8 @@ type Handlers struct {
 	InternalReallocationItemHandler InternalReallocationItemHandler
 	ExternalReallocationHandler     ExternalReallocationHandler
 	ExternalReallocationItemHandler ExternalReallocationItemHandler
-	LogHandler LogHandler
-	}
+	LogHandler                      LogHandler
+}
 
 type InvoiceHandler interface {
 	CreateInvoice(w http.ResponseWriter, r *http.Request)
@@ -432,6 +432,7 @@ type CurrentBudgetHandler interface {
 	CreateCurrentBudget(w http.ResponseWriter, r *http.Request)
 	GetCurrentBudgetById(w http.ResponseWriter, r *http.Request)
 	GetCurrentBudgetList(w http.ResponseWriter, r *http.Request)
+	GetAcctualCurrentBudget(w http.ResponseWriter, r *http.Request)
 }
 
 type SpendingReleaseHandler interface {

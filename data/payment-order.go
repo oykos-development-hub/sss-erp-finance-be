@@ -112,11 +112,22 @@ func (t *PaymentOrder) Update(ctx context.Context, tx up.Session, m PaymentOrder
 
 	m.IDOfStatement = order.IDOfStatement
 
-	res := collection.Find(m.ID)
-	err = res.Update(&m)
-	if err != nil {
+	m.UpdatedAt = time.Now()
+	userID, ok := contextutil.GetUserIDFromContext(ctx)
+	if !ok {
+		return errors.New("user ID not found in context")
+	}
+
+	query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+	if _, err := tx.SQL().Exec(query); err != nil {
 		return err
 	}
+
+	res := collection.Find(m.ID)
+	if err := res.Update(&m); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -159,30 +170,21 @@ func (t *PaymentOrder) Insert(ctx context.Context, tx up.Session, m PaymentOrder
 
 	var id int
 
-	err := Upper.Tx(func(sess up.Session) error {
-
-		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
-		if _, err := sess.SQL().Exec(query); err != nil {
-			return err
-		}
-
-		collection := sess.Collection(t.Table())
-
-		var res up.InsertResult
-		var err error
-
-		if res, err = collection.Insert(m); err != nil {
-			return err
-		}
-
-		id = getInsertId(res.ID())
-
-		return nil
-	})
-
-	if err != nil {
+	query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+	if _, err := tx.SQL().Exec(query); err != nil {
 		return 0, err
 	}
+
+	collection := tx.Collection(t.Table())
+
+	var res up.InsertResult
+	var err error
+
+	if res, err = collection.Insert(m); err != nil {
+		return 0, err
+	}
+
+	id = getInsertId(res.ID())
 
 	return id, nil
 }
@@ -378,19 +380,14 @@ func (t *PaymentOrder) PayPaymentOrder(ctx context.Context, tx up.Session, id in
 		return errors.New("user ID not found in context")
 	}
 
-	err := Upper.Tx(func(sess up.Session) error {
-		// Set the user_id variable
-		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
-		if _, err := sess.SQL().Exec(query); err != nil {
-			return err
-		}
-
-		query = `update payment_orders set sap_id = $1, date_of_sap = $2 where id = $3`
-
-		_, err := sess.SQL().Query(query, SAPID, DateOfSAP, id)
+	query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+	if _, err := tx.SQL().Exec(query); err != nil {
 		return err
+	}
 
-	})
+	query = `update payment_orders set sap_id = $1, date_of_sap = $2 where id = $3`
+
+	_, err := tx.SQL().Query(query, SAPID, DateOfSAP, id)
 
 	return err
 }
@@ -402,20 +399,14 @@ func (t *PaymentOrder) CancelPaymentOrder(ctx context.Context, tx up.Session, id
 		return errors.New("user ID not found in context")
 	}
 
-	err := Upper.Tx(func(sess up.Session) error {
-		// Set the user_id variable
-		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
-		if _, err := sess.SQL().Exec(query); err != nil {
-			return err
-		}
-
-		query = `update payment_orders set status = 'Storniran' where id = $1`
-
-		_, err := sess.SQL().Query(query, id)
-
+	query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+	if _, err := tx.SQL().Exec(query); err != nil {
 		return err
+	}
 
-	})
+	query = `update payment_orders set status = 'Storniran' where id = $1`
+
+	_, err := tx.SQL().Query(query, id)
 
 	return err
 

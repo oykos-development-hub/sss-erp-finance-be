@@ -114,25 +114,17 @@ func (t *Invoice) Update(ctx context.Context, tx up.Session, m Invoice) error {
 		return errors.New("user ID not found in context")
 	}
 
-	err := Upper.Tx(func(sess up.Session) error {
-
-		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
-		if _, err := sess.SQL().Exec(query); err != nil {
-			return err
-		}
-
-		collection := sess.Collection(t.Table())
-		res := collection.Find(m.ID)
-		if err := res.Update(&m); err != nil {
-			return err
-		}
-
-		return nil
-	})
-
-	if err != nil {
+	query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+	if _, err := tx.SQL().Exec(query); err != nil {
 		return err
 	}
+
+	collection := tx.Collection(t.Table())
+	res := collection.Find(m.ID)
+	if err := res.Update(&m); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -175,30 +167,21 @@ func (t *Invoice) Insert(ctx context.Context, tx up.Session, m Invoice) (int, er
 
 	var id int
 
-	err := Upper.Tx(func(sess up.Session) error {
-
-		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
-		if _, err := sess.SQL().Exec(query); err != nil {
-			return err
-		}
-
-		collection := sess.Collection(t.Table())
-
-		var res up.InsertResult
-		var err error
-
-		if res, err = collection.Insert(m); err != nil {
-			return err
-		}
-
-		id = getInsertId(res.ID())
-
-		return nil
-	})
-
-	if err != nil {
+	query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+	if _, err := tx.SQL().Exec(query); err != nil {
 		return 0, err
 	}
+
+	collection := tx.Collection(t.Table())
+
+	var res up.InsertResult
+	var err error
+
+	if res, err = collection.Insert(m); err != nil {
+		return 0, err
+	}
+
+	id = getInsertId(res.ID())
 
 	return id, nil
 }

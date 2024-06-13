@@ -407,6 +407,7 @@ type CurrentBudgetService interface {
 	UpdateActual(ctx context.Context, budgetID, accountID, unitID int, actual decimal.Decimal) (*dto.CurrentBudgetResponseDTO, error)
 	GetCurrentBudget(id int) (*dto.CurrentBudgetResponseDTO, error)
 	GetCurrentBudgetList(filter dto.CurrentBudgetFilterDTO) ([]dto.CurrentBudgetResponseDTO, *uint64, error)
+	GetAcctualCurrentBudget(organizationUnitID int) ([]dto.CurrentBudgetResponseDTO, error)
 }
 
 type SpendingReleaseService interface {

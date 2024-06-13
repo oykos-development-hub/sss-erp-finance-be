@@ -181,3 +181,37 @@ func (t *CurrentBudget) Insert(ctx context.Context, m CurrentBudget) (int, error
 
 	return id, nil
 }
+
+func (t *CurrentBudget) GetAcctualCurrentBudget(organizationUnitID int) ([]*CurrentBudget, error) {
+	var response []*CurrentBudget
+
+	query := `WITH sorted_data AS (
+   			  SELECT *
+   			  FROM current_budgets
+			  WHERE unit_id = $1
+   			  ORDER BY id DESC)
+		SELECT budget_id, account_id, actual, balance, initial_actual
+		FROM sorted_data
+		WHERE budget_id = (SELECT budget_id FROM sorted_data LIMIT 1) and unit_id = $1;`
+
+	rows, err := Upper.SQL().Query(query, organizationUnitID)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var item CurrentBudget
+
+		err = rows.Scan(&item.BudgetID, &item.AccountID, &item.Actual, &item.Balance, &item.InitialActual)
+
+		if err != nil {
+			return nil, err
+		}
+
+		response = append(response, &item)
+	}
+
+	return response, nil
+}
