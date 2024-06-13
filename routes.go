@@ -296,7 +296,7 @@ func routes(app *celeritas.Celeritas, middleware *middleware.Middleware, handler
 		rt.Post("/current-budgets", handlers.CurrentBudgetHandler.CreateCurrentBudget)
 		rt.Get("/current-budgets/{id}", handlers.CurrentBudgetHandler.GetCurrentBudgetById)
 		rt.Get("/current-budgets", handlers.CurrentBudgetHandler.GetCurrentBudgetList)
-		rt.Get("/get-acctual-current-budget/{id}", handlers.CurrentBudgetHandler.GetAcctualCurrentBudget)
+		rt.Get("/get-actual-current-budget/{id}", handlers.CurrentBudgetHandler.GetAcctualCurrentBudget)
 
 		rt.Post("/budgets/{budget_id}/units/{unit_id}/spending-releases", handlers.SpendingReleaseHandler.CreateSpendingRelease)
 		rt.Get("/spending-releases/{id}", handlers.SpendingReleaseHandler.GetSpendingReleaseById)
