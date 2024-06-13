@@ -13,8 +13,8 @@ type LogDTO struct {
 	ItemID    int               `json:"item_id"`
 	Operation data.LogOperation `json:"operation"`
 	Entity    data.LogEntity    `json:"entity"`
-	OldState  json.RawMessage   `json:"old_state"`
-	NewState  json.RawMessage   `json:"new_state"`
+	OldState  *json.RawMessage  `json:"old_state"`
+	NewState  *json.RawMessage  `json:"new_state"`
 }
 
 type LogResponseDTO struct {
@@ -24,8 +24,8 @@ type LogResponseDTO struct {
 	ItemID    int               `json:"item_id"`
 	Operation data.LogOperation `json:"operation"`
 	Entity    data.LogEntity    `json:"entity"`
-	OldState  json.RawMessage   `json:"old_state"`
-	NewState  json.RawMessage   `json:"new_state"`
+	OldState  *json.RawMessage  `json:"old_state"`
+	NewState  *json.RawMessage  `json:"new_state"`
 }
 
 type LogFilterDTO struct {

@@ -59,14 +59,14 @@ var (
 
 // Log struct
 type Log struct {
-	ID        int             `db:"id,omitempty"`
-	ChangedAt time.Time       `db:"changed_at"`
-	UserID    int             `db:"user_id"`
-	ItemID    int             `db:"item_id"`
-	Operation LogOperation    `db:"operation"`
-	Entity    LogEntity       `db:"entity"`
-	OldState  json.RawMessage `db:"old_state"`
-	NewState  json.RawMessage `db:"new_state"`
+	ID        int              `db:"id,omitempty"`
+	ChangedAt time.Time        `db:"changed_at"`
+	UserID    int              `db:"user_id"`
+	ItemID    int              `db:"item_id"`
+	Operation LogOperation     `db:"operation"`
+	Entity    LogEntity        `db:"entity"`
+	OldState  *json.RawMessage `db:"old_state"`
+	NewState  *json.RawMessage `db:"new_state"`
 }
 
 // Table returns the table name
