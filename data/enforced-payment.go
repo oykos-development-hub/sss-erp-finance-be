@@ -180,6 +180,7 @@ func (t *EnforcedPayment) Delete(ctx context.Context, id int) error {
 func (t *EnforcedPayment) Insert(ctx context.Context, tx up.Session, m EnforcedPayment) (int, error) {
 	m.CreatedAt = time.Now()
 	m.UpdatedAt = time.Now()
+	m.Status = EnforcedPaymentStatusCreated
 	userID, ok := contextutil.GetUserIDFromContext(ctx)
 	if !ok {
 		return 0, errors.New("user ID not found in context")

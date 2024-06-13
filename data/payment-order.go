@@ -180,6 +180,10 @@ func (t *PaymentOrder) Insert(ctx context.Context, tx up.Session, m PaymentOrder
 	var res up.InsertResult
 	var err error
 
+	status := "Kreiran"
+
+	m.Status = &status
+
 	if res, err = collection.Insert(m); err != nil {
 		return 0, err
 	}
@@ -385,7 +389,7 @@ func (t *PaymentOrder) PayPaymentOrder(ctx context.Context, tx up.Session, id in
 		return err
 	}
 
-	query = `update payment_orders set sap_id = $1, date_of_sap = $2 where id = $3`
+	query = `update payment_orders set sap_id = $1, date_of_sap = $2, status = 'Plaćen' where id = $3`
 
 	_, err := tx.SQL().Query(query, SAPID, DateOfSAP, id)
 
