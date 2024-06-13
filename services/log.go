@@ -1,6 +1,8 @@
 package services
 
 import (
+	"fmt"
+
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
 	"gitlab.sudovi.me/erp/finance-api/errors"
@@ -97,6 +99,16 @@ func (h *LogServiceImpl) GetLogList(filter dto.LogFilterDTO) ([]dto.LogResponseD
 
 	if filter.ItemID != nil {
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"item_id": *filter.ItemID})
+	}
+
+	if filter.Search != nil {
+		likeCondition := fmt.Sprintf("%%%s%%", *filter.Search)
+		conditionAndExp = up.And(
+			up.Or(
+				up.Cond{"old_state::text ILIKE": likeCondition},
+				up.Cond{"new_state::text ILIKE": likeCondition},
+			),
+		)
 	}
 
 	if filter.SortByTitle != nil {
