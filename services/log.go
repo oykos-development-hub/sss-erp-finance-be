@@ -119,7 +119,7 @@ func (h *LogServiceImpl) GetLogList(filter dto.LogFilterDTO) ([]dto.LogResponseD
 		}
 	}
 
-	orders = append(orders, "-created_at")
+	orders = append(orders, "-id")
 
 	data, total, err := h.repo.GetAll(filter.Page, filter.Size, conditionAndExp, orders)
 	if err != nil {
