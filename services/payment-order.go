@@ -10,12 +10,14 @@ import (
 	"gitlab.sudovi.me/erp/finance-api/errors"
 
 	"github.com/oykos-development-hub/celeritas"
+	"github.com/shopspring/decimal"
 	up "github.com/upper/db/v4"
 )
 
 type PaymentOrderServiceImpl struct {
 	App                          *celeritas.Celeritas
 	repo                         data.PaymentOrder
+	currentBudgetService         CurrentBudgetService
 	itemsRepo                    data.PaymentOrderItem
 	invoiceRepo                  data.Invoice
 	invoiceArticlesRepo          data.Article
@@ -24,12 +26,13 @@ type PaymentOrderServiceImpl struct {
 	salariesRepo                 data.Salary
 }
 
-func NewPaymentOrderServiceImpl(app *celeritas.Celeritas, repo data.PaymentOrder, itemsRepo data.PaymentOrderItem,
+func NewPaymentOrderServiceImpl(app *celeritas.Celeritas, currentBudgetService CurrentBudgetService, repo data.PaymentOrder, itemsRepo data.PaymentOrderItem,
 	invoiceRepo data.Invoice, invoiceArticleRepo data.Article, additionalExpensesRepo data.AdditionalExpense,
 	salaryAdditionalExpensesRepo data.SalaryAdditionalExpense, salariesRepo data.Salary) PaymentOrderService {
 	return &PaymentOrderServiceImpl{
 		App:                          app,
 		repo:                         repo,
+		currentBudgetService:         currentBudgetService,
 		itemsRepo:                    itemsRepo,
 		invoiceRepo:                  invoiceRepo,
 		invoiceArticlesRepo:          invoiceArticleRepo,
@@ -423,7 +426,39 @@ func (h *PaymentOrderServiceImpl) GetAllObligations(filter dto.GetObligationsFil
 
 func (h *PaymentOrderServiceImpl) PayPaymentOrder(ctx context.Context, id int, input dto.PaymentOrderDTO) error {
 	err := data.Upper.Tx(func(tx up.Session) error {
-		err := h.repo.PayPaymentOrder(ctx, tx, id, *input.SAPID, *input.DateOfSAP)
+
+		paymentOrder, err := h.GetPaymentOrder(id)
+
+		if err != nil {
+			return errors.ErrInternalServer
+		}
+
+		for _, item := range paymentOrder.Items {
+			currentBudget, _, err := h.currentBudgetService.GetCurrentBudgetList(dto.CurrentBudgetFilterDTO{
+				UnitID:    &paymentOrder.OrganizationUnitID,
+				AccountID: &item.AccountID,
+			})
+
+			if err != nil {
+				return err
+			}
+
+			if len(currentBudget) > 0 {
+				currentAmount := currentBudget[0].Balance.Sub(decimal.NewFromFloat32(float32(item.Amount)))
+				if currentAmount.LessThan(decimal.NewFromInt(0)) {
+					return errors.ErrInsufficientFunds
+				} else {
+					err = h.currentBudgetService.UpdateBalance(ctx, tx, currentBudget[0].ID, currentAmount)
+					if err != nil {
+						return err
+					}
+				}
+			} else {
+				return errors.ErrInsufficientFunds
+			}
+		}
+
+		err = h.repo.PayPaymentOrder(ctx, tx, id, *input.SAPID, *input.DateOfSAP)
 		if err != nil {
 			return errors.ErrInternalServer
 		}
@@ -443,6 +478,29 @@ func (h *PaymentOrderServiceImpl) CancelPaymentOrder(ctx context.Context, id int
 
 		if err != nil {
 			return err
+		}
+
+		for _, item := range input.Items {
+			currentBudget, _, err := h.currentBudgetService.GetCurrentBudgetList(dto.CurrentBudgetFilterDTO{
+				UnitID:    &input.OrganizationUnitID,
+				AccountID: &item.AccountID,
+			})
+
+			if err != nil {
+				return err
+			}
+
+			if len(currentBudget) > 0 {
+				currentAmount := currentBudget[0].Balance.Add(decimal.NewFromFloat32(float32(item.Amount)))
+
+				err = h.currentBudgetService.UpdateBalance(ctx, tx, currentBudget[0].ID, currentAmount)
+				if err != nil {
+					return err
+				}
+
+			} else {
+				return errors.ErrNotFound
+			}
 		}
 
 		for _, item := range input.Items {

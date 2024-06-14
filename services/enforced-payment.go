@@ -10,22 +10,25 @@ import (
 	"gitlab.sudovi.me/erp/finance-api/errors"
 
 	"github.com/oykos-development-hub/celeritas"
+	"github.com/shopspring/decimal"
 	up "github.com/upper/db/v4"
 )
 
 type EnforcedPaymentServiceImpl struct {
 	App                    *celeritas.Celeritas
 	repo                   data.EnforcedPayment
+	currentBudget          CurrentBudgetService
 	itemsRepo              data.EnforcedPaymentItem
 	invoicesRepo           data.Invoice
 	invoiceArticlesRepo    data.Article
 	additionalExpensesRepo data.AdditionalExpense
 }
 
-func NewEnforcedPaymentServiceImpl(app *celeritas.Celeritas, repo data.EnforcedPayment, itemsRepo data.EnforcedPaymentItem, invoicesRepo data.Invoice, invoiceArticlesRepo data.Article, additionalExpensesRepo data.AdditionalExpense) EnforcedPaymentService {
+func NewEnforcedPaymentServiceImpl(app *celeritas.Celeritas, repo data.EnforcedPayment, currentBudget CurrentBudgetService, itemsRepo data.EnforcedPaymentItem, invoicesRepo data.Invoice, invoiceArticlesRepo data.Article, additionalExpensesRepo data.AdditionalExpense) EnforcedPaymentService {
 	return &EnforcedPaymentServiceImpl{
 		App:                    app,
 		repo:                   repo,
+		currentBudget:          currentBudget,
 		itemsRepo:              itemsRepo,
 		invoicesRepo:           invoicesRepo,
 		invoiceArticlesRepo:    invoiceArticlesRepo,
@@ -59,6 +62,37 @@ func (h *EnforcedPaymentServiceImpl) CreateEnforcedPayment(ctx context.Context, 
 				if err != nil {
 					return err
 				}
+			}
+		}
+
+		paymentOrder, err := h.GetEnforcedPayment(id)
+
+		if err != nil {
+			return errors.ErrInternalServer
+		}
+
+		for _, item := range paymentOrder.Items {
+			currentBudget, _, err := h.currentBudget.GetCurrentBudgetList(dto.CurrentBudgetFilterDTO{
+				UnitID:    &paymentOrder.OrganizationUnitID,
+				AccountID: &item.AccountID,
+			})
+
+			if err != nil {
+				return err
+			}
+
+			if len(currentBudget) > 0 {
+				currentAmount := currentBudget[0].Balance.Sub(decimal.NewFromFloat32(float32(item.Amount)))
+				if currentAmount.LessThan(decimal.NewFromInt(0)) {
+					return errors.ErrInsufficientFunds
+				} else {
+					err = h.currentBudget.UpdateBalance(ctx, tx, currentBudget[0].ID, currentAmount)
+					if err != nil {
+						return err
+					}
+				}
+			} else {
+				return errors.ErrInsufficientFunds
 			}
 		}
 
@@ -114,6 +148,35 @@ func (h *EnforcedPaymentServiceImpl) ReturnEnforcedPayment(ctx context.Context, 
 		err := h.repo.ReturnEnforcedPayment(ctx, tx, *dataToInsert)
 		if err != nil {
 			return errors.ErrInternalServer
+		}
+
+		paymentOrder, err := h.GetEnforcedPayment(id)
+
+		if err != nil {
+			return errors.ErrInternalServer
+		}
+
+		for _, item := range paymentOrder.Items {
+			currentBudget, _, err := h.currentBudget.GetCurrentBudgetList(dto.CurrentBudgetFilterDTO{
+				UnitID:    &paymentOrder.OrganizationUnitID,
+				AccountID: &item.AccountID,
+			})
+
+			if err != nil {
+				return err
+			}
+
+			if len(currentBudget) > 0 {
+				currentAmount := currentBudget[0].Balance.Add(decimal.NewFromFloat32(float32(item.Amount)))
+
+				err = h.currentBudget.UpdateBalance(ctx, tx, currentBudget[0].ID, currentAmount)
+				if err != nil {
+					return err
+				}
+
+			} else {
+				return errors.ErrNotFound
+			}
 		}
 
 		return nil

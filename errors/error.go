@@ -6,16 +6,17 @@ import (
 )
 
 var (
-	ErrUserExists     = errors.New("user already exists")
-	ErrNotFound       = errors.New("not found")
-	ErrInvalidInput   = errors.New("invalid input")
-	ErrUnauthorized   = errors.New("unauthorized")
-	ErrExpired        = errors.New("expired")
-	ErrForbidden      = errors.New("forbidden")
-	ErrDatabaseError  = errors.New("database error")
-	ErrInternalServer = errors.New("internal server error")
-	ErrBadRequest     = errors.New("invalid input")
-	ErrAlreadyDone    = errors.New("already done")
+	ErrUserExists        = errors.New("user already exists")
+	ErrNotFound          = errors.New("not found")
+	ErrInvalidInput      = errors.New("invalid input")
+	ErrUnauthorized      = errors.New("unauthorized")
+	ErrExpired           = errors.New("expired")
+	ErrForbidden         = errors.New("forbidden")
+	ErrDatabaseError     = errors.New("database error")
+	ErrInternalServer    = errors.New("internal server error")
+	ErrBadRequest        = errors.New("invalid input")
+	ErrAlreadyDone       = errors.New("already done")
+	ErrInsufficientFunds = errors.New("insufficient funds")
 	// define more custom errors as needed
 )
 

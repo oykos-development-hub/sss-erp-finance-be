@@ -31,6 +31,8 @@ type CurrentBudgetFilterDTO struct {
 	Page        *int    `json:"page"`
 	Size        *int    `json:"size"`
 	SortByTitle *string `json:"sort_by_title"`
+	UnitID      *int    `json:"unit_id"`
+	AccountID   *int    `json:"account_id"`
 }
 
 func (dto CurrentBudgetDTO) ToCurrentBudget() *data.CurrentBudget {

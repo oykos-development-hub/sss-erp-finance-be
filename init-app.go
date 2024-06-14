@@ -42,6 +42,15 @@ func initApplication() *celeritas.Celeritas {
 	BudgetService := services.NewBudgetServiceImpl(cel, models.Budget)
 	BudgetHandler := handlers.NewBudgetHandler(cel, BudgetService)
 
+	SpendingDynamicService := services.NewSpendingDynamicServiceImpl(cel, models.SpendingDynamicEntry, models.CurrentBudget)
+	SpendingDynamicHandler := handlers.NewSpendingDynamicHandler(cel, SpendingDynamicService)
+
+	SpendingReleaseService := services.NewSpendingReleaseServiceImpl(cel, models.SpendingRelease, models.CurrentBudget, models.Budget)
+	SpendingReleaseHandler := handlers.NewSpendingReleaseHandler(cel, SpendingReleaseService)
+
+	CurrentBudgetService := services.NewCurrentBudgetServiceImpl(cel, models.CurrentBudget, SpendingDynamicService)
+	CurrentBudgetHandler := handlers.NewCurrentBudgetHandler(cel, CurrentBudgetService)
+
 	FinancialBudgetService := services.NewFinancialBudgetServiceImpl(cel, models.FinancialBudget)
 	FinancialBudgetHandler := handlers.NewFinancialBudgetHandler(cel, FinancialBudgetService)
 
@@ -153,10 +162,10 @@ func initApplication() *celeritas.Celeritas {
 	PaymentOrderItemService := services.NewPaymentOrderItemServiceImpl(cel, models.PaymentOrderItem)
 	PaymentOrderItemHandler := handlers.NewPaymentOrderItemHandler(cel, PaymentOrderItemService)
 
-	PaymentOrderService := services.NewPaymentOrderServiceImpl(cel, models.PaymentOrder, models.PaymentOrderItem, models.Invoice, models.Article, models.AdditionalExpense, models.SalaryAdditionalExpense, models.Salary)
+	PaymentOrderService := services.NewPaymentOrderServiceImpl(cel, CurrentBudgetService, models.PaymentOrder, models.PaymentOrderItem, models.Invoice, models.Article, models.AdditionalExpense, models.SalaryAdditionalExpense, models.Salary)
 	PaymentOrderHandler := handlers.NewPaymentOrderHandler(cel, PaymentOrderService)
 
-	EnforcedPaymentService := services.NewEnforcedPaymentServiceImpl(cel, models.EnforcedPayment, models.EnforcedPaymentItem, models.Invoice, models.Article, models.AdditionalExpense)
+	EnforcedPaymentService := services.NewEnforcedPaymentServiceImpl(cel, models.EnforcedPayment, CurrentBudgetService, models.EnforcedPaymentItem, models.Invoice, models.Article, models.AdditionalExpense)
 	EnforcedPaymentHandler := handlers.NewEnforcedPaymentHandler(cel, EnforcedPaymentService)
 
 	EnforcedPaymentItemService := services.NewEnforcedPaymentItemServiceImpl(cel, models.EnforcedPaymentItem)
@@ -174,15 +183,6 @@ func initApplication() *celeritas.Celeritas {
 	AccountingEntryItemService := services.NewAccountingEntryItemServiceImpl(cel, models.AccountingEntryItem)
 	AccountingEntryItemHandler := handlers.NewAccountingEntryItemHandler(cel, AccountingEntryItemService)
 
-	SpendingDynamicService := services.NewSpendingDynamicServiceImpl(cel, models.SpendingDynamicEntry, models.CurrentBudget)
-	SpendingDynamicHandler := handlers.NewSpendingDynamicHandler(cel, SpendingDynamicService)
-
-	CurrentBudgetService := services.NewCurrentBudgetServiceImpl(cel, models.CurrentBudget, SpendingDynamicService)
-	CurrentBudgetHandler := handlers.NewCurrentBudgetHandler(cel, CurrentBudgetService)
-
-	SpendingReleaseService := services.NewSpendingReleaseServiceImpl(cel, models.SpendingRelease, models.CurrentBudget, models.Budget)
-	SpendingReleaseHandler := handlers.NewSpendingReleaseHandler(cel, SpendingReleaseService)
-
 	InternalReallocationService := services.NewInternalReallocationServiceImpl(cel, models.InternalReallocation, models.InternalReallocationItem, models.CurrentBudget)
 	InternalReallocationHandler := handlers.NewInternalReallocationHandler(cel, InternalReallocationService)
 
@@ -195,7 +195,6 @@ func initApplication() *celeritas.Celeritas {
 	ExternalReallocationItemService := services.NewExternalReallocationItemServiceImpl(cel, models.ExternalReallocationItem)
 	ExternalReallocationItemHandler := handlers.NewExternalReallocationItemHandler(cel, ExternalReallocationItemService)
 
-		
 	LogService := services.NewLogServiceImpl(cel, models.Log)
 	LogHandler := handlers.NewLogHandler(cel, LogService)
 
@@ -250,7 +249,7 @@ func initApplication() *celeritas.Celeritas {
 		InternalReallocationItemHandler: InternalReallocationItemHandler,
 		ExternalReallocationHandler:     ExternalReallocationHandler,
 		ExternalReallocationItemHandler: ExternalReallocationItemHandler,
-		LogHandler: LogHandler,
+		LogHandler:                      LogHandler,
 	}
 
 	myMiddleware := &middleware.Middleware{

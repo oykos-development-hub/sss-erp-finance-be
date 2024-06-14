@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/shopspring/decimal"
+	up "github.com/upper/db/v4"
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
 )
@@ -405,6 +406,7 @@ type SpendingDynamicService interface {
 type CurrentBudgetService interface {
 	CreateCurrentBudget(ctx context.Context, input dto.CurrentBudgetDTO) (*dto.CurrentBudgetResponseDTO, error)
 	UpdateActual(ctx context.Context, budgetID, accountID, unitID int, actual decimal.Decimal) (*dto.CurrentBudgetResponseDTO, error)
+	UpdateBalance(ctx context.Context, tx up.Session, id int, balance decimal.Decimal) error
 	GetCurrentBudget(id int) (*dto.CurrentBudgetResponseDTO, error)
 	GetCurrentBudgetList(filter dto.CurrentBudgetFilterDTO) ([]dto.CurrentBudgetResponseDTO, *uint64, error)
 	GetAcctualCurrentBudget(organizationUnitID int) ([]dto.CurrentBudgetResponseDTO, error)

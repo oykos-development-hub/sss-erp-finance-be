@@ -73,6 +73,16 @@ func (h *CurrentBudgetServiceImpl) UpdateActual(ctx context.Context, unitID, bud
 	return &response, nil
 }
 
+func (h *CurrentBudgetServiceImpl) UpdateBalance(ctx context.Context, tx up.Session, id int, balance decimal.Decimal) error {
+
+	err := h.repo.UpdateBalanceWithTx(ctx, tx, id, balance)
+	if err != nil {
+		return errors.Wrap(err, "UpdateBalance")
+	}
+
+	return nil
+}
+
 func (h *CurrentBudgetServiceImpl) GetCurrentBudget(id int) (*dto.CurrentBudgetResponseDTO, error) {
 	data, err := h.repo.Get(id)
 	if err != nil {
@@ -89,9 +99,13 @@ func (h *CurrentBudgetServiceImpl) GetCurrentBudgetList(filter dto.CurrentBudget
 	var orders []interface{}
 
 	// example of making conditions
-	// if filter.Year != nil {
-	// 	conditionAndExp = up.And(conditionAndExp, &up.Cond{"year": *filter.Year})
-	// }
+	if filter.AccountID != nil {
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"account_id": *filter.AccountID})
+	}
+
+	if filter.UnitID != nil {
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"unit_id": *filter.UnitID})
+	}
 
 	if filter.SortByTitle != nil {
 		if *filter.SortByTitle == "asc" {
