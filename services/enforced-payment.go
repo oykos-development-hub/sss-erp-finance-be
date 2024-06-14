@@ -202,7 +202,7 @@ func (h *EnforcedPaymentServiceImpl) ReturnEnforcedPayment(ctx context.Context, 
 			if len(currentBudget) > 0 {
 				amount := 0.0
 
-				if len(input.Items) == 1 {
+				if len(paymentOrder.Items) == 1 {
 					amount = *input.ReturnAmount
 				} else {
 					amount, err = h.getInvoiceAmount(*item.InvoiceID)
