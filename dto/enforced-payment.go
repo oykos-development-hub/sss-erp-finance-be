@@ -7,58 +7,60 @@ import (
 )
 
 type EnforcedPaymentDTO struct {
-	OrganizationUnitID int                        `json:"organization_unit_id"`
-	SupplierID         int                        `json:"supplier_id"`
-	BankAccount        string                     `json:"bank_account"`
-	DateOfPayment      time.Time                  `json:"date_of_payment"`
-	DateOfOrder        *time.Time                 `json:"date_of_order"`
-	IDOfStatement      *int                       `json:"id_of_statement"`
-	SAPID              *string                    `json:"sap_id"`
-	Registred          *bool                      `json:"registred"`
-	RegistredReturn    *bool                      `json:"registred_return"`
-	ReturnAmount       *float64                   `json:"return_amount"`
-	Status             data.EnforcedPaymentStatus `json:"status"`
-	ReturnFileID       *int                       `json:"return_file_id"`
-	Description        string                     `json:"description"`
-	DateOfSAP          *time.Time                 `json:"date_of_sap"`
-	ReturnDate         *time.Time                 `json:"return_date"`
-	Items              []EnforcedPaymentItemDTO   `json:"items"`
-	Amount             float64                    `json:"amount"`
-	AmountForLawyer    float64                    `json:"amount_for_lawyer"`
-	AmountForAgent     float64                    `json:"amount_for_agent"`
-	AmountForBank      float64                    `json:"amount_for_bank"`
-	AgentID            int                        `json:"agent_id"`
-	ExecutionNumber    string                     `json:"execution_number"`
-	FileID             *int                       `json:"file_id"`
+	OrganizationUnitID   int                        `json:"organization_unit_id"`
+	SupplierID           int                        `json:"supplier_id"`
+	BankAccount          string                     `json:"bank_account"`
+	DateOfPayment        time.Time                  `json:"date_of_payment"`
+	DateOfOrder          *time.Time                 `json:"date_of_order"`
+	IDOfStatement        *int                       `json:"id_of_statement"`
+	SAPID                *string                    `json:"sap_id"`
+	Registred            *bool                      `json:"registred"`
+	RegistredReturn      *bool                      `json:"registred_return"`
+	ReturnAmount         *float64                   `json:"return_amount"`
+	Status               data.EnforcedPaymentStatus `json:"status"`
+	ReturnFileID         *int                       `json:"return_file_id"`
+	Description          string                     `json:"description"`
+	DateOfSAP            *time.Time                 `json:"date_of_sap"`
+	ReturnDate           *time.Time                 `json:"return_date"`
+	Items                []EnforcedPaymentItemDTO   `json:"items"`
+	Amount               float64                    `json:"amount"`
+	AmountForLawyer      float64                    `json:"amount_for_lawyer"`
+	AmountForAgent       float64                    `json:"amount_for_agent"`
+	AmountForBank        float64                    `json:"amount_for_bank"`
+	AccountIDForExpenses int                        `json:"account_id_for_expenses"`
+	AgentID              int                        `json:"agent_id"`
+	ExecutionNumber      string                     `json:"execution_number"`
+	FileID               *int                       `json:"file_id"`
 }
 
 type EnforcedPaymentResponseDTO struct {
-	ID                 int                              `json:"id"`
-	OrganizationUnitID int                              `json:"organization_unit_id"`
-	SupplierID         int                              `json:"supplier_id"`
-	BankAccount        string                           `json:"bank_account"`
-	DateOfPayment      time.Time                        `json:"date_of_payment"`
-	DateOfOrder        *time.Time                       `json:"date_of_order"`
-	IDOfStatement      *int                             `json:"id_of_statement"`
-	SAPID              *string                          `json:"sap_id"`
-	Description        string                           `json:"description"`
-	Status             data.EnforcedPaymentStatus       `json:"status"`
-	Registred          *bool                            `json:"registred"`
-	RegistredReturn    *bool                            `json:"registred_return"`
-	ReturnFileID       *int                             `json:"return_file_id"`
-	DateOfSAP          *time.Time                       `json:"date_of_sap"`
-	ReturnDate         *time.Time                       `json:"return_date"`
-	ReturnAmount       *float64                         `json:"return_amount"`
-	Items              []EnforcedPaymentItemResponseDTO `json:"items"`
-	Amount             float64                          `json:"amount"`
-	AmountForLawyer    float64                          `json:"amount_for_lawyer"`
-	AmountForAgent     float64                          `json:"amount_for_agent"`
-	AmountForBank      float64                          `json:"amount_for_bank"`
-	FileID             *int                             `json:"file_id"`
-	AgentID            int                              `json:"agent_id"`
-	ExecutionNumber    string                           `json:"execution_number"`
-	CreatedAt          time.Time                        `json:"created_at"`
-	UpdatedAt          time.Time                        `json:"updated_at"`
+	ID                   int                              `json:"id"`
+	OrganizationUnitID   int                              `json:"organization_unit_id"`
+	SupplierID           int                              `json:"supplier_id"`
+	BankAccount          string                           `json:"bank_account"`
+	DateOfPayment        time.Time                        `json:"date_of_payment"`
+	DateOfOrder          *time.Time                       `json:"date_of_order"`
+	IDOfStatement        *int                             `json:"id_of_statement"`
+	SAPID                *string                          `json:"sap_id"`
+	Description          string                           `json:"description"`
+	Status               data.EnforcedPaymentStatus       `json:"status"`
+	Registred            *bool                            `json:"registred"`
+	RegistredReturn      *bool                            `json:"registred_return"`
+	ReturnFileID         *int                             `json:"return_file_id"`
+	DateOfSAP            *time.Time                       `json:"date_of_sap"`
+	ReturnDate           *time.Time                       `json:"return_date"`
+	ReturnAmount         *float64                         `json:"return_amount"`
+	Items                []EnforcedPaymentItemResponseDTO `json:"items"`
+	Amount               float64                          `json:"amount"`
+	AmountForLawyer      float64                          `json:"amount_for_lawyer"`
+	AmountForAgent       float64                          `json:"amount_for_agent"`
+	AmountForBank        float64                          `json:"amount_for_bank"`
+	AccountIDForExpenses int                              `json:"account_id_for_expenses"`
+	FileID               *int                             `json:"file_id"`
+	AgentID              int                              `json:"agent_id"`
+	ExecutionNumber      string                           `json:"execution_number"`
+	CreatedAt            time.Time                        `json:"created_at"`
+	UpdatedAt            time.Time                        `json:"updated_at"`
 }
 
 type EnforcedPaymentFilterDTO struct {
@@ -75,58 +77,60 @@ type EnforcedPaymentFilterDTO struct {
 
 func (dto EnforcedPaymentDTO) ToEnforcedPayment() *data.EnforcedPayment {
 	return &data.EnforcedPayment{
-		OrganizationUnitID: dto.OrganizationUnitID,
-		SupplierID:         dto.SupplierID,
-		BankAccount:        dto.BankAccount,
-		DateOfPayment:      dto.DateOfPayment,
-		IDOfStatement:      dto.IDOfStatement,
-		SAPID:              dto.SAPID,
-		DateOfOrder:        dto.DateOfOrder,
-		DateOfSAP:          dto.DateOfSAP,
-		FileID:             dto.FileID,
-		Registred:          dto.Registred,
-		RegistredReturn:    dto.RegistredReturn,
-		Description:        dto.Description,
-		Amount:             dto.Amount,
-		AmountForLawyer:    dto.AmountForLawyer,
-		AmountForAgent:     dto.AmountForAgent,
-		AmountForBank:      dto.AmountForBank,
-		AgentID:            dto.AgentID,
-		ExecutionNumber:    dto.ExecutionNumber,
-		ReturnDate:         dto.ReturnDate,
-		ReturnAmount:       dto.ReturnAmount,
-		Status:             dto.Status,
-		ReturnFileID:       dto.ReturnFileID,
+		OrganizationUnitID:   dto.OrganizationUnitID,
+		SupplierID:           dto.SupplierID,
+		BankAccount:          dto.BankAccount,
+		DateOfPayment:        dto.DateOfPayment,
+		IDOfStatement:        dto.IDOfStatement,
+		SAPID:                dto.SAPID,
+		DateOfOrder:          dto.DateOfOrder,
+		DateOfSAP:            dto.DateOfSAP,
+		FileID:               dto.FileID,
+		AccountIDForExpenses: dto.AccountIDForExpenses,
+		Registred:            dto.Registred,
+		RegistredReturn:      dto.RegistredReturn,
+		Description:          dto.Description,
+		Amount:               dto.Amount,
+		AmountForLawyer:      dto.AmountForLawyer,
+		AmountForAgent:       dto.AmountForAgent,
+		AmountForBank:        dto.AmountForBank,
+		AgentID:              dto.AgentID,
+		ExecutionNumber:      dto.ExecutionNumber,
+		ReturnDate:           dto.ReturnDate,
+		ReturnAmount:         dto.ReturnAmount,
+		Status:               dto.Status,
+		ReturnFileID:         dto.ReturnFileID,
 	}
 }
 
 func ToEnforcedPaymentResponseDTO(data data.EnforcedPayment) EnforcedPaymentResponseDTO {
 	return EnforcedPaymentResponseDTO{
-		ID:                 data.ID,
-		OrganizationUnitID: data.OrganizationUnitID,
-		SupplierID:         data.SupplierID,
-		BankAccount:        data.BankAccount,
-		DateOfPayment:      data.DateOfPayment,
-		IDOfStatement:      data.IDOfStatement,
-		SAPID:              data.SAPID,
-		Registred:          data.Registred,
-		RegistredReturn:    data.RegistredReturn,
-		DateOfOrder:        data.DateOfOrder,
-		DateOfSAP:          data.DateOfSAP,
-		FileID:             data.FileID,
-		Description:        data.Description,
-		Amount:             data.Amount,
-		AmountForLawyer:    data.AmountForLawyer,
-		AmountForAgent:     data.AmountForAgent,
-		AmountForBank:      data.AmountForBank,
-		AgentID:            data.AgentID,
-		ExecutionNumber:    data.ExecutionNumber,
-		ReturnDate:         data.ReturnDate,
-		ReturnAmount:       data.ReturnAmount,
-		Status:             data.Status,
-		ReturnFileID:       data.ReturnFileID,
-		CreatedAt:          data.CreatedAt,
-		UpdatedAt:          data.UpdatedAt,
+		ID:                   data.ID,
+		OrganizationUnitID:   data.OrganizationUnitID,
+		SupplierID:           data.SupplierID,
+		BankAccount:          data.BankAccount,
+		DateOfPayment:        data.DateOfPayment,
+		IDOfStatement:        data.IDOfStatement,
+		SAPID:                data.SAPID,
+		Registred:            data.Registred,
+		AccountIDForExpenses: data.AccountIDForExpenses,
+		RegistredReturn:      data.RegistredReturn,
+		DateOfOrder:          data.DateOfOrder,
+		DateOfSAP:            data.DateOfSAP,
+		FileID:               data.FileID,
+		Description:          data.Description,
+		Amount:               data.Amount,
+		AmountForLawyer:      data.AmountForLawyer,
+		AmountForAgent:       data.AmountForAgent,
+		AmountForBank:        data.AmountForBank,
+		AgentID:              data.AgentID,
+		ExecutionNumber:      data.ExecutionNumber,
+		ReturnDate:           data.ReturnDate,
+		ReturnAmount:         data.ReturnAmount,
+		Status:               data.Status,
+		ReturnFileID:         data.ReturnFileID,
+		CreatedAt:            data.CreatedAt,
+		UpdatedAt:            data.UpdatedAt,
 	}
 }
 

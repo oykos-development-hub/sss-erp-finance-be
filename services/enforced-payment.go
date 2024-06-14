@@ -79,7 +79,19 @@ func (h *EnforcedPaymentServiceImpl) CreateEnforcedPayment(ctx context.Context, 
 			}
 
 			if len(currentBudget) > 0 {
-				currentAmount := currentBudget[0].Balance.Sub(decimal.NewFromFloat32(float32(item.Amount)))
+				amount := 0.0
+
+				if len(input.Items) == 1 {
+					amount = input.Amount
+				} else {
+					amount, err = h.getInvoiceAmount(*item.InvoiceID)
+
+					if err != nil {
+						return err
+					}
+				}
+
+				currentAmount := currentBudget[0].Balance.Sub(decimal.NewFromFloat32(float32(amount)))
 				if currentAmount.LessThan(decimal.NewFromInt(0)) {
 					return errors.ErrInsufficientFunds
 				} else {
@@ -91,6 +103,31 @@ func (h *EnforcedPaymentServiceImpl) CreateEnforcedPayment(ctx context.Context, 
 			} else {
 				return errors.ErrInsufficientFunds
 			}
+
+			amount := input.AmountForAgent + input.AmountForBank + input.AmountForLawyer
+
+			currentBudget, _, err = h.currentBudget.GetCurrentBudgetList(dto.CurrentBudgetFilterDTO{
+				UnitID:    &input.OrganizationUnitID,
+				AccountID: &input.AccountIDForExpenses,
+			})
+
+			if err != nil {
+				return err
+			}
+			if len(currentBudget) > 0 {
+				currentAmount := currentBudget[0].Balance.Sub(decimal.NewFromFloat32(float32(amount)))
+				if currentAmount.LessThan(decimal.NewFromInt(0)) {
+					return errors.ErrInsufficientFunds
+				} else {
+					err = h.currentBudget.UpdateBalance(ctx, tx, currentBudget[0].ID, currentAmount)
+					if err != nil {
+						return err
+					}
+				}
+			} else {
+				return errors.ErrNotFound
+			}
+
 		}
 
 		return nil
@@ -149,7 +186,7 @@ func (h *EnforcedPaymentServiceImpl) ReturnEnforcedPayment(ctx context.Context, 
 		paymentOrder, err := h.GetEnforcedPayment(id)
 
 		if err != nil {
-			return errors.ErrInternalServer
+			return err
 		}
 
 		for _, item := range paymentOrder.Items {
@@ -163,13 +200,51 @@ func (h *EnforcedPaymentServiceImpl) ReturnEnforcedPayment(ctx context.Context, 
 			}
 
 			if len(currentBudget) > 0 {
-				currentAmount := currentBudget[0].Balance.Add(decimal.NewFromFloat32(float32(item.Amount)))
+				amount := 0.0
 
-				err = h.currentBudget.UpdateBalance(ctx, tx, currentBudget[0].ID, currentAmount)
-				if err != nil {
-					return err
+				if len(input.Items) == 1 {
+					amount = input.Amount
+				} else {
+					amount, err = h.getInvoiceAmount(*item.InvoiceID)
+
+					if err != nil {
+						return err
+					}
 				}
 
+				currentAmount := currentBudget[0].Balance.Sub(decimal.NewFromFloat32(float32(amount)))
+				if currentAmount.LessThan(decimal.NewFromInt(0)) {
+					return errors.ErrInsufficientFunds
+				} else {
+					err = h.currentBudget.UpdateBalance(ctx, tx, currentBudget[0].ID, currentAmount)
+					if err != nil {
+						return err
+					}
+				}
+			} else {
+				return errors.ErrInsufficientFunds
+			}
+
+			amount := paymentOrder.AmountForAgent + paymentOrder.AmountForBank + paymentOrder.AmountForLawyer
+
+			currentBudget, _, err = h.currentBudget.GetCurrentBudgetList(dto.CurrentBudgetFilterDTO{
+				UnitID:    &paymentOrder.OrganizationUnitID,
+				AccountID: &paymentOrder.AccountIDForExpenses,
+			})
+
+			if err != nil {
+				return err
+			}
+			if len(currentBudget) > 0 {
+				currentAmount := currentBudget[0].Balance.Sub(decimal.NewFromFloat32(float32(amount)))
+				if currentAmount.LessThan(decimal.NewFromInt(0)) {
+					return errors.ErrInsufficientFunds
+				} else {
+					err = h.currentBudget.UpdateBalance(ctx, tx, currentBudget[0].ID, currentAmount)
+					if err != nil {
+						return err
+					}
+				}
 			} else {
 				return errors.ErrNotFound
 			}
@@ -362,4 +437,47 @@ func updateInvoiceStatusForEnforcedPayment(ctx context.Context, id int, tx up.Se
 	}
 
 	return nil
+}
+
+func (h *EnforcedPaymentServiceImpl) getInvoiceAmount(id int) (float64, error) {
+	invoice, err := h.invoicesRepo.Get(id)
+
+	amount := 0.0
+
+	if err != nil {
+		return 0.0, err
+	}
+
+	if invoice.Type == data.TypeInvoice {
+		conditionAndExp := &up.AndExpr{}
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"invoice_id": id})
+		articles, _, err := h.invoiceArticlesRepo.GetAll(nil, nil, conditionAndExp, nil)
+		if err != nil {
+			return 0.0, err
+		}
+
+		for _, article := range articles {
+			price := (article.NetPrice + article.NetPrice*float64(article.VatPercentage)/100) * float64(article.Amount)
+			amount += price
+		}
+
+		return amount, err
+	} else {
+		conditionAndExp := &up.AndExpr{}
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"invoice_id": id})
+
+		additionalExpenses, _, err := h.additionalExpensesRepo.GetAll(nil, nil, conditionAndExp, nil)
+
+		if err != nil {
+			return 0.0, err
+		}
+
+		for _, item := range additionalExpenses {
+			if item.Title == "Neto" {
+				return float64(item.Price), err
+			}
+		}
+	}
+
+	return amount, nil
 }

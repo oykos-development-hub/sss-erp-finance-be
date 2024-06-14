@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS enforced_payments (
     amount_for_lawyer FLOAT,
     amount_for_agent FLOAT,
     amount_for_bank FLOAT,
+    account_id_for_expenses INTEGER,
     agent_id INTEGER,
     execution_number TEXT,
     registred BOOLEAN default false,

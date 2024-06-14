@@ -19,31 +19,32 @@ var (
 
 // EnforcedPayment struct
 type EnforcedPayment struct {
-	ID                 int                   `db:"id,omitempty"`
-	OrganizationUnitID int                   `db:"organization_unit_id"`
-	SupplierID         int                   `db:"supplier_id"`
-	BankAccount        string                `db:"bank_account"`
-	DateOfPayment      time.Time             `db:"date_of_payment"`
-	DateOfOrder        *time.Time            `db:"date_of_order"`
-	IDOfStatement      *int                  `db:"id_of_statement,omitempty"`
-	SAPID              *string               `db:"sap_id"`
-	Status             EnforcedPaymentStatus `db:"status"`
-	Registred          *bool                 `db:"registred,omitempty"`
-	RegistredReturn    *bool                 `db:"registred_return,omitempty"`
-	ReturnAmount       *float64              `db:"return_amount"`
-	DateOfSAP          *time.Time            `db:"date_of_sap"`
-	FileID             *int                  `db:"file_id"`
-	ReturnFileID       *int                  `db:"return_file_id"`
-	ReturnDate         *time.Time            `db:"return_date"`
-	Amount             float64               `db:"amount"`
-	AmountForLawyer    float64               `db:"amount_for_lawyer"`
-	AmountForAgent     float64               `db:"amount_for_agent"`
-	AmountForBank      float64               `db:"amount_for_bank"`
-	AgentID            int                   `db:"agent_id"`
-	ExecutionNumber    string                `db:"execution_number"`
-	Description        string                `db:"description"`
-	CreatedAt          time.Time             `db:"created_at,omitempty"`
-	UpdatedAt          time.Time             `db:"updated_at"`
+	ID                   int                   `db:"id,omitempty"`
+	OrganizationUnitID   int                   `db:"organization_unit_id"`
+	SupplierID           int                   `db:"supplier_id"`
+	BankAccount          string                `db:"bank_account"`
+	DateOfPayment        time.Time             `db:"date_of_payment"`
+	DateOfOrder          *time.Time            `db:"date_of_order"`
+	IDOfStatement        *int                  `db:"id_of_statement,omitempty"`
+	SAPID                *string               `db:"sap_id"`
+	Status               EnforcedPaymentStatus `db:"status"`
+	Registred            *bool                 `db:"registred,omitempty"`
+	RegistredReturn      *bool                 `db:"registred_return,omitempty"`
+	ReturnAmount         *float64              `db:"return_amount"`
+	DateOfSAP            *time.Time            `db:"date_of_sap"`
+	FileID               *int                  `db:"file_id"`
+	ReturnFileID         *int                  `db:"return_file_id"`
+	ReturnDate           *time.Time            `db:"return_date"`
+	Amount               float64               `db:"amount"`
+	AmountForLawyer      float64               `db:"amount_for_lawyer"`
+	AmountForAgent       float64               `db:"amount_for_agent"`
+	AmountForBank        float64               `db:"amount_for_bank"`
+	AccountIDForExpenses int                   `db:"account_id_for_expenses"`
+	AgentID              int                   `db:"agent_id"`
+	ExecutionNumber      string                `db:"execution_number"`
+	Description          string                `db:"description"`
+	CreatedAt            time.Time             `db:"created_at,omitempty"`
+	UpdatedAt            time.Time             `db:"updated_at"`
 }
 
 // Table returns the table name
