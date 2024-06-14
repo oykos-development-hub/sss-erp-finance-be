@@ -466,7 +466,7 @@ func (h *PaymentOrderServiceImpl) PayPaymentOrder(ctx context.Context, id int, i
 	})
 
 	if err != nil {
-		return errors.ErrInternalServer
+		return err
 	}
 
 	return nil
@@ -530,7 +530,7 @@ func (h *PaymentOrderServiceImpl) CancelPaymentOrder(ctx context.Context, id int
 
 		err = h.repo.CancelPaymentOrder(ctx, tx, id)
 		if err != nil {
-			return errors.ErrInternalServer
+			return err
 		}
 		return nil
 	})

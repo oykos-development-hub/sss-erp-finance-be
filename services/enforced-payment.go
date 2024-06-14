@@ -101,7 +101,7 @@ func (h *EnforcedPaymentServiceImpl) CreateEnforcedPayment(ctx context.Context, 
 
 	if err != nil {
 		fmt.Println(err)
-		return nil, errors.ErrInternalServer
+		return nil, err
 	}
 
 	dataToInsert, err = h.repo.Get(id)
@@ -182,7 +182,7 @@ func (h *EnforcedPaymentServiceImpl) ReturnEnforcedPayment(ctx context.Context, 
 		return nil
 	})
 	if err != nil {
-		return errors.ErrInternalServer
+		return err
 	}
 
 	return nil
