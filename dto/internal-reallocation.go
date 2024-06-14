@@ -3,6 +3,7 @@ package dto
 import (
 	"time"
 
+	"github.com/shopspring/decimal"
 	"gitlab.sudovi.me/erp/finance-api/data"
 )
 
@@ -24,6 +25,7 @@ type InternalReallocationResponseDTO struct {
 	RequestedBy        int                                   `json:"requested_by"`
 	FileID             int                                   `json:"file_id"`
 	BudgetID           int                                   `json:"budget_id"`
+	Sum                decimal.Decimal                       `json:"sum"`
 	Items              []InternalReallocationItemResponseDTO `json:"items"`
 	CreatedAt          time.Time                             `json:"created_at"`
 	UpdatedAt          time.Time                             `json:"updated_at"`

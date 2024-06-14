@@ -261,5 +261,29 @@ func (h *InternalReallocationServiceImpl) GetInternalReallocationList(filter dto
 	}
 	response := dto.ToInternalReallocationListResponseDTO(data)
 
+	for i := 0; i < len(response); i++ {
+		condition := up.And(
+			up.Cond{"reallocation_id": response[i].ID},
+		)
+
+		items, _, err := h.itemsRepo.GetAll(nil, nil, condition, nil)
+
+		if err != nil {
+			h.App.ErrorLog.Println(err)
+			return nil, nil, errors.ErrInternalServer
+		}
+
+		responseItems := dto.ToInternalReallocationItemListResponseDTO(items)
+
+		response[0].Items = responseItems
+		var amount decimal.Decimal
+		for _, item := range items {
+			if item.DestinationAccountID != 0 {
+				amount = amount.Sub(item.Amount)
+			}
+		}
+		response[0].Sum = amount
+	}
+
 	return response, total, nil
 }
