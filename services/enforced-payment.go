@@ -203,7 +203,7 @@ func (h *EnforcedPaymentServiceImpl) ReturnEnforcedPayment(ctx context.Context, 
 				amount := 0.0
 
 				if len(input.Items) == 1 {
-					amount = input.Amount
+					amount = *input.ReturnAmount
 				} else {
 					amount, err = h.getInvoiceAmount(*item.InvoiceID)
 
@@ -212,42 +212,17 @@ func (h *EnforcedPaymentServiceImpl) ReturnEnforcedPayment(ctx context.Context, 
 					}
 				}
 
-				currentAmount := currentBudget[0].Balance.Sub(decimal.NewFromFloat32(float32(amount)))
-				if currentAmount.LessThan(decimal.NewFromInt(0)) {
-					return errors.ErrInsufficientFunds
-				} else {
-					err = h.currentBudget.UpdateBalance(ctx, tx, currentBudget[0].ID, currentAmount)
-					if err != nil {
-						return err
-					}
-				}
-			} else {
-				return errors.ErrInsufficientFunds
-			}
+				currentAmount := currentBudget[0].Balance.Add(decimal.NewFromFloat32(float32(amount)))
 
-			amount := paymentOrder.AmountForAgent + paymentOrder.AmountForBank + paymentOrder.AmountForLawyer
+				err = h.currentBudget.UpdateBalance(ctx, tx, currentBudget[0].ID, currentAmount)
+				if err != nil {
+					return err
 
-			currentBudget, _, err = h.currentBudget.GetCurrentBudgetList(dto.CurrentBudgetFilterDTO{
-				UnitID:    &paymentOrder.OrganizationUnitID,
-				AccountID: &paymentOrder.AccountIDForExpenses,
-			})
-
-			if err != nil {
-				return err
-			}
-			if len(currentBudget) > 0 {
-				currentAmount := currentBudget[0].Balance.Sub(decimal.NewFromFloat32(float32(amount)))
-				if currentAmount.LessThan(decimal.NewFromInt(0)) {
-					return errors.ErrInsufficientFunds
-				} else {
-					err = h.currentBudget.UpdateBalance(ctx, tx, currentBudget[0].ID, currentAmount)
-					if err != nil {
-						return err
-					}
 				}
 			} else {
 				return errors.ErrNotFound
 			}
+
 		}
 
 		return nil
