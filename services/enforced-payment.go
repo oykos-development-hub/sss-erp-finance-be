@@ -44,7 +44,6 @@ func (h *EnforcedPaymentServiceImpl) CreateEnforcedPayment(ctx context.Context, 
 		var err error
 		id, err = h.repo.Insert(ctx, tx, *dataToInsert)
 		if err != nil {
-			fmt.Println(err)
 			return errors.ErrInternalServer
 		}
 
@@ -65,15 +64,13 @@ func (h *EnforcedPaymentServiceImpl) CreateEnforcedPayment(ctx context.Context, 
 			}
 		}
 
-		paymentOrder, err := h.GetEnforcedPayment(id)
-
 		if err != nil {
 			return errors.ErrInternalServer
 		}
 
-		for _, item := range paymentOrder.Items {
+		for _, item := range input.Items {
 			currentBudget, _, err := h.currentBudget.GetCurrentBudgetList(dto.CurrentBudgetFilterDTO{
-				UnitID:    &paymentOrder.OrganizationUnitID,
+				UnitID:    &input.OrganizationUnitID,
 				AccountID: &item.AccountID,
 			})
 
@@ -100,7 +97,6 @@ func (h *EnforcedPaymentServiceImpl) CreateEnforcedPayment(ctx context.Context, 
 	})
 
 	if err != nil {
-		fmt.Println(err)
 		return nil, err
 	}
 
