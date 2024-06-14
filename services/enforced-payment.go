@@ -192,12 +192,18 @@ func (h *EnforcedPaymentServiceImpl) GetEnforcedPayment(id int) (*dto.EnforcedPa
 				}
 			}
 		}
+		var amount float32
+		if len(items) == 1 {
+			amount = float32(paymentData.Amount)
+		} else {
+			amount = item.Amount
+		}
 
 		response.Items = append(response.Items, dto.EnforcedPaymentItemResponseDTO{
 			ID:             item.ID,
 			PaymentOrderID: item.PaymentOrderID,
 			Title:          item.Title,
-			Amount:         item.Amount,
+			Amount:         amount,
 			InvoiceID:      item.InvoiceID,
 			AccountID:      item.AccountID,
 		})
