@@ -208,9 +208,9 @@ func (h *PaymentOrderServiceImpl) GetPaymentOrder(id int) (*dto.PaymentOrderResp
 			}
 
 			if item.InvoiceNumber != "" {
-				builtItem.Title = "Račun broj " + item.InvoiceNumber
+				builtItem.Title = item.InvoiceNumber
 			} else {
-				builtItem.Title = "Predračun broj " + item.ProFormaInvoiceNumber
+				builtItem.Title = item.ProFormaInvoiceNumber
 			}
 
 		} else if item.AdditionalExpenseID != nil {
@@ -228,11 +228,7 @@ func (h *PaymentOrderServiceImpl) GetPaymentOrder(id int) (*dto.PaymentOrderResp
 
 			builtItem.Type = item.Type
 
-			if builtItem.Type == data.TypeDecision {
-				builtItem.Title = "Rješenje broj " + item.InvoiceNumber + " " + string(additionalItem.Title)
-			} else {
-				builtItem.Title = "Ugovor broj " + item.InvoiceNumber + " " + string(additionalItem.Title)
-			}
+			builtItem.Title = item.InvoiceNumber
 
 		} else if item.SalaryAdditionalExpenseID != nil {
 			additionalItem, err := h.salaryAdditionalExpensesRepo.Get(*item.SalaryAdditionalExpenseID)

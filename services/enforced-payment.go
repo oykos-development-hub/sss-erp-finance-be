@@ -280,7 +280,7 @@ func (h *EnforcedPaymentServiceImpl) GetEnforcedPayment(id int) (*dto.EnforcedPa
 					price := (article.NetPrice + article.NetPrice*float64(article.VatPercentage)/100) * float64(article.Amount)
 					item.Amount += float32(price)
 				}
-				item.Title = "Faktura broj " + invoice.InvoiceNumber
+				item.Title = invoice.InvoiceNumber
 			} else {
 				conditionAndExp := &up.AndExpr{}
 				conditionAndExp = up.And(conditionAndExp, &up.Cond{"invoice_id": item.InvoiceID})
@@ -294,11 +294,8 @@ func (h *EnforcedPaymentServiceImpl) GetEnforcedPayment(id int) (*dto.EnforcedPa
 					}
 				}
 
-				if invoice.Type == data.TypeDecision {
-					item.Title = "Rješenje broj " + invoice.InvoiceNumber
-				} else {
-					item.Title = "Ugovor broj " + invoice.InvoiceNumber
-				}
+				item.Title = invoice.InvoiceNumber
+
 			}
 		}
 		var amount float32

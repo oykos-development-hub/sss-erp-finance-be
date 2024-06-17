@@ -295,7 +295,6 @@ func (t *AccountingEntry) GetObligationsForAccounting(filter ObligationsFilter) 
 			}
 
 			obligation.Type = TypeInvoice
-			obligation.Title = "Račun broj " + obligation.Title
 			items = append(items, obligation)
 		}
 	}
@@ -312,12 +311,6 @@ func (t *AccountingEntry) GetObligationsForAccounting(filter ObligationsFilter) 
 
 		if err != nil {
 			return nil, nil, err
-		}
-
-		if obligation.Type == TypeDecision {
-			obligation.Title = "Rješenje broj " + obligation.Title
-		} else {
-			obligation.Title = "Ugovor broj " + obligation.Title
 		}
 
 		if filter.Type == nil || *filter.Type == obligation.Type {

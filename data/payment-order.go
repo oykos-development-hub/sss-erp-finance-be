@@ -268,10 +268,8 @@ func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation
 			}
 			obligation.Type = TypeInvoice
 
-			if obligation.Title != "" {
-				obligation.Title = "Račun broj " + obligation.Title
-			} else if invoiceNumber != nil {
-				obligation.Title = "Predračun broj " + *invoiceNumber
+			if invoiceNumber != nil {
+				obligation.Title = *invoiceNumber
 			}
 
 			items = append(items, obligation)
@@ -313,12 +311,6 @@ func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation
 				} else {
 					obligation.RemainPrice = obligation.TotalPrice
 				}
-			}
-
-			if obligation.Type == TypeDecision {
-				obligation.Title = "Rješenje broj " + title + " " + obligation.Title
-			} else {
-				obligation.Title = "Ugovor broj " + title + " " + obligation.Title
 			}
 
 			if filter.Type == nil || *filter.Type == obligation.Type {
