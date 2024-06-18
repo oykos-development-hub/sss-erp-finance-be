@@ -101,7 +101,7 @@ func (t *SpendingRelease) GetAll(filter SpendingReleaseFilterDTO) ([]SpendingRel
 
 	err := query.OrderBy("-sr.created_at").All(&all)
 	if err != nil {
-		return nil, err
+		return nil, errors.New("upper all")
 	}
 
 	return all, err
@@ -132,10 +132,10 @@ func (t *SpendingRelease) GetAllSum(month, year, budgetID, unitID int) ([]Spendi
 
 	err := query.All(&all)
 	if err != nil {
-		return nil, errors.Wrap(err, "get release overview")
+		return nil, errors.Wrap(err, "upper all")
 	}
 
-	return all, err
+	return all, nil
 }
 
 // GetAll gets all records from the database, using upper
@@ -148,12 +148,12 @@ func (t *SpendingRelease) GetBy(condition up.AndExpr) (*SpendingRelease, error) 
 	err := res.One(&one)
 	if err != nil {
 		if goerrors.Is(err, up.ErrNoMoreRows) {
-			return nil, errors.WrapNotFoundError(err, "repo spending-release getBy")
+			return nil, errors.WrapNotFoundError(err, "no rows found")
 		}
-		return nil, errors.Wrap(err, "repo spending-release getBy")
+		return nil, errors.Wrap(err, "upper one")
 	}
 
-	return &one, err
+	return &one, nil
 }
 
 // Get gets one record from the database, by id, using upper
@@ -178,7 +178,7 @@ func (t *SpendingRelease) Get(id int) (*SpendingReleaseWithCurrentBudget, error)
 
 	err := query.OrderBy("-sr.created_at").One(&one)
 	if err != nil {
-		return nil, err
+		return nil, errors.New("upper one")
 	}
 
 	return &one, err
@@ -190,7 +190,7 @@ func (t *SpendingRelease) Update(ctx context.Context, m SpendingRelease) error {
 	res := collection.Find(m.ID)
 	err := res.Update(&m)
 	if err != nil {
-		return errors.Wrap(err, "repo spending-release update")
+		return errors.Wrap(err, "upper update")
 	}
 	return nil
 }
@@ -202,9 +202,10 @@ func (t *SpendingRelease) Delete(ctx context.Context, id int) error {
 	err := res.Delete()
 	if err != nil {
 		if goerrors.Is(err, up.ErrNoMoreRows) {
-			return errors.WrapNotFoundError(err, "repo spending-release delete")
+			return errors.WrapNotFoundError(err, "upper delete")
 		}
-		return errors.Wrap(err, "repo spending-release delete")
+
+		return errors.Wrap(err, "upper delete")
 	}
 	return nil
 }
@@ -215,7 +216,7 @@ func (t *SpendingRelease) Insert(ctx context.Context, m SpendingRelease) (int, e
 
 	userID, ok := contextutil.GetUserIDFromContext(ctx)
 	if !ok {
-		return 0, errors.New("user ID not found in context")
+		return 0, errors.New("user id not found in context")
 	}
 
 	var id int
@@ -224,7 +225,7 @@ func (t *SpendingRelease) Insert(ctx context.Context, m SpendingRelease) (int, e
 
 		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
 		if _, err := sess.SQL().Exec(query); err != nil {
-			return err
+			return errors.New("upper exec")
 		}
 
 		collection := sess.Collection(t.Table())
@@ -233,7 +234,7 @@ func (t *SpendingRelease) Insert(ctx context.Context, m SpendingRelease) (int, e
 		var err error
 
 		if res, err = collection.Insert(m); err != nil {
-			return err
+			return errors.New("upper insert")
 		}
 
 		id = getInsertId(res.ID())
@@ -242,7 +243,7 @@ func (t *SpendingRelease) Insert(ctx context.Context, m SpendingRelease) (int, e
 	})
 
 	if err != nil {
-		return 0, err
+		return 0, errors.New("upper tx")
 	}
 
 	return id, nil

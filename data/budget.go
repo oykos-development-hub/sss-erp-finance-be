@@ -54,17 +54,12 @@ func (t *Budget) GetAll(condition *up.Cond, orders []any) ([]*Budget, error) {
 		res = collection.Find()
 	}
 
-	err := res.All(&all)
+	err := res.OrderBy(orders...).All(&all)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "upper all")
 	}
 
-	err = res.OrderBy(orders...).All(&all)
-	if err != nil {
-		return nil, err
-	}
-
-	return all, err
+	return all, nil
 }
 
 // Get gets one record from the database, by id, using upper
@@ -78,7 +73,7 @@ func (t *Budget) Get(id int) (*Budget, error) {
 		if goerrors.Is(err, up.ErrNoMoreRows) {
 			return nil, errors.WrapNotFoundError(err, "repo get")
 		}
-		return nil, errors.Wrap(err, "repo budget get")
+		return nil, errors.Wrap(err, "upper one")
 	}
 	return &one, nil
 }
@@ -88,28 +83,28 @@ func (t *Budget) Update(ctx context.Context, m Budget) error {
 	m.UpdatedAt = time.Now()
 	userID, ok := contextutil.GetUserIDFromContext(ctx)
 	if !ok {
-		return errors.New("user ID not found in context")
+		return errors.New("user id not found in context")
 	}
 
 	err := Upper.Tx(func(sess up.Session) error {
 
 		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
 		if _, err := sess.SQL().Exec(query); err != nil {
-			return err
+			return errors.Wrap(err, "upper exec")
 		}
 
 		collection := sess.Collection(t.Table())
 		res := collection.Find(m.ID)
 		if err := res.Update(&m); err != nil {
-			return err
+			return errors.Wrap(err, "upper update")
 		}
 
 		return nil
 	})
-
 	if err != nil {
-		return err
+		return errors.Wrap(err, "upper tx")
 	}
+
 	return nil
 }
 
@@ -117,27 +112,28 @@ func (t *Budget) Update(ctx context.Context, m Budget) error {
 func (t *Budget) Delete(ctx context.Context, id int) error {
 	userID, ok := contextutil.GetUserIDFromContext(ctx)
 	if !ok {
-		return errors.New("user ID not found in context")
+		return errors.New("user id not found in context")
 	}
 
 	err := Upper.Tx(func(sess up.Session) error {
 		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
 		if _, err := sess.SQL().Exec(query); err != nil {
-			return err
+			return errors.Wrap(err, "upper exec")
 		}
 
 		collection := sess.Collection(t.Table())
 		res := collection.Find(id)
 		if err := res.Delete(); err != nil {
-			return err
+			return errors.Wrap(err, "upper delete")
 		}
 
 		return nil
 	})
 
 	if err != nil {
-		return err
+		return errors.Wrap(err, "upper tx")
 	}
+
 	return nil
 }
 
@@ -147,7 +143,7 @@ func (t *Budget) Insert(ctx context.Context, m Budget) (int, error) {
 	m.UpdatedAt = time.Now()
 	userID, ok := contextutil.GetUserIDFromContext(ctx)
 	if !ok {
-		return 0, errors.New("user ID not found in context")
+		return 0, errors.New("user id not found in context")
 	}
 
 	var id int
@@ -156,7 +152,7 @@ func (t *Budget) Insert(ctx context.Context, m Budget) (int, error) {
 
 		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
 		if _, err := sess.SQL().Exec(query); err != nil {
-			return err
+			return errors.Wrap(err, "upper exec")
 		}
 
 		collection := sess.Collection(t.Table())
@@ -165,7 +161,7 @@ func (t *Budget) Insert(ctx context.Context, m Budget) (int, error) {
 		var err error
 
 		if res, err = collection.Insert(m); err != nil {
-			return err
+			return errors.Wrap(err, "upper insert")
 		}
 
 		id = getInsertId(res.ID())
@@ -174,7 +170,7 @@ func (t *Budget) Insert(ctx context.Context, m Budget) (int, error) {
 	})
 
 	if err != nil {
-		return 0, err
+		return 0, errors.Wrap(err, "upper tx")
 	}
 
 	return id, nil
