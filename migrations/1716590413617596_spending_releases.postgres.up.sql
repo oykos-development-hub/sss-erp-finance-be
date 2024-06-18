@@ -4,5 +4,6 @@ CREATE TABLE IF NOT EXISTS spending_releases (
     year INTEGER NOT NULL,
     month INTEGER NOT NULL,
     value DECIMAL (10, 2) NOT NULL,
+    username TEXT,
     created_at TIMESTAMP
 );

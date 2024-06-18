@@ -302,7 +302,7 @@ func routes(app *celeritas.Celeritas, middleware *middleware.Middleware, handler
 		rt.Get("/spending-releases/{id}", handlers.SpendingReleaseHandler.GetSpendingReleaseById)
 		rt.Get("/spending-releases", handlers.SpendingReleaseHandler.GetSpendingReleaseList)
 		rt.Get("/spending-releases/overview", handlers.SpendingReleaseHandler.GetSpendingReleaseOverview)
-		rt.Delete("/spending-releases/{id}", handlers.SpendingReleaseHandler.DeleteSpendingRelease)
+		rt.Delete("/spending-releases", handlers.SpendingReleaseHandler.DeleteSpendingRelease)
 
 		rt.Post("/internal-reallocations", handlers.InternalReallocationHandler.CreateInternalReallocation)
 		rt.Get("/internal-reallocations/{id}", handlers.InternalReallocationHandler.GetInternalReallocationById)
