@@ -5,7 +5,6 @@ import (
 
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
-	"gitlab.sudovi.me/erp/finance-api/pkg/errors"
 	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 
 	"github.com/shopspring/decimal"
@@ -57,11 +56,11 @@ func (h *SpendingDynamicServiceImpl) CreateSpendingDynamic(ctx context.Context, 
 		}
 		if len(oldDynamic) > 0 {
 			if entriesInputData.SumOfMonths().GreaterThan(currentBudget.Actual.Add(oldDynamic[0].TotalSavings)) {
-				return errors.NewBadRequestError("sum cannot be greater than actual plus all the savings")
+				return newErrors.NewBadRequestError("sum cannot be greater than actual plus all the savings")
 			}
 		} else {
 			if !entriesInputData.SumOfMonths().Equal(currentBudget.Actual) {
-				return errors.NewBadRequestError("sum must match actual of current budget")
+				return newErrors.NewBadRequestError("sum must match actual of current budget")
 			}
 		}
 

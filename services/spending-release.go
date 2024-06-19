@@ -6,7 +6,6 @@ import (
 
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
-	"gitlab.sudovi.me/erp/finance-api/pkg/errors"
 	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 
 	"github.com/oykos-development-hub/celeritas"
@@ -44,8 +43,8 @@ func (h *SpendingReleaseServiceImpl) CreateSpendingRelease(ctx context.Context, 
 		}
 
 		_, err = h.repo.GetBy(*up.And(up.Cond{"current_budget_id": currentBudget.ID}, up.Cond{"month": currentMonth}))
-		if !errors.IsErr(err, errors.NotFoundCode) {
-			return nil, errors.NewWithCode(errors.SingleMonthSpendingReleaseCode, "only single release is allowed per month")
+		if !newErrors.IsErr(err, newErrors.NotFoundCode) {
+			return nil, newErrors.NewWithCode(newErrors.SingleMonthSpendingReleaseCode, "only single release is allowed per month")
 		}
 
 		budget, err := h.repoBudget.Get(currentBudget.BudgetID)
@@ -61,11 +60,11 @@ func (h *SpendingReleaseServiceImpl) CreateSpendingRelease(ctx context.Context, 
 			Username:        inputDTO.Username,
 		}
 		if !inputData.ValidateNewRelease() {
-			return nil, errors.NewWithCode(errors.ReleaseInCurrentMonthCode, "release is possible only in the current month")
+			return nil, newErrors.NewWithCode(newErrors.ReleaseInCurrentMonthCode, "release is possible only in the current month")
 		}
 
 		if currentBudget.Vault().Sub(inputData.Value).LessThan(decimal.Zero) {
-			return nil, errors.NewWithCode(errors.NotEnoughFundsCode, "not enough funds")
+			return nil, newErrors.NewWithCode(newErrors.NotEnoughFundsCode, "not enough funds")
 		}
 
 		id, err := h.repo.Insert(ctx, inputData)

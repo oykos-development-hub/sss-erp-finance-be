@@ -5,7 +5,6 @@ import (
 
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
-	"gitlab.sudovi.me/erp/finance-api/pkg/errors"
 	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 
 	"github.com/oykos-development-hub/celeritas"
@@ -86,7 +85,7 @@ func (h *CurrentBudgetServiceImpl) UpdateBalance(ctx context.Context, tx up.Sess
 func (h *CurrentBudgetServiceImpl) GetCurrentBudget(id int) (*dto.CurrentBudgetResponseDTO, error) {
 	data, err := h.repo.Get(id)
 	if err != nil {
-		return nil, errors.WrapNotFoundError(err, "repo current budget get by")
+		return nil, newErrors.WrapNotFoundError(err, "repo current budget get by")
 	}
 	response := dto.ToCurrentBudgetResponseDTO(data)
 

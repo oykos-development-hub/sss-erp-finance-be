@@ -148,6 +148,21 @@ func (h *ExternalReallocationServiceImpl) GetExternalReallocationList(filter dto
 	}
 	response := dto.ToExternalReallocationListResponseDTO(data)
 
+	for i := 0; i < len(response); i++ {
+		condition := up.And(
+			up.Cond{"reallocation_id": response[i].ID},
+		)
+
+		items, _, err := h.itemsRepo.GetAll(nil, nil, condition, nil)
+
+		if err != nil {
+			return nil, nil, newErrors.Wrap(err, "repo external reallocation items get all")
+		}
+
+		responseItems := dto.ToExternalReallocationItemListResponseDTO(items)
+
+		response[i].Items = responseItems
+	}
 	return response, total, nil
 }
 

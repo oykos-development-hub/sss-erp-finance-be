@@ -142,6 +142,8 @@ func (t *ExternalReallocation) Delete(ctx context.Context, id int) error {
 func (t *ExternalReallocation) Insert(ctx context.Context, tx up.Session, m ExternalReallocation) (int, error) {
 	m.CreatedAt = time.Now()
 	m.UpdatedAt = time.Now()
+	m.Status = ReallocationStatusCreated
+	m.DateOfRequest = time.Now()
 	userID, ok := contextutil.GetUserIDFromContext(ctx)
 	if !ok {
 		err := newErrors.New("user ID not found in context")
