@@ -8,6 +8,7 @@ import (
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
 	"gitlab.sudovi.me/erp/finance-api/errors"
+	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 )
 
 type FlatRatePaymentServiceImpl struct {
@@ -32,20 +33,19 @@ func (h *FlatRatePaymentServiceImpl) CreateFlatRatePayment(ctx context.Context, 
 
 	id, err := h.repo.Insert(ctx, *flatRatePayment)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo flat rate payment insert")
 	}
 
 	flatRatePayment, err = flatRatePayment.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo flat rate payment get")
 	}
 
 	res := dto.ToFlatRatePaymentResponseDTO(*flatRatePayment)
 
 	_, _, err = h.FlatRateSharedLogicService.CalculateFlatRateDetailsAndUpdateStatus(ctx, flatRatePayment.FlatRateID)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, err
+		return nil, newErrors.Wrap(err, "flat rate shared logic service calculate flat rate details and update status")
 	}
 
 	return &res, nil
@@ -55,20 +55,17 @@ func (h *FlatRatePaymentServiceImpl) CreateFlatRatePayment(ctx context.Context, 
 func (h *FlatRatePaymentServiceImpl) DeleteFlatRatePayment(ctx context.Context, id int) error {
 	FlatRatePayment, err := h.repo.Get(id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return errors.ErrNotFound
+		return newErrors.Wrap(err, "repo flat rate payment get")
 	}
 
 	err = h.repo.Delete(ctx, id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return errors.ErrInternalServer
+		return newErrors.Wrap(err, "repo flat rate payment delete")
 	}
 
 	_, _, err = h.FlatRateSharedLogicService.CalculateFlatRateDetailsAndUpdateStatus(ctx, FlatRatePayment.FlatRateID)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return errors.ErrInternalServer
+		return newErrors.Wrap(err, "flat rate shared logic service calculate flat rate details and update status")
 	}
 
 	return nil
@@ -81,20 +78,19 @@ func (h *FlatRatePaymentServiceImpl) UpdateFlatRatePayment(ctx context.Context, 
 
 	err := h.repo.Update(ctx, *data)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo flat rate payment update")
 	}
 
 	data, err = h.repo.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo flat rate payment get")
 	}
 
 	response := dto.ToFlatRatePaymentResponseDTO(*data)
 
 	_, _, err = h.FlatRateSharedLogicService.CalculateFlatRateDetailsAndUpdateStatus(ctx, data.FlatRateID)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "flat rate shared logic service calculate flat rate details and update status")
 	}
 
 	return &response, nil
@@ -105,12 +101,11 @@ func (h *FlatRatePaymentServiceImpl) GetFlatRatePaymentList(input dto.FlatRatePa
 
 	FlatRatePayments, total, err := h.getFlatRatePaymentsByFlatRateID(input.FlatRateID)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, nil, errors.ErrInternalServer
+		return nil, nil, newErrors.Wrap(err, "get flat rate payments by flat rate id")
 	}
 
 	if len(FlatRatePayments) == 0 {
-		return nil, nil, errors.ErrNotFound
+		return nil, nil, newErrors.Wrap(errors.ErrNotFound, "get flat rate payments by flat rate id")
 	}
 	response := dto.ToFlatRatePaymentListResponseDTO(FlatRatePayments)
 
@@ -122,8 +117,7 @@ func (h *FlatRatePaymentServiceImpl) getFlatRatePaymentsByFlatRateID(FlatRateID 
 
 	FlatRatePayments, total, err := h.repo.GetAll(&cond)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, nil, errors.ErrInternalServer
+		return nil, nil, newErrors.Wrap(err, "repo flat rate payment get all")
 	}
 
 	return FlatRatePayments, total, nil
@@ -133,9 +127,9 @@ func (h *FlatRatePaymentServiceImpl) getFlatRatePaymentsByFlatRateID(FlatRateID 
 func (h *FlatRatePaymentServiceImpl) GetFlatRatePayment(id int) (*dto.FlatRatePaymentResponseDTO, error) {
 	data, err := h.repo.Get(id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrNotFound
+		return nil, newErrors.Wrap(err, "repo flat rate payment get")
 	}
+
 	response := dto.ToFlatRatePaymentResponseDTO(*data)
 
 	return &response, nil

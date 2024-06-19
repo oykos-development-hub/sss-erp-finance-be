@@ -32,12 +32,14 @@ func (h *propbenconfHandlerImpl) CreatePropBenConf(w http.ResponseWriter, r *htt
 	var input dto.PropBenConfDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
 	}
 
 	validator := h.App.Validator().ValidateStruct(&input)
 	if !validator.Valid() {
+		h.App.ErrorLog.Print(validator.Errors)
 		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
 		return
 	}
@@ -47,6 +49,7 @@ func (h *propbenconfHandlerImpl) CreatePropBenConf(w http.ResponseWriter, r *htt
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
 	}
@@ -56,6 +59,7 @@ func (h *propbenconfHandlerImpl) CreatePropBenConf(w http.ResponseWriter, r *htt
 
 	res, err := h.service.CreatePropBenConf(ctx, input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -69,6 +73,7 @@ func (h *propbenconfHandlerImpl) GetPropBenConfById(w http.ResponseWriter, r *ht
 
 	res, err := h.service.GetPropBenConf(id)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -83,12 +88,14 @@ func (h *propbenconfHandlerImpl) UpdatePropBenConf(w http.ResponseWriter, r *htt
 	var input dto.PropBenConfDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
 	}
 
 	validator := h.App.Validator().ValidateStruct(&input)
 	if !validator.Valid() {
+		h.App.ErrorLog.Print(validator.Errors)
 		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
 		return
 	}
@@ -98,6 +105,7 @@ func (h *propbenconfHandlerImpl) UpdatePropBenConf(w http.ResponseWriter, r *htt
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
 	}
@@ -107,6 +115,7 @@ func (h *propbenconfHandlerImpl) UpdatePropBenConf(w http.ResponseWriter, r *htt
 
 	res, err := h.service.UpdatePropBenConf(ctx, id, input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -123,6 +132,7 @@ func (h *propbenconfHandlerImpl) DeletePropBenConf(w http.ResponseWriter, r *htt
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
 	}
@@ -132,6 +142,7 @@ func (h *propbenconfHandlerImpl) DeletePropBenConf(w http.ResponseWriter, r *htt
 
 	err = h.service.DeletePropBenConf(ctx, id)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -147,12 +158,14 @@ func (h *propbenconfHandlerImpl) GetPropBenConfList(w http.ResponseWriter, r *ht
 
 	validator := h.App.Validator().ValidateStruct(&filter)
 	if !validator.Valid() {
+		h.App.ErrorLog.Print(validator.Errors)
 		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
 		return
 	}
 
 	res, total, err := h.service.GetPropBenConfList(filter)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}

@@ -4,6 +4,7 @@ import (
 	"time"
 
 	up "github.com/upper/db/v4"
+	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 )
 
 // AccountingEntryItem struct
@@ -44,7 +45,7 @@ func (t *AccountingEntryItem) GetAll(page *int, size *int, condition *up.AndExpr
 	}
 	total, err := res.Count()
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, newErrors.Wrap(err, "upper count")
 	}
 
 	if page != nil && size != nil {
@@ -53,7 +54,7 @@ func (t *AccountingEntryItem) GetAll(page *int, size *int, condition *up.AndExpr
 
 	err = res.OrderBy(orders...).All(&all)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, newErrors.Wrap(err, "upper all")
 	}
 
 	return all, &total, err
@@ -67,7 +68,7 @@ func (t *AccountingEntryItem) Get(id int) (*AccountingEntryItem, error) {
 	res := collection.Find(up.Cond{"id": id})
 	err := res.One(&one)
 	if err != nil {
-		return nil, err
+		return nil, newErrors.Wrap(err, "upper one")
 	}
 	return &one, nil
 }
@@ -79,7 +80,7 @@ func (t *AccountingEntryItem) Update(tx up.Session, m AccountingEntryItem) error
 	res := collection.Find(m.ID)
 	err := res.Update(&m)
 	if err != nil {
-		return err
+		return newErrors.Wrap(err, "upper update")
 	}
 	return nil
 }
@@ -90,7 +91,7 @@ func (t *AccountingEntryItem) Delete(id int) error {
 	res := collection.Find(id)
 	err := res.Delete()
 	if err != nil {
-		return err
+		return newErrors.Wrap(err, "upper delete")
 	}
 	return nil
 }
@@ -102,7 +103,7 @@ func (t *AccountingEntryItem) Insert(tx up.Session, m AccountingEntryItem) (int,
 	collection := tx.Collection(t.Table())
 	res, err := collection.Insert(m)
 	if err != nil {
-		return 0, err
+		return 0, newErrors.Wrap(err, "upper insert")
 	}
 
 	id := getInsertId(res.ID())

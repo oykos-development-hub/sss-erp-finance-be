@@ -32,12 +32,14 @@ func (h *procedurecostHandlerImpl) CreateProcedureCost(w http.ResponseWriter, r 
 	var input dto.ProcedureCostDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
 	}
 
 	validator := h.App.Validator().ValidateStruct(&input)
 	if !validator.Valid() {
+		h.App.ErrorLog.Print(validator.Errors)
 		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
 		return
 	}
@@ -47,6 +49,7 @@ func (h *procedurecostHandlerImpl) CreateProcedureCost(w http.ResponseWriter, r 
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
 	}
@@ -56,6 +59,7 @@ func (h *procedurecostHandlerImpl) CreateProcedureCost(w http.ResponseWriter, r 
 
 	res, err := h.service.CreateProcedureCost(ctx, input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -69,6 +73,7 @@ func (h *procedurecostHandlerImpl) GetProcedureCostById(w http.ResponseWriter, r
 
 	res, err := h.service.GetProcedureCost(id)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -83,12 +88,14 @@ func (h *procedurecostHandlerImpl) UpdateProcedureCost(w http.ResponseWriter, r 
 	var input dto.ProcedureCostDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
 	}
 
 	validator := h.App.Validator().ValidateStruct(&input)
 	if !validator.Valid() {
+		h.App.ErrorLog.Print(validator.Errors)
 		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
 		return
 	}
@@ -98,6 +105,7 @@ func (h *procedurecostHandlerImpl) UpdateProcedureCost(w http.ResponseWriter, r 
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
 	}
@@ -107,6 +115,7 @@ func (h *procedurecostHandlerImpl) UpdateProcedureCost(w http.ResponseWriter, r 
 
 	res, err := h.service.UpdateProcedureCost(ctx, id, input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -123,6 +132,7 @@ func (h *procedurecostHandlerImpl) DeleteProcedureCost(w http.ResponseWriter, r 
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
 	}
@@ -132,6 +142,7 @@ func (h *procedurecostHandlerImpl) DeleteProcedureCost(w http.ResponseWriter, r 
 
 	err = h.service.DeleteProcedureCost(ctx, id)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -147,12 +158,14 @@ func (h *procedurecostHandlerImpl) GetProcedureCostList(w http.ResponseWriter, r
 
 	validator := h.App.Validator().ValidateStruct(&filter)
 	if !validator.Valid() {
+		h.App.ErrorLog.Print(validator.Errors)
 		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
 		return
 	}
 
 	res, total, err := h.service.GetProcedureCostList(filter)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}

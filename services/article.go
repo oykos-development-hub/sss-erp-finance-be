@@ -3,7 +3,7 @@ package services
 import (
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
-	"gitlab.sudovi.me/erp/finance-api/errors"
+	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 
 	"github.com/oykos-development-hub/celeritas"
 	up "github.com/upper/db/v4"
@@ -26,12 +26,12 @@ func (h *ArticleServiceImpl) CreateArticle(input dto.ArticleDTO) (*dto.ArticleRe
 
 	id, err := h.repo.Insert(*data)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo article insert")
 	}
 
 	data, err = data.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo article get")
 	}
 
 	res := dto.ToArticleResponseDTO(*data)
@@ -45,12 +45,12 @@ func (h *ArticleServiceImpl) UpdateArticle(id int, input dto.ArticleDTO) (*dto.A
 
 	err := h.repo.Update(*data)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo article update")
 	}
 
 	data, err = h.repo.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo article get")
 	}
 
 	response := dto.ToArticleResponseDTO(*data)
@@ -61,8 +61,7 @@ func (h *ArticleServiceImpl) UpdateArticle(id int, input dto.ArticleDTO) (*dto.A
 func (h *ArticleServiceImpl) DeleteArticle(id int) error {
 	err := h.repo.Delete(id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return errors.ErrInternalServer
+		return newErrors.Wrap(err, "repo article delete")
 	}
 
 	return nil
@@ -71,9 +70,9 @@ func (h *ArticleServiceImpl) DeleteArticle(id int) error {
 func (h *ArticleServiceImpl) GetArticle(id int) (*dto.ArticleResponseDTO, error) {
 	data, err := h.repo.Get(id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrNotFound
+		return nil, newErrors.Wrap(err, "repo article get")
 	}
+
 	response := dto.ToArticleResponseDTO(*data)
 
 	return &response, nil
@@ -99,8 +98,7 @@ func (h *ArticleServiceImpl) GetArticleList(filter dto.ArticleFilterDTO) ([]dto.
 
 	data, total, err := h.repo.GetAll(filter.Page, filter.Size, conditionAndExp, orders)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, nil, errors.ErrInternalServer
+		return nil, nil, newErrors.Wrap(err, "repo article get all")
 	}
 	response := dto.ToArticleListResponseDTO(data)
 

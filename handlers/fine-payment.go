@@ -32,12 +32,14 @@ func (h *finePaymentHandlerImpl) CreateFinePayment(w http.ResponseWriter, r *htt
 	var input dto.FinePaymentDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
 	}
 
 	validator := h.App.Validator().ValidateStruct(&input)
 	if !validator.Valid() {
+		h.App.ErrorLog.Print(validator.Errors)
 		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
 		return
 	}
@@ -47,6 +49,7 @@ func (h *finePaymentHandlerImpl) CreateFinePayment(w http.ResponseWriter, r *htt
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
 	}
@@ -56,6 +59,7 @@ func (h *finePaymentHandlerImpl) CreateFinePayment(w http.ResponseWriter, r *htt
 
 	res, err := h.service.CreateFinePayment(ctx, input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -72,6 +76,7 @@ func (h *finePaymentHandlerImpl) DeleteFinePayment(w http.ResponseWriter, r *htt
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
 	}
@@ -81,6 +86,7 @@ func (h *finePaymentHandlerImpl) DeleteFinePayment(w http.ResponseWriter, r *htt
 
 	err = h.service.DeleteFinePayment(ctx, id)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -92,6 +98,7 @@ func (h *finePaymentHandlerImpl) DeleteFinePayment(w http.ResponseWriter, r *htt
 func (h *finePaymentHandlerImpl) UpdateFinePayment(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
 	}
@@ -99,12 +106,14 @@ func (h *finePaymentHandlerImpl) UpdateFinePayment(w http.ResponseWriter, r *htt
 	var input dto.FinePaymentDTO
 	err = h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
 	}
 
 	validator := h.App.Validator().ValidateStruct(&input)
 	if !validator.Valid() {
+		h.App.ErrorLog.Print(validator.Errors)
 		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
 		return
 	}
@@ -114,6 +123,7 @@ func (h *finePaymentHandlerImpl) UpdateFinePayment(w http.ResponseWriter, r *htt
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
 	}
@@ -123,6 +133,7 @@ func (h *finePaymentHandlerImpl) UpdateFinePayment(w http.ResponseWriter, r *htt
 
 	res, err := h.service.UpdateFinePayment(ctx, id, input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -136,6 +147,7 @@ func (h *finePaymentHandlerImpl) GetFinePaymentById(w http.ResponseWriter, r *ht
 
 	res, err := h.service.GetFinePayment(id)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -151,12 +163,14 @@ func (h *finePaymentHandlerImpl) GetFinePaymentList(w http.ResponseWriter, r *ht
 
 	validator := h.App.Validator().ValidateStruct(&filter)
 	if !validator.Valid() {
+		h.App.ErrorLog.Print(validator.Errors)
 		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
 		return
 	}
 
 	res, total, err := h.service.GetFinePaymentList(filter)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}

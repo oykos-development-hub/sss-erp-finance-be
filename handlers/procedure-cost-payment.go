@@ -32,12 +32,14 @@ func (h *procedurecostPaymentHandlerImpl) CreateProcedureCostPayment(w http.Resp
 	var input dto.ProcedureCostPaymentDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
 	}
 
 	validator := h.App.Validator().ValidateStruct(&input)
 	if !validator.Valid() {
+		h.App.ErrorLog.Print(validator.Errors)
 		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
 		return
 	}
@@ -47,6 +49,7 @@ func (h *procedurecostPaymentHandlerImpl) CreateProcedureCostPayment(w http.Resp
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
 	}
@@ -56,6 +59,7 @@ func (h *procedurecostPaymentHandlerImpl) CreateProcedureCostPayment(w http.Resp
 
 	res, err := h.service.CreateProcedureCostPayment(ctx, input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -72,6 +76,7 @@ func (h *procedurecostPaymentHandlerImpl) DeleteProcedureCostPayment(w http.Resp
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
 	}
@@ -81,6 +86,7 @@ func (h *procedurecostPaymentHandlerImpl) DeleteProcedureCostPayment(w http.Resp
 
 	err = h.service.DeleteProcedureCostPayment(ctx, id)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -92,6 +98,7 @@ func (h *procedurecostPaymentHandlerImpl) DeleteProcedureCostPayment(w http.Resp
 func (h *procedurecostPaymentHandlerImpl) UpdateProcedureCostPayment(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
 	}
@@ -99,12 +106,14 @@ func (h *procedurecostPaymentHandlerImpl) UpdateProcedureCostPayment(w http.Resp
 	var input dto.ProcedureCostPaymentDTO
 	err = h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
 	}
 
 	validator := h.App.Validator().ValidateStruct(&input)
 	if !validator.Valid() {
+		h.App.ErrorLog.Print(validator.Errors)
 		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
 		return
 	}
@@ -114,6 +123,7 @@ func (h *procedurecostPaymentHandlerImpl) UpdateProcedureCostPayment(w http.Resp
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
 	}
@@ -123,6 +133,7 @@ func (h *procedurecostPaymentHandlerImpl) UpdateProcedureCostPayment(w http.Resp
 
 	res, err := h.service.UpdateProcedureCostPayment(ctx, id, input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -136,6 +147,7 @@ func (h *procedurecostPaymentHandlerImpl) GetProcedureCostPaymentById(w http.Res
 
 	res, err := h.service.GetProcedureCostPayment(id)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -151,12 +163,14 @@ func (h *procedurecostPaymentHandlerImpl) GetProcedureCostPaymentList(w http.Res
 
 	validator := h.App.Validator().ValidateStruct(&filter)
 	if !validator.Valid() {
+		h.App.ErrorLog.Print(validator.Errors)
 		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
 		return
 	}
 
 	res, total, err := h.service.GetProcedureCostPaymentList(filter)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}

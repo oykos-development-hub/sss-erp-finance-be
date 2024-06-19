@@ -5,7 +5,7 @@ import (
 
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
-	"gitlab.sudovi.me/erp/finance-api/errors"
+	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 
 	"github.com/oykos-development-hub/celeritas"
 	up "github.com/upper/db/v4"
@@ -31,19 +31,19 @@ func (h *FixedDepositWillDispatchServiceImpl) CreateFixedDepositWillDispatch(ctx
 		var err error
 		id, err = h.repo.Insert(ctx, tx, *dataToInsert)
 		if err != nil {
-			return errors.ErrInternalServer
+			return newErrors.Wrap(err, "repo fixed deposit will dispatch insert")
 		}
 
 		return nil
 	})
 
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "upper tx")
 	}
 
 	dataToInsert, err = h.repo.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo fixed deposit will dispatch get")
 	}
 
 	res := dto.ToFixedDepositWillDispatchResponseDTO(*dataToInsert)
@@ -58,17 +58,17 @@ func (h *FixedDepositWillDispatchServiceImpl) UpdateFixedDepositWillDispatch(ctx
 	err := data.Upper.Tx(func(tx up.Session) error {
 		err := h.repo.Update(ctx, tx, *dataToInsert)
 		if err != nil {
-			return errors.ErrInternalServer
+			return newErrors.Wrap(err, "repo fixed deposit will dispatch update")
 		}
 		return nil
 	})
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "upper tx")
 	}
 
 	dataToInsert, err = h.repo.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo fixed deposit will dispatch get")
 	}
 
 	response := dto.ToFixedDepositWillDispatchResponseDTO(*dataToInsert)
@@ -79,8 +79,7 @@ func (h *FixedDepositWillDispatchServiceImpl) UpdateFixedDepositWillDispatch(ctx
 func (h *FixedDepositWillDispatchServiceImpl) DeleteFixedDepositWillDispatch(ctx context.Context, id int) error {
 	err := h.repo.Delete(ctx, id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return errors.ErrInternalServer
+		return newErrors.Wrap(err, "repo fixed deposit will dispatch delete")
 	}
 
 	return nil
@@ -89,9 +88,9 @@ func (h *FixedDepositWillDispatchServiceImpl) DeleteFixedDepositWillDispatch(ctx
 func (h *FixedDepositWillDispatchServiceImpl) GetFixedDepositWillDispatch(id int) (*dto.FixedDepositWillDispatchResponseDTO, error) {
 	data, err := h.repo.Get(id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrNotFound
+		return nil, newErrors.Wrap(err, "repo fixed deposit will dispatch get")
 	}
+
 	response := dto.ToFixedDepositWillDispatchResponseDTO(*data)
 
 	return &response, nil
@@ -117,8 +116,7 @@ func (h *FixedDepositWillDispatchServiceImpl) GetFixedDepositWillDispatchList(fi
 
 	data, total, err := h.repo.GetAll(filter.Page, filter.Size, conditionAndExp, orders)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, nil, errors.ErrInternalServer
+		return nil, nil, newErrors.Wrap(err, "repo fixed deposit will dispatch get all")
 	}
 	response := dto.ToFixedDepositWillDispatchListResponseDTO(data)
 

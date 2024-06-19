@@ -7,6 +7,7 @@ import (
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
 	"gitlab.sudovi.me/erp/finance-api/errors"
+	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 
 	"github.com/oykos-development-hub/celeritas"
 	"github.com/shopspring/decimal"
@@ -37,7 +38,7 @@ func (h *InternalReallocationServiceImpl) CreateInternalReallocation(ctx context
 		var err error
 		id, err = h.repo.Insert(ctx, tx, *dataToInsert)
 		if err != nil {
-			return errors.ErrInternalServer
+			return newErrors.Wrap(err, "repo internal reallocation insert")
 		}
 
 		for _, item := range input.Items {
@@ -47,7 +48,7 @@ func (h *InternalReallocationServiceImpl) CreateInternalReallocation(ctx context
 			_, err = h.itemsRepo.Insert(tx, *itemToInsert)
 
 			if err != nil {
-				return errors.ErrInternalServer
+				return newErrors.Wrap(err, "repo internal reallocation item insert")
 			}
 
 			if item.SourceAccountID != 0 {
@@ -59,7 +60,7 @@ func (h *InternalReallocationServiceImpl) CreateInternalReallocation(ctx context
 				))
 
 				if err != nil {
-					return errors.ErrInternalServer
+					return newErrors.Wrap(err, "repo current budget get by")
 				}
 
 				value := currentBudget.Actual.Sub(itemToInsert.Amount)
@@ -67,7 +68,7 @@ func (h *InternalReallocationServiceImpl) CreateInternalReallocation(ctx context
 				err = h.currentBudgetRepo.UpdateActual(ctx, currentBudget.ID, value)
 
 				if err != nil {
-					return errors.ErrInternalServer
+					return newErrors.Wrap(err, "repo current budget update actual")
 				}
 
 			}
@@ -80,7 +81,7 @@ func (h *InternalReallocationServiceImpl) CreateInternalReallocation(ctx context
 				))
 
 				if err != nil {
-					return errors.ErrInternalServer
+					return newErrors.Wrap(err, "repo current budget get by")
 				}
 
 				value := currentBudget.Actual.Add(itemToInsert.Amount)
@@ -88,7 +89,7 @@ func (h *InternalReallocationServiceImpl) CreateInternalReallocation(ctx context
 				err = h.currentBudgetRepo.UpdateActual(ctx, currentBudget.ID, value)
 
 				if err != nil {
-					return errors.ErrInternalServer
+					return newErrors.Wrap(err, "repo current budget update actual")
 				}
 			}
 		}
@@ -97,12 +98,12 @@ func (h *InternalReallocationServiceImpl) CreateInternalReallocation(ctx context
 	})
 
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "upper tx")
 	}
 
 	dataToInsert, err = h.repo.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo internal reallocation get")
 	}
 
 	res := dto.ToInternalReallocationResponseDTO(*dataToInsert)
@@ -114,8 +115,7 @@ func (h *InternalReallocationServiceImpl) DeleteInternalReallocation(ctx context
 	reallocation, err := h.GetInternalReallocation(id)
 
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return errors.ErrInternalServer
+		return newErrors.Wrap(err, "repo internal reallocation get")
 	}
 
 	for _, item := range reallocation.Items {
@@ -128,21 +128,20 @@ func (h *InternalReallocationServiceImpl) DeleteInternalReallocation(ctx context
 			))
 
 			if err != nil {
-				return errors.ErrInternalServer
+				return newErrors.Wrap(err, "repo current budget get by")
 			}
 
 			value := currentBudget.Actual.Sub(item.Amount)
 
 			if value.Cmp(decimal.NewFromFloat(0)) < 0 {
-				return errors.ErrInvalidInput
+				return newErrors.Wrap(errors.ErrInsufficientFunds, "update actual")
 			}
 		}
 	}
 
 	err = h.repo.Delete(ctx, id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return errors.ErrInternalServer
+		return newErrors.Wrap(err, "repo internal reallocation delete")
 	}
 
 	for _, item := range reallocation.Items {
@@ -155,7 +154,7 @@ func (h *InternalReallocationServiceImpl) DeleteInternalReallocation(ctx context
 			))
 
 			if err != nil {
-				return errors.ErrInternalServer
+				return newErrors.Wrap(err, "repo current budget get by")
 			}
 
 			value := currentBudget.Actual.Add(item.Amount)
@@ -163,7 +162,7 @@ func (h *InternalReallocationServiceImpl) DeleteInternalReallocation(ctx context
 			err = h.currentBudgetRepo.UpdateActual(ctx, currentBudget.ID, value)
 
 			if err != nil {
-				return errors.ErrInternalServer
+				return newErrors.Wrap(err, "repo current budget update actual")
 			}
 
 		}
@@ -176,7 +175,7 @@ func (h *InternalReallocationServiceImpl) DeleteInternalReallocation(ctx context
 			))
 
 			if err != nil {
-				return errors.ErrInternalServer
+				return newErrors.Wrap(err, "repo current budget get by")
 			}
 
 			value := currentBudget.Actual.Sub(item.Amount)
@@ -184,7 +183,7 @@ func (h *InternalReallocationServiceImpl) DeleteInternalReallocation(ctx context
 			err = h.currentBudgetRepo.UpdateActual(ctx, currentBudget.ID, value)
 
 			if err != nil {
-				return errors.ErrInternalServer
+				return newErrors.Wrap(err, "repo current budget update actual")
 			}
 		}
 	}
@@ -195,8 +194,7 @@ func (h *InternalReallocationServiceImpl) DeleteInternalReallocation(ctx context
 func (h *InternalReallocationServiceImpl) GetInternalReallocation(id int) (*dto.InternalReallocationResponseDTO, error) {
 	data, err := h.repo.Get(id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrNotFound
+		return nil, newErrors.Wrap(err, "repo internal reallocation get")
 	}
 
 	condition := up.And(
@@ -206,8 +204,7 @@ func (h *InternalReallocationServiceImpl) GetInternalReallocation(id int) (*dto.
 	items, _, err := h.itemsRepo.GetAll(nil, nil, condition, nil)
 
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo internal reallocation item get")
 	}
 
 	response := dto.ToInternalReallocationResponseDTO(*data)
@@ -256,8 +253,7 @@ func (h *InternalReallocationServiceImpl) GetInternalReallocationList(filter dto
 
 	data, total, err := h.repo.GetAll(filter.Page, filter.Size, conditionAndExp, orders)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, nil, errors.ErrInternalServer
+		return nil, nil, newErrors.Wrap(err, "repo internal reallocation get all")
 	}
 	response := dto.ToInternalReallocationListResponseDTO(data)
 
@@ -269,8 +265,7 @@ func (h *InternalReallocationServiceImpl) GetInternalReallocationList(filter dto
 		items, _, err := h.itemsRepo.GetAll(nil, nil, condition, nil)
 
 		if err != nil {
-			h.App.ErrorLog.Println(err)
-			return nil, nil, errors.ErrInternalServer
+			return nil, nil, newErrors.Wrap(err, "repo internal reallocation item get all")
 		}
 
 		responseItems := dto.ToInternalReallocationItemListResponseDTO(items)

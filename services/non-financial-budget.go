@@ -5,7 +5,7 @@ import (
 
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
-	"gitlab.sudovi.me/erp/finance-api/errors"
+	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 
 	"github.com/oykos-development-hub/celeritas"
 	up "github.com/upper/db/v4"
@@ -28,14 +28,12 @@ func (h *NonFinancialBudgetServiceImpl) CreateNonFinancialBudget(ctx context.Con
 
 	id, err := h.repo.Insert(ctx, *data)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo non financial budget insert")
 	}
 
 	data, err = data.Get(id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo non financial budget get")
 	}
 
 	res := dto.ToNonFinancialBudgetResponseDTO(*data)
@@ -49,14 +47,12 @@ func (h *NonFinancialBudgetServiceImpl) UpdateNonFinancialBudget(ctx context.Con
 
 	err := h.repo.Update(ctx, *data)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo non financial budget update")
 	}
 
 	data, err = h.repo.Get(id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo non financial budget get")
 	}
 
 	response := dto.ToNonFinancialBudgetResponseDTO(*data)
@@ -67,8 +63,7 @@ func (h *NonFinancialBudgetServiceImpl) UpdateNonFinancialBudget(ctx context.Con
 func (h *NonFinancialBudgetServiceImpl) DeleteNonFinancialBudget(ctx context.Context, id int) error {
 	err := h.repo.Delete(ctx, id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return errors.ErrInternalServer
+		return newErrors.Wrap(err, "repo non financial budget delete")
 	}
 
 	return nil
@@ -77,9 +72,9 @@ func (h *NonFinancialBudgetServiceImpl) DeleteNonFinancialBudget(ctx context.Con
 func (h *NonFinancialBudgetServiceImpl) GetNonFinancialBudget(id int) (*dto.NonFinancialBudgetResponseDTO, error) {
 	data, err := h.repo.Get(id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrNotFound
+		return nil, newErrors.Wrap(err, "repo non financial budget get")
 	}
+
 	response := dto.ToNonFinancialBudgetResponseDTO(*data)
 
 	return &response, nil
@@ -105,8 +100,7 @@ func (h *NonFinancialBudgetServiceImpl) GetNonFinancialBudgetList(filter dto.Non
 
 	data, total, err := h.repo.GetAll(filter.Page, filter.Size, conditionAndExp, orders)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, nil, errors.ErrInternalServer
+		return nil, nil, newErrors.Wrap(err, "repo non financial budget get all")
 	}
 	response := dto.ToNonFinancialBudgetListResponseDTO(data)
 

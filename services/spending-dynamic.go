@@ -6,6 +6,7 @@ import (
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
 	"gitlab.sudovi.me/erp/finance-api/pkg/errors"
+	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 
 	"github.com/shopspring/decimal"
 	up "github.com/upper/db/v4"
@@ -35,7 +36,7 @@ func NewSpendingDynamicServiceImpl(
 func (h *SpendingDynamicServiceImpl) CreateSpendingDynamic(ctx context.Context, budgetID, unitID int, inputDataDTO []dto.SpendingDynamicDTO) error {
 	latestVersion, err := h.repoEntries.FindLatestVersion()
 	if err != nil {
-		return errors.Wrap(err, "repo entries find latest version")
+		return newErrors.Wrap(err, "repo entries find latest version")
 	}
 
 	for _, inputDTO := range inputDataDTO {
@@ -45,14 +46,14 @@ func (h *SpendingDynamicServiceImpl) CreateSpendingDynamic(ctx context.Context, 
 			up.Cond{"account_id": inputDTO.AccountID},
 		))
 		if err != nil {
-			return errors.Wrap(err, "repo current budget get by")
+			return newErrors.Wrap(err, "repo current budget get by")
 		}
 
 		entriesInputData := inputDTO.ToSpendingDynamicEntry()
 
 		oldDynamic, err := h.GetSpendingDynamic(&currentBudget.ID, nil, nil, nil)
 		if err != nil {
-			return errors.Wrap(err, "get spending dynamic")
+			return newErrors.Wrap(err, "get spending dynamic")
 		}
 		if len(oldDynamic) > 0 {
 			if entriesInputData.SumOfMonths().GreaterThan(currentBudget.Actual.Add(oldDynamic[0].TotalSavings)) {
@@ -69,7 +70,7 @@ func (h *SpendingDynamicServiceImpl) CreateSpendingDynamic(ctx context.Context, 
 
 		_, err = h.repoEntries.Insert(ctx, *entriesInputData)
 		if err != nil {
-			return errors.Wrap(err, "repo entries insert")
+			return newErrors.Wrap(err, "repo entries insert")
 		}
 	}
 
@@ -81,7 +82,7 @@ func (h *SpendingDynamicServiceImpl) CreateInititalSpendingDynamicFromCurrentBud
 
 	_, err := h.repoEntries.Insert(ctx, *spendingDynamicEntry)
 	if err != nil {
-		return errors.Wrap(err, "repo entries insert")
+		return newErrors.Wrap(err, "repo entries insert")
 	}
 
 	return err
@@ -117,7 +118,7 @@ func (h *SpendingDynamicServiceImpl) generateInitialSpendingDynamicEntry(current
 func (h *SpendingDynamicServiceImpl) GetSpendingDynamicHistory(budgetID, unitID int) ([]dto.SpendingDynamicHistoryResponseDTO, error) {
 	history, err := h.repoEntries.FindHistoryChanges(budgetID, unitID)
 	if err != nil {
-		return nil, errors.Wrap(err, "repo entries find history changes")
+		return nil, newErrors.Wrap(err, "repo entries find history changes")
 	}
 
 	res := make([]dto.SpendingDynamicHistoryResponseDTO, len(history))
@@ -138,7 +139,7 @@ func (h *SpendingDynamicServiceImpl) GetSpendingDynamicHistory(budgetID, unitID 
 func (h *SpendingDynamicServiceImpl) GetSpendingDynamic(currentBudgetID, budgetID, unitID *int, version *int) ([]dto.SpendingDynamicWithEntryResponseDTO, error) {
 	entries, err := h.repoEntries.FindAll(currentBudgetID, version, budgetID, unitID)
 	if err != nil {
-		return nil, errors.Wrap(err, "repo entries find all")
+		return nil, newErrors.Wrap(err, "repo entries find all")
 	}
 
 	entriesListRes := make([]dto.SpendingDynamicWithEntryResponseDTO, 0)
@@ -149,7 +150,7 @@ func (h *SpendingDynamicServiceImpl) GetSpendingDynamic(currentBudgetID, budgetI
 		}
 		releases, err := h.repoRelease.GetAll(filter)
 		if err != nil {
-			return nil, errors.Wrap(err, "repo release get all")
+			return nil, newErrors.Wrap(err, "repo release get all")
 		}
 		entryRes := dto.SpendingDynamicWithEntryResponseDTO{
 			ID:              entry.ID,
@@ -217,7 +218,7 @@ func (h *SpendingDynamicServiceImpl) GetActual(budgetID, unitID, accountID int) 
 		up.Cond{"account_id": accountID},
 	))
 	if err != nil {
-		return decimal.Zero, errors.Wrap(err, "repo current budget get by")
+		return decimal.Zero, newErrors.Wrap(err, "repo current budget get by")
 	}
 
 	return currentBudget.Actual, nil

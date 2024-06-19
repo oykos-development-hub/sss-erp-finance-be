@@ -7,6 +7,7 @@ import (
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
 	"gitlab.sudovi.me/erp/finance-api/pkg/errors"
+	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 
 	"github.com/oykos-development-hub/celeritas"
 	"github.com/shopspring/decimal"
@@ -39,7 +40,7 @@ func (h *SpendingReleaseServiceImpl) CreateSpendingRelease(ctx context.Context, 
 			up.Cond{"account_id": inputDTO.AccountID},
 		))
 		if err != nil {
-			return nil, errors.Wrap(err, "repo current budget get by")
+			return nil, newErrors.Wrap(err, "repo current budget get by")
 		}
 
 		_, err = h.repo.GetBy(*up.And(up.Cond{"current_budget_id": currentBudget.ID}, up.Cond{"month": currentMonth}))
@@ -49,7 +50,7 @@ func (h *SpendingReleaseServiceImpl) CreateSpendingRelease(ctx context.Context, 
 
 		budget, err := h.repoBudget.Get(currentBudget.BudgetID)
 		if err != nil {
-			return nil, errors.Wrap(err, "repo budget get")
+			return nil, newErrors.Wrap(err, "repo budget get")
 		}
 
 		inputData := data.SpendingRelease{
@@ -69,17 +70,17 @@ func (h *SpendingReleaseServiceImpl) CreateSpendingRelease(ctx context.Context, 
 
 		id, err := h.repo.Insert(ctx, inputData)
 		if err != nil {
-			return nil, errors.Wrap(err, "repo release insert")
+			return nil, newErrors.Wrap(err, "repo release insert")
 		}
 
 		item, err := h.repo.Get(id)
 		if err != nil {
-			return nil, errors.Wrap(err, "repo release get")
+			return nil, newErrors.Wrap(err, "repo release get")
 		}
 
 		err = h.repoCurrentBudget.UpdateBalance(currentBudget.ID, currentBudget.Balance.Add(item.Value))
 		if err != nil {
-			return nil, errors.Wrap(err, "repo current budget update balance")
+			return nil, newErrors.Wrap(err, "repo current budget update balance")
 		}
 
 		resItem := dto.ToSpendingReleaseResponseDTO(item)
@@ -97,23 +98,23 @@ func (h *SpendingReleaseServiceImpl) DeleteSpendingRelease(ctx context.Context, 
 		Month:    &input.Month,
 	})
 	if err != nil {
-		return errors.Wrap(err, "repo get all")
+		return newErrors.Wrap(err, "repo get all")
 	}
 
 	for _, release := range releases {
 		err = h.repo.Delete(ctx, release.ID)
 		if err != nil {
-			return errors.Wrap(err, "repo delete")
+			return newErrors.Wrap(err, "repo delete")
 		}
 
 		currentBudget, err := h.repoCurrentBudget.Get(release.CurrentBudgetID)
 		if err != nil {
-			return errors.Wrap(err, "repo current budget get")
+			return newErrors.Wrap(err, "repo current budget get")
 		}
 
 		err = h.repoCurrentBudget.UpdateBalance(currentBudget.ID, currentBudget.Balance.Sub(release.Value))
 		if err != nil {
-			return errors.Wrap(err, "repo current budget update balance")
+			return newErrors.Wrap(err, "repo current budget update balance")
 		}
 	}
 
@@ -123,7 +124,7 @@ func (h *SpendingReleaseServiceImpl) DeleteSpendingRelease(ctx context.Context, 
 func (h *SpendingReleaseServiceImpl) GetSpendingRelease(id int) (*dto.SpendingReleaseResponseDTO, error) {
 	data, err := h.repo.Get(id)
 	if err != nil {
-		return nil, errors.Wrap(err, "repo release get")
+		return nil, newErrors.Wrap(err, "repo release get")
 	}
 	response := dto.ToSpendingReleaseResponseDTO(data)
 
@@ -133,7 +134,7 @@ func (h *SpendingReleaseServiceImpl) GetSpendingRelease(id int) (*dto.SpendingRe
 func (h *SpendingReleaseServiceImpl) GetSpendingReleaseList(filter data.SpendingReleaseFilterDTO) ([]dto.SpendingReleaseResponseDTO, error) {
 	data, err := h.repo.GetAll(filter)
 	if err != nil {
-		return nil, errors.Wrap(err, "repo release get all")
+		return nil, newErrors.Wrap(err, "repo release get all")
 	}
 	response := dto.ToSpendingReleaseListResponseDTO(data)
 
@@ -144,7 +145,7 @@ func (h *SpendingReleaseServiceImpl) GetSpendingReleaseList(filter data.Spending
 func (h *SpendingReleaseServiceImpl) GetSpendingReleaseOverview(filter dto.SpendingReleaseOverviewFilterDTO) ([]dto.SpendingReleaseOverview, error) {
 	data, err := h.repo.GetAllSum(filter.Month, filter.Year, filter.BudgetID, filter.UnitID)
 	if err != nil {
-		return nil, errors.Wrap(err, "repo release get all sum")
+		return nil, newErrors.Wrap(err, "repo release get all sum")
 	}
 
 	response := dto.ToSpendingReleaseOverviewDTO(data)

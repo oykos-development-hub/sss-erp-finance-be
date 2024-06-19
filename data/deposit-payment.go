@@ -7,7 +7,7 @@ import (
 
 	up "github.com/upper/db/v4"
 	"gitlab.sudovi.me/erp/finance-api/contextutil"
-	"gitlab.sudovi.me/erp/finance-api/pkg/errors"
+	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 )
 
 // DepositPayment struct
@@ -54,7 +54,7 @@ func (t *DepositPayment) GetAll(page *int, size *int, condition *up.AndExpr, ord
 	}
 	total, err := res.Count()
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, newErrors.Wrap(err, "upper count")
 	}
 
 	if page != nil && size != nil {
@@ -63,7 +63,7 @@ func (t *DepositPayment) GetAll(page *int, size *int, condition *up.AndExpr, ord
 
 	err = res.OrderBy(orders...).All(&all)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, newErrors.Wrap(err, "upper all")
 	}
 
 	return all, &total, err
@@ -77,7 +77,7 @@ func (t *DepositPayment) Get(id int) (*DepositPayment, error) {
 	res := collection.Find(up.Cond{"id": id})
 	err := res.One(&one)
 	if err != nil {
-		return nil, err
+		return nil, newErrors.Wrap(err, "upper one")
 	}
 	return &one, nil
 }
@@ -87,18 +87,19 @@ func (t *DepositPayment) Update(ctx context.Context, tx up.Session, m DepositPay
 	m.UpdatedAt = time.Now()
 	userID, ok := contextutil.GetUserIDFromContext(ctx)
 	if !ok {
-		return errors.New("user ID not found in context")
+		err := newErrors.New("user ID not found in context")
+		return newErrors.Wrap(err, "contextuitl get user id from context")
 	}
 
 	query := fmt.Sprintf("SET myapp.user_id = %d", userID)
 	if _, err := tx.SQL().Exec(query); err != nil {
-		return err
+		return newErrors.Wrap(err, "upper exec")
 	}
 
 	collection := tx.Collection(t.Table())
 	res := collection.Find(m.ID)
 	if err := res.Update(&m); err != nil {
-		return err
+		return newErrors.Wrap(err, "upper update")
 	}
 
 	return nil
@@ -108,26 +109,27 @@ func (t *DepositPayment) Update(ctx context.Context, tx up.Session, m DepositPay
 func (t *DepositPayment) Delete(ctx context.Context, id int) error {
 	userID, ok := contextutil.GetUserIDFromContext(ctx)
 	if !ok {
-		return errors.New("user ID not found in context")
+		err := newErrors.New("user ID not found in context")
+		return newErrors.Wrap(err, "contextuitl get user id from context")
 	}
 
 	err := Upper.Tx(func(sess up.Session) error {
 		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
 		if _, err := sess.SQL().Exec(query); err != nil {
-			return err
+			return newErrors.Wrap(err, "upper exec")
 		}
 
 		collection := sess.Collection(t.Table())
 		res := collection.Find(id)
 		if err := res.Delete(); err != nil {
-			return err
+			return newErrors.Wrap(err, "upper delete")
 		}
 
 		return nil
 	})
 
 	if err != nil {
-		return err
+		return newErrors.Wrap(err, "upper tx")
 	}
 	return nil
 }
@@ -138,14 +140,15 @@ func (t *DepositPayment) Insert(ctx context.Context, tx up.Session, m DepositPay
 	m.UpdatedAt = time.Now()
 	userID, ok := contextutil.GetUserIDFromContext(ctx)
 	if !ok {
-		return 0, errors.New("user ID not found in context")
+		err := newErrors.New("user ID not found in context")
+		return 0, newErrors.Wrap(err, "contextuitl get user id from context")
 	}
 
 	var id int
 
 	query := fmt.Sprintf("SET myapp.user_id = %d", userID)
 	if _, err := tx.SQL().Exec(query); err != nil {
-		return 0, err
+		return 0, newErrors.Wrap(err, "upper exec")
 	}
 
 	collection := tx.Collection(t.Table())
@@ -154,7 +157,7 @@ func (t *DepositPayment) Insert(ctx context.Context, tx up.Session, m DepositPay
 	var err error
 
 	if res, err = collection.Insert(m); err != nil {
-		return 0, err
+		return 0, newErrors.Wrap(err, "upper insert")
 	}
 
 	id = getInsertId(res.ID())
@@ -172,7 +175,7 @@ func (t *DepositPayment) GetDepositPaymentByCaseNumber(caseNumber string, source
 
 	rows1, err := Upper.SQL().Query(query1, caseNumber, sourceBankAccount)
 	if err != nil {
-		return response, err
+		return response, newErrors.Wrap(err, "upper exec")
 	}
 	defer rows1.Close()
 
@@ -181,13 +184,13 @@ func (t *DepositPayment) GetDepositPaymentByCaseNumber(caseNumber string, source
 		err = rows1.Scan(&amountPayments)
 
 		if err != nil {
-			return response, err
+			return response, newErrors.Wrap(err, "upper scan")
 		}
 	}
 
 	rows2, err := Upper.SQL().Query(query2, caseNumber, sourceBankAccount)
 	if err != nil {
-		return response, err
+		return response, newErrors.Wrap(err, "upper exec")
 	}
 	defer rows2.Close()
 
@@ -196,7 +199,7 @@ func (t *DepositPayment) GetDepositPaymentByCaseNumber(caseNumber string, source
 		err = rows2.Scan(&amountSpending)
 
 		if err != nil {
-			return response, err
+			return response, newErrors.Wrap(err, "upper scan")
 		}
 	}
 
@@ -218,7 +221,7 @@ func (t *DepositPayment) GetCaseNumber(orgUnitID int, sourceBankAccount string) 
 
 	rows1, err := Upper.SQL().Query(query1, orgUnitID, sourceBankAccount)
 	if err != nil {
-		return response, err
+		return response, newErrors.Wrap(err, "upper exec")
 	}
 	defer rows1.Close()
 
@@ -233,12 +236,12 @@ func (t *DepositPayment) GetCaseNumber(orgUnitID int, sourceBankAccount string) 
 		item.Amount = amount
 
 		if err != nil {
-			return response, err
+			return response, newErrors.Wrap(err, "upper scan")
 		}
 
 		rows2, err := Upper.SQL().Query(query2, &item.CaseNumber, sourceBankAccount)
 		if err != nil {
-			return response, err
+			return response, newErrors.Wrap(err, "upper exec")
 		}
 		defer rows2.Close()
 
@@ -247,7 +250,7 @@ func (t *DepositPayment) GetCaseNumber(orgUnitID int, sourceBankAccount string) 
 			err = rows2.Scan(&amountSpending)
 
 			if err != nil {
-				return response, err
+				return response, newErrors.Wrap(err, "upper scan")
 			}
 		}
 
@@ -270,14 +273,14 @@ func (t *DepositPayment) GetInitialState(filter DepositInitialStateFilter) ([]*D
 		item, err := getAmountByBankAccount(*filter.BankAccount, filter.Date)
 
 		if err != nil {
-			return nil, err
+			return nil, newErrors.Wrap(err, "get amount by bank account")
 		}
 
 		response = append(response, item)
 	} else if filter.TransitionalBankAccount != nil && filter.OrganizationUnitID != nil {
 		item, err := getAmountOnTransitionalBankAccount(*filter.OrganizationUnitID, filter.Date)
 		if err != nil {
-			return nil, err
+			return nil, newErrors.Wrap(err, "get amount on transitional bank account")
 		}
 
 		response = append(response, item)
@@ -301,7 +304,7 @@ func getAmountByBankAccount(bankAccount string, date time.Time) (*DepositPayment
 
 	rows1, err := Upper.SQL().Query(query1, bankAccount, formattedDate)
 	if err != nil {
-		return nil, err
+		return nil, newErrors.Wrap(err, "upper exec")
 	}
 	defer rows1.Close()
 
@@ -312,7 +315,7 @@ func getAmountByBankAccount(bankAccount string, date time.Time) (*DepositPayment
 		err = rows1.Scan(&amount)
 
 		if err != nil {
-			return nil, err
+			return nil, newErrors.Wrap(err, "upper scan")
 		}
 
 		if amount != nil {
@@ -321,7 +324,7 @@ func getAmountByBankAccount(bankAccount string, date time.Time) (*DepositPayment
 
 		rows2, err := Upper.SQL().Query(query2, bankAccount, formattedDate)
 		if err != nil {
-			return nil, err
+			return nil, newErrors.Wrap(err, "upper exec")
 		}
 		defer rows2.Close()
 
@@ -330,7 +333,7 @@ func getAmountByBankAccount(bankAccount string, date time.Time) (*DepositPayment
 			err = rows2.Scan(&amountSpending)
 
 			if err != nil {
-				return nil, err
+				return nil, newErrors.Wrap(err, "upper scan")
 			}
 		}
 
@@ -340,7 +343,7 @@ func getAmountByBankAccount(bankAccount string, date time.Time) (*DepositPayment
 
 		rows3, err := Upper.SQL().Query(query3, bankAccount, formattedDate)
 		if err != nil {
-			return nil, err
+			return nil, newErrors.Wrap(err, "upper exec")
 		}
 		defer rows3.Close()
 
@@ -348,7 +351,7 @@ func getAmountByBankAccount(bankAccount string, date time.Time) (*DepositPayment
 			err = rows3.Scan(&amountSpending)
 
 			if err != nil {
-				return nil, err
+				return nil, newErrors.Wrap(err, "upper scan")
 			}
 		}
 
@@ -370,7 +373,7 @@ func getAmountOnTransitionalBankAccount(orgUnit int, date time.Time) (*DepositPa
 
 	rows1, err := Upper.SQL().Query(query1, orgUnit, formattedDate)
 	if err != nil {
-		return nil, err
+		return nil, newErrors.Wrap(err, "upper exec")
 	}
 	defer rows1.Close()
 
@@ -380,7 +383,7 @@ func getAmountOnTransitionalBankAccount(orgUnit int, date time.Time) (*DepositPa
 		err = rows1.Scan(&amount)
 
 		if err != nil {
-			return nil, err
+			return nil, newErrors.Wrap(err, "upper scan")
 		}
 
 		if amount != nil {

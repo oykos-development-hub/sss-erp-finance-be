@@ -3,7 +3,7 @@ package services
 import (
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
-	"gitlab.sudovi.me/erp/finance-api/errors"
+	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 
 	"github.com/oykos-development-hub/celeritas"
 	up "github.com/upper/db/v4"
@@ -29,19 +29,19 @@ func (h *InternalReallocationItemServiceImpl) CreateInternalReallocationItem(inp
 		var err error
 		id, err = h.repo.Insert(tx, *dataToInsert)
 		if err != nil {
-			return errors.ErrInternalServer
+			return newErrors.Wrap(err, "repo internal reallocation item insert")
 		}
 
 		return nil
 	})
 
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "upper tx")
 	}
 
 	dataToInsert, err = h.repo.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo internal reallocation item get")
 	}
 
 	res := dto.ToInternalReallocationItemResponseDTO(*dataToInsert)
@@ -52,8 +52,7 @@ func (h *InternalReallocationItemServiceImpl) CreateInternalReallocationItem(inp
 func (h *InternalReallocationItemServiceImpl) DeleteInternalReallocationItem(id int) error {
 	err := h.repo.Delete(id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return errors.ErrInternalServer
+		return newErrors.Wrap(err, "repo internal reallocation item delete")
 	}
 
 	return nil
@@ -62,9 +61,9 @@ func (h *InternalReallocationItemServiceImpl) DeleteInternalReallocationItem(id 
 func (h *InternalReallocationItemServiceImpl) GetInternalReallocationItem(id int) (*dto.InternalReallocationItemResponseDTO, error) {
 	data, err := h.repo.Get(id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrNotFound
+		return nil, newErrors.Wrap(err, "repo internal reallocation item get")
 	}
+
 	response := dto.ToInternalReallocationItemResponseDTO(*data)
 
 	return &response, nil
@@ -91,8 +90,7 @@ func (h *InternalReallocationItemServiceImpl) GetInternalReallocationItemList(fi
 
 	data, total, err := h.repo.GetAll(filter.Page, filter.Size, conditionAndExp, orders)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, nil, errors.ErrInternalServer
+		return nil, nil, newErrors.Wrap(err, "repo internal reallocation item get all")
 	}
 	response := dto.ToInternalReallocationItemListResponseDTO(data)
 

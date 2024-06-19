@@ -36,6 +36,7 @@ func (h *spendingreleaseHandlerImpl) CreateSpendingRelease(w http.ResponseWriter
 	var input []dto.SpendingReleaseDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
 	}
@@ -79,6 +80,7 @@ func (h *spendingreleaseHandlerImpl) DeleteSpendingRelease(w http.ResponseWriter
 	var input dto.DeleteSpendingReleaseInput
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
 	}

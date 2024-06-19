@@ -2,15 +2,14 @@ package data
 
 import (
 	"context"
+	goerrors "errors"
 	"fmt"
 	"time"
-
-	goerrors "errors"
 
 	"github.com/shopspring/decimal"
 	up "github.com/upper/db/v4"
 	"gitlab.sudovi.me/erp/finance-api/contextutil"
-	"gitlab.sudovi.me/erp/finance-api/pkg/errors"
+	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 )
 
 // CurrentBudget struct
@@ -47,7 +46,7 @@ func (t *CurrentBudget) GetAll(page *int, size *int, condition *up.AndExpr, orde
 	}
 	total, err := res.Count()
 	if err != nil {
-		return nil, nil, errors.Wrap(err, "upper count")
+		return nil, nil, newErrors.Wrap(err, "upper count")
 	}
 
 	if page != nil && size != nil {
@@ -56,7 +55,7 @@ func (t *CurrentBudget) GetAll(page *int, size *int, condition *up.AndExpr, orde
 
 	err = res.OrderBy(orders...).All(&all)
 	if err != nil {
-		return nil, nil, errors.Wrap(err, "upper all")
+		return nil, nil, newErrors.Wrap(err, "upper all")
 	}
 
 	return all, &total, nil
@@ -72,9 +71,9 @@ func (t *CurrentBudget) GetBy(condition up.AndExpr) (*CurrentBudget, error) {
 	err := res.One(&one)
 	if err != nil {
 		if goerrors.Is(err, up.ErrNoMoreRows) {
-			return nil, errors.WrapNotFoundError(err, "upper one")
+			return nil, newErrors.WrapNotFoundError(err, "upper one")
 		}
-		return nil, errors.Wrap(err, "upper one")
+		return nil, newErrors.Wrap(err, "upper one")
 	}
 
 	return &one, nil
@@ -89,9 +88,9 @@ func (t *CurrentBudget) Get(id int) (*CurrentBudget, error) {
 	err := res.One(&one)
 	if err != nil {
 		if goerrors.Is(err, up.ErrNoMoreRows) {
-			return nil, errors.WrapNotFoundError(err, "upper one")
+			return nil, newErrors.WrapNotFoundError(err, "upper one")
 		}
-		return nil, errors.Wrap(err, "upper one")
+		return nil, newErrors.Wrap(err, "upper one")
 	}
 	return &one, nil
 }
@@ -101,14 +100,15 @@ func (t *CurrentBudget) UpdateActual(ctx context.Context, currentBudgetID int, a
 
 	userID, ok := contextutil.GetUserIDFromContext(ctx)
 	if !ok {
-		return errors.New("user id not found in context")
+		err := newErrors.New("user ID not found in context")
+		return newErrors.Wrap(err, "contextuitl get user id from context")
 	}
 
 	err := Upper.Tx(func(sess up.Session) error {
 		// Set the user_id variable
 		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
 		if _, err := sess.SQL().Exec(query); err != nil {
-			return errors.Wrap(err, "upper exec")
+			return newErrors.Wrap(err, "upper exec")
 		}
 
 		updateQuery := fmt.Sprintf("UPDATE %s SET actual = $1 WHERE id = $2", t.Table())
@@ -119,13 +119,13 @@ func (t *CurrentBudget) UpdateActual(ctx context.Context, currentBudgetID int, a
 		}
 		rowsAffected, _ := res.RowsAffected()
 		if rowsAffected != 1 {
-			return errors.NewNotFoundError("upper no rows affected")
+			return newErrors.NewNotFoundError("upper no rows affected")
 		}
 
 		return nil
 	})
 	if err != nil {
-		return errors.Wrap(err, "upper tx")
+		return newErrors.Wrap(err, "upper tx")
 	}
 
 	return nil
@@ -134,24 +134,25 @@ func (t *CurrentBudget) UpdateActual(ctx context.Context, currentBudgetID int, a
 func (t *CurrentBudget) UpdateBalanceWithTx(ctx context.Context, tx up.Session, currentBudgetID int, balance decimal.Decimal) error {
 	userID, ok := contextutil.GetUserIDFromContext(ctx)
 	if !ok {
-		return errors.New("user id not found in context")
+		err := newErrors.New("user ID not found in context")
+		return newErrors.Wrap(err, "contextuitl get user id from context")
 	}
 
 	query := fmt.Sprintf("SET myapp.user_id = %d", userID)
 	if _, err := tx.SQL().Exec(query); err != nil {
-		return errors.Wrap(err, "upper exec")
+		return newErrors.Wrap(err, "upper exec")
 	}
 
 	updateQuery := fmt.Sprintf("UPDATE %s SET balance = $1 WHERE id = $2", t.Table())
 
 	res, err := tx.SQL().Exec(updateQuery, balance, currentBudgetID)
 	if err != nil {
-		return errors.Wrap(err, "upper tx")
+		return newErrors.Wrap(err, "upper tx")
 	}
 
 	rowsAffected, _ := res.RowsAffected()
 	if rowsAffected != 1 {
-		return errors.NewNotFoundError("upper no rows affected")
+		return newErrors.NewNotFoundError("upper no rows affected")
 	}
 
 	return nil
@@ -163,12 +164,12 @@ func (t *CurrentBudget) UpdateBalance(currentBudgetID int, balance decimal.Decim
 
 	res, err := Upper.SQL().Exec(updateQuery, balance, currentBudgetID)
 	if err != nil {
-		return errors.Wrap(err, "upper exec")
+		return newErrors.Wrap(err, "upper exec")
 	}
 
 	rowsAffected, _ := res.RowsAffected()
 	if rowsAffected != 1 {
-		return errors.NewNotFoundError("upper no rows affected")
+		return newErrors.NewNotFoundError("upper no rows affected")
 	}
 
 	return nil
@@ -179,7 +180,8 @@ func (t *CurrentBudget) Insert(ctx context.Context, m CurrentBudget) (int, error
 	m.CreatedAt = time.Now()
 	userID, ok := contextutil.GetUserIDFromContext(ctx)
 	if !ok {
-		return 0, errors.New("user id not found in context")
+		err := newErrors.New("user ID not found in context")
+		return 0, newErrors.Wrap(err, "contextuitl get user id from context")
 	}
 
 	var id int
@@ -187,7 +189,7 @@ func (t *CurrentBudget) Insert(ctx context.Context, m CurrentBudget) (int, error
 	err := Upper.Tx(func(sess up.Session) error {
 		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
 		if _, err := sess.SQL().Exec(query); err != nil {
-			return errors.New("upper exec")
+			return newErrors.New("upper exec")
 		}
 
 		collection := sess.Collection(t.Table())
@@ -196,7 +198,7 @@ func (t *CurrentBudget) Insert(ctx context.Context, m CurrentBudget) (int, error
 		var err error
 
 		if res, err = collection.Insert(m); err != nil {
-			return errors.New("upper insert")
+			return newErrors.New("upper insert")
 		}
 
 		id = getInsertId(res.ID())
@@ -204,7 +206,7 @@ func (t *CurrentBudget) Insert(ctx context.Context, m CurrentBudget) (int, error
 		return nil
 	})
 	if err != nil {
-		return 0, errors.New("upper tx")
+		return 0, newErrors.New("upper tx")
 	}
 
 	return id, nil
@@ -224,7 +226,7 @@ func (t *CurrentBudget) GetActualCurrentBudget(organizationUnitID int) ([]*Curre
 
 	rows, err := Upper.SQL().Query(query, organizationUnitID)
 	if err != nil {
-		return nil, errors.New("upper query")
+		return nil, newErrors.New("upper query")
 	}
 
 	defer rows.Close()
@@ -235,7 +237,7 @@ func (t *CurrentBudget) GetActualCurrentBudget(organizationUnitID int) ([]*Curre
 		err = rows.Scan(&item.BudgetID, &item.AccountID, &item.Actual, &item.Balance, &item.InitialActual)
 
 		if err != nil {
-			return nil, errors.New("sql scan")
+			return nil, newErrors.New("sql scan")
 		}
 
 		response = append(response, &item)

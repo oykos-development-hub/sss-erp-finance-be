@@ -3,7 +3,7 @@ package services
 import (
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
-	"gitlab.sudovi.me/erp/finance-api/errors"
+	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 
 	"github.com/oykos-development-hub/celeritas"
 	up "github.com/upper/db/v4"
@@ -29,19 +29,19 @@ func (h *PaymentOrderItemServiceImpl) CreatePaymentOrderItem(input dto.PaymentOr
 		var err error
 		id, err = h.repo.Insert(tx, *dataToInsert)
 		if err != nil {
-			return errors.ErrInternalServer
+			return newErrors.Wrap(err, "repo payment order item insert")
 		}
 
 		return nil
 	})
 
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "upper tx")
 	}
 
 	dataToInsert, err = h.repo.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo payment order item get")
 	}
 
 	res := dto.ToPaymentOrderItemResponseDTO(*dataToInsert)
@@ -56,17 +56,17 @@ func (h *PaymentOrderItemServiceImpl) UpdatePaymentOrderItem(id int, input dto.P
 	err := data.Upper.Tx(func(tx up.Session) error {
 		err := h.repo.Update(tx, *dataToInsert)
 		if err != nil {
-			return errors.ErrInternalServer
+			return newErrors.Wrap(err, "repo payment order item update")
 		}
 		return nil
 	})
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "upper tx")
 	}
 
 	dataToInsert, err = h.repo.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo payment order item get")
 	}
 
 	response := dto.ToPaymentOrderItemResponseDTO(*dataToInsert)
@@ -77,8 +77,7 @@ func (h *PaymentOrderItemServiceImpl) UpdatePaymentOrderItem(id int, input dto.P
 func (h *PaymentOrderItemServiceImpl) DeletePaymentOrderItem(id int) error {
 	err := h.repo.Delete(id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return errors.ErrInternalServer
+		return newErrors.Wrap(err, "repo payment order item delete")
 	}
 
 	return nil
@@ -87,9 +86,9 @@ func (h *PaymentOrderItemServiceImpl) DeletePaymentOrderItem(id int) error {
 func (h *PaymentOrderItemServiceImpl) GetPaymentOrderItem(id int) (*dto.PaymentOrderItemResponseDTO, error) {
 	data, err := h.repo.Get(id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrNotFound
+		return nil, newErrors.Wrap(err, "repo payment order item get")
 	}
+
 	response := dto.ToPaymentOrderItemResponseDTO(*data)
 
 	return &response, nil
@@ -120,8 +119,7 @@ func (h *PaymentOrderItemServiceImpl) GetPaymentOrderItemList(filter dto.Payment
 
 	data, total, err := h.repo.GetAll(filter.Page, filter.Size, conditionAndExp, orders)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, nil, errors.ErrInternalServer
+		return nil, nil, newErrors.Wrap(err, "repo payment order item get all")
 	}
 	response := dto.ToPaymentOrderItemListResponseDTO(data)
 

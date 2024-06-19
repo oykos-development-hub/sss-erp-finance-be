@@ -8,6 +8,7 @@ import (
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
 	"gitlab.sudovi.me/erp/finance-api/errors"
+	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 
 	"github.com/oykos-development-hub/celeritas"
 	"github.com/shopspring/decimal"
@@ -44,7 +45,7 @@ func (h *EnforcedPaymentServiceImpl) CreateEnforcedPayment(ctx context.Context, 
 		var err error
 		id, err = h.repo.Insert(ctx, tx, *dataToInsert)
 		if err != nil {
-			return errors.ErrInternalServer
+			return newErrors.Wrap(err, "repo enforced payment insert")
 		}
 
 		for _, item := range input.Items {
@@ -52,20 +53,20 @@ func (h *EnforcedPaymentServiceImpl) CreateEnforcedPayment(ctx context.Context, 
 			itemToInsert.PaymentOrderID = id
 			_, err = h.itemsRepo.Insert(tx, *itemToInsert)
 			if err != nil {
-				return err
+				return newErrors.Wrap(err, "repo enforced payment item insert")
 			}
 
 			if item.InvoiceID != nil {
 				err = updateInvoiceStatusForEnforcedPayment(ctx, *item.InvoiceID, tx, h)
 
 				if err != nil {
-					return err
+					return newErrors.Wrap(err, "update invoice status for enforced payment")
 				}
 			}
 		}
 
 		if err != nil {
-			return errors.ErrInternalServer
+			return newErrors.Wrap(err, "upper tx")
 		}
 
 		for _, item := range input.Items {
@@ -75,7 +76,7 @@ func (h *EnforcedPaymentServiceImpl) CreateEnforcedPayment(ctx context.Context, 
 			})
 
 			if err != nil {
-				return err
+				return newErrors.Wrap(err, "repo current budget get all")
 			}
 
 			if len(currentBudget) > 0 {
@@ -87,21 +88,21 @@ func (h *EnforcedPaymentServiceImpl) CreateEnforcedPayment(ctx context.Context, 
 					amount, err = h.getInvoiceAmount(*item.InvoiceID)
 
 					if err != nil {
-						return err
+						return newErrors.Wrap(err, "get invoice amount")
 					}
 				}
 
 				currentAmount := currentBudget[0].Balance.Sub(decimal.NewFromFloat32(float32(amount)))
 				if currentAmount.LessThan(decimal.NewFromInt(0)) {
-					return errors.ErrInsufficientFunds
+					return newErrors.Wrap(errors.ErrInsufficientFunds, "repo current budget update balance")
 				} else {
 					err = h.currentBudget.UpdateBalance(ctx, tx, currentBudget[0].ID, currentAmount)
 					if err != nil {
-						return err
+						return newErrors.Wrap(err, "repo current budget update balance")
 					}
 				}
 			} else {
-				return errors.ErrInsufficientFunds
+				return newErrors.Wrap(errors.ErrInsufficientFunds, "repo current budget update balance")
 			}
 
 			amount := input.AmountForAgent + input.AmountForBank + input.AmountForLawyer
@@ -112,20 +113,20 @@ func (h *EnforcedPaymentServiceImpl) CreateEnforcedPayment(ctx context.Context, 
 			})
 
 			if err != nil {
-				return err
+				return newErrors.Wrap(err, "repo current budget get")
 			}
 			if len(currentBudget) > 0 {
 				currentAmount := currentBudget[0].Balance.Sub(decimal.NewFromFloat32(float32(amount)))
 				if currentAmount.LessThan(decimal.NewFromInt(0)) {
-					return errors.ErrInsufficientFunds
+					return newErrors.Wrap(errors.ErrInsufficientFunds, "repo current budget update balance")
 				} else {
 					err = h.currentBudget.UpdateBalance(ctx, tx, currentBudget[0].ID, currentAmount)
 					if err != nil {
-						return err
+						return newErrors.Wrap(errors.ErrInsufficientFunds, "repo current budget update balance")
 					}
 				}
 			} else {
-				return errors.ErrNotFound
+				return newErrors.Wrap(errors.ErrNotFound, "repo current budget get all")
 			}
 
 		}
@@ -134,13 +135,12 @@ func (h *EnforcedPaymentServiceImpl) CreateEnforcedPayment(ctx context.Context, 
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, newErrors.Wrap(errors.ErrInsufficientFunds, "upper tx")
 	}
 
 	dataToInsert, err = h.repo.Get(id)
 	if err != nil {
-		fmt.Println(err)
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(errors.ErrInsufficientFunds, "repo enforced payment get")
 	}
 
 	res := dto.ToEnforcedPaymentResponseDTO(*dataToInsert)
@@ -155,17 +155,17 @@ func (h *EnforcedPaymentServiceImpl) UpdateEnforcedPayment(ctx context.Context, 
 	err := data.Upper.Tx(func(tx up.Session) error {
 		err := h.repo.Update(ctx, tx, *dataToInsert)
 		if err != nil {
-			return errors.ErrInternalServer
+			return newErrors.Wrap(errors.ErrInsufficientFunds, "repo enforced payment update")
 		}
 		return nil
 	})
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "upper tx")
 	}
 
 	dataToInsert, err = h.repo.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo enforced payment get")
 	}
 
 	response := dto.ToEnforcedPaymentResponseDTO(*dataToInsert)
@@ -180,13 +180,13 @@ func (h *EnforcedPaymentServiceImpl) ReturnEnforcedPayment(ctx context.Context, 
 	err := data.Upper.Tx(func(tx up.Session) error {
 		err := h.repo.ReturnEnforcedPayment(ctx, tx, *dataToInsert)
 		if err != nil {
-			return errors.ErrInternalServer
+			return newErrors.Wrap(err, "repo enforced payment return enforced payment")
 		}
 
 		paymentOrder, err := h.GetEnforcedPayment(id)
 
 		if err != nil {
-			return err
+			return newErrors.Wrap(err, "get enforced payment")
 		}
 
 		for _, item := range paymentOrder.Items {
@@ -196,7 +196,7 @@ func (h *EnforcedPaymentServiceImpl) ReturnEnforcedPayment(ctx context.Context, 
 			})
 
 			if err != nil {
-				return err
+				return newErrors.Wrap(err, "repo current budget get all")
 			}
 
 			if len(currentBudget) > 0 {
@@ -208,7 +208,7 @@ func (h *EnforcedPaymentServiceImpl) ReturnEnforcedPayment(ctx context.Context, 
 					amount, err = h.getInvoiceAmount(*item.InvoiceID)
 
 					if err != nil {
-						return err
+						return newErrors.Wrap(err, "get invoice amount")
 					}
 				}
 
@@ -216,11 +216,11 @@ func (h *EnforcedPaymentServiceImpl) ReturnEnforcedPayment(ctx context.Context, 
 
 				err = h.currentBudget.UpdateBalance(ctx, tx, currentBudget[0].ID, currentAmount)
 				if err != nil {
-					return err
+					return newErrors.Wrap(err, "repo current budget update balance")
 
 				}
 			} else {
-				return errors.ErrNotFound
+				return newErrors.Wrap(errors.ErrNotFound, "repo current budget get all")
 			}
 
 		}
@@ -228,7 +228,7 @@ func (h *EnforcedPaymentServiceImpl) ReturnEnforcedPayment(ctx context.Context, 
 		return nil
 	})
 	if err != nil {
-		return err
+		return newErrors.Wrap(err, "upper tx")
 	}
 
 	return nil
@@ -237,8 +237,7 @@ func (h *EnforcedPaymentServiceImpl) ReturnEnforcedPayment(ctx context.Context, 
 func (h *EnforcedPaymentServiceImpl) DeleteEnforcedPayment(ctx context.Context, id int) error {
 	err := h.repo.Delete(ctx, id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return errors.ErrInternalServer
+		return newErrors.Wrap(err, "repo enforced payment delete")
 	}
 
 	return nil
@@ -247,9 +246,9 @@ func (h *EnforcedPaymentServiceImpl) DeleteEnforcedPayment(ctx context.Context, 
 func (h *EnforcedPaymentServiceImpl) GetEnforcedPayment(id int) (*dto.EnforcedPaymentResponseDTO, error) {
 	paymentData, err := h.repo.Get(id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrNotFound
+		return nil, newErrors.Wrap(err, "repo enforced payment get")
 	}
+
 	response := dto.ToEnforcedPaymentResponseDTO(*paymentData)
 
 	conditionAndExp := &up.AndExpr{}
@@ -257,7 +256,7 @@ func (h *EnforcedPaymentServiceImpl) GetEnforcedPayment(id int) (*dto.EnforcedPa
 	items, _, err := h.itemsRepo.GetAll(nil, nil, conditionAndExp, nil)
 
 	if err != nil {
-		return nil, err
+		return nil, newErrors.Wrap(err, "repo enforced payment items get all")
 	}
 
 	for _, item := range items {
@@ -266,7 +265,7 @@ func (h *EnforcedPaymentServiceImpl) GetEnforcedPayment(id int) (*dto.EnforcedPa
 			invoice, err := h.invoicesRepo.Get(*item.InvoiceID)
 
 			if err != nil {
-				return nil, err
+				return nil, newErrors.Wrap(err, "repo invoice get")
 			}
 
 			if invoice.Type == data.TypeInvoice {
@@ -274,7 +273,7 @@ func (h *EnforcedPaymentServiceImpl) GetEnforcedPayment(id int) (*dto.EnforcedPa
 				conditionAndExp = up.And(conditionAndExp, &up.Cond{"invoice_id": item.InvoiceID})
 				articles, _, err := h.invoiceArticlesRepo.GetAll(nil, nil, conditionAndExp, nil)
 				if err != nil {
-					return nil, err
+					return nil, newErrors.Wrap(err, "repo article get all")
 				}
 				for _, article := range articles {
 					price := (article.NetPrice + article.NetPrice*float64(article.VatPercentage)/100) * float64(article.Amount)
@@ -286,7 +285,7 @@ func (h *EnforcedPaymentServiceImpl) GetEnforcedPayment(id int) (*dto.EnforcedPa
 				conditionAndExp = up.And(conditionAndExp, &up.Cond{"invoice_id": item.InvoiceID})
 				articles, _, err := h.additionalExpensesRepo.GetAll(nil, nil, conditionAndExp, nil)
 				if err != nil {
-					return nil, err
+					return nil, newErrors.Wrap(err, "repo additional expenses get all")
 				}
 				for _, article := range articles {
 					if article.Title == "Neto" {
@@ -366,8 +365,7 @@ func (h *EnforcedPaymentServiceImpl) GetEnforcedPaymentList(filter dto.EnforcedP
 
 	data, total, err := h.repo.GetAll(filter.Page, filter.Size, conditionAndExp, orders)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, nil, errors.ErrInternalServer
+		return nil, nil, newErrors.Wrap(err, "repo enforced payment get all")
 	}
 	response := dto.ToEnforcedPaymentListResponseDTO(data)
 
@@ -378,7 +376,7 @@ func updateInvoiceStatusForEnforcedPayment(ctx context.Context, id int, tx up.Se
 	invoice, err := h.invoicesRepo.Get(id)
 
 	if err != nil {
-		return err
+		return newErrors.Wrap(err, "repo invoice get")
 	}
 
 	conditionAndExp := &up.AndExpr{}
@@ -387,7 +385,7 @@ func updateInvoiceStatusForEnforcedPayment(ctx context.Context, id int, tx up.Se
 	additionalExpenses, _, err := h.additionalExpensesRepo.GetAll(nil, nil, conditionAndExp, nil)
 
 	if err != nil {
-		return err
+		return newErrors.Wrap(err, "repo additional expenses get")
 	}
 
 	for _, item := range additionalExpenses {
@@ -395,7 +393,7 @@ func updateInvoiceStatusForEnforcedPayment(ctx context.Context, id int, tx up.Se
 			item.Status = data.InvoiceStatusFull
 			err = h.additionalExpensesRepo.Update(tx, *item)
 			if err != nil {
-				return err
+				return newErrors.Wrap(err, "repo additional expenses update")
 			}
 		}
 	}
@@ -405,7 +403,7 @@ func updateInvoiceStatusForEnforcedPayment(ctx context.Context, id int, tx up.Se
 	err = h.invoicesRepo.Update(ctx, tx, *invoice)
 
 	if err != nil {
-		return err
+		return newErrors.Wrap(err, "repo invoice update")
 	}
 
 	return nil
@@ -417,7 +415,7 @@ func (h *EnforcedPaymentServiceImpl) getInvoiceAmount(id int) (float64, error) {
 	amount := 0.0
 
 	if err != nil {
-		return 0.0, err
+		return 0.0, newErrors.Wrap(err, "repo invoice get")
 	}
 
 	if invoice.Type == data.TypeInvoice {
@@ -425,7 +423,7 @@ func (h *EnforcedPaymentServiceImpl) getInvoiceAmount(id int) (float64, error) {
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"invoice_id": id})
 		articles, _, err := h.invoiceArticlesRepo.GetAll(nil, nil, conditionAndExp, nil)
 		if err != nil {
-			return 0.0, err
+			return 0.0, newErrors.Wrap(err, "repo article get all")
 		}
 
 		for _, article := range articles {
@@ -441,7 +439,7 @@ func (h *EnforcedPaymentServiceImpl) getInvoiceAmount(id int) (float64, error) {
 		additionalExpenses, _, err := h.additionalExpensesRepo.GetAll(nil, nil, conditionAndExp, nil)
 
 		if err != nil {
-			return 0.0, err
+			return 0.0, newErrors.Wrap(err, "repo additional expenses get all")
 		}
 
 		for _, item := range additionalExpenses {

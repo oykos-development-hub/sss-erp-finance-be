@@ -7,7 +7,7 @@ import (
 
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
-	"gitlab.sudovi.me/erp/finance-api/errors"
+	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 
 	"github.com/oykos-development-hub/celeritas"
 	up "github.com/upper/db/v4"
@@ -42,7 +42,7 @@ func (h *InvoiceServiceImpl) CreateInvoice(ctx context.Context, input dto.Invoic
 		}
 		id, err = h.repo.Insert(ctx, tx, *invoice)
 		if err != nil {
-			return errors.ErrInternalServer
+			return newErrors.Wrap(err, "repo invoice insert")
 		}
 
 		for _, additionalExpense := range input.AdditionalExpenses {
@@ -52,7 +52,7 @@ func (h *InvoiceServiceImpl) CreateInvoice(ctx context.Context, input dto.Invoic
 			additionalExpenseData.Status = data.InvoiceStatusCreated
 			if additionalExpenseData.Price > 0 {
 				if _, err = h.additionalExpensesRepo.Insert(tx, *additionalExpenseData); err != nil {
-					return err
+					return newErrors.Wrap(err, "repo additional expenses insert")
 				}
 			}
 		}
@@ -60,12 +60,12 @@ func (h *InvoiceServiceImpl) CreateInvoice(ctx context.Context, input dto.Invoic
 		return nil
 	})
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "upper tx")
 	}
 
 	response, err := h.repo.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo invoice get")
 	}
 
 	res := dto.ToInvoiceResponseDTO(*response)
@@ -99,7 +99,7 @@ func (h *InvoiceServiceImpl) UpdateInvoice(ctx context.Context, id int, input dt
 		var err error
 		err = h.repo.Update(ctx, tx, *invoice)
 		if err != nil {
-			return errors.ErrInternalServer
+			return newErrors.Wrap(err, "repo invoice update")
 		}
 
 		validExpenses := make(map[int]bool)
@@ -121,7 +121,7 @@ func (h *InvoiceServiceImpl) UpdateInvoice(ctx context.Context, id int, input dt
 					_, err = h.additionalExpensesRepo.Insert(tx, *additionalExpenseData)
 
 					if err != nil {
-						return err
+						return newErrors.Wrap(err, "repo additional expenses insert")
 					}
 				}
 			}
@@ -132,7 +132,7 @@ func (h *InvoiceServiceImpl) UpdateInvoice(ctx context.Context, id int, input dt
 				err := h.additionalExpensesRepo.Delete(itemID)
 
 				if err != nil {
-					return err
+					return newErrors.Wrap(err, "repo additional expenses delete")
 				}
 			} else {
 				for _, item := range input.AdditionalExpenses {
@@ -144,7 +144,7 @@ func (h *InvoiceServiceImpl) UpdateInvoice(ctx context.Context, id int, input dt
 						additionalExpenseData.Status = data.InvoiceStatusCreated
 						err := h.additionalExpensesRepo.Update(tx, *additionalExpenseData)
 						if err != nil {
-							return err
+							return newErrors.Wrap(err, "repo additional expenses update")
 						}
 					}
 				}
@@ -154,7 +154,7 @@ func (h *InvoiceServiceImpl) UpdateInvoice(ctx context.Context, id int, input dt
 	})
 
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "upper tx")
 	}
 
 	response := dto.ToInvoiceResponseDTO(*invoice)
@@ -165,8 +165,7 @@ func (h *InvoiceServiceImpl) UpdateInvoice(ctx context.Context, id int, input dt
 func (h *InvoiceServiceImpl) DeleteInvoice(ctx context.Context, id int) error {
 	err := h.repo.Delete(ctx, id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return errors.ErrInternalServer
+		return newErrors.Wrap(err, "repo invoice delete")
 	}
 
 	return nil
@@ -175,16 +174,15 @@ func (h *InvoiceServiceImpl) DeleteInvoice(ctx context.Context, id int) error {
 func (h *InvoiceServiceImpl) GetInvoice(id int) (*dto.InvoiceResponseDTO, error) {
 	data, err := h.repo.Get(id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrNotFound
+		return nil, newErrors.Wrap(err, "repo invoice get")
 	}
+
 	response := dto.ToInvoiceResponseDTO(*data)
 
 	articles, _, err := h.articlesServices.GetArticleList(dto.ArticleFilterDTO{InvoiceID: &id})
 
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, err
+		return nil, newErrors.Wrap(err, "repo articles get")
 	}
 
 	response.Articles = articles
@@ -192,8 +190,7 @@ func (h *InvoiceServiceImpl) GetInvoice(id int) (*dto.InvoiceResponseDTO, error)
 	additionalExpenses, _, err := h.additionalExpenses.GetAdditionalExpenseList(dto.AdditionalExpenseFilterDTO{InvoiceID: &id})
 
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, err
+		return nil, newErrors.Wrap(err, "repo additional expenses get")
 	}
 
 	response.AdditionalExpenses = additionalExpenses
@@ -267,8 +264,7 @@ func (h *InvoiceServiceImpl) GetInvoiceList(input dto.InvoicesFilter) ([]dto.Inv
 
 	data, total, err := h.repo.GetAll(input.Page, input.Size, conditionAndExp)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, nil, err
+		return nil, nil, newErrors.Wrap(err, "repo invoice get all")
 	}
 	response := dto.ToInvoiceListResponseDTO(data)
 
@@ -278,8 +274,7 @@ func (h *InvoiceServiceImpl) GetInvoiceList(input dto.InvoicesFilter) ([]dto.Inv
 		})
 
 		if err != nil {
-			h.App.ErrorLog.Println(err)
-			return nil, nil, err
+			return nil, nil, newErrors.Wrap(err, "repo additional expenses get all")
 		}
 
 		if len(additionalExpenses) > 0 {

@@ -7,7 +7,7 @@ import (
 
 	up "github.com/upper/db/v4"
 	"gitlab.sudovi.me/erp/finance-api/contextutil"
-	"gitlab.sudovi.me/erp/finance-api/pkg/errors"
+	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 )
 
 type PaymentOrder struct {
@@ -71,7 +71,7 @@ func (t *PaymentOrder) GetAll(page *int, size *int, condition *up.AndExpr, order
 	}
 	total, err := res.Count()
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, newErrors.Wrap(err, "upper count")
 	}
 
 	if page != nil && size != nil {
@@ -80,7 +80,7 @@ func (t *PaymentOrder) GetAll(page *int, size *int, condition *up.AndExpr, order
 
 	err = res.OrderBy(orders...).All(&all)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, newErrors.Wrap(err, "upper all")
 	}
 
 	return all, &total, err
@@ -94,7 +94,7 @@ func (t *PaymentOrder) Get(id int) (*PaymentOrder, error) {
 	res := collection.Find(up.Cond{"id": id})
 	err := res.One(&one)
 	if err != nil {
-		return nil, err
+		return nil, newErrors.Wrap(err, "upper one")
 	}
 	return &one, nil
 }
@@ -115,17 +115,18 @@ func (t *PaymentOrder) Update(ctx context.Context, tx up.Session, m PaymentOrder
 	m.UpdatedAt = time.Now()
 	userID, ok := contextutil.GetUserIDFromContext(ctx)
 	if !ok {
-		return errors.New("user ID not found in context")
+		err := newErrors.New("user ID not found in context")
+		return newErrors.Wrap(err, "contextuitl get user id from context")
 	}
 
 	query := fmt.Sprintf("SET myapp.user_id = %d", userID)
 	if _, err := tx.SQL().Exec(query); err != nil {
-		return err
+		return newErrors.Wrap(err, "upper exec")
 	}
 
 	res := collection.Find(m.ID)
 	if err := res.Update(&m); err != nil {
-		return err
+		return newErrors.Wrap(err, "upper update")
 	}
 
 	return nil
@@ -135,26 +136,27 @@ func (t *PaymentOrder) Update(ctx context.Context, tx up.Session, m PaymentOrder
 func (t *PaymentOrder) Delete(ctx context.Context, id int) error {
 	userID, ok := contextutil.GetUserIDFromContext(ctx)
 	if !ok {
-		return errors.New("user ID not found in context")
+		err := newErrors.New("user ID not found in context")
+		return newErrors.Wrap(err, "contextuitl get user id from context")
 	}
 
 	err := Upper.Tx(func(sess up.Session) error {
 		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
 		if _, err := sess.SQL().Exec(query); err != nil {
-			return err
+			return newErrors.Wrap(err, "upper exec")
 		}
 
 		collection := sess.Collection(t.Table())
 		res := collection.Find(id)
 		if err := res.Delete(); err != nil {
-			return err
+			return newErrors.Wrap(err, "upper delete")
 		}
 
 		return nil
 	})
 
 	if err != nil {
-		return err
+		return newErrors.Wrap(err, "upper tx")
 	}
 	return nil
 }
@@ -165,14 +167,15 @@ func (t *PaymentOrder) Insert(ctx context.Context, tx up.Session, m PaymentOrder
 	m.UpdatedAt = time.Now()
 	userID, ok := contextutil.GetUserIDFromContext(ctx)
 	if !ok {
-		return 0, errors.New("user ID not found in context")
+		err := newErrors.New("user ID not found in context")
+		return 0, newErrors.Wrap(err, "contextuitl get user id from context")
 	}
 
 	var id int
 
 	query := fmt.Sprintf("SET myapp.user_id = %d", userID)
 	if _, err := tx.SQL().Exec(query); err != nil {
-		return 0, err
+		return 0, newErrors.Wrap(err, "upper exec")
 	}
 
 	collection := tx.Collection(t.Table())
@@ -185,7 +188,7 @@ func (t *PaymentOrder) Insert(ctx context.Context, tx up.Session, m PaymentOrder
 	m.Status = &status
 
 	if res, err = collection.Insert(m); err != nil {
-		return 0, err
+		return 0, newErrors.Wrap(err, "upper insert")
 	}
 
 	id = getInsertId(res.ID())
@@ -233,7 +236,7 @@ func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation
 	if filter.Type == nil || *filter.Type == TypeInvoice {
 		rows, err := Upper.SQL().Query(queryForInvoices, filter.SupplierID, filter.OrganizationUnitID, InvoiceStatusFull, TypeInvoice, InvoiceStatusIncomplete)
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, newErrors.Wrap(err, "upper exec")
 		}
 		defer rows.Close()
 
@@ -244,20 +247,20 @@ func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation
 			err = rows.Scan(&obligation.InvoiceID, &obligation.TotalPrice, &obligation.Title, &invoiceNumber, &obligation.Status, &obligation.CreatedAt)
 
 			if err != nil {
-				return nil, nil, err
+				return nil, nil, newErrors.Wrap(err, "upper scan")
 			}
 
 			rows1, err := Upper.SQL().Query(queryForPaidInvoices, obligation.InvoiceID)
 
 			if err != nil {
-				return nil, nil, err
+				return nil, nil, newErrors.Wrap(err, "upper exec")
 			}
 
 			for rows1.Next() {
 				err = rows1.Scan(&paid)
 
 				if err != nil {
-					return nil, nil, err
+					return nil, nil, newErrors.Wrap(err, "upper scan")
 				}
 
 				if paid != nil {
@@ -279,7 +282,7 @@ func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation
 	if filter.Type == nil || (*filter.Type == TypeDecision || *filter.Type == TypeContract) {
 		rows, err := Upper.SQL().Query(queryForAdditionalExpenses, filter.SupplierID, filter.OrganizationUnitID, InvoiceStatusFull)
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, newErrors.Wrap(err, "upper exec")
 		}
 		defer rows.Close()
 
@@ -290,20 +293,20 @@ func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation
 			err = rows.Scan(&obligation.AdditionalExpenseID, &obligation.TotalPrice, &obligation.Title, &obligation.Type, &title, &obligation.Status, &obligation.CreatedAt)
 
 			if err != nil {
-				return nil, nil, err
+				return nil, nil, newErrors.Wrap(err, "upper scan")
 			}
 
 			rows1, err := Upper.SQL().Query(queryForPaidAdditionalExpenses, obligation.AdditionalExpenseID)
 
 			if err != nil {
-				return nil, nil, err
+				return nil, nil, newErrors.Wrap(err, "upper exec")
 			}
 
 			for rows1.Next() {
 				err = rows1.Scan(&paid)
 
 				if err != nil {
-					return nil, nil, err
+					return nil, nil, newErrors.Wrap(err, "upper scan")
 				}
 
 				if paid != nil {
@@ -322,7 +325,7 @@ func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation
 	if filter.Type == nil || *filter.Type == TypeSalary {
 		rows, err := Upper.SQL().Query(queryForSalaryAdditionalExpenses, filter.SupplierID, filter.OrganizationUnitID, InvoiceStatusFull)
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, newErrors.Wrap(err, "upper exec")
 		}
 		defer rows.Close()
 
@@ -333,20 +336,20 @@ func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation
 			err = rows.Scan(&obligation.SalaryAdditionalExpenseID, &obligation.TotalPrice, &title, &obligation.Status, &obligation.CreatedAt, &obligation.Title)
 
 			if err != nil {
-				return nil, nil, err
+				return nil, nil, newErrors.Wrap(err, "upper scan")
 			}
 
 			rows1, err := Upper.SQL().Query(queryForPaidSalaryAdditionalExpenses, obligation.AdditionalExpenseID)
 
 			if err != nil {
-				return nil, nil, err
+				return nil, nil, newErrors.Wrap(err, "upper exec")
 			}
 
 			for rows1.Next() {
 				err = rows1.Scan(&paid)
 
 				if err != nil {
-					return nil, nil, err
+					return nil, nil, newErrors.Wrap(err, "upper scan")
 				}
 
 				if paid != nil {
@@ -373,37 +376,47 @@ func (t *PaymentOrder) PayPaymentOrder(ctx context.Context, tx up.Session, id in
 
 	userID, ok := contextutil.GetUserIDFromContext(ctx)
 	if !ok {
-		return errors.New("user ID not found in context")
+		err := newErrors.New("user ID not found in context")
+		return newErrors.Wrap(err, "contextuitl get user id from context")
 	}
 
 	query := fmt.Sprintf("SET myapp.user_id = %d", userID)
 	if _, err := tx.SQL().Exec(query); err != nil {
-		return err
+		return newErrors.Wrap(err, "upper exec")
 	}
 
 	query = `update payment_orders set sap_id = $1, date_of_sap = $2, status = 'Plaćen' where id = $3`
 
 	_, err := tx.SQL().Query(query, SAPID, DateOfSAP, id)
 
-	return err
+	if err != nil {
+		return newErrors.Wrap(err, "upper exec")
+	}
+
+	return nil
 }
 
 func (t *PaymentOrder) CancelPaymentOrder(ctx context.Context, tx up.Session, id int) error {
 
 	userID, ok := contextutil.GetUserIDFromContext(ctx)
 	if !ok {
-		return errors.New("user ID not found in context")
+		err := newErrors.New("user ID not found in context")
+		return newErrors.Wrap(err, "contextuitl get user id from context")
 	}
 
 	query := fmt.Sprintf("SET myapp.user_id = %d", userID)
 	if _, err := tx.SQL().Exec(query); err != nil {
-		return err
+		return newErrors.Wrap(err, "upper exec")
 	}
 
 	query = `update payment_orders set status = 'Storniran' where id = $1`
 
 	_, err := tx.SQL().Query(query, id)
 
-	return err
+	if err != nil {
+		return newErrors.Wrap(err, "upper exec")
+	}
+
+	return nil
 
 }

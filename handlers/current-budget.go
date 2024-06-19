@@ -32,12 +32,14 @@ func (h *currentbudgetHandlerImpl) CreateCurrentBudget(w http.ResponseWriter, r 
 	var input dto.CurrentBudgetDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
 	}
 
 	validator := h.App.Validator().ValidateStruct(&input)
 	if !validator.Valid() {
+		h.App.ErrorLog.Print(validator.Errors)
 		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
 		return
 	}
@@ -47,6 +49,7 @@ func (h *currentbudgetHandlerImpl) CreateCurrentBudget(w http.ResponseWriter, r 
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
 	}
@@ -56,6 +59,7 @@ func (h *currentbudgetHandlerImpl) CreateCurrentBudget(w http.ResponseWriter, r 
 
 	res, err := h.service.CreateCurrentBudget(ctx, input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -68,6 +72,7 @@ func (h *currentbudgetHandlerImpl) GetCurrentBudgetById(w http.ResponseWriter, r
 
 	res, err := h.service.GetCurrentBudget(id)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -82,12 +87,14 @@ func (h *currentbudgetHandlerImpl) GetCurrentBudgetList(w http.ResponseWriter, r
 
 	validator := h.App.Validator().ValidateStruct(&filter)
 	if !validator.Valid() {
+		h.App.ErrorLog.Print(validator.Errors)
 		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
 		return
 	}
 
 	res, total, err := h.service.GetCurrentBudgetList(filter)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -100,6 +107,7 @@ func (h *currentbudgetHandlerImpl) GetAcctualCurrentBudget(w http.ResponseWriter
 
 	res, err := h.service.GetAcctualCurrentBudget(organizationUnitID)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}

@@ -5,7 +5,7 @@ import (
 
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
-	"gitlab.sudovi.me/erp/finance-api/errors"
+	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 
 	"github.com/oykos-development-hub/celeritas"
 	"github.com/upper/db/v4"
@@ -28,12 +28,12 @@ func (h *BudgetServiceImpl) CreateBudget(ctx context.Context, input dto.BudgetDT
 
 	id, err := h.repo.Insert(ctx, *data)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo budget insert")
 	}
 
 	data, err = data.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo budget get")
 	}
 
 	res := dto.ToBudgetResponseDTO(*data)
@@ -47,12 +47,12 @@ func (h *BudgetServiceImpl) UpdateBudget(ctx context.Context, id int, input dto.
 
 	err := h.repo.Update(ctx, *data)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo budget update")
 	}
 
 	data, err = h.repo.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo budget get")
 	}
 
 	response := dto.ToBudgetResponseDTO(*data)
@@ -63,8 +63,7 @@ func (h *BudgetServiceImpl) UpdateBudget(ctx context.Context, id int, input dto.
 func (h *BudgetServiceImpl) DeleteBudget(ctx context.Context, id int) error {
 	err := h.repo.Delete(ctx, id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return errors.ErrInternalServer
+		return newErrors.Wrap(err, "repo budget delete")
 	}
 
 	return nil
@@ -73,9 +72,9 @@ func (h *BudgetServiceImpl) DeleteBudget(ctx context.Context, id int) error {
 func (h *BudgetServiceImpl) GetBudget(id int) (*dto.BudgetResponseDTO, error) {
 	data, err := h.repo.Get(id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrNotFound
+		return nil, newErrors.Wrap(err, "repo budget get")
 	}
+
 	response := dto.ToBudgetResponseDTO(*data)
 
 	return &response, nil
@@ -99,8 +98,7 @@ func (h *BudgetServiceImpl) GetBudgetList(input dto.GetBudgetListInput) ([]dto.B
 
 	data, err := h.repo.GetAll(&cond, orders)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo budget get all")
 	}
 	response := dto.ToBudgetListResponseDTO(data)
 

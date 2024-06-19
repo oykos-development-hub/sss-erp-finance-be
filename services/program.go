@@ -6,7 +6,7 @@ import (
 
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
-	"gitlab.sudovi.me/erp/finance-api/errors"
+	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 
 	"github.com/oykos-development-hub/celeritas"
 	up "github.com/upper/db/v4"
@@ -29,12 +29,12 @@ func (h *ProgramServiceImpl) CreateProgram(ctx context.Context, input dto.Progra
 
 	id, err := h.repo.Insert(ctx, *data)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo program insert")
 	}
 
 	data, err = data.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo program get")
 	}
 
 	res := dto.ToProgramResponseDTO(*data)
@@ -48,12 +48,12 @@ func (h *ProgramServiceImpl) UpdateProgram(ctx context.Context, id int, input dt
 
 	err := h.repo.Update(ctx, *data)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo program update")
 	}
 
 	data, err = h.repo.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo program get")
 	}
 
 	response := dto.ToProgramResponseDTO(*data)
@@ -64,8 +64,7 @@ func (h *ProgramServiceImpl) UpdateProgram(ctx context.Context, id int, input dt
 func (h *ProgramServiceImpl) DeleteProgram(ctx context.Context, id int) error {
 	err := h.repo.Delete(ctx, id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return errors.ErrInternalServer
+		return newErrors.Wrap(err, "repo program delete")
 	}
 
 	return nil
@@ -74,9 +73,9 @@ func (h *ProgramServiceImpl) DeleteProgram(ctx context.Context, id int) error {
 func (h *ProgramServiceImpl) GetProgram(id int) (*dto.ProgramResponseDTO, error) {
 	data, err := h.repo.Get(id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrNotFound
+		return nil, newErrors.Wrap(err, "repo program get")
 	}
+
 	response := dto.ToProgramResponseDTO(*data)
 
 	return &response, nil
@@ -116,8 +115,7 @@ func (h *ProgramServiceImpl) GetProgramList(filter dto.ProgramFilterDTO) ([]dto.
 
 	data, total, err := h.repo.GetAll(filter.Page, filter.Size, conditionAndExp, orders)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, nil, errors.ErrInternalServer
+		return nil, nil, newErrors.Wrap(err, "repo program get all")
 	}
 	response := dto.ToProgramListResponseDTO(data)
 

@@ -4,6 +4,7 @@ import (
 	"time"
 
 	up "github.com/upper/db/v4"
+	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 )
 
 // FinancialBudgetLimit struct
@@ -34,7 +35,7 @@ func (t *FinancialBudgetLimit) GetAll(page *int, size *int, condition *up.AndExp
 	}
 	total, err := res.Count()
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, newErrors.Wrap(err, "upper count")
 	}
 
 	if page != nil && size != nil {
@@ -43,7 +44,7 @@ func (t *FinancialBudgetLimit) GetAll(page *int, size *int, condition *up.AndExp
 
 	err = res.OrderBy(orders...).All(&all)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, newErrors.Wrap(err, "upper all")
 	}
 
 	return all, &total, err
@@ -57,7 +58,7 @@ func (t *FinancialBudgetLimit) Get(id int) (*FinancialBudgetLimit, error) {
 	res := collection.Find(up.Cond{"id": id})
 	err := res.One(&one)
 	if err != nil {
-		return nil, err
+		return nil, newErrors.Wrap(err, "upper one")
 	}
 	return &one, nil
 }
@@ -69,7 +70,7 @@ func (t *FinancialBudgetLimit) Update(m FinancialBudgetLimit) error {
 	res := collection.Find(m.ID)
 	err := res.Update(&m)
 	if err != nil {
-		return err
+		return newErrors.Wrap(err, "upper update")
 	}
 	return nil
 }
@@ -80,7 +81,7 @@ func (t *FinancialBudgetLimit) Delete(id int) error {
 	res := collection.Find(id)
 	err := res.Delete()
 	if err != nil {
-		return err
+		return newErrors.Wrap(err, "upper delete")
 	}
 	return nil
 }
@@ -92,7 +93,7 @@ func (t *FinancialBudgetLimit) Insert(m FinancialBudgetLimit) (int, error) {
 	collection := Upper.Collection(t.Table())
 	res, err := collection.Insert(m)
 	if err != nil {
-		return 0, err
+		return 0, newErrors.Wrap(err, "upper insert")
 	}
 
 	id := getInsertId(res.ID())

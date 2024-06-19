@@ -7,7 +7,7 @@ import (
 
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
-	"gitlab.sudovi.me/erp/finance-api/errors"
+	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 
 	"github.com/oykos-development-hub/celeritas"
 	"github.com/upper/db/v4"
@@ -31,13 +31,11 @@ func NewFlatRateSharedLogicServiceImpl(app *celeritas.Celeritas, repoFlatRate da
 func (h *FlatRateSharedLogicServiceImpl) CalculateFlatRateDetailsAndUpdateStatus(ctx context.Context, flatrateId int) (*dto.FlatRateDetailsDTO, data.FlatRateStatus, error) {
 	flatrate, err := h.repoFlatRate.Get(flatrateId)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, 0, errors.ErrNotFound
+		return nil, 0, newErrors.Wrap(err, "repo flat rate get")
 	}
 	payments, err := h.getFlatRatePaymentsByFlatRateID(flatrate.ID)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, 0, errors.ErrNotFound
+		return nil, 0, newErrors.Wrap(err, "get flat rate payments by flat rate id")
 	}
 
 	details := &dto.FlatRateDetailsDTO{}
@@ -85,7 +83,7 @@ func (h *FlatRateSharedLogicServiceImpl) CalculateFlatRateDetailsAndUpdateStatus
 		flatrate.Status = newStatus
 		err = h.repoFlatRate.Update(ctx, *flatrate)
 		if err != nil {
-			return nil, 0, errors.ErrInternalServer
+			return nil, 0, newErrors.Wrap(err, "repo flat rate update")
 		}
 	}
 
@@ -97,8 +95,7 @@ func (h *FlatRateSharedLogicServiceImpl) getFlatRatePaymentsByFlatRateID(flatrat
 
 	flatratePayments, _, err := h.repoFlatRatePayment.GetAll(&cond)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo flat rate get all")
 	}
 
 	return flatratePayments, nil

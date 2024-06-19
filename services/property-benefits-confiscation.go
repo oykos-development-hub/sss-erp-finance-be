@@ -6,7 +6,7 @@ import (
 
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
-	"gitlab.sudovi.me/erp/finance-api/errors"
+	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 
 	"github.com/oykos-development-hub/celeritas"
 	up "github.com/upper/db/v4"
@@ -34,12 +34,12 @@ func (h *PropBenConfServiceImpl) CreatePropBenConf(ctx context.Context, input dt
 
 	id, err := h.repo.Insert(ctx, *propbenconf)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo prop ben conf insert")
 	}
 
 	propbenconf, err = propbenconf.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo prop ben conf get")
 	}
 
 	return h.createPropBenConfResponse(ctx, propbenconf)
@@ -49,8 +49,7 @@ func (h *PropBenConfServiceImpl) CreatePropBenConf(ctx context.Context, input dt
 func (h *PropBenConfServiceImpl) GetPropBenConf(id int) (*dto.PropBenConfResponseDTO, error) {
 	propbenconf, err := h.repo.Get(id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrNotFound
+		return nil, newErrors.Wrap(err, "repo prop ben conf get")
 	}
 
 	return h.createPropBenConfResponse(context.Background(), propbenconf)
@@ -63,12 +62,12 @@ func (h *PropBenConfServiceImpl) UpdatePropBenConf(ctx context.Context, id int, 
 
 	err := h.repo.Update(ctx, *propbenconf)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo prop ben conf update")
 	}
 
 	propbenconf, err = h.repo.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo prop ben conf get")
 	}
 
 	return h.createPropBenConfResponse(ctx, propbenconf)
@@ -78,8 +77,7 @@ func (h *PropBenConfServiceImpl) UpdatePropBenConf(ctx context.Context, id int, 
 func (h *PropBenConfServiceImpl) DeletePropBenConf(ctx context.Context, id int) error {
 	err := h.repo.Delete(ctx, id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return errors.ErrInternalServer
+		return newErrors.Wrap(err, "repo prop ben conf delete")
 	}
 
 	return nil
@@ -116,8 +114,7 @@ func (h *PropBenConfServiceImpl) GetPropBenConfList(input dto.PropBenConfFilterD
 
 	propbenconfs, total, err := h.repo.GetAll(input.Page, input.Size, conditionAndExp)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, nil, err
+		return nil, nil, newErrors.Wrap(err, "repo prop ben conf get all")
 	}
 
 	var propbenconfsList []data.PropBenConf
@@ -127,8 +124,7 @@ func (h *PropBenConfServiceImpl) GetPropBenConfList(input dto.PropBenConfFilterD
 
 	response, err := h.convertPropBenConfsToResponses(context.Background(), propbenconfsList)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, nil, err
+		return nil, nil, newErrors.Wrap(err, "convert prop ben confs to responses")
 	}
 
 	return response, total, nil
@@ -140,7 +136,7 @@ func (h *PropBenConfServiceImpl) convertPropBenConfsToResponses(ctx context.Cont
 	for _, fee := range propbenconfs {
 		response, err := h.createPropBenConfResponse(ctx, &fee)
 		if err != nil {
-			return nil, err
+			return nil, newErrors.Wrap(err, "create prop ben conf response")
 		}
 		responses = append(responses, *response)
 	}
@@ -154,8 +150,7 @@ func (h *PropBenConfServiceImpl) createPropBenConfResponse(ctx context.Context, 
 	var err error
 	response.PropBenConfDetailsDTO, newStatus, err = h.propbenconfSharedLogicService.CalculatePropBenConfDetailsAndUpdateStatus(ctx, propbenconf.ID)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, err
+		return nil, newErrors.Wrap(err, "prop ben conf shared logic service calculate prop ben conf details and update status")
 	}
 	response.Status = newStatus
 

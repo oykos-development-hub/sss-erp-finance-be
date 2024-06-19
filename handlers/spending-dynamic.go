@@ -35,12 +35,14 @@ func (h *spendingdynamicHandlerImpl) CreateSpendingDynamic(w http.ResponseWriter
 	var input []dto.SpendingDynamicDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
 	}
 
 	validator := h.App.Validator().ValidateStruct(&input)
 	if !validator.Valid() {
+		h.App.ErrorLog.Print(validator.Errors)
 		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
 		return
 	}
@@ -50,6 +52,7 @@ func (h *spendingdynamicHandlerImpl) CreateSpendingDynamic(w http.ResponseWriter
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
 	}
@@ -59,12 +62,14 @@ func (h *spendingdynamicHandlerImpl) CreateSpendingDynamic(w http.ResponseWriter
 
 	err = h.service.CreateSpendingDynamic(ctx, budgetID, unitID, input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
 
 	res, err := h.service.GetSpendingDynamic(nil, &budgetID, &unitID, nil)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -78,6 +83,7 @@ func (h *spendingdynamicHandlerImpl) GetBudgetSpendingDynamicHistory(w http.Resp
 
 	res, err := h.service.GetSpendingDynamicHistory(budgetID, unitID)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -95,12 +101,14 @@ func (h *spendingdynamicHandlerImpl) GetBudgetSpendingDynamic(w http.ResponseWri
 
 	validator := h.App.Validator().ValidateStruct(&filter)
 	if !validator.Valid() {
+		h.App.ErrorLog.Print(validator.Errors)
 		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
 		return
 	}
 
 	res, err := h.service.GetSpendingDynamic(nil, &budgetID, &unitID, filter.Version)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -115,6 +123,7 @@ func (h *spendingdynamicHandlerImpl) GetActual(w http.ResponseWriter, r *http.Re
 
 	res, err := h.service.GetActual(budgetID, unitID, accountID)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}

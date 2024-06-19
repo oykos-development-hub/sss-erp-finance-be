@@ -6,7 +6,7 @@ import (
 
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
-	"gitlab.sudovi.me/erp/finance-api/errors"
+	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 
 	"github.com/oykos-development-hub/celeritas"
 	up "github.com/upper/db/v4"
@@ -36,7 +36,7 @@ func (h *DepositPaymentOrderServiceImpl) CreateDepositPaymentOrder(ctx context.C
 		var err error
 		id, err = h.repo.Insert(ctx, tx, *dataToInsert)
 		if err != nil {
-			return err
+			return newErrors.Wrap(err, "repo deposit payment order insert")
 		}
 
 		for _, item := range input.AdditionalExpenses {
@@ -47,7 +47,7 @@ func (h *DepositPaymentOrderServiceImpl) CreateDepositPaymentOrder(ctx context.C
 			if itemToInsert.Price > 0 {
 				_, err = h.additionalExpensesRepo.Insert(tx, *itemToInsert)
 				if err != nil {
-					return err
+					return newErrors.Wrap(err, "repo deposit payment order additional expenses insert")
 				}
 			}
 		}
@@ -55,7 +55,7 @@ func (h *DepositPaymentOrderServiceImpl) CreateDepositPaymentOrder(ctx context.C
 		for _, item := range input.AdditionalExpensesForPaying {
 			itemToInsert, err := h.additionalExpensesRepo.Get(item.ID)
 			if err != nil {
-				return err
+				return newErrors.Wrap(err, "repo deposit payment order additional expenses get")
 			}
 			itemToInsert.PayingPaymentOrderID = &id
 			itemToInsert.Status = "Na čekanju"
@@ -63,7 +63,7 @@ func (h *DepositPaymentOrderServiceImpl) CreateDepositPaymentOrder(ctx context.C
 			itemToInsert.ID = item.ID
 			err = h.additionalExpensesRepo.Update(tx, *itemToInsert)
 			if err != nil {
-				return err
+				return newErrors.Wrap(err, "repo deposit payment order additional expenses update")
 			}
 		}
 
@@ -71,12 +71,12 @@ func (h *DepositPaymentOrderServiceImpl) CreateDepositPaymentOrder(ctx context.C
 	})
 
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "upper tx")
 	}
 
 	dataToInsert, err = h.repo.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo deposit payment order get")
 	}
 
 	res := dto.ToDepositPaymentOrderResponseDTO(*dataToInsert)
@@ -91,14 +91,14 @@ func (h *DepositPaymentOrderServiceImpl) UpdateDepositPaymentOrder(ctx context.C
 	oldData, err := h.GetDepositPaymentOrder(id)
 
 	if err != nil {
-		return nil, err
+		return nil, newErrors.Wrap(err, "repo deposit payment order get")
 	}
 
 	err = data.Upper.Tx(func(tx up.Session) error {
 		var err error
 		err = h.repo.Update(ctx, tx, *dataToInsert)
 		if err != nil {
-			return errors.ErrInternalServer
+			return newErrors.Wrap(err, "repo deposit payment order update")
 		}
 
 		//update vezanih troskova koji su nastali od tog naloga
@@ -120,7 +120,7 @@ func (h *DepositPaymentOrderServiceImpl) UpdateDepositPaymentOrder(ctx context.C
 				_, err = h.additionalExpensesRepo.Insert(tx, *additionalExpenseData)
 
 				if err != nil {
-					return err
+					return newErrors.Wrap(err, "repo deposit payment order additional expenses insert")
 				}
 			}
 		}
@@ -130,14 +130,14 @@ func (h *DepositPaymentOrderServiceImpl) UpdateDepositPaymentOrder(ctx context.C
 				err := h.additionalExpensesRepo.Delete(itemID)
 
 				if err != nil {
-					return err
+					return newErrors.Wrap(err, "repo deposit payment order additional expenses delete")
 				}
 			} else {
 				for _, item := range input.AdditionalExpenses {
 					if item.ID == itemID {
 						additionalExpenseData, err := h.additionalExpensesRepo.Get(item.ID)
 						if err != nil {
-							return err
+							return newErrors.Wrap(err, "repo deposit payment order additional expenses get")
 						}
 						additionalExpenseData.ID = itemID
 						additionalExpenseData.PaymentOrderID = id
@@ -145,7 +145,7 @@ func (h *DepositPaymentOrderServiceImpl) UpdateDepositPaymentOrder(ctx context.C
 						additionalExpenseData.Status = "Kreiran"
 						err = h.additionalExpensesRepo.Update(tx, *additionalExpenseData)
 						if err != nil {
-							return err
+							return newErrors.Wrap(err, "repo deposit payment order additional expenses update")
 						}
 					}
 				}
@@ -166,7 +166,7 @@ func (h *DepositPaymentOrderServiceImpl) UpdateDepositPaymentOrder(ctx context.C
 			} else {
 				additionalExpenseData, err := h.additionalExpensesRepo.Get(item.ID)
 				if err != nil {
-					return err
+					return newErrors.Wrap(err, "repo deposit payment order additional expenses get")
 				}
 				additionalExpenseData.PayingPaymentOrderID = &id
 				additionalExpenseData.SourceBankAccount = dataToInsert.SourceBankAccount
@@ -174,7 +174,7 @@ func (h *DepositPaymentOrderServiceImpl) UpdateDepositPaymentOrder(ctx context.C
 				err = h.additionalExpensesRepo.Update(tx, *additionalExpenseData)
 
 				if err != nil {
-					return err
+					return newErrors.Wrap(err, "repo deposit payment order additional expenses update")
 				}
 			}
 		}
@@ -184,7 +184,7 @@ func (h *DepositPaymentOrderServiceImpl) UpdateDepositPaymentOrder(ctx context.C
 				additionalExpenseData, err := h.additionalExpensesRepo.Get(itemID)
 
 				if err != nil {
-					return err
+					return newErrors.Wrap(err, "repo deposit payment order additional expenses get")
 				}
 
 				additionalExpenseData.PayingPaymentOrderID = nil
@@ -194,7 +194,7 @@ func (h *DepositPaymentOrderServiceImpl) UpdateDepositPaymentOrder(ctx context.C
 				err = h.additionalExpensesRepo.Update(tx, *additionalExpenseData)
 
 				if err != nil {
-					return err
+					return newErrors.Wrap(err, "repo deposit payment order additional expenses update")
 				}
 			}
 		}
@@ -203,12 +203,12 @@ func (h *DepositPaymentOrderServiceImpl) UpdateDepositPaymentOrder(ctx context.C
 	})
 
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "upper tx")
 	}
 
 	dataToInsert, err = h.repo.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo deposit payment order delete")
 	}
 
 	response := dto.ToDepositPaymentOrderResponseDTO(*dataToInsert)
@@ -221,7 +221,7 @@ func (h *DepositPaymentOrderServiceImpl) PayDepositPaymentOrder(ctx context.Cont
 		var err error
 		err = h.repo.PayDepositPaymentOrder(ctx, tx, id, *input.IDOfStatement, *input.DateOfStatement)
 		if err != nil {
-			return errors.ErrInternalServer
+			return newErrors.Wrap(err, "repo deposit payment order pay")
 		}
 
 		additionalExpenses, _, err := h.additionalExpenses.GetDepositAdditionalExpenseList(dto.DepositAdditionalExpenseFilterDTO{
@@ -229,19 +229,19 @@ func (h *DepositPaymentOrderServiceImpl) PayDepositPaymentOrder(ctx context.Cont
 		})
 
 		if err != nil {
-			return err
+			return newErrors.Wrap(err, "repo deposit payment order additional expenses get all")
 		}
 
 		for _, item := range additionalExpenses {
 			if item.Title == "Neto" {
 				itemToUpdate, err := h.additionalExpensesRepo.Get(item.ID)
 				if err != nil {
-					return err
+					return newErrors.Wrap(err, "repo deposit payment order additional expenses get")
 				}
 				itemToUpdate.Status = "Plaćen"
 				err = h.additionalExpensesRepo.Update(tx, *itemToUpdate)
 				if err != nil {
-					return err
+					return newErrors.Wrap(err, "repo deposit payment order additional expenses update")
 				}
 			}
 		}
@@ -251,18 +251,18 @@ func (h *DepositPaymentOrderServiceImpl) PayDepositPaymentOrder(ctx context.Cont
 		})
 
 		if err != nil {
-			return err
+			return newErrors.Wrap(err, "repo deposit payment order additional expenses get all")
 		}
 
 		for _, item := range additionalExpenses {
 			itemToUpdate, err := h.additionalExpensesRepo.Get(item.ID)
 			if err != nil {
-				return err
+				return newErrors.Wrap(err, "repo deposit payment order additional expenses get")
 			}
 			itemToUpdate.Status = "Plaćen"
 			err = h.additionalExpensesRepo.Update(tx, *itemToUpdate)
 			if err != nil {
-				return err
+				return newErrors.Wrap(err, "repo deposit payment order additional expenses update")
 			}
 
 		}
@@ -271,7 +271,7 @@ func (h *DepositPaymentOrderServiceImpl) PayDepositPaymentOrder(ctx context.Cont
 	})
 
 	if err != nil {
-		return errors.ErrInternalServer
+		return newErrors.Wrap(err, "upper tx")
 	}
 
 	return nil
@@ -284,18 +284,18 @@ func (h *DepositPaymentOrderServiceImpl) DeleteDepositPaymentOrder(ctx context.C
 		})
 
 		if err != nil {
-			return err
+			return newErrors.Wrap(err, "repo deposit payment order additional expenses get all")
 		}
 
 		for _, item := range additionalExpenses {
 			itemToUpdate, err := h.additionalExpensesRepo.Get(item.ID)
 			if err != nil {
-				return err
+				return newErrors.Wrap(err, "repo deposit payment order additional expenses get")
 			}
 			itemToUpdate.Status = "Kreiran"
 			err = h.additionalExpensesRepo.Update(tx, *itemToUpdate)
 			if err != nil {
-				return err
+				return newErrors.Wrap(err, "repo deposit payment order additional expenses update")
 			}
 
 		}
@@ -304,13 +304,12 @@ func (h *DepositPaymentOrderServiceImpl) DeleteDepositPaymentOrder(ctx context.C
 	})
 
 	if err != nil {
-		return err
+		return newErrors.Wrap(err, "upper tx")
 	}
 
 	err = h.repo.Delete(ctx, id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return errors.ErrInternalServer
+		return newErrors.Wrap(err, "repo deposit payment order delete")
 	}
 
 	return nil
@@ -319,16 +318,15 @@ func (h *DepositPaymentOrderServiceImpl) DeleteDepositPaymentOrder(ctx context.C
 func (h *DepositPaymentOrderServiceImpl) GetDepositPaymentOrder(id int) (*dto.DepositPaymentOrderResponseDTO, error) {
 	data, err := h.repo.Get(id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrNotFound
+		return nil, newErrors.Wrap(err, "repo deposit payment order get")
 	}
+
 	response := dto.ToDepositPaymentOrderResponseDTO(*data)
 
 	additionalExpenses, _, err := h.additionalExpenses.GetDepositAdditionalExpenseList(dto.DepositAdditionalExpenseFilterDTO{PaymentOrderID: &id})
 
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, err
+		return nil, newErrors.Wrap(err, "repo deposit payment order additional expenses get all")
 	}
 
 	response.AdditionalExpenses = additionalExpenses
@@ -336,16 +334,14 @@ func (h *DepositPaymentOrderServiceImpl) GetDepositPaymentOrder(id int) (*dto.De
 	additionalExpenses, _, err = h.additionalExpenses.GetDepositAdditionalExpenseList(dto.DepositAdditionalExpenseFilterDTO{PayingPaymentOrderID: &id})
 
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, err
+		return nil, newErrors.Wrap(err, "repo deposit payment order additional expenses get all")
 	}
 
 	for i := 0; i < len(additionalExpenses); i++ {
 		order, err := h.repo.Get(additionalExpenses[i].PaymentOrderID)
 
 		if err != nil {
-			h.App.ErrorLog.Println(err)
-			return nil, err
+			return nil, newErrors.Wrap(err, "repo deposit payment order get")
 		}
 
 		additionalExpenses[i].CaseNumber = order.CaseNumber
@@ -413,8 +409,7 @@ func (h *DepositPaymentOrderServiceImpl) GetDepositPaymentOrderList(filter dto.D
 
 	data, total, err := h.repo.GetAll(filter.Page, filter.Size, conditionAndExp, orders)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, nil, errors.ErrInternalServer
+		return nil, nil, newErrors.Wrap(err, "repo deposit payment order get all")
 	}
 	response := dto.ToDepositPaymentOrderListResponseDTO(data)
 
@@ -422,8 +417,7 @@ func (h *DepositPaymentOrderServiceImpl) GetDepositPaymentOrderList(filter dto.D
 		additionalExpenses, _, err := h.additionalExpenses.GetDepositAdditionalExpenseList(dto.DepositAdditionalExpenseFilterDTO{PaymentOrderID: &response[i].ID})
 
 		if err != nil {
-			h.App.ErrorLog.Println(err)
-			return nil, nil, errors.ErrInternalServer
+			return nil, nil, newErrors.Wrap(err, "repo deposit payment order additional expenses get all")
 		}
 
 		response[i].AdditionalExpenses = additionalExpenses
@@ -431,8 +425,7 @@ func (h *DepositPaymentOrderServiceImpl) GetDepositPaymentOrderList(filter dto.D
 		additionalExpenses, _, err = h.additionalExpenses.GetDepositAdditionalExpenseList(dto.DepositAdditionalExpenseFilterDTO{PayingPaymentOrderID: &response[i].ID})
 
 		if err != nil {
-			h.App.ErrorLog.Println(err)
-			return nil, nil, errors.ErrInternalServer
+			return nil, nil, newErrors.Wrap(err, "repo deposit payment order additional expenses get all")
 		}
 
 		response[i].AdditionalExpensesForPaying = additionalExpenses

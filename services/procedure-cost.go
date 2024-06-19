@@ -6,7 +6,7 @@ import (
 
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
-	"gitlab.sudovi.me/erp/finance-api/errors"
+	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 
 	"github.com/oykos-development-hub/celeritas"
 	up "github.com/upper/db/v4"
@@ -34,12 +34,12 @@ func (h *ProcedureCostServiceImpl) CreateProcedureCost(ctx context.Context, inpu
 
 	id, err := h.repo.Insert(ctx, *procedurecost)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo procedure cost insert")
 	}
 
 	procedurecost, err = procedurecost.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo procedure cost get")
 	}
 
 	return h.createProcedureCostResponse(context.Background(), procedurecost)
@@ -49,8 +49,7 @@ func (h *ProcedureCostServiceImpl) CreateProcedureCost(ctx context.Context, inpu
 func (h *ProcedureCostServiceImpl) GetProcedureCost(id int) (*dto.ProcedureCostResponseDTO, error) {
 	procedurecost, err := h.repo.Get(id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrNotFound
+		return nil, newErrors.Wrap(err, "repo procedure cost get")
 	}
 
 	return h.createProcedureCostResponse(context.Background(), procedurecost)
@@ -63,12 +62,12 @@ func (h *ProcedureCostServiceImpl) UpdateProcedureCost(ctx context.Context, id i
 
 	err := h.repo.Update(ctx, *procedurecost)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo procedure cost update")
 	}
 
 	procedurecost, err = h.repo.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo procedure cost get")
 	}
 
 	return h.createProcedureCostResponse(ctx, procedurecost)
@@ -78,8 +77,7 @@ func (h *ProcedureCostServiceImpl) UpdateProcedureCost(ctx context.Context, id i
 func (h *ProcedureCostServiceImpl) DeleteProcedureCost(ctx context.Context, id int) error {
 	err := h.repo.Delete(ctx, id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return errors.ErrInternalServer
+		return newErrors.Wrap(err, "repo procedure cost delete")
 	}
 
 	return nil
@@ -116,8 +114,7 @@ func (h *ProcedureCostServiceImpl) GetProcedureCostList(input dto.ProcedureCostF
 
 	procedureCosts, total, err := h.repo.GetAll(input.Page, input.Size, conditionAndExp)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, nil, err
+		return nil, nil, newErrors.Wrap(err, "repo procedure cost get all")
 	}
 
 	var procedureCostsList []data.ProcedureCost
@@ -127,8 +124,7 @@ func (h *ProcedureCostServiceImpl) GetProcedureCostList(input dto.ProcedureCostF
 
 	response, err := h.convertProcedureCostsToResponses(context.Background(), procedureCostsList)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, nil, err
+		return nil, nil, newErrors.Wrap(err, "convert procedure costs to responses")
 	}
 
 	return response, total, nil
@@ -140,7 +136,7 @@ func (h *ProcedureCostServiceImpl) convertProcedureCostsToResponses(ctx context.
 	for _, fee := range procedurecosts {
 		response, err := h.createProcedureCostResponse(ctx, &fee)
 		if err != nil {
-			return nil, err
+			return nil, newErrors.Wrap(err, "create procedure cost response")
 		}
 		responses = append(responses, *response)
 	}
@@ -154,8 +150,7 @@ func (h *ProcedureCostServiceImpl) createProcedureCostResponse(ctx context.Conte
 	var err error
 	response.ProcedureCostDetails, newStatus, err = h.procedurecostSharedLogicService.CalculateProcedureCostDetailsAndUpdateStatus(ctx, procedurecost.ID)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, err
+		return nil, newErrors.Wrap(err, "procedure shared logic service calculate procedure cost details and update status")
 	}
 	response.Status = newStatus
 

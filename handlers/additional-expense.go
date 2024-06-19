@@ -31,6 +31,7 @@ func (h *additionalexpenseHandlerImpl) DeleteAdditionalExpense(w http.ResponseWr
 
 	err := h.service.DeleteAdditionalExpense(id)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -43,6 +44,7 @@ func (h *additionalexpenseHandlerImpl) GetAdditionalExpenseById(w http.ResponseW
 
 	res, err := h.service.GetAdditionalExpense(id)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -57,12 +59,14 @@ func (h *additionalexpenseHandlerImpl) GetAdditionalExpenseList(w http.ResponseW
 
 	validator := h.App.Validator().ValidateStruct(&filter)
 	if !validator.Valid() {
+		h.App.ErrorLog.Print(validator.Errors)
 		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
 		return
 	}
 
 	res, total, err := h.service.GetAdditionalExpenseList(filter)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}

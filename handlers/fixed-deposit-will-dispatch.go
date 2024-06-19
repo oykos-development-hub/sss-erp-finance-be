@@ -32,12 +32,14 @@ func (h *fixeddepositwilldispatchHandlerImpl) CreateFixedDepositWillDispatch(w h
 	var input dto.FixedDepositWillDispatchDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
 	}
 
 	validator := h.App.Validator().ValidateStruct(&input)
 	if !validator.Valid() {
+		h.App.ErrorLog.Print(validator.Errors)
 		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
 		return
 	}
@@ -47,6 +49,7 @@ func (h *fixeddepositwilldispatchHandlerImpl) CreateFixedDepositWillDispatch(w h
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
 	}
@@ -56,6 +59,7 @@ func (h *fixeddepositwilldispatchHandlerImpl) CreateFixedDepositWillDispatch(w h
 
 	res, err := h.service.CreateFixedDepositWillDispatch(ctx, input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -69,12 +73,14 @@ func (h *fixeddepositwilldispatchHandlerImpl) UpdateFixedDepositWillDispatch(w h
 	var input dto.FixedDepositWillDispatchDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
 	}
 
 	validator := h.App.Validator().ValidateStruct(&input)
 	if !validator.Valid() {
+		h.App.ErrorLog.Print(validator.Errors)
 		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
 		return
 	}
@@ -84,6 +90,7 @@ func (h *fixeddepositwilldispatchHandlerImpl) UpdateFixedDepositWillDispatch(w h
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
 	}
@@ -93,6 +100,7 @@ func (h *fixeddepositwilldispatchHandlerImpl) UpdateFixedDepositWillDispatch(w h
 
 	res, err := h.service.UpdateFixedDepositWillDispatch(ctx, id, input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -108,6 +116,7 @@ func (h *fixeddepositwilldispatchHandlerImpl) DeleteFixedDepositWillDispatch(w h
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
 	}
@@ -117,6 +126,7 @@ func (h *fixeddepositwilldispatchHandlerImpl) DeleteFixedDepositWillDispatch(w h
 
 	err = h.service.DeleteFixedDepositWillDispatch(ctx, id)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -129,6 +139,7 @@ func (h *fixeddepositwilldispatchHandlerImpl) GetFixedDepositWillDispatchById(w 
 
 	res, err := h.service.GetFixedDepositWillDispatch(id)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -143,12 +154,14 @@ func (h *fixeddepositwilldispatchHandlerImpl) GetFixedDepositWillDispatchList(w 
 
 	validator := h.App.Validator().ValidateStruct(&filter)
 	if !validator.Valid() {
+		h.App.ErrorLog.Print(validator.Errors)
 		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
 		return
 	}
 
 	res, total, err := h.service.GetFixedDepositWillDispatchList(filter)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}

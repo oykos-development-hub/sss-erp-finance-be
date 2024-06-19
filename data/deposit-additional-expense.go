@@ -4,6 +4,7 @@ import (
 	"time"
 
 	up "github.com/upper/db/v4"
+	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 )
 
 // DepositAdditionalExpense struct
@@ -41,7 +42,7 @@ func (t *DepositAdditionalExpense) GetAll(page *int, size *int, condition *up.An
 	}
 	total, err := res.Count()
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, newErrors.Wrap(err, "upper count")
 	}
 
 	if page != nil && size != nil {
@@ -50,7 +51,7 @@ func (t *DepositAdditionalExpense) GetAll(page *int, size *int, condition *up.An
 
 	err = res.OrderBy(orders...).All(&all)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, newErrors.Wrap(err, "upper all")
 	}
 
 	return all, &total, err
@@ -64,7 +65,7 @@ func (t *DepositAdditionalExpense) Get(id int) (*DepositAdditionalExpense, error
 	res := collection.Find(up.Cond{"id": id})
 	err := res.One(&one)
 	if err != nil {
-		return nil, err
+		return nil, newErrors.Wrap(err, "upper one")
 	}
 	return &one, nil
 }
@@ -76,7 +77,7 @@ func (t *DepositAdditionalExpense) Update(tx up.Session, m DepositAdditionalExpe
 	res := collection.Find(m.ID)
 	err := res.Update(&m)
 	if err != nil {
-		return err
+		return newErrors.Wrap(err, "upper update")
 	}
 	return nil
 }
@@ -87,7 +88,7 @@ func (t *DepositAdditionalExpense) Delete(id int) error {
 	res := collection.Find(id)
 	err := res.Delete()
 	if err != nil {
-		return err
+		return newErrors.Wrap(err, "upper delete")
 	}
 	return nil
 }
@@ -99,7 +100,7 @@ func (t *DepositAdditionalExpense) Insert(tx up.Session, m DepositAdditionalExpe
 	collection := tx.Collection(t.Table())
 	res, err := collection.Insert(m)
 	if err != nil {
-		return 0, err
+		return 0, newErrors.Wrap(err, "upper insert")
 	}
 
 	id := getInsertId(res.ID())

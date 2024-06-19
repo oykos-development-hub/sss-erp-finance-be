@@ -5,7 +5,7 @@ import (
 
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
-	"gitlab.sudovi.me/erp/finance-api/errors"
+	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 
 	"github.com/oykos-development-hub/celeritas"
 	"github.com/shopspring/decimal"
@@ -38,12 +38,12 @@ func (h *FilledFinancialBudgetServiceImpl) CreateFilledFinancialBudget(ctx conte
 
 	id, err := h.repo.Insert(ctx, *data)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo filled financial budget insert")
 	}
 
 	data, err = data.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo filled financial budget get")
 	}
 
 	res := dto.ToFilledFinancialBudgetResponseDTO(data)
@@ -57,12 +57,12 @@ func (h *FilledFinancialBudgetServiceImpl) UpdateFilledFinancialBudget(ctx conte
 
 	err := h.repo.Update(ctx, *inputData)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo filled financial budget update")
 	}
 
 	resData, err := h.repo.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo filled financial budget update")
 	}
 
 	response := dto.ToFilledFinancialBudgetResponseDTO(resData)
@@ -73,17 +73,17 @@ func (h *FilledFinancialBudgetServiceImpl) UpdateFilledFinancialBudget(ctx conte
 func (h *FilledFinancialBudgetServiceImpl) UpdateActualFilledFinancialBudget(ctx context.Context, id int, actual decimal.Decimal) (*dto.FilledFinancialBudgetResponseDTO, error) {
 	err := h.repo.UpdateActual(ctx, id, actual)
 	if err != nil {
-		return nil, err
+		return nil, newErrors.Wrap(err, "repo filled financial budget update actual")
 	}
 
 	item, err := h.repo.Get(id)
 	if err != nil {
-		return nil, err
+		return nil, newErrors.Wrap(err, "repo filled financial budget get")
 	}
 
 	budgetRequest, err := h.reqRepo.Get(item.BudgetRequestID)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo budget request get")
 	}
 
 	// TODO: check if there is only one insert. If we allow official to update actual, then we need to update it here too.
@@ -96,7 +96,7 @@ func (h *FilledFinancialBudgetServiceImpl) UpdateActualFilledFinancialBudget(ctx
 		Balance:       decimal.Zero,
 	})
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo current budget insert")
 	}
 
 	response := dto.ToFilledFinancialBudgetResponseDTO(item)
@@ -107,8 +107,7 @@ func (h *FilledFinancialBudgetServiceImpl) UpdateActualFilledFinancialBudget(ctx
 func (h *FilledFinancialBudgetServiceImpl) DeleteFilledFinancialBudget(ctx context.Context, id int) error {
 	err := h.repo.Delete(ctx, id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return errors.ErrInternalServer
+		return newErrors.Wrap(err, "repo filled financial budget delete")
 	}
 
 	return nil
@@ -117,9 +116,9 @@ func (h *FilledFinancialBudgetServiceImpl) DeleteFilledFinancialBudget(ctx conte
 func (h *FilledFinancialBudgetServiceImpl) GetFilledFinancialBudget(id int) (*dto.FilledFinancialBudgetResponseDTO, error) {
 	data, err := h.repo.Get(id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrNotFound
+		return nil, newErrors.Wrap(err, "repo filled financial budget get")
 	}
+
 	response := dto.ToFilledFinancialBudgetResponseDTO(data)
 
 	return &response, nil
@@ -139,8 +138,7 @@ func (h *FilledFinancialBudgetServiceImpl) GetFilledFinancialBudgetList(filter d
 
 	data, total, err := h.repo.GetAll(filter.Page, filter.Size, conditionAndExp, orders)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, nil, errors.ErrInternalServer
+		return nil, nil, newErrors.Wrap(err, "repo filled financial budget get all")
 	}
 
 	response := dto.ToFilledFinancialBudgetListResponseDTO(data)
@@ -151,8 +149,7 @@ func (h *FilledFinancialBudgetServiceImpl) GetFilledFinancialBudgetList(filter d
 func (h *FilledFinancialBudgetServiceImpl) GetSummaryFilledFinancialRequests(budgetID int, requestType data.RequestType) ([]dto.FilledFinancialBudgetResponseDTO, error) {
 	data, err := h.repo.GetSummaryFilledFinancialRequests(budgetID, requestType)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo filled financial budget get summary filled financial requests")
 	}
 	response := dto.ToFilledFinancialBudgetListResponseDTO(data)
 

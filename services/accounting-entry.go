@@ -7,6 +7,7 @@ import (
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
 	"gitlab.sudovi.me/erp/finance-api/errors"
+	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 
 	"github.com/oykos-development-hub/celeritas"
 	up "github.com/upper/db/v4"
@@ -62,12 +63,12 @@ func (h *AccountingEntryServiceImpl) CreateAccountingEntry(ctx context.Context, 
 		}
 
 		if dataToInsert.Type == "" {
-			return errors.ErrInvalidInput
+			return newErrors.Wrap(errors.ErrInvalidInput, "check input")
 		}
 
 		id, err = h.repo.Insert(ctx, tx, *dataToInsert)
 		if err != nil {
-			return errors.ErrInternalServer
+			return newErrors.Wrap(err, "repo accounting entry insert")
 		}
 
 		for _, item := range input.Items {
@@ -76,16 +77,17 @@ func (h *AccountingEntryServiceImpl) CreateAccountingEntry(ctx context.Context, 
 
 			_, err = h.items.Insert(tx, *itemToInsert)
 			if err != nil {
-				return err
+				return newErrors.Wrap(err, "repo accounting entry item insert")
 			}
 
 			boolTrue := true
 			if (item.Type == string(data.TypeInvoice) || item.Type == string(data.TypeContract) || item.Type == string(data.TypeDecision)) &&
 				item.InvoiceID != nil && *item.InvoiceID != 0 {
+
 				invoice, err := h.invoiceRepo.Get(*item.InvoiceID)
 
 				if err != nil {
-					return err
+					return newErrors.Wrap(err, "repo invoice get")
 				}
 
 				invoice.Registred = &boolTrue
@@ -93,13 +95,13 @@ func (h *AccountingEntryServiceImpl) CreateAccountingEntry(ctx context.Context, 
 				err = h.invoiceRepo.Update(ctx, tx, *invoice)
 
 				if err != nil {
-					return err
+					return newErrors.Wrap(err, "repo invoice update")
 				}
 			} else if item.Type == string(data.TypeSalary) && item.SalaryID != nil && *item.SalaryID != 0 {
 				salary, err := h.salaryRepo.Get(*item.SalaryID)
 
 				if err != nil {
-					return err
+					return newErrors.Wrap(err, "repo salary get")
 				}
 
 				salary.Registred = &boolTrue
@@ -107,13 +109,13 @@ func (h *AccountingEntryServiceImpl) CreateAccountingEntry(ctx context.Context, 
 				err = h.salaryRepo.Update(ctx, tx, *salary)
 
 				if err != nil {
-					return err
+					return newErrors.Wrap(err, "repo salary update")
 				}
 			} else if item.Type == string(data.TypePaymentOrder) && item.PaymentOrderID != nil && *item.PaymentOrderID != 0 {
 				paymentOrder, err := h.paymentOrderRepo.Get(*item.PaymentOrderID)
 
 				if err != nil {
-					return err
+					return newErrors.Wrap(err, "repo payment order get")
 				}
 
 				paymentOrder.Registred = &boolTrue
@@ -121,13 +123,13 @@ func (h *AccountingEntryServiceImpl) CreateAccountingEntry(ctx context.Context, 
 				err = h.paymentOrderRepo.Update(ctx, tx, *paymentOrder)
 
 				if err != nil {
-					return err
+					return newErrors.Wrap(err, "repo payment order update")
 				}
 			} else if item.Type == string(data.TypeEnforcedPayment) && item.EnforcedPaymentID != nil && *item.EnforcedPaymentID != 0 {
 				enforcedPayment, err := h.enforcedPaymentRepo.Get(*item.EnforcedPaymentID)
 
 				if err != nil {
-					return err
+					return newErrors.Wrap(err, "repo enforced payment get")
 				}
 
 				enforcedPayment.Registred = &boolTrue
@@ -135,13 +137,13 @@ func (h *AccountingEntryServiceImpl) CreateAccountingEntry(ctx context.Context, 
 				err = h.enforcedPaymentRepo.Update(ctx, tx, *enforcedPayment)
 
 				if err != nil {
-					return err
+					return newErrors.Wrap(err, "repo enforced payment update")
 				}
 			} else if item.Type == string(data.TypeReturnEnforcedPayment) && item.ReturnEnforcedPaymentID != nil && *item.ReturnEnforcedPaymentID != 0 {
 				enforcedPayment, err := h.enforcedPaymentRepo.Get(*item.ReturnEnforcedPaymentID)
 
 				if err != nil {
-					return err
+					return newErrors.Wrap(err, "repo enforced payment get")
 				}
 
 				enforcedPayment.RegistredReturn = &boolTrue
@@ -149,7 +151,7 @@ func (h *AccountingEntryServiceImpl) CreateAccountingEntry(ctx context.Context, 
 				err = h.enforcedPaymentRepo.Update(ctx, tx, *enforcedPayment)
 
 				if err != nil {
-					return err
+					return newErrors.Wrap(err, "repo enforced payment update")
 				}
 			}
 
@@ -159,12 +161,12 @@ func (h *AccountingEntryServiceImpl) CreateAccountingEntry(ctx context.Context, 
 	})
 
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "upper tx")
 	}
 
 	dataToInsert, err = h.repo.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo accounting entry get")
 	}
 
 	res := dto.ToAccountingEntryResponseDTO(*dataToInsert)
@@ -179,17 +181,17 @@ func (h *AccountingEntryServiceImpl) UpdateAccountingEntry(ctx context.Context, 
 	err := data.Upper.Tx(func(tx up.Session) error {
 		err := h.repo.Update(ctx, tx, *dataToInsert)
 		if err != nil {
-			return errors.ErrInternalServer
+			return newErrors.Wrap(err, "repo accounting entry update")
 		}
 		return nil
 	})
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "upper tx")
 	}
 
 	dataToInsert, err = h.repo.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo accounting entry get")
 	}
 
 	response := dto.ToAccountingEntryResponseDTO(*dataToInsert)
@@ -203,7 +205,7 @@ func (h *AccountingEntryServiceImpl) DeleteAccountingEntry(ctx context.Context, 
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"entry_id": id})
 		items, _, err := h.items.GetAll(nil, nil, conditionAndExp, nil)
 		if err != nil {
-			return errors.ErrInternalServer
+			return newErrors.Wrap(err, "repo accounting entry items get all")
 		}
 
 		for _, item := range items {
@@ -213,7 +215,7 @@ func (h *AccountingEntryServiceImpl) DeleteAccountingEntry(ctx context.Context, 
 				invoice, err := h.invoiceRepo.Get(*item.InvoiceID)
 
 				if err != nil {
-					return err
+					return newErrors.Wrap(err, "repo invoice get")
 				}
 
 				invoice.Registred = &boolFalse
@@ -221,13 +223,13 @@ func (h *AccountingEntryServiceImpl) DeleteAccountingEntry(ctx context.Context, 
 				err = h.invoiceRepo.Update(ctx, tx, *invoice)
 
 				if err != nil {
-					return err
+					return newErrors.Wrap(err, "repo invoice update")
 				}
 			} else if item.Type == string(data.TypeSalary) && item.SalaryID != nil && *item.SalaryID != 0 {
 				salary, err := h.salaryRepo.Get(*item.SalaryID)
 
 				if err != nil {
-					return err
+					return newErrors.Wrap(err, "repo salary get")
 				}
 
 				salary.Registred = &boolFalse
@@ -235,13 +237,13 @@ func (h *AccountingEntryServiceImpl) DeleteAccountingEntry(ctx context.Context, 
 				err = h.salaryRepo.Update(ctx, tx, *salary)
 
 				if err != nil {
-					return err
+					return newErrors.Wrap(err, "repo salary update")
 				}
 			} else if item.Type == string(data.TypePaymentOrder) && item.PaymentOrderID != nil && *item.PaymentOrderID != 0 {
 				paymentOrder, err := h.paymentOrderRepo.Get(*item.PaymentOrderID)
 
 				if err != nil {
-					return err
+					return newErrors.Wrap(err, "repo payment order get")
 				}
 
 				paymentOrder.Registred = &boolFalse
@@ -249,13 +251,13 @@ func (h *AccountingEntryServiceImpl) DeleteAccountingEntry(ctx context.Context, 
 				err = h.paymentOrderRepo.Update(ctx, tx, *paymentOrder)
 
 				if err != nil {
-					return err
+					return newErrors.Wrap(err, "repo payment order update")
 				}
 			} else if item.Type == string(data.TypeEnforcedPayment) && item.EnforcedPaymentID != nil && *item.EnforcedPaymentID != 0 {
 				enforcedPayment, err := h.enforcedPaymentRepo.Get(*item.EnforcedPaymentID)
 
 				if err != nil {
-					return err
+					return newErrors.Wrap(err, "repo enforced payment get")
 				}
 
 				enforcedPayment.Registred = &boolFalse
@@ -263,13 +265,13 @@ func (h *AccountingEntryServiceImpl) DeleteAccountingEntry(ctx context.Context, 
 				err = h.enforcedPaymentRepo.Update(ctx, tx, *enforcedPayment)
 
 				if err != nil {
-					return err
+					return newErrors.Wrap(err, "repo enforced payment update")
 				}
 			} else if item.Type == string(data.TypeReturnEnforcedPayment) && item.ReturnEnforcedPaymentID != nil && *item.ReturnEnforcedPaymentID != 0 {
 				enforcedPayment, err := h.enforcedPaymentRepo.Get(*item.ReturnEnforcedPaymentID)
 
 				if err != nil {
-					return err
+					return newErrors.Wrap(err, "repo enforced payment get")
 				}
 
 				enforcedPayment.RegistredReturn = &boolFalse
@@ -277,23 +279,21 @@ func (h *AccountingEntryServiceImpl) DeleteAccountingEntry(ctx context.Context, 
 				err = h.enforcedPaymentRepo.Update(ctx, tx, *enforcedPayment)
 
 				if err != nil {
-					return err
+					return newErrors.Wrap(err, "repo enforced payment update")
 				}
 			}
 		}
 
 		err = h.repo.Delete(ctx, id)
 		if err != nil {
-			h.App.ErrorLog.Println(err)
-			return errors.ErrInternalServer
+			return newErrors.Wrap(err, "repo accounting entry delete")
 		}
 
 		return nil
 	})
 
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return errors.ErrInternalServer
+		return newErrors.Wrap(err, "upper tx")
 	}
 
 	return nil
@@ -302,9 +302,9 @@ func (h *AccountingEntryServiceImpl) DeleteAccountingEntry(ctx context.Context, 
 func (h *AccountingEntryServiceImpl) GetAccountingEntry(id int) (*dto.AccountingEntryResponseDTO, error) {
 	data, err := h.repo.Get(id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrNotFound
+		return nil, newErrors.Wrap(err, "repo accounting entry get")
 	}
+
 	response := dto.ToAccountingEntryResponseDTO(*data)
 
 	conditionAndExp := &up.AndExpr{}
@@ -312,8 +312,7 @@ func (h *AccountingEntryServiceImpl) GetAccountingEntry(id int) (*dto.Accounting
 	items, _, err := h.items.GetAll(nil, nil, conditionAndExp, nil)
 
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrNotFound
+		return nil, newErrors.Wrap(err, "repo accounting entry item get all")
 	}
 
 	var debitAmount float64
@@ -379,8 +378,7 @@ func (h *AccountingEntryServiceImpl) GetAccountingEntryList(filter dto.Accountin
 
 	data, total, err := h.repo.GetAll(filter.Page, filter.Size, conditionAndExp, orders)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, nil, errors.ErrInternalServer
+		return nil, nil, newErrors.Wrap(err, "repo accounting entry get all")
 	}
 	response := dto.ToAccountingEntryListResponseDTO(data)
 
@@ -390,8 +388,7 @@ func (h *AccountingEntryServiceImpl) GetAccountingEntryList(filter dto.Accountin
 		items, _, err := h.items.GetAll(nil, nil, conditionAndExp, nil)
 
 		if err != nil {
-			h.App.ErrorLog.Println(err)
-			return nil, nil, errors.ErrNotFound
+			return nil, nil, newErrors.Wrap(err, "repo accounting entry item get all")
 		}
 
 		var debitAmount float64
@@ -443,8 +440,7 @@ func (h *AccountingEntryServiceImpl) GetAnalyticalCard(filter data.AnalyticalCar
 		responseItem, err := h.repo.GetAnalyticalCard(filter)
 
 		if err != nil {
-			h.App.ErrorLog.Println(err)
-			return nil, errors.ErrInternalServer
+			return nil, newErrors.Wrap(err, "repo accounting entry get analytical card")
 		}
 		responseItem.SupplierID = *filter.SupplierID
 		response = append(response, *responseItem)
@@ -452,8 +448,7 @@ func (h *AccountingEntryServiceImpl) GetAnalyticalCard(filter data.AnalyticalCar
 		allSuppliers, err := h.repo.GetAllSuppliers(filter)
 
 		if err != nil {
-			h.App.ErrorLog.Println(err)
-			return nil, errors.ErrInternalServer
+			return nil, newErrors.Wrap(err, "repo accounting entry get all suppliers")
 		}
 
 		for _, supplierID := range allSuppliers {
@@ -463,7 +458,7 @@ func (h *AccountingEntryServiceImpl) GetAnalyticalCard(filter data.AnalyticalCar
 
 			if err != nil {
 				h.App.ErrorLog.Println(err)
-				return nil, errors.ErrInternalServer
+				return nil, newErrors.Wrap(err, "repo accounting entry get analytical card")
 			}
 
 			responseItem.SupplierID = *filter.SupplierID
@@ -490,7 +485,7 @@ func (h *AccountingEntryServiceImpl) GetObligationsForAccounting(filter dto.GetO
 	items, total, err := h.repo.GetObligationsForAccounting(dataFilter)
 
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, newErrors.Wrap(err, "repo accounting entry get obligations for accounting")
 	}
 
 	var response []dto.ObligationForAccounting
@@ -525,7 +520,7 @@ func (h *AccountingEntryServiceImpl) GetPaymentOrdersForAccounting(filter dto.Ge
 	items, total, err := h.repo.GetPaymentOrdersForAccounting(dataFilter)
 
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, newErrors.Wrap(err, "repo accounting entry get payment orders for accounting")
 	}
 
 	var response []dto.PaymentOrdersForAccounting
@@ -557,7 +552,7 @@ func (h *AccountingEntryServiceImpl) GetEnforcedPaymentsForAccounting(filter dto
 	items, total, err := h.repo.GetEnforcedPaymentsForAccounting(dataFilter)
 
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, newErrors.Wrap(err, "repo accounting entry get enforced payments for accounting")
 	}
 
 	var response []dto.PaymentOrdersForAccounting
@@ -589,7 +584,7 @@ func (h *AccountingEntryServiceImpl) GetReturnedEnforcedPaymentsForAccounting(fi
 	items, total, err := h.repo.GetReturnedEnforcedPaymentsForAccounting(dataFilter)
 
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, newErrors.Wrap(err, "repo accounting entry get returned enforced payments for accounting")
 	}
 
 	var response []dto.PaymentOrdersForAccounting
@@ -616,7 +611,7 @@ func (h *AccountingEntryServiceImpl) BuildAccountingOrderForObligations(orderDat
 		invoice, err := h.invoiceRepo.Get(id)
 
 		if err != nil {
-			return nil, err
+			return nil, newErrors.Wrap(err, "repo invoice get")
 		}
 
 		switch invoice.Type {
@@ -624,7 +619,7 @@ func (h *AccountingEntryServiceImpl) BuildAccountingOrderForObligations(orderDat
 			item, err := buildAccountingOrderForInvoice(id, h)
 
 			if err != nil {
-				return nil, err
+				return nil, newErrors.Wrap(err, "build accounting order for invoice")
 			}
 
 			response.Items = append(response.Items, item...)
@@ -632,7 +627,7 @@ func (h *AccountingEntryServiceImpl) BuildAccountingOrderForObligations(orderDat
 			item, err := buildAccountingOrderForDecisions(id, h)
 
 			if err != nil {
-				return nil, err
+				return nil, newErrors.Wrap(err, "build accounting order for decisions")
 			}
 
 			response.Items = append(response.Items, item...)
@@ -640,7 +635,7 @@ func (h *AccountingEntryServiceImpl) BuildAccountingOrderForObligations(orderDat
 			item, err := buildAccountingOrderForContracts(id, h)
 
 			if err != nil {
-				return nil, err
+				return nil, newErrors.Wrap(err, "build accounting order for contracts")
 			}
 			response.Items = append(response.Items, item...)
 		}
@@ -650,7 +645,7 @@ func (h *AccountingEntryServiceImpl) BuildAccountingOrderForObligations(orderDat
 		item, err := buildAccountingOrderForSalaries(id, h)
 
 		if err != nil {
-			return nil, err
+			return nil, newErrors.Wrap(err, "build accounting order for salaries")
 		}
 		response.Items = append(response.Items, item...)
 	}
@@ -659,7 +654,7 @@ func (h *AccountingEntryServiceImpl) BuildAccountingOrderForObligations(orderDat
 		item, err := buildAccountingOrderForPaymentOrder(id, h)
 
 		if err != nil {
-			return nil, err
+			return nil, newErrors.Wrap(err, "build accounting order for payment order")
 		}
 		response.Items = append(response.Items, item...)
 	}
@@ -668,7 +663,7 @@ func (h *AccountingEntryServiceImpl) BuildAccountingOrderForObligations(orderDat
 		item, err := buildAccountingOrderForEnforcedPayment(id, h)
 
 		if err != nil {
-			return nil, err
+			return nil, newErrors.Wrap(err, "build accounting order for enforced payment")
 		}
 		response.Items = append(response.Items, item...)
 	}
@@ -677,7 +672,7 @@ func (h *AccountingEntryServiceImpl) BuildAccountingOrderForObligations(orderDat
 		item, err := buildAccountingOrderForReturnEnforcedPayment(id, h)
 
 		if err != nil {
-			return nil, err
+			return nil, newErrors.Wrap(err, "build accounting order for return enforced payment")
 		}
 		response.Items = append(response.Items, item...)
 
@@ -697,7 +692,7 @@ func buildAccountingOrderForInvoice(id int, h *AccountingEntryServiceImpl) ([]dt
 	invoice, err := h.invoiceRepo.Get(id)
 
 	if err != nil {
-		return nil, err
+		return nil, newErrors.Wrap(err, "repo invoice get")
 	}
 
 	conditionAndExp := &up.AndExpr{}
@@ -705,7 +700,7 @@ func buildAccountingOrderForInvoice(id int, h *AccountingEntryServiceImpl) ([]dt
 	articles, _, err := h.articlesRepo.GetAll(nil, nil, conditionAndExp, nil)
 
 	if err != nil {
-		return nil, err
+		return nil, newErrors.Wrap(err, "repo article get all")
 	}
 
 	var price float64
@@ -718,12 +713,12 @@ func buildAccountingOrderForInvoice(id int, h *AccountingEntryServiceImpl) ([]dt
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, newErrors.Wrap(err, "repo model of accounting get all")
 	}
 
 	//ako ne postoji u bazi odgovarajuci model za taj tip obaveze/naloga vraca se invalid input
 	if len(model) != 1 {
-		return nil, errors.ErrInvalidInput
+		return nil, newErrors.Wrap(errors.ErrNotFound, "repo model of accounting get all")
 	}
 
 	for _, modelItem := range model[0].Items {
@@ -766,7 +761,7 @@ func buildAccountingOrderForDecisions(id int, h *AccountingEntryServiceImpl) ([]
 	invoice, err := h.invoiceRepo.Get(id)
 
 	if err != nil {
-		return nil, err
+		return nil, newErrors.Wrap(err, "repo invoice get")
 	}
 
 	conditionAndExp := &up.AndExpr{}
@@ -774,7 +769,7 @@ func buildAccountingOrderForDecisions(id int, h *AccountingEntryServiceImpl) ([]
 	additionalExpenses, _, err := h.additionalExpensesRepo.GetAll(nil, nil, conditionAndExp, nil)
 
 	if err != nil {
-		return nil, err
+		return nil, newErrors.Wrap(err, "repo additional expenses get all")
 	}
 
 	var price float64
@@ -838,12 +833,12 @@ func buildAccountingOrderForDecisions(id int, h *AccountingEntryServiceImpl) ([]
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, newErrors.Wrap(err, "repo model of accounting get all")
 	}
 
 	//ako ne postoji u bazi odgovarajuci model za taj tip obaveze/naloga vraca se invalid input
 	if len(model) != 1 {
-		return nil, errors.ErrInvalidInput
+		return nil, newErrors.Wrap(errors.ErrNotFound, "repo model of accounting get all")
 	}
 
 	for _, modelItem := range model[0].Items {
@@ -1021,7 +1016,7 @@ func buildAccountingOrderForContracts(id int, h *AccountingEntryServiceImpl) ([]
 	invoice, err := h.invoiceRepo.Get(id)
 
 	if err != nil {
-		return nil, err
+		return nil, newErrors.Wrap(err, "repo invoice get")
 	}
 
 	conditionAndExp := &up.AndExpr{}
@@ -1029,7 +1024,7 @@ func buildAccountingOrderForContracts(id int, h *AccountingEntryServiceImpl) ([]
 	additionalExpenses, _, err := h.additionalExpensesRepo.GetAll(nil, nil, conditionAndExp, nil)
 
 	if err != nil {
-		return nil, err
+		return nil, newErrors.Wrap(err, "repo additional expenses get all")
 	}
 
 	var price float64
@@ -1093,12 +1088,12 @@ func buildAccountingOrderForContracts(id int, h *AccountingEntryServiceImpl) ([]
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, newErrors.Wrap(err, "repo model of accounting get all")
 	}
 
 	//ako ne postoji u bazi odgovarajuci model za taj tip obaveze/naloga vraca se invalid input
 	if len(model) != 1 {
-		return nil, errors.ErrInvalidInput
+		return nil, newErrors.Wrap(errors.ErrNotFound, "repo model of accounting get all")
 	}
 
 	for _, modelItem := range model[0].Items {
@@ -1276,7 +1271,7 @@ func buildAccountingOrderForSalaries(id int, h *AccountingEntryServiceImpl) ([]d
 	salary, err := h.salaryRepo.Get(id)
 
 	if err != nil {
-		return nil, err
+		return nil, newErrors.Wrap(err, "repo salary get")
 	}
 
 	conditionAndExp := &up.AndExpr{}
@@ -1284,7 +1279,7 @@ func buildAccountingOrderForSalaries(id int, h *AccountingEntryServiceImpl) ([]d
 	additionalExpenses, _, err := h.salaryAdditionalExpensesRepo.GetAll(nil, nil, conditionAndExp, nil)
 
 	if err != nil {
-		return nil, err
+		return nil, newErrors.Wrap(err, "repo salary additional expenses get all")
 	}
 
 	models, _, err := h.modelOfAccountingRepo.GetModelsOfAccountingList(dto.ModelsOfAccountingFilterDTO{
@@ -1292,12 +1287,12 @@ func buildAccountingOrderForSalaries(id int, h *AccountingEntryServiceImpl) ([]d
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, newErrors.Wrap(err, "repo model of accounting get all")
 	}
 
 	//ako ne postoji u bazi odgovarajuci model za taj tip obaveze/naloga vraca se invalid input
 	if len(models) != 1 {
-		return nil, errors.ErrInvalidInput
+		return nil, newErrors.Wrap(errors.ErrNotFound, "repo model of accounting get all")
 	}
 
 	var price float64
@@ -1448,7 +1443,7 @@ func buildAccountingOrderForPaymentOrder(id int, h *AccountingEntryServiceImpl) 
 	paymentOrder, err := h.paymentOrderRepo.Get(id)
 
 	if err != nil {
-		return nil, err
+		return nil, newErrors.Wrap(err, "repo payment order get")
 	}
 
 	model, _, err := h.modelOfAccountingRepo.GetModelsOfAccountingList(dto.ModelsOfAccountingFilterDTO{
@@ -1456,12 +1451,12 @@ func buildAccountingOrderForPaymentOrder(id int, h *AccountingEntryServiceImpl) 
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, newErrors.Wrap(err, "repo model of accounting get all")
 	}
 
 	//ako ne postoji u bazi odgovarajuci model za taj tip obaveze/naloga vraca se invalid input
 	if len(model) != 1 {
-		return nil, errors.ErrInvalidInput
+		return nil, newErrors.Wrap(errors.ErrNotFound, "repo model of accounting get all")
 	}
 
 	for _, modelItem := range model[0].Items {
@@ -1528,7 +1523,7 @@ func buildAccountingOrderForEnforcedPayment(id int, h *AccountingEntryServiceImp
 	enforcedPayment, err := h.enforcedPaymentRepo.Get(id)
 
 	if err != nil {
-		return nil, err
+		return nil, newErrors.Wrap(err, "repo enforced payment get")
 	}
 
 	model, _, err := h.modelOfAccountingRepo.GetModelsOfAccountingList(dto.ModelsOfAccountingFilterDTO{
@@ -1536,12 +1531,12 @@ func buildAccountingOrderForEnforcedPayment(id int, h *AccountingEntryServiceImp
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, newErrors.Wrap(err, "repo model of accounting get all")
 	}
 
 	//ako ne postoji u bazi odgovarajuci model za taj tip obaveze/naloga vraca se invalid input
 	if len(model) != 1 {
-		return nil, errors.ErrInvalidInput
+		return nil, newErrors.Wrap(errors.ErrNotFound, "repo model of accounting get all")
 	}
 
 	for _, modelItem := range model[0].Items {
@@ -1626,7 +1621,7 @@ func buildAccountingOrderForReturnEnforcedPayment(id int, h *AccountingEntryServ
 	enforcedPayment, err := h.enforcedPaymentRepo.Get(id)
 
 	if err != nil {
-		return nil, err
+		return nil, newErrors.Wrap(err, "repo enforced payment get")
 	}
 
 	model, _, err := h.modelOfAccountingRepo.GetModelsOfAccountingList(dto.ModelsOfAccountingFilterDTO{
@@ -1634,12 +1629,12 @@ func buildAccountingOrderForReturnEnforcedPayment(id int, h *AccountingEntryServ
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, newErrors.Wrap(err, "repo model of accounting get all")
 	}
 
 	//ako ne postoji u bazi odgovarajuci model za taj tip obaveze/naloga vraca se invalid input
 	if len(model) != 1 {
-		return nil, errors.ErrInvalidInput
+		return nil, newErrors.Wrap(errors.ErrNotFound, "repo model of accounting get all")
 	}
 
 	for _, modelItem := range model[0].Items {

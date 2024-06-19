@@ -8,6 +8,7 @@ import (
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
 	"gitlab.sudovi.me/erp/finance-api/errors"
+	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 
 	"github.com/oykos-development-hub/celeritas"
 	"github.com/shopspring/decimal"
@@ -50,8 +51,7 @@ func (h *PaymentOrderServiceImpl) CreatePaymentOrder(ctx context.Context, input 
 		var err error
 		id, err = h.repo.Insert(ctx, tx, *dataToInsert)
 		if err != nil {
-			fmt.Println(err)
-			return errors.ErrInternalServer
+			return newErrors.Wrap(err, "repo payment order insert")
 		}
 
 		for _, item := range input.Items {
@@ -59,26 +59,26 @@ func (h *PaymentOrderServiceImpl) CreatePaymentOrder(ctx context.Context, input 
 			itemToInsert.PaymentOrderID = id
 			_, err = h.itemsRepo.Insert(tx, *itemToInsert)
 			if err != nil {
-				return err
+				return newErrors.Wrap(err, "repo payment order item insert")
 			}
 
 			if item.InvoiceID != nil {
 				err = updateInvoiceStatus(ctx, *item.InvoiceID, dataToInsert.Amount, len(input.Items), tx, h)
 
 				if err != nil {
-					return err
+					return newErrors.Wrap(err, "update invoice status")
 				}
 			} else if item.AdditionalExpenseID != nil {
 				err = updateAdditionalExpenseStatus(*item.AdditionalExpenseID, dataToInsert.Amount, len(input.Items), tx, h)
 
 				if err != nil {
-					return err
+					return newErrors.Wrap(err, "update additional expense status")
 				}
 			} else if item.SalaryAdditionalExpenseID != nil {
 				err = updateSalaryAdditionalExpenseStatus(*item.SalaryAdditionalExpenseID, dataToInsert.Amount, len(input.Items), tx, h)
 
 				if err != nil {
-					return err
+					return newErrors.Wrap(err, "update salary status")
 				}
 			}
 		}
@@ -87,14 +87,12 @@ func (h *PaymentOrderServiceImpl) CreatePaymentOrder(ctx context.Context, input 
 	})
 
 	if err != nil {
-		fmt.Println(err)
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "upper tx")
 	}
 
 	dataToInsert, err = h.repo.Get(id)
 	if err != nil {
-		fmt.Println(err)
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo payment order get")
 	}
 
 	res := dto.ToPaymentOrderResponseDTO(*dataToInsert)
@@ -109,17 +107,17 @@ func (h *PaymentOrderServiceImpl) UpdatePaymentOrder(ctx context.Context, id int
 	err := data.Upper.Tx(func(tx up.Session) error {
 		err := h.repo.Update(ctx, tx, *dataToInsert)
 		if err != nil {
-			return errors.ErrInternalServer
+			return newErrors.Wrap(err, "repo payment order update")
 		}
 		return nil
 	})
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "upper tx")
 	}
 
 	dataToInsert, err = h.repo.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo payment order get")
 	}
 
 	response := dto.ToPaymentOrderResponseDTO(*dataToInsert)
@@ -132,7 +130,7 @@ func (h *PaymentOrderServiceImpl) DeletePaymentOrder(ctx context.Context, id int
 	input, err := h.GetPaymentOrder(id)
 
 	if err != nil {
-		return err
+		return newErrors.Wrap(err, "repo payment order get")
 	}
 
 	for _, item := range input.Items {
@@ -140,30 +138,26 @@ func (h *PaymentOrderServiceImpl) DeletePaymentOrder(ctx context.Context, id int
 			err = updateInvoiceStatusOnDelete(ctx, *item.InvoiceID, len(input.Items), data.Upper, h)
 
 			if err != nil {
-				h.App.ErrorLog.Println(err)
-				return err
+				return newErrors.Wrap(err, "update invoice status on delete")
 			}
 		} else if item.AdditionalExpenseID != nil {
 			err = updateAdditionalExpenseStatusOnDelete(*item.AdditionalExpenseID, len(input.Items), data.Upper, h)
 
 			if err != nil {
-				h.App.ErrorLog.Println(err)
-				return err
+				return newErrors.Wrap(err, "update additional expense status on delete")
 			}
 		} else if item.SalaryAdditionalExpenseID != nil {
 			err = updateSalaryAdditionalExpenseStatusOnDelete(*item.SalaryAdditionalExpenseID, len(input.Items), data.Upper, h)
 
 			if err != nil {
-				h.App.ErrorLog.Println(err)
-				return err
+				return newErrors.Wrap(err, "update salary additioanl expense status on delete")
 			}
 		}
 	}
 
 	err = h.repo.Delete(ctx, id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return errors.ErrInternalServer
+		return newErrors.Wrap(err, "repo payment order delete")
 	}
 
 	return nil
@@ -172,9 +166,9 @@ func (h *PaymentOrderServiceImpl) DeletePaymentOrder(ctx context.Context, id int
 func (h *PaymentOrderServiceImpl) GetPaymentOrder(id int) (*dto.PaymentOrderResponseDTO, error) {
 	paymentData, err := h.repo.Get(id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrNotFound
+		return nil, newErrors.Wrap(err, "repo payment order get")
 	}
+
 	response := dto.ToPaymentOrderResponseDTO(*paymentData)
 
 	conditionAndExp := &up.AndExpr{}
@@ -182,7 +176,7 @@ func (h *PaymentOrderServiceImpl) GetPaymentOrder(id int) (*dto.PaymentOrderResp
 	items, _, err := h.itemsRepo.GetAll(nil, nil, conditionAndExp, nil)
 
 	if err != nil {
-		return nil, err
+		return nil, newErrors.Wrap(err, "repo payment order item get all")
 	}
 
 	for _, item := range items {
@@ -204,7 +198,7 @@ func (h *PaymentOrderServiceImpl) GetPaymentOrder(id int) (*dto.PaymentOrderResp
 			item, err := h.invoiceRepo.Get(*item.InvoiceID)
 
 			if err != nil {
-				return nil, err
+				return nil, newErrors.Wrap(err, "repo invoice get")
 			}
 
 			if item.InvoiceNumber != "" {
@@ -218,12 +212,12 @@ func (h *PaymentOrderServiceImpl) GetPaymentOrder(id int) (*dto.PaymentOrderResp
 			additionalItem, err := h.additionalExpensesRepo.Get(*item.AdditionalExpenseID)
 
 			if err != nil {
-				return nil, err
+				return nil, newErrors.Wrap(err, "repo additional expense get")
 			}
 
 			item, err := h.invoiceRepo.Get(additionalItem.InvoiceID)
 			if err != nil {
-				return nil, err
+				return nil, newErrors.Wrap(err, "repo invoice get")
 			}
 
 			builtItem.Type = item.Type
@@ -234,13 +228,13 @@ func (h *PaymentOrderServiceImpl) GetPaymentOrder(id int) (*dto.PaymentOrderResp
 			additionalItem, err := h.salaryAdditionalExpensesRepo.Get(*item.SalaryAdditionalExpenseID)
 
 			if err != nil {
-				return nil, err
+				return nil, newErrors.Wrap(err, "repo salary additional expense get")
 			}
 
 			item, err := h.salariesRepo.Get(additionalItem.SalaryID)
 
 			if err != nil {
-				return nil, err
+				return nil, newErrors.Wrap(err, "repo salary get")
 			}
 
 			builtItem.Type = data.TypeSalary
@@ -321,8 +315,7 @@ func (h *PaymentOrderServiceImpl) GetPaymentOrderList(filter dto.PaymentOrderFil
 
 	data, total, err := h.repo.GetAll(filter.Page, filter.Size, conditionAndExp, orders)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, nil, errors.ErrInternalServer
+		return nil, nil, newErrors.Wrap(err, "repo payment order get all")
 	}
 	response := dto.ToPaymentOrderListResponseDTO(data)
 
@@ -342,7 +335,7 @@ func (h *PaymentOrderServiceImpl) GetAllObligations(filter dto.GetObligationsFil
 	items, total, err := h.repo.GetAllObligations(dataFilter)
 
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, newErrors.Wrap(err, "repo payment order get all obligations")
 	}
 
 	var response []dto.ObligationResponse
@@ -355,7 +348,7 @@ func (h *PaymentOrderServiceImpl) GetAllObligations(filter dto.GetObligationsFil
 			articles, _, err := h.invoiceArticlesRepo.GetAll(nil, nil, conditionAndExp, nil)
 
 			if err != nil {
-				return nil, nil, err
+				return nil, nil, newErrors.Wrap(err, "repo article get all")
 			}
 
 			accountMap := make(map[int]float64)
@@ -376,7 +369,7 @@ func (h *PaymentOrderServiceImpl) GetAllObligations(filter dto.GetObligationsFil
 			paidItems, _, err := h.itemsRepo.GetAll(nil, nil, conditionAndExp, nil)
 
 			if err != nil {
-				return nil, nil, err
+				return nil, nil, newErrors.Wrap(err, "repo payment order items get")
 			}
 
 			for _, item := range paidItems {
@@ -384,7 +377,7 @@ func (h *PaymentOrderServiceImpl) GetAllObligations(filter dto.GetObligationsFil
 				paymentOrder, err := h.repo.Get(item.PaymentOrderID)
 
 				if err != nil {
-					return nil, nil, err
+					return nil, nil, newErrors.Wrap(err, "repo payment order get")
 				}
 
 				if paymentOrder.Status == nil || *paymentOrder.Status != "Storniran" {
@@ -426,7 +419,7 @@ func (h *PaymentOrderServiceImpl) PayPaymentOrder(ctx context.Context, id int, i
 		paymentOrder, err := h.GetPaymentOrder(id)
 
 		if err != nil {
-			return errors.ErrInternalServer
+			return newErrors.Wrap(err, "repo payment order get")
 		}
 
 		for _, item := range paymentOrder.Items {
@@ -436,33 +429,33 @@ func (h *PaymentOrderServiceImpl) PayPaymentOrder(ctx context.Context, id int, i
 			})
 
 			if err != nil {
-				return err
+				return newErrors.Wrap(err, "repo current budget get")
 			}
 
 			if len(currentBudget) > 0 {
 				currentAmount := currentBudget[0].Balance.Sub(decimal.NewFromFloat32(float32(item.Amount)))
 				if currentAmount.LessThan(decimal.NewFromInt(0)) {
-					return errors.ErrInsufficientFunds
+					return newErrors.Wrap(errors.ErrInsufficientFunds, "repo current budget update balance")
 				} else {
 					err = h.currentBudgetService.UpdateBalance(ctx, tx, currentBudget[0].ID, currentAmount)
 					if err != nil {
-						return err
+						return newErrors.Wrap(err, "repo current budget update balance")
 					}
 				}
 			} else {
-				return errors.ErrInsufficientFunds
+				return newErrors.Wrap(errors.ErrInsufficientFunds, "repo current budget update balance")
 			}
 		}
 
 		err = h.repo.PayPaymentOrder(ctx, tx, id, *input.SAPID, *input.DateOfSAP)
 		if err != nil {
-			return errors.ErrInternalServer
+			return newErrors.Wrap(err, "repo payment order pay")
 		}
 		return nil
 	})
 
 	if err != nil {
-		return err
+		return newErrors.Wrap(err, "upper tx")
 	}
 
 	return nil
@@ -473,7 +466,7 @@ func (h *PaymentOrderServiceImpl) CancelPaymentOrder(ctx context.Context, id int
 		input, err := h.GetPaymentOrder(id)
 
 		if err != nil {
-			return err
+			return newErrors.Wrap(err, "repo payment order get")
 		}
 
 		for _, item := range input.Items {
@@ -483,7 +476,7 @@ func (h *PaymentOrderServiceImpl) CancelPaymentOrder(ctx context.Context, id int
 			})
 
 			if err != nil {
-				return err
+				return newErrors.Wrap(err, "repo current budget get all")
 			}
 
 			if len(currentBudget) > 0 {
@@ -491,11 +484,11 @@ func (h *PaymentOrderServiceImpl) CancelPaymentOrder(ctx context.Context, id int
 
 				err = h.currentBudgetService.UpdateBalance(ctx, tx, currentBudget[0].ID, currentAmount)
 				if err != nil {
-					return err
+					return newErrors.Wrap(err, "repo current budget update balance")
 				}
 
 			} else {
-				return errors.ErrNotFound
+				return newErrors.Wrap(errors.ErrNotFound, "repo current budget get all")
 			}
 		}
 
@@ -504,35 +497,32 @@ func (h *PaymentOrderServiceImpl) CancelPaymentOrder(ctx context.Context, id int
 				err = updateInvoiceStatusOnDelete(ctx, *item.InvoiceID, len(input.Items), tx, h)
 
 				if err != nil {
-					h.App.ErrorLog.Println(err)
-					return err
+					return newErrors.Wrap(err, "update invoice status on delete")
 				}
 			} else if item.AdditionalExpenseID != nil {
 				err = updateAdditionalExpenseStatusOnDelete(*item.AdditionalExpenseID, len(input.Items), tx, h)
 
 				if err != nil {
-					h.App.ErrorLog.Println(err)
-					return err
+					return newErrors.Wrap(err, "update additional expense status on delete")
 				}
 			} else if item.SalaryAdditionalExpenseID != nil {
 				err = updateSalaryAdditionalExpenseStatusOnDelete(*item.SalaryAdditionalExpenseID, len(input.Items), tx, h)
 
 				if err != nil {
-					h.App.ErrorLog.Println(err)
-					return err
+					return newErrors.Wrap(err, "update salary additional expense status on delete")
 				}
 			}
 		}
 
 		err = h.repo.CancelPaymentOrder(ctx, tx, id)
 		if err != nil {
-			return err
+			return newErrors.Wrap(err, "repo payment order cancel payment order")
 		}
 		return nil
 	})
 
 	if err != nil {
-		return errors.ErrInternalServer
+		return newErrors.Wrap(err, "upper tx")
 	}
 
 	return nil
@@ -542,7 +532,7 @@ func updateInvoiceStatus(ctx context.Context, id int, amount float64, lenOfArray
 	invoice, err := h.invoiceRepo.Get(id)
 
 	if err != nil {
-		return err
+		return newErrors.Wrap(err, "repo invoice get")
 	}
 
 	conditionAndExp := &up.AndExpr{}
@@ -551,7 +541,7 @@ func updateInvoiceStatus(ctx context.Context, id int, amount float64, lenOfArray
 	articles, _, err := h.invoiceArticlesRepo.GetAll(nil, nil, conditionAndExp, nil)
 
 	if err != nil {
-		return err
+		return newErrors.Wrap(err, "repo article get all")
 	}
 
 	var price float64
@@ -565,7 +555,7 @@ func updateInvoiceStatus(ctx context.Context, id int, amount float64, lenOfArray
 	items, _, err := h.itemsRepo.GetAll(nil, nil, conditionAndExp, nil)
 
 	if err != nil {
-		return err
+		return newErrors.Wrap(err, "repo payment order items get all")
 	}
 
 	statusCanceled := "Storniran"
@@ -573,7 +563,7 @@ func updateInvoiceStatus(ctx context.Context, id int, amount float64, lenOfArray
 		paymentOrder, err := h.repo.Get(item.PaymentOrderID)
 
 		if err != nil {
-			return err
+			return newErrors.Wrap(err, "repo payment order get")
 		}
 
 		if paymentOrder.Status == nil || *paymentOrder.Status != statusCanceled {
@@ -590,7 +580,7 @@ func updateInvoiceStatus(ctx context.Context, id int, amount float64, lenOfArray
 	err = h.invoiceRepo.Update(ctx, tx, *invoice)
 
 	if err != nil {
-		return err
+		return newErrors.Wrap(err, "repo invoice update")
 	}
 
 	return nil
@@ -600,7 +590,7 @@ func updateAdditionalExpenseStatus(id int, amount float64, lenOfArray int, tx up
 	item, err := h.additionalExpensesRepo.Get(id)
 
 	if err != nil {
-		return err
+		return newErrors.Wrap(err, "repo additional expense get")
 	}
 
 	conditionAndExp := &up.AndExpr{}
@@ -609,7 +599,7 @@ func updateAdditionalExpenseStatus(id int, amount float64, lenOfArray int, tx up
 	items, _, err := h.itemsRepo.GetAll(nil, nil, conditionAndExp, nil)
 
 	if err != nil {
-		return err
+		return newErrors.Wrap(err, "repo payment order item get all")
 	}
 
 	statusCanceled := "Storniran"
@@ -618,7 +608,7 @@ func updateAdditionalExpenseStatus(id int, amount float64, lenOfArray int, tx up
 		paymentOrder, err := h.repo.Get(item.PaymentOrderID)
 
 		if err != nil {
-			return err
+			return newErrors.Wrap(err, "repo payment order get")
 		}
 		if paymentOrder.Status == nil || *paymentOrder.Status != statusCanceled {
 			amount += paymentOrder.Amount
@@ -634,7 +624,7 @@ func updateAdditionalExpenseStatus(id int, amount float64, lenOfArray int, tx up
 	err = h.additionalExpensesRepo.Update(tx, *item)
 
 	if err != nil {
-		return err
+		return newErrors.Wrap(err, "repo additional expense update")
 	}
 
 	return nil
@@ -644,7 +634,7 @@ func updateSalaryAdditionalExpenseStatus(id int, amount float64, lenOfArray int,
 	item, err := h.salaryAdditionalExpensesRepo.Get(id)
 
 	if err != nil {
-		return err
+		return newErrors.Wrap(err, "repo salary additional expense get")
 	}
 
 	conditionAndExp := &up.AndExpr{}
@@ -653,7 +643,7 @@ func updateSalaryAdditionalExpenseStatus(id int, amount float64, lenOfArray int,
 	items, _, err := h.itemsRepo.GetAll(nil, nil, conditionAndExp, nil)
 
 	if err != nil {
-		return err
+		return newErrors.Wrap(err, "repo payment order items get all")
 	}
 
 	statusCanceled := "Storniran"
@@ -661,7 +651,7 @@ func updateSalaryAdditionalExpenseStatus(id int, amount float64, lenOfArray int,
 		paymentOrder, err := h.repo.Get(item.PaymentOrderID)
 
 		if err != nil {
-			return err
+			return newErrors.Wrap(err, "repo payment order get")
 		}
 
 		if paymentOrder.Status == nil || *paymentOrder.Status != statusCanceled {
@@ -678,7 +668,7 @@ func updateSalaryAdditionalExpenseStatus(id int, amount float64, lenOfArray int,
 	err = h.salaryAdditionalExpensesRepo.Update(tx, *item)
 
 	if err != nil {
-		return err
+		return newErrors.Wrap(err, "repo salary additional expense update")
 	}
 
 	return nil
@@ -688,7 +678,7 @@ func updateInvoiceStatusOnDelete(ctx context.Context, id int, lenOfArray int, tx
 	invoice, err := h.invoiceRepo.Get(id)
 
 	if err != nil {
-		return err
+		return newErrors.Wrap(err, "repo invoice get")
 	}
 
 	conditionAndExp := &up.AndExpr{}
@@ -697,7 +687,7 @@ func updateInvoiceStatusOnDelete(ctx context.Context, id int, lenOfArray int, tx
 	items, _, err := h.itemsRepo.GetAll(nil, nil, conditionAndExp, nil)
 
 	if err != nil {
-		return err
+		return newErrors.Wrap(err, "repo payment order item get all")
 	}
 
 	//ako smo dobili nazad samo item koji brisemo
@@ -710,7 +700,7 @@ func updateInvoiceStatusOnDelete(ctx context.Context, id int, lenOfArray int, tx
 			paymentOrder, err := h.repo.Get(item.PaymentOrderID)
 
 			if err != nil {
-				return err
+				return newErrors.Wrap(err, "repo payment order get")
 			}
 
 			if paymentOrder.Status == nil || *paymentOrder.Status != "Storniran" {
@@ -728,7 +718,7 @@ func updateInvoiceStatusOnDelete(ctx context.Context, id int, lenOfArray int, tx
 	err = h.invoiceRepo.Update(ctx, tx, *invoice)
 
 	if err != nil {
-		return err
+		return newErrors.Wrap(err, "repo invoice update")
 	}
 
 	return nil
@@ -738,7 +728,7 @@ func updateAdditionalExpenseStatusOnDelete(id int, lenOfArray int, tx up.Session
 	item, err := h.additionalExpensesRepo.Get(id)
 
 	if err != nil {
-		return err
+		return newErrors.Wrap(err, "repo additional expense get")
 	}
 
 	conditionAndExp := &up.AndExpr{}
@@ -747,7 +737,7 @@ func updateAdditionalExpenseStatusOnDelete(id int, lenOfArray int, tx up.Session
 	items, _, err := h.itemsRepo.GetAll(nil, nil, conditionAndExp, nil)
 
 	if err != nil {
-		return err
+		return newErrors.Wrap(err, "repo payment order item get all")
 	}
 
 	if len(items) == 1 || lenOfArray > 1 {
@@ -758,7 +748,7 @@ func updateAdditionalExpenseStatusOnDelete(id int, lenOfArray int, tx up.Session
 			paymentOrder, err := h.repo.Get(item.PaymentOrderID)
 
 			if err != nil {
-				return err
+				return newErrors.Wrap(err, "repo payment order get")
 			}
 
 			if paymentOrder.Status == nil || *paymentOrder.Status != "Storniran" {
@@ -776,7 +766,7 @@ func updateAdditionalExpenseStatusOnDelete(id int, lenOfArray int, tx up.Session
 	err = h.additionalExpensesRepo.Update(tx, *item)
 
 	if err != nil {
-		return err
+		return newErrors.Wrap(err, "repo additional expense update")
 	}
 
 	return nil
@@ -786,7 +776,7 @@ func updateSalaryAdditionalExpenseStatusOnDelete(id int, lenOfArray int, tx up.S
 	item, err := h.salaryAdditionalExpensesRepo.Get(id)
 
 	if err != nil {
-		return err
+		return newErrors.Wrap(err, "repo salary additional expense get")
 	}
 
 	conditionAndExp := &up.AndExpr{}
@@ -795,7 +785,7 @@ func updateSalaryAdditionalExpenseStatusOnDelete(id int, lenOfArray int, tx up.S
 	items, _, err := h.itemsRepo.GetAll(nil, nil, conditionAndExp, nil)
 
 	if err != nil {
-		return err
+		return newErrors.Wrap(err, "repo payment order item get all")
 	}
 
 	if len(items) == 1 || lenOfArray > 1 {
@@ -806,7 +796,7 @@ func updateSalaryAdditionalExpenseStatusOnDelete(id int, lenOfArray int, tx up.S
 			paymentOrder, err := h.repo.Get(item.PaymentOrderID)
 
 			if err != nil {
-				return err
+				return newErrors.Wrap(err, "repo payment order get")
 			}
 
 			if paymentOrder.Status == nil || *paymentOrder.Status != "Storniran" {
@@ -824,7 +814,7 @@ func updateSalaryAdditionalExpenseStatusOnDelete(id int, lenOfArray int, tx up.S
 	err = h.salaryAdditionalExpensesRepo.Update(tx, *item)
 
 	if err != nil {
-		return err
+		return newErrors.Wrap(err, "repo salary additional expense update")
 	}
 
 	return nil

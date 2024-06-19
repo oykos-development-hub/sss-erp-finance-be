@@ -8,6 +8,7 @@ import (
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
 	"gitlab.sudovi.me/erp/finance-api/errors"
+	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 )
 
 type PropBenConfPaymentServiceImpl struct {
@@ -32,20 +33,19 @@ func (h *PropBenConfPaymentServiceImpl) CreatePropBenConfPayment(ctx context.Con
 
 	id, err := h.repo.Insert(ctx, *propbenconfPayment)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo prop ben conf payment insert")
 	}
 
 	propbenconfPayment, err = propbenconfPayment.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo prop ben conf payment get")
 	}
 
 	res := dto.ToPropBenConfPaymentResponseDTO(*propbenconfPayment)
 
 	_, _, err = h.propbenconfSharedLogicService.CalculatePropBenConfDetailsAndUpdateStatus(ctx, propbenconfPayment.PropBenConfID)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, err
+		return nil, newErrors.Wrap(err, "repo prop ben conf shared logic service calcualte prop ben conf details and update status")
 	}
 
 	return &res, nil
@@ -55,20 +55,17 @@ func (h *PropBenConfPaymentServiceImpl) CreatePropBenConfPayment(ctx context.Con
 func (h *PropBenConfPaymentServiceImpl) DeletePropBenConfPayment(ctx context.Context, id int) error {
 	propbenconfPayment, err := h.repo.Get(id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return errors.ErrNotFound
+		return newErrors.Wrap(err, "repo prop ben conf payment get")
 	}
 
 	err = h.repo.Delete(ctx, id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return errors.ErrInternalServer
+		return newErrors.Wrap(err, "repo prop ben conf payment delete")
 	}
 
 	_, _, err = h.propbenconfSharedLogicService.CalculatePropBenConfDetailsAndUpdateStatus(ctx, propbenconfPayment.PropBenConfID)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return errors.ErrInternalServer
+		return newErrors.Wrap(err, "repo prop ben conf shared logic service calculate prop ben conf details and update status")
 	}
 
 	return nil
@@ -81,20 +78,19 @@ func (h *PropBenConfPaymentServiceImpl) UpdatePropBenConfPayment(ctx context.Con
 
 	err := h.repo.Update(ctx, *data)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo prop ben conf payment update")
 	}
 
 	data, err = h.repo.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo prop ben conf payment get")
 	}
 
 	response := dto.ToPropBenConfPaymentResponseDTO(*data)
 
 	_, _, err = h.propbenconfSharedLogicService.CalculatePropBenConfDetailsAndUpdateStatus(ctx, data.PropBenConfID)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo prop ben conf shared logic service calculate prop ben conf details and update status")
 	}
 
 	return &response, nil
@@ -105,12 +101,11 @@ func (h *PropBenConfPaymentServiceImpl) GetPropBenConfPaymentList(input dto.Prop
 
 	propbenconfPayments, total, err := h.getPropBenConfPaymentsByPropBenConfID(input.PropBenConfID)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, nil, errors.ErrInternalServer
+		return nil, nil, newErrors.Wrap(err, "get prop ben conf payments by pro ben conf id")
 	}
 
 	if len(propbenconfPayments) == 0 {
-		return nil, nil, errors.ErrNotFound
+		return nil, nil, newErrors.Wrap(errors.ErrNotFound, "get prop ben conf payments by pro ben conf id")
 	}
 	response := dto.ToPropBenConfPaymentListResponseDTO(propbenconfPayments)
 
@@ -122,8 +117,7 @@ func (h *PropBenConfPaymentServiceImpl) getPropBenConfPaymentsByPropBenConfID(pr
 
 	propbenconfPayments, total, err := h.repo.GetAll(&cond)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, nil, errors.ErrInternalServer
+		return nil, nil, newErrors.Wrap(err, "rep prop ben conf payments get all")
 	}
 
 	return propbenconfPayments, total, nil
@@ -133,9 +127,9 @@ func (h *PropBenConfPaymentServiceImpl) getPropBenConfPaymentsByPropBenConfID(pr
 func (h *PropBenConfPaymentServiceImpl) GetPropBenConfPayment(id int) (*dto.PropBenConfPaymentResponseDTO, error) {
 	data, err := h.repo.Get(id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrNotFound
+		return nil, newErrors.Wrap(err, "repo prop ben conf payments get")
 	}
+
 	response := dto.ToPropBenConfPaymentResponseDTO(*data)
 
 	return &response, nil

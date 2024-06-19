@@ -8,7 +8,7 @@ import (
 
 	up "github.com/upper/db/v4"
 	"gitlab.sudovi.me/erp/finance-api/contextutil"
-	"gitlab.sudovi.me/erp/finance-api/pkg/errors"
+	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 )
 
 type BudgetType int
@@ -56,7 +56,7 @@ func (t *Budget) GetAll(condition *up.Cond, orders []any) ([]*Budget, error) {
 
 	err := res.OrderBy(orders...).All(&all)
 	if err != nil {
-		return nil, errors.Wrap(err, "upper all")
+		return nil, newErrors.Wrap(err, "upper all")
 	}
 
 	return all, nil
@@ -71,9 +71,9 @@ func (t *Budget) Get(id int) (*Budget, error) {
 	err := res.One(&one)
 	if err != nil {
 		if goerrors.Is(err, up.ErrNoMoreRows) {
-			return nil, errors.WrapNotFoundError(err, "repo get")
+			return nil, newErrors.WrapNotFoundError(err, "repo get")
 		}
-		return nil, errors.Wrap(err, "upper one")
+		return nil, newErrors.Wrap(err, "upper one")
 	}
 	return &one, nil
 }
@@ -83,26 +83,27 @@ func (t *Budget) Update(ctx context.Context, m Budget) error {
 	m.UpdatedAt = time.Now()
 	userID, ok := contextutil.GetUserIDFromContext(ctx)
 	if !ok {
-		return errors.New("user id not found in context")
+		err := newErrors.New("user ID not found in context")
+		return newErrors.Wrap(err, "contextuitl get user id from context")
 	}
 
 	err := Upper.Tx(func(sess up.Session) error {
 
 		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
 		if _, err := sess.SQL().Exec(query); err != nil {
-			return errors.Wrap(err, "upper exec")
+			return newErrors.Wrap(err, "upper exec")
 		}
 
 		collection := sess.Collection(t.Table())
 		res := collection.Find(m.ID)
 		if err := res.Update(&m); err != nil {
-			return errors.Wrap(err, "upper update")
+			return newErrors.Wrap(err, "upper update")
 		}
 
 		return nil
 	})
 	if err != nil {
-		return errors.Wrap(err, "upper tx")
+		return newErrors.Wrap(err, "upper tx")
 	}
 
 	return nil
@@ -112,26 +113,27 @@ func (t *Budget) Update(ctx context.Context, m Budget) error {
 func (t *Budget) Delete(ctx context.Context, id int) error {
 	userID, ok := contextutil.GetUserIDFromContext(ctx)
 	if !ok {
-		return errors.New("user id not found in context")
+		err := newErrors.New("user ID not found in context")
+		return newErrors.Wrap(err, "contextuitl get user id from context")
 	}
 
 	err := Upper.Tx(func(sess up.Session) error {
 		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
 		if _, err := sess.SQL().Exec(query); err != nil {
-			return errors.Wrap(err, "upper exec")
+			return newErrors.Wrap(err, "upper exec")
 		}
 
 		collection := sess.Collection(t.Table())
 		res := collection.Find(id)
 		if err := res.Delete(); err != nil {
-			return errors.Wrap(err, "upper delete")
+			return newErrors.Wrap(err, "upper delete")
 		}
 
 		return nil
 	})
 
 	if err != nil {
-		return errors.Wrap(err, "upper tx")
+		return newErrors.Wrap(err, "upper tx")
 	}
 
 	return nil
@@ -143,7 +145,8 @@ func (t *Budget) Insert(ctx context.Context, m Budget) (int, error) {
 	m.UpdatedAt = time.Now()
 	userID, ok := contextutil.GetUserIDFromContext(ctx)
 	if !ok {
-		return 0, errors.New("user id not found in context")
+		err := newErrors.New("user ID not found in context")
+		return 0, newErrors.Wrap(err, "contextuitl get user id from context")
 	}
 
 	var id int
@@ -152,7 +155,7 @@ func (t *Budget) Insert(ctx context.Context, m Budget) (int, error) {
 
 		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
 		if _, err := sess.SQL().Exec(query); err != nil {
-			return errors.Wrap(err, "upper exec")
+			return newErrors.Wrap(err, "upper exec")
 		}
 
 		collection := sess.Collection(t.Table())
@@ -161,7 +164,7 @@ func (t *Budget) Insert(ctx context.Context, m Budget) (int, error) {
 		var err error
 
 		if res, err = collection.Insert(m); err != nil {
-			return errors.Wrap(err, "upper insert")
+			return newErrors.Wrap(err, "upper insert")
 		}
 
 		id = getInsertId(res.ID())
@@ -170,7 +173,7 @@ func (t *Budget) Insert(ctx context.Context, m Budget) (int, error) {
 	})
 
 	if err != nil {
-		return 0, errors.Wrap(err, "upper tx")
+		return 0, newErrors.Wrap(err, "upper tx")
 	}
 
 	return id, nil

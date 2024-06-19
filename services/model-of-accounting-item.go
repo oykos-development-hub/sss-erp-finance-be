@@ -3,7 +3,7 @@ package services
 import (
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
-	"gitlab.sudovi.me/erp/finance-api/errors"
+	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 
 	"github.com/oykos-development-hub/celeritas"
 	up "github.com/upper/db/v4"
@@ -29,19 +29,19 @@ func (h *ModelOfAccountingItemServiceImpl) CreateModelOfAccountingItem(input dto
 		var err error
 		id, err = h.repo.Insert(tx, *dataToInsert)
 		if err != nil {
-			return errors.ErrInternalServer
+			return newErrors.Wrap(err, "repo model of accounting item insert")
 		}
 
 		return nil
 	})
 
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "upper tx")
 	}
 
 	dataToInsert, err = h.repo.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo model of accounting item get")
 	}
 
 	res := dto.ToModelOfAccountingItemResponseDTO(*dataToInsert)
@@ -56,17 +56,17 @@ func (h *ModelOfAccountingItemServiceImpl) UpdateModelOfAccountingItem(id int, i
 	err := data.Upper.Tx(func(tx up.Session) error {
 		err := h.repo.Update(tx, *dataToInsert)
 		if err != nil {
-			return errors.ErrInternalServer
+			return newErrors.Wrap(err, "repo model of accounting item update")
 		}
 		return nil
 	})
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "upper tx")
 	}
 
 	dataToInsert, err = h.repo.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo model of accounting item get")
 	}
 
 	response := dto.ToModelOfAccountingItemResponseDTO(*dataToInsert)
@@ -77,9 +77,9 @@ func (h *ModelOfAccountingItemServiceImpl) UpdateModelOfAccountingItem(id int, i
 func (h *ModelOfAccountingItemServiceImpl) GetModelOfAccountingItem(id int) (*dto.ModelOfAccountingItemResponseDTO, error) {
 	data, err := h.repo.Get(id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrNotFound
+		return nil, newErrors.Wrap(err, "repo model of accounting item get")
 	}
+
 	response := dto.ToModelOfAccountingItemResponseDTO(*data)
 
 	return &response, nil
@@ -106,8 +106,7 @@ func (h *ModelOfAccountingItemServiceImpl) GetModelOfAccountingItemList(filter d
 
 	data, total, err := h.repo.GetAll(filter.Page, filter.Size, conditionAndExp, orders)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, nil, errors.ErrInternalServer
+		return nil, nil, newErrors.Wrap(err, "repo model of accounting item get all")
 	}
 	response := dto.ToModelOfAccountingItemListResponseDTO(data)
 

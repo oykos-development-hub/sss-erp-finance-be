@@ -7,7 +7,7 @@ import (
 
 	up "github.com/upper/db/v4"
 	"gitlab.sudovi.me/erp/finance-api/contextutil"
-	"gitlab.sudovi.me/erp/finance-api/pkg/errors"
+	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 )
 
 // FixedDepositWillDispatch struct
@@ -41,7 +41,7 @@ func (t *FixedDepositWillDispatch) GetAll(page *int, size *int, condition *up.An
 	}
 	total, err := res.Count()
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, newErrors.Wrap(err, "upper count")
 	}
 
 	if page != nil && size != nil {
@@ -50,7 +50,7 @@ func (t *FixedDepositWillDispatch) GetAll(page *int, size *int, condition *up.An
 
 	err = res.OrderBy(orders...).All(&all)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, newErrors.Wrap(err, "upper all")
 	}
 
 	return all, &total, err
@@ -64,7 +64,7 @@ func (t *FixedDepositWillDispatch) Get(id int) (*FixedDepositWillDispatch, error
 	res := collection.Find(up.Cond{"id": id})
 	err := res.One(&one)
 	if err != nil {
-		return nil, err
+		return nil, newErrors.Wrap(err, "upper one")
 	}
 	return &one, nil
 }
@@ -74,18 +74,19 @@ func (t *FixedDepositWillDispatch) Update(ctx context.Context, tx up.Session, m 
 	m.UpdatedAt = time.Now()
 	userID, ok := contextutil.GetUserIDFromContext(ctx)
 	if !ok {
-		return errors.New("user ID not found in context")
+		err := newErrors.New("user ID not found in context")
+		return newErrors.Wrap(err, "contextuitl get user id from context")
 	}
 
 	query := fmt.Sprintf("SET myapp.user_id = %d", userID)
 	if _, err := tx.SQL().Exec(query); err != nil {
-		return err
+		return newErrors.Wrap(err, "upper exec")
 	}
 
 	collection := tx.Collection(t.Table())
 	res := collection.Find(m.ID)
 	if err := res.Update(&m); err != nil {
-		return err
+		return newErrors.Wrap(err, "upper update")
 	}
 
 	return nil
@@ -95,26 +96,27 @@ func (t *FixedDepositWillDispatch) Update(ctx context.Context, tx up.Session, m 
 func (t *FixedDepositWillDispatch) Delete(ctx context.Context, id int) error {
 	userID, ok := contextutil.GetUserIDFromContext(ctx)
 	if !ok {
-		return errors.New("user ID not found in context")
+		err := newErrors.New("user ID not found in context")
+		return newErrors.Wrap(err, "contextuitl get user id from context")
 	}
 
 	err := Upper.Tx(func(sess up.Session) error {
 		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
 		if _, err := sess.SQL().Exec(query); err != nil {
-			return err
+			return newErrors.Wrap(err, "upper exec")
 		}
 
 		collection := sess.Collection(t.Table())
 		res := collection.Find(id)
 		if err := res.Delete(); err != nil {
-			return err
+			return newErrors.Wrap(err, "upper delete")
 		}
 
 		return nil
 	})
 
 	if err != nil {
-		return err
+		return newErrors.Wrap(err, "upper tx")
 	}
 	return nil
 }
@@ -125,14 +127,15 @@ func (t *FixedDepositWillDispatch) Insert(ctx context.Context, tx up.Session, m 
 	m.UpdatedAt = time.Now()
 	userID, ok := contextutil.GetUserIDFromContext(ctx)
 	if !ok {
-		return 0, errors.New("user ID not found in context")
+		err := newErrors.New("user ID not found in context")
+		return 0, newErrors.Wrap(err, "contextuitl get user id from context")
 	}
 
 	var id int
 
 	query := fmt.Sprintf("SET myapp.user_id = %d", userID)
 	if _, err := tx.SQL().Exec(query); err != nil {
-		return 0, err
+		return 0, newErrors.Wrap(err, "upper exec")
 	}
 
 	collection := tx.Collection(t.Table())
@@ -141,7 +144,7 @@ func (t *FixedDepositWillDispatch) Insert(ctx context.Context, tx up.Session, m 
 	var err error
 
 	if res, err = collection.Insert(m); err != nil {
-		return 0, err
+		return 0, newErrors.Wrap(err, "upper insert")
 	}
 
 	id = getInsertId(res.ID())

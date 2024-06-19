@@ -6,7 +6,7 @@ import (
 
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
-	"gitlab.sudovi.me/erp/finance-api/errors"
+	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 
 	"github.com/oykos-development-hub/celeritas"
 	up "github.com/upper/db/v4"
@@ -29,8 +29,7 @@ func NewAdditionalExpenseServiceImpl(app *celeritas.Celeritas, repo data.Additio
 func (h *AdditionalExpenseServiceImpl) DeleteAdditionalExpense(id int) error {
 	err := h.repo.Delete(id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return errors.ErrInternalServer
+		return newErrors.Wrap(err, "repo additional expense delete")
 	}
 
 	return nil
@@ -39,9 +38,9 @@ func (h *AdditionalExpenseServiceImpl) DeleteAdditionalExpense(id int) error {
 func (h *AdditionalExpenseServiceImpl) GetAdditionalExpense(id int) (*dto.AdditionalExpenseResponseDTO, error) {
 	data, err := h.repo.Get(id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrNotFound
+		return nil, newErrors.Wrap(err, "repo additional expense get")
 	}
+
 	response := dto.ToAdditionalExpenseResponseDTO(*data)
 
 	return &response, nil
@@ -97,8 +96,7 @@ func (h *AdditionalExpenseServiceImpl) GetAdditionalExpenseList(filter dto.Addit
 
 	items, total, err := h.repo.GetAll(filter.Page, filter.Size, conditionAndExp, orders)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, nil, errors.ErrInternalServer
+		return nil, nil, newErrors.Wrap(err, "repo additional expenses get all")
 	}
 	response := dto.ToAdditionalExpenseListResponseDTO(items)
 
@@ -106,8 +104,7 @@ func (h *AdditionalExpenseServiceImpl) GetAdditionalExpenseList(filter dto.Addit
 		invoice, err := h.invoiceRepo.Get(response[i].InvoiceID)
 
 		if err != nil {
-			h.App.ErrorLog.Println(err)
-			return nil, nil, errors.ErrInternalServer
+			return nil, nil, newErrors.Wrap(err, "repo invoice get all")
 		}
 
 		response[i].ObligationType = invoice.Type

@@ -8,8 +8,8 @@ import (
 	"gitlab.sudovi.me/erp/finance-api/errors"
 	"gitlab.sudovi.me/erp/finance-api/services"
 
-	"github.com/oykos-development-hub/celeritas"
 	"github.com/go-chi/chi/v5"
+	"github.com/oykos-development-hub/celeritas"
 )
 
 // FixedDepositJudgeHandler is a concrete type that implements FixedDepositJudgeHandler
@@ -30,18 +30,21 @@ func (h *fixeddepositjudgeHandlerImpl) CreateFixedDepositJudge(w http.ResponseWr
 	var input dto.FixedDepositJudgeDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
 	}
 
 	validator := h.App.Validator().ValidateStruct(&input)
 	if !validator.Valid() {
+		h.App.ErrorLog.Print(validator.Errors)
 		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
 		return
 	}
 
 	res, err := h.service.CreateFixedDepositJudge(input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -55,18 +58,21 @@ func (h *fixeddepositjudgeHandlerImpl) UpdateFixedDepositJudge(w http.ResponseWr
 	var input dto.FixedDepositJudgeDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
 	}
 
 	validator := h.App.Validator().ValidateStruct(&input)
 	if !validator.Valid() {
+		h.App.ErrorLog.Print(validator.Errors)
 		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
 		return
 	}
 
 	res, err := h.service.UpdateFixedDepositJudge(id, input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -79,6 +85,7 @@ func (h *fixeddepositjudgeHandlerImpl) DeleteFixedDepositJudge(w http.ResponseWr
 
 	err := h.service.DeleteFixedDepositJudge(id)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -91,6 +98,7 @@ func (h *fixeddepositjudgeHandlerImpl) GetFixedDepositJudgeById(w http.ResponseW
 
 	res, err := h.service.GetFixedDepositJudge(id)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -105,12 +113,14 @@ func (h *fixeddepositjudgeHandlerImpl) GetFixedDepositJudgeList(w http.ResponseW
 
 	validator := h.App.Validator().ValidateStruct(&filter)
 	if !validator.Valid() {
+		h.App.ErrorLog.Print(validator.Errors)
 		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
 		return
 	}
 
 	res, total, err := h.service.GetFixedDepositJudgeList(filter)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}

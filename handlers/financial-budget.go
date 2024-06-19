@@ -32,12 +32,14 @@ func (h *financialbudgetHandlerImpl) CreateFinancialBudget(w http.ResponseWriter
 	var input dto.FinancialBudgetDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
 	}
 
 	validator := h.App.Validator().ValidateStruct(&input)
 	if !validator.Valid() {
+		h.App.ErrorLog.Print(validator.Errors)
 		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
 		return
 	}
@@ -47,6 +49,7 @@ func (h *financialbudgetHandlerImpl) CreateFinancialBudget(w http.ResponseWriter
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
 	}
@@ -56,6 +59,7 @@ func (h *financialbudgetHandlerImpl) CreateFinancialBudget(w http.ResponseWriter
 
 	res, err := h.service.CreateFinancialBudget(ctx, input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -69,12 +73,14 @@ func (h *financialbudgetHandlerImpl) UpdateFinancialBudget(w http.ResponseWriter
 	var input dto.FinancialBudgetDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
 	}
 
 	validator := h.App.Validator().ValidateStruct(&input)
 	if !validator.Valid() {
+		h.App.ErrorLog.Print(validator.Errors)
 		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
 		return
 	}
@@ -84,6 +90,7 @@ func (h *financialbudgetHandlerImpl) UpdateFinancialBudget(w http.ResponseWriter
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
 	}
@@ -93,6 +100,7 @@ func (h *financialbudgetHandlerImpl) UpdateFinancialBudget(w http.ResponseWriter
 
 	res, err := h.service.UpdateFinancialBudget(ctx, id, input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -108,6 +116,7 @@ func (h *financialbudgetHandlerImpl) DeleteFinancialBudget(w http.ResponseWriter
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
 	}
@@ -117,6 +126,7 @@ func (h *financialbudgetHandlerImpl) DeleteFinancialBudget(w http.ResponseWriter
 
 	err = h.service.DeleteFinancialBudget(ctx, id)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -129,6 +139,7 @@ func (h *financialbudgetHandlerImpl) GetFinancialBudgetById(w http.ResponseWrite
 
 	res, err := h.service.GetFinancialBudget(id)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -141,6 +152,7 @@ func (h *financialbudgetHandlerImpl) GetFinancialBudgetByBudgetID(w http.Respons
 
 	res, err := h.service.GetFinancialBudgetByBudgetID(id)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -151,6 +163,7 @@ func (h *financialbudgetHandlerImpl) GetFinancialBudgetByBudgetID(w http.Respons
 func (h *financialbudgetHandlerImpl) GetFinancialBudgetList(w http.ResponseWriter, r *http.Request) {
 	res, err := h.service.GetFinancialBudgetList()
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}

@@ -6,6 +6,7 @@ import (
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
 	"gitlab.sudovi.me/erp/finance-api/errors"
+	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 
 	"github.com/oykos-development-hub/celeritas"
 	"github.com/upper/db/v4"
@@ -28,12 +29,12 @@ func (h *FinancialBudgetServiceImpl) CreateFinancialBudget(ctx context.Context, 
 
 	id, err := h.repo.Insert(ctx, *data)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo financial budget insert")
 	}
 
 	data, err = data.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo financial budget get")
 	}
 
 	res := dto.ToFinancialBudgetResponseDTO(*data)
@@ -47,12 +48,12 @@ func (h *FinancialBudgetServiceImpl) UpdateFinancialBudget(ctx context.Context, 
 
 	err := h.repo.Update(ctx, *data)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo financial budget update")
 	}
 
 	data, err = h.repo.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo financial budget get")
 	}
 
 	response := dto.ToFinancialBudgetResponseDTO(*data)
@@ -63,8 +64,7 @@ func (h *FinancialBudgetServiceImpl) UpdateFinancialBudget(ctx context.Context, 
 func (h *FinancialBudgetServiceImpl) DeleteFinancialBudget(ctx context.Context, id int) error {
 	err := h.repo.Delete(ctx, id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return errors.ErrInternalServer
+		return newErrors.Wrap(err, "repo financial budget delete")
 	}
 
 	return nil
@@ -73,9 +73,9 @@ func (h *FinancialBudgetServiceImpl) DeleteFinancialBudget(ctx context.Context, 
 func (h *FinancialBudgetServiceImpl) GetFinancialBudget(id int) (*dto.FinancialBudgetResponseDTO, error) {
 	data, err := h.repo.Get(id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrNotFound
+		return nil, newErrors.Wrap(err, "repo financial budget get")
 	}
+
 	response := dto.ToFinancialBudgetResponseDTO(*data)
 
 	return &response, nil
@@ -85,11 +85,10 @@ func (h *FinancialBudgetServiceImpl) GetFinancialBudgetByBudgetID(id int) (*dto.
 	cond := db.Cond{"budget_id": id}
 	data, err := h.repo.GetAll(&cond)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo financial budget get all")
 	}
 	if len(data) == 0 {
-		return nil, errors.ErrNotFound
+		return nil, newErrors.Wrap(errors.ErrNotFound, "repo financial budget get all")
 	}
 	response := dto.ToFinancialBudgetResponseDTO(*data[0])
 
@@ -99,8 +98,7 @@ func (h *FinancialBudgetServiceImpl) GetFinancialBudgetByBudgetID(id int) (*dto.
 func (h *FinancialBudgetServiceImpl) GetFinancialBudgetList() ([]dto.FinancialBudgetResponseDTO, error) {
 	data, err := h.repo.GetAll(nil)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo financial budget get all")
 	}
 	response := dto.ToFinancialBudgetListResponseDTO(data)
 

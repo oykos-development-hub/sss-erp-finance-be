@@ -4,6 +4,7 @@ import (
 	"time"
 
 	up "github.com/upper/db/v4"
+	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 )
 
 // PaymentOrderItem struct
@@ -38,7 +39,7 @@ func (t *PaymentOrderItem) GetAll(page *int, size *int, condition *up.AndExpr, o
 	}
 	total, err := res.Count()
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, newErrors.Wrap(err, "upper count")
 	}
 
 	if page != nil && size != nil {
@@ -47,7 +48,7 @@ func (t *PaymentOrderItem) GetAll(page *int, size *int, condition *up.AndExpr, o
 
 	err = res.OrderBy(orders...).All(&all)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, newErrors.Wrap(err, "upper all")
 	}
 
 	return all, &total, err
@@ -61,7 +62,7 @@ func (t *PaymentOrderItem) Get(id int) (*PaymentOrderItem, error) {
 	res := collection.Find(up.Cond{"id": id})
 	err := res.One(&one)
 	if err != nil {
-		return nil, err
+		return nil, newErrors.Wrap(err, "upper one")
 	}
 	return &one, nil
 }
@@ -73,7 +74,7 @@ func (t *PaymentOrderItem) Update(tx up.Session, m PaymentOrderItem) error {
 	res := collection.Find(m.ID)
 	err := res.Update(&m)
 	if err != nil {
-		return err
+		return newErrors.Wrap(err, "upper update")
 	}
 	return nil
 }
@@ -84,7 +85,7 @@ func (t *PaymentOrderItem) Delete(id int) error {
 	res := collection.Find(id)
 	err := res.Delete()
 	if err != nil {
-		return err
+		return newErrors.Wrap(err, "upper delete")
 	}
 	return nil
 }
@@ -96,7 +97,7 @@ func (t *PaymentOrderItem) Insert(tx up.Session, m PaymentOrderItem) (int, error
 	collection := tx.Collection(t.Table())
 	res, err := collection.Insert(m)
 	if err != nil {
-		return 0, err
+		return 0, newErrors.Wrap(err, "upper insert")
 	}
 
 	id := getInsertId(res.ID())

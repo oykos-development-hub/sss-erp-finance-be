@@ -8,6 +8,7 @@ import (
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
 	"gitlab.sudovi.me/erp/finance-api/errors"
+	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 )
 
 type ProcedureCostPaymentServiceImpl struct {
@@ -32,20 +33,19 @@ func (h *ProcedureCostPaymentServiceImpl) CreateProcedureCostPayment(ctx context
 
 	id, err := h.repo.Insert(ctx, *procedurecostPayment)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo procedure cost payment insert")
 	}
 
 	procedurecostPayment, err = procedurecostPayment.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo procedure cost payment get")
 	}
 
 	res := dto.ToProcedureCostPaymentResponseDTO(*procedurecostPayment)
 
 	_, _, err = h.procedurecostSharedLogicService.CalculateProcedureCostDetailsAndUpdateStatus(ctx, procedurecostPayment.ProcedureCostID)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, err
+		return nil, newErrors.Wrap(err, "procedure cost shared logic service calculate procedure cost details and update status")
 	}
 
 	return &res, nil
@@ -55,20 +55,18 @@ func (h *ProcedureCostPaymentServiceImpl) CreateProcedureCostPayment(ctx context
 func (h *ProcedureCostPaymentServiceImpl) DeleteProcedureCostPayment(ctx context.Context, id int) error {
 	procedurecostPayment, err := h.repo.Get(id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return errors.ErrNotFound
+		return newErrors.Wrap(err, "repo procedure cost payment get")
 	}
 
 	err = h.repo.Delete(ctx, id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return errors.ErrInternalServer
+		return newErrors.Wrap(err, "repo procedure cost payment delete")
 	}
 
 	_, _, err = h.procedurecostSharedLogicService.CalculateProcedureCostDetailsAndUpdateStatus(ctx, procedurecostPayment.ProcedureCostID)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return errors.ErrInternalServer
+		return newErrors.Wrap(err, "procedure cost shared logic service calculate procedure cost details and update status")
+
 	}
 
 	return nil
@@ -81,20 +79,20 @@ func (h *ProcedureCostPaymentServiceImpl) UpdateProcedureCostPayment(ctx context
 
 	err := h.repo.Update(ctx, *data)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo procedure cost payment update")
 	}
 
 	data, err = h.repo.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo procedure cost payment get")
 	}
 
 	response := dto.ToProcedureCostPaymentResponseDTO(*data)
 
 	_, _, err = h.procedurecostSharedLogicService.CalculateProcedureCostDetailsAndUpdateStatus(ctx, data.ProcedureCostID)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "procedure cost shared logic service calculate procedure cost details and update status")
+
 	}
 
 	return &response, nil
@@ -105,12 +103,13 @@ func (h *ProcedureCostPaymentServiceImpl) GetProcedureCostPaymentList(input dto.
 
 	procedurecostPayments, total, err := h.getProcedureCostPaymentsByProcedureCostID(input.ProcedureCostID)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, nil, errors.ErrInternalServer
+		return nil, nil, newErrors.Wrap(err, "get procedure cost payments by procedure cost id")
+
 	}
 
 	if len(procedurecostPayments) == 0 {
-		return nil, nil, errors.ErrNotFound
+		return nil, nil, newErrors.Wrap(errors.ErrNotFound, "procedure cost shared logic service calculate procedure cost details and update status")
+
 	}
 	response := dto.ToProcedureCostPaymentListResponseDTO(procedurecostPayments)
 
@@ -122,8 +121,8 @@ func (h *ProcedureCostPaymentServiceImpl) getProcedureCostPaymentsByProcedureCos
 
 	procedurecostPayments, total, err := h.repo.GetAll(&cond)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, nil, errors.ErrInternalServer
+		return nil, nil, newErrors.Wrap(err, "repo procedure cost payments get all")
+
 	}
 
 	return procedurecostPayments, total, nil
@@ -133,9 +132,9 @@ func (h *ProcedureCostPaymentServiceImpl) getProcedureCostPaymentsByProcedureCos
 func (h *ProcedureCostPaymentServiceImpl) GetProcedureCostPayment(id int) (*dto.ProcedureCostPaymentResponseDTO, error) {
 	data, err := h.repo.Get(id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrNotFound
+		return nil, newErrors.Wrap(err, "repo procedure cost payment get")
 	}
+
 	response := dto.ToProcedureCostPaymentResponseDTO(*data)
 
 	return &response, nil

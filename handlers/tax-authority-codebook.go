@@ -32,12 +32,14 @@ func (h *taxauthoritycodebookHandlerImpl) CreateTaxAuthorityCodebook(w http.Resp
 	var input dto.TaxAuthorityCodebookDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
 	}
 
 	validator := h.App.Validator().ValidateStruct(&input)
 	if !validator.Valid() {
+		h.App.ErrorLog.Print(validator.Errors)
 		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
 		return
 	}
@@ -47,6 +49,7 @@ func (h *taxauthoritycodebookHandlerImpl) CreateTaxAuthorityCodebook(w http.Resp
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
 	}
@@ -56,6 +59,7 @@ func (h *taxauthoritycodebookHandlerImpl) CreateTaxAuthorityCodebook(w http.Resp
 
 	res, err := h.service.CreateTaxAuthorityCodebook(ctx, input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -69,12 +73,14 @@ func (h *taxauthoritycodebookHandlerImpl) UpdateTaxAuthorityCodebook(w http.Resp
 	var input dto.TaxAuthorityCodebookDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
 	}
 
 	validator := h.App.Validator().ValidateStruct(&input)
 	if !validator.Valid() {
+		h.App.ErrorLog.Print(validator.Errors)
 		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
 		return
 	}
@@ -84,6 +90,7 @@ func (h *taxauthoritycodebookHandlerImpl) UpdateTaxAuthorityCodebook(w http.Resp
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
 	}
@@ -93,6 +100,7 @@ func (h *taxauthoritycodebookHandlerImpl) UpdateTaxAuthorityCodebook(w http.Resp
 
 	res, err := h.service.UpdateTaxAuthorityCodebook(ctx, id, input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -106,12 +114,14 @@ func (h *taxauthoritycodebookHandlerImpl) DeactivateTaxAuthorityCodebook(w http.
 	var input dto.TaxAuthorityCodebookDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
 	}
 
 	validator := h.App.Validator().ValidateStruct(&input)
 	if !validator.Valid() {
+		h.App.ErrorLog.Print(validator.Errors)
 		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
 		return
 	}
@@ -121,6 +131,7 @@ func (h *taxauthoritycodebookHandlerImpl) DeactivateTaxAuthorityCodebook(w http.
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
 	}
@@ -130,6 +141,7 @@ func (h *taxauthoritycodebookHandlerImpl) DeactivateTaxAuthorityCodebook(w http.
 
 	err = h.service.DeactivateTaxAuthorityCodebook(ctx, id, input.Active)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -145,6 +157,7 @@ func (h *taxauthoritycodebookHandlerImpl) DeleteTaxAuthorityCodebook(w http.Resp
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
 	}
@@ -154,6 +167,7 @@ func (h *taxauthoritycodebookHandlerImpl) DeleteTaxAuthorityCodebook(w http.Resp
 
 	err = h.service.DeleteTaxAuthorityCodebook(ctx, id)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -166,6 +180,7 @@ func (h *taxauthoritycodebookHandlerImpl) GetTaxAuthorityCodebookById(w http.Res
 
 	res, err := h.service.GetTaxAuthorityCodebook(id)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -180,12 +195,14 @@ func (h *taxauthoritycodebookHandlerImpl) GetTaxAuthorityCodebookList(w http.Res
 
 	validator := h.App.Validator().ValidateStruct(&filter)
 	if !validator.Valid() {
+		h.App.ErrorLog.Print(validator.Errors)
 		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
 		return
 	}
 
 	res, total, err := h.service.GetTaxAuthorityCodebookList(filter)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}

@@ -6,7 +6,7 @@ import (
 
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
-	"gitlab.sudovi.me/erp/finance-api/errors"
+	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 
 	"github.com/oykos-development-hub/celeritas"
 	"github.com/upper/db/v4"
@@ -30,13 +30,11 @@ func NewFeeSharedLogicServiceImpl(app *celeritas.Celeritas, repoFee data.Fee, re
 func (h *FeeSharedLogicServiceImpl) CalculateFeeDetailsAndUpdateStatus(ctx context.Context, feeId int) (*dto.FeeDetailsDTO, data.FeeStatus, error) {
 	fee, err := h.repoFee.Get(feeId)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, 0, errors.ErrNotFound
+		return nil, 0, newErrors.Wrap(err, "repo fee get")
 	}
 	payments, err := h.getFeePaymentsByFeeID(fee.ID)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, 0, errors.ErrNotFound
+		return nil, 0, newErrors.Wrap(err, "get fee payments by fee id")
 	}
 
 	details := &dto.FeeDetailsDTO{}
@@ -68,7 +66,7 @@ func (h *FeeSharedLogicServiceImpl) CalculateFeeDetailsAndUpdateStatus(ctx conte
 		fee.Status = newStatus
 		err = h.repoFee.Update(ctx, *fee)
 		if err != nil {
-			return nil, 0, errors.ErrInternalServer
+			return nil, 0, newErrors.Wrap(err, "repo fee update")
 		}
 	}
 
@@ -80,8 +78,7 @@ func (h *FeeSharedLogicServiceImpl) getFeePaymentsByFeeID(feeID int) ([]*data.Fe
 
 	feePayments, _, err := h.repoFeePayment.GetAll(&cond)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo fee payment get all")
 	}
 
 	return feePayments, nil

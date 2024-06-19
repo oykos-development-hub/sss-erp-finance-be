@@ -8,6 +8,7 @@ import (
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
 	"gitlab.sudovi.me/erp/finance-api/errors"
+	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 )
 
 type FinePaymentServiceImpl struct {
@@ -32,20 +33,19 @@ func (h *FinePaymentServiceImpl) CreateFinePayment(ctx context.Context, input dt
 
 	id, err := h.repo.Insert(ctx, *finePayment)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo fine payment insert")
 	}
 
 	finePayment, err = finePayment.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo fine payment get")
 	}
 
 	res := dto.ToFinePaymentResponseDTO(*finePayment)
 
 	_, _, err = h.fineSharedLogicService.CalculateFineDetailsAndUpdateStatus(ctx, finePayment.FineID)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, err
+		return nil, newErrors.Wrap(err, "fine shared logic calculate fine details and update status")
 	}
 
 	return &res, nil
@@ -55,20 +55,17 @@ func (h *FinePaymentServiceImpl) CreateFinePayment(ctx context.Context, input dt
 func (h *FinePaymentServiceImpl) DeleteFinePayment(ctx context.Context, id int) error {
 	finePayment, err := h.repo.Get(id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return errors.ErrNotFound
+		return newErrors.Wrap(err, "repo fine payment get")
 	}
 
 	err = h.repo.Delete(ctx, id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return errors.ErrInternalServer
+		return newErrors.Wrap(err, "repo fine payment delete")
 	}
 
 	_, _, err = h.fineSharedLogicService.CalculateFineDetailsAndUpdateStatus(ctx, finePayment.FineID)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return errors.ErrInternalServer
+		return newErrors.Wrap(err, "fine shared logic calculate fine details and update status")
 	}
 
 	return nil
@@ -81,20 +78,19 @@ func (h *FinePaymentServiceImpl) UpdateFinePayment(ctx context.Context, id int, 
 
 	err := h.repo.Update(ctx, *data)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo fine payment update")
 	}
 
 	data, err = h.repo.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo fine payment get")
 	}
 
 	response := dto.ToFinePaymentResponseDTO(*data)
 
 	_, _, err = h.fineSharedLogicService.CalculateFineDetailsAndUpdateStatus(ctx, data.FineID)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "fine shared logic calculate fine details and update status")
 	}
 
 	return &response, nil
@@ -105,12 +101,11 @@ func (h *FinePaymentServiceImpl) GetFinePaymentList(input dto.FinePaymentFilterD
 
 	finePayments, total, err := h.getFinePaymentsByFineID(input.FineID)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, nil, errors.ErrInternalServer
+		return nil, nil, newErrors.Wrap(err, "get fine payment by fine id")
 	}
 
 	if len(finePayments) == 0 {
-		return nil, nil, errors.ErrNotFound
+		return nil, nil, newErrors.Wrap(errors.ErrNotFound, "get fine payment by fine id")
 	}
 	response := dto.ToFinePaymentListResponseDTO(finePayments)
 
@@ -122,8 +117,7 @@ func (h *FinePaymentServiceImpl) getFinePaymentsByFineID(fineID int) ([]*data.Fi
 
 	finePayments, total, err := h.repo.GetAll(&cond)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, nil, errors.ErrInternalServer
+		return nil, nil, newErrors.Wrap(err, "repo fine payment get all")
 	}
 
 	return finePayments, total, nil
@@ -133,9 +127,9 @@ func (h *FinePaymentServiceImpl) getFinePaymentsByFineID(fineID int) ([]*data.Fi
 func (h *FinePaymentServiceImpl) GetFinePayment(id int) (*dto.FinePaymentResponseDTO, error) {
 	data, err := h.repo.Get(id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrNotFound
+		return nil, newErrors.Wrap(err, "repo fine payment get")
 	}
+
 	response := dto.ToFinePaymentResponseDTO(*data)
 
 	return &response, nil

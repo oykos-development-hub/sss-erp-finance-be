@@ -7,7 +7,7 @@ import (
 
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
-	"gitlab.sudovi.me/erp/finance-api/errors"
+	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 
 	"github.com/oykos-development-hub/celeritas"
 	"github.com/upper/db/v4"
@@ -31,13 +31,11 @@ func NewFineSharedLogicServiceImpl(app *celeritas.Celeritas, repoFine data.Fine,
 func (h *FineSharedLogicServiceImpl) CalculateFineDetailsAndUpdateStatus(ctx context.Context, fineId int) (*dto.FineFeeDetailsDTO, data.FineStatus, error) {
 	fine, err := h.repoFine.Get(fineId)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, 0, errors.ErrNotFound
+		return nil, 0, newErrors.Wrap(err, "repo fine get")
 	}
 	payments, err := h.getFinePaymentsByFineID(fine.ID)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, 0, errors.ErrNotFound
+		return nil, 0, newErrors.Wrap(err, "get fine payments by fine id")
 	}
 
 	details := &dto.FineFeeDetailsDTO{}
@@ -85,7 +83,7 @@ func (h *FineSharedLogicServiceImpl) CalculateFineDetailsAndUpdateStatus(ctx con
 		fine.Status = newStatus
 		err = h.repoFine.Update(ctx, *fine)
 		if err != nil {
-			return nil, 0, errors.ErrInternalServer
+			return nil, 0, newErrors.Wrap(err, "repo fine update")
 		}
 	}
 
@@ -97,8 +95,7 @@ func (h *FineSharedLogicServiceImpl) getFinePaymentsByFineID(fineID int) ([]*dat
 
 	finePayments, _, err := h.repoFinePayment.GetAll(&cond)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo fine payment get all")
 	}
 
 	return finePayments, nil

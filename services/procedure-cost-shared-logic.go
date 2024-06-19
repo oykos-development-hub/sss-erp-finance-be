@@ -7,7 +7,7 @@ import (
 
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
-	"gitlab.sudovi.me/erp/finance-api/errors"
+	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 
 	"github.com/oykos-development-hub/celeritas"
 	"github.com/upper/db/v4"
@@ -31,13 +31,11 @@ func NewProcedureCostSharedLogicServiceImpl(app *celeritas.Celeritas, repoProced
 func (h *ProcedureCostSharedLogicServiceImpl) CalculateProcedureCostDetailsAndUpdateStatus(ctx context.Context, procedurecostId int) (*dto.ProcedureCostDetailsDTO, data.ProcedureCostStatus, error) {
 	procedurecost, err := h.repoProcedureCost.Get(procedurecostId)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, 0, errors.ErrNotFound
+		return nil, 0, newErrors.Wrap(err, "repo procedure cost get")
 	}
 	payments, err := h.getProcedureCostPaymentsByProcedureCostID(procedurecost.ID)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, 0, errors.ErrNotFound
+		return nil, 0, newErrors.Wrap(err, "get procedure cost payments by procedure cost id")
 	}
 
 	details := &dto.ProcedureCostDetailsDTO{}
@@ -84,7 +82,7 @@ func (h *ProcedureCostSharedLogicServiceImpl) CalculateProcedureCostDetailsAndUp
 		procedurecost.Status = newStatus
 		err = h.repoProcedureCost.Update(ctx, *procedurecost)
 		if err != nil {
-			return nil, 0, errors.ErrInternalServer
+			return nil, 0, newErrors.Wrap(err, "repo procedure cost update")
 		}
 	}
 
@@ -96,8 +94,7 @@ func (h *ProcedureCostSharedLogicServiceImpl) getProcedureCostPaymentsByProcedur
 
 	procedurecostPayments, _, err := h.repoProcedureCostPayment.GetAll(&cond)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo procedure cost payment get all")
 	}
 
 	return procedurecostPayments, nil

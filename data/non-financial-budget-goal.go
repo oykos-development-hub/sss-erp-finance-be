@@ -7,7 +7,7 @@ import (
 
 	up "github.com/upper/db/v4"
 	"gitlab.sudovi.me/erp/finance-api/contextutil"
-	"gitlab.sudovi.me/erp/finance-api/pkg/errors"
+	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 )
 
 // NonFinancialBudgetGoal struct
@@ -38,7 +38,7 @@ func (t *NonFinancialBudgetGoal) GetAll(page *int, size *int, condition *up.AndE
 	}
 	total, err := res.Count()
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, newErrors.Wrap(err, "upper count")
 	}
 
 	if page != nil && size != nil {
@@ -47,7 +47,7 @@ func (t *NonFinancialBudgetGoal) GetAll(page *int, size *int, condition *up.AndE
 
 	err = res.OrderBy(orders...).All(&all)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, newErrors.Wrap(err, "upper all")
 	}
 
 	return all, &total, err
@@ -61,7 +61,7 @@ func (t *NonFinancialBudgetGoal) Get(id int) (*NonFinancialBudgetGoal, error) {
 	res := collection.Find(up.Cond{"id": id})
 	err := res.One(&one)
 	if err != nil {
-		return nil, err
+		return nil, newErrors.Wrap(err, "upper one")
 	}
 	return &one, nil
 }
@@ -71,27 +71,28 @@ func (t *NonFinancialBudgetGoal) Update(ctx context.Context, m NonFinancialBudge
 	m.UpdatedAt = time.Now()
 	userID, ok := contextutil.GetUserIDFromContext(ctx)
 	if !ok {
-		return errors.New("user ID not found in context")
+		err := newErrors.New("user ID not found in context")
+		return newErrors.Wrap(err, "contextuitl get user id from context")
 	}
 
 	err := Upper.Tx(func(sess up.Session) error {
 
 		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
 		if _, err := sess.SQL().Exec(query); err != nil {
-			return err
+			return newErrors.Wrap(err, "upper exec")
 		}
 
 		collection := sess.Collection(t.Table())
 		res := collection.Find(m.ID)
 		if err := res.Update(&m); err != nil {
-			return err
+			return newErrors.Wrap(err, "upper update")
 		}
 
 		return nil
 	})
 
 	if err != nil {
-		return err
+		return newErrors.Wrap(err, "upper tx")
 	}
 	return nil
 }
@@ -100,26 +101,27 @@ func (t *NonFinancialBudgetGoal) Update(ctx context.Context, m NonFinancialBudge
 func (t *NonFinancialBudgetGoal) Delete(ctx context.Context, id int) error {
 	userID, ok := contextutil.GetUserIDFromContext(ctx)
 	if !ok {
-		return errors.New("user ID not found in context")
+		err := newErrors.New("user ID not found in context")
+		return newErrors.Wrap(err, "contextuitl get user id from context")
 	}
 
 	err := Upper.Tx(func(sess up.Session) error {
 		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
 		if _, err := sess.SQL().Exec(query); err != nil {
-			return err
+			return newErrors.Wrap(err, "upper exec")
 		}
 
 		collection := sess.Collection(t.Table())
 		res := collection.Find(id)
 		if err := res.Delete(); err != nil {
-			return err
+			return newErrors.Wrap(err, "upper delete")
 		}
 
 		return nil
 	})
 
 	if err != nil {
-		return err
+		return newErrors.Wrap(err, "upper tx")
 	}
 	return nil
 }
@@ -130,7 +132,8 @@ func (t *NonFinancialBudgetGoal) Insert(ctx context.Context, m NonFinancialBudge
 	m.UpdatedAt = time.Now()
 	userID, ok := contextutil.GetUserIDFromContext(ctx)
 	if !ok {
-		return 0, errors.New("user ID not found in context")
+		err := newErrors.New("user ID not found in context")
+		return 0, newErrors.Wrap(err, "contextuitl get user id from context")
 	}
 
 	var id int
@@ -139,7 +142,7 @@ func (t *NonFinancialBudgetGoal) Insert(ctx context.Context, m NonFinancialBudge
 
 		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
 		if _, err := sess.SQL().Exec(query); err != nil {
-			return err
+			return newErrors.Wrap(err, "upper exec")
 		}
 
 		collection := sess.Collection(t.Table())
@@ -148,7 +151,7 @@ func (t *NonFinancialBudgetGoal) Insert(ctx context.Context, m NonFinancialBudge
 		var err error
 
 		if res, err = collection.Insert(m); err != nil {
-			return err
+			return newErrors.Wrap(err, "upper insert")
 		}
 
 		id = getInsertId(res.ID())
@@ -157,7 +160,7 @@ func (t *NonFinancialBudgetGoal) Insert(ctx context.Context, m NonFinancialBudge
 	})
 
 	if err != nil {
-		return 0, err
+		return 0, newErrors.Wrap(err, "upper tx")
 	}
 
 	return id, nil

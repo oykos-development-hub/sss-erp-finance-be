@@ -3,7 +3,7 @@ package services
 import (
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
-	"gitlab.sudovi.me/erp/finance-api/errors"
+	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 
 	"github.com/oykos-development-hub/celeritas"
 	up "github.com/upper/db/v4"
@@ -29,19 +29,19 @@ func (h *EnforcedPaymentItemServiceImpl) CreateEnforcedPaymentItem(input dto.Enf
 		var err error
 		id, err = h.repo.Insert(tx, *dataToInsert)
 		if err != nil {
-			return errors.ErrInternalServer
+			return newErrors.Wrap(err, "repo enforced payment item insert")
 		}
 
 		return nil
 	})
 
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "upper tx")
 	}
 
 	dataToInsert, err = h.repo.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo enforced payment item get")
 	}
 
 	res := dto.ToEnforcedPaymentItemResponseDTO(*dataToInsert)
@@ -56,17 +56,17 @@ func (h *EnforcedPaymentItemServiceImpl) UpdateEnforcedPaymentItem(id int, input
 	err := data.Upper.Tx(func(tx up.Session) error {
 		err := h.repo.Update(tx, *dataToInsert)
 		if err != nil {
-			return errors.ErrInternalServer
+			return newErrors.Wrap(err, "repo enforced payment item update")
 		}
 		return nil
 	})
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "upper tx")
 	}
 
 	dataToInsert, err = h.repo.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo enforced payment item get")
 	}
 
 	response := dto.ToEnforcedPaymentItemResponseDTO(*dataToInsert)
@@ -77,8 +77,7 @@ func (h *EnforcedPaymentItemServiceImpl) UpdateEnforcedPaymentItem(id int, input
 func (h *EnforcedPaymentItemServiceImpl) DeleteEnforcedPaymentItem(id int) error {
 	err := h.repo.Delete(id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return errors.ErrInternalServer
+		return newErrors.Wrap(err, "repo enforced payment item delete")
 	}
 
 	return nil
@@ -87,9 +86,9 @@ func (h *EnforcedPaymentItemServiceImpl) DeleteEnforcedPaymentItem(id int) error
 func (h *EnforcedPaymentItemServiceImpl) GetEnforcedPaymentItem(id int) (*dto.EnforcedPaymentItemResponseDTO, error) {
 	data, err := h.repo.Get(id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrNotFound
+		return nil, newErrors.Wrap(err, "repo enforced payment item get")
 	}
+
 	response := dto.ToEnforcedPaymentItemResponseDTO(*data)
 
 	return &response, nil
@@ -115,8 +114,7 @@ func (h *EnforcedPaymentItemServiceImpl) GetEnforcedPaymentItemList(filter dto.E
 
 	data, total, err := h.repo.GetAll(filter.Page, filter.Size, conditionAndExp, orders)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, nil, errors.ErrInternalServer
+		return nil, nil, newErrors.Wrap(err, "repo enforced payment item get all")
 	}
 	response := dto.ToEnforcedPaymentItemListResponseDTO(data)
 

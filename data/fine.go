@@ -8,7 +8,7 @@ import (
 	"github.com/lib/pq"
 	up "github.com/upper/db/v4"
 	"gitlab.sudovi.me/erp/finance-api/contextutil"
-	"gitlab.sudovi.me/erp/finance-api/pkg/errors"
+	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 )
 
 type FineActType int
@@ -67,7 +67,7 @@ func (t *Fine) Get(id int) (*Fine, error) {
 	res := collection.Find(up.Cond{"id": id})
 	err := res.One(&one)
 	if err != nil {
-		return nil, err
+		return nil, newErrors.Wrap(err, "upper one")
 	}
 	return &one, nil
 }
@@ -78,7 +78,8 @@ func (t *Fine) Insert(ctx context.Context, m Fine) (int, error) {
 	m.UpdatedAt = time.Now()
 	userID, ok := contextutil.GetUserIDFromContext(ctx)
 	if !ok {
-		return 0, errors.New("user ID not found in context")
+		err := newErrors.New("user ID not found in context")
+		return 0, newErrors.Wrap(err, "contextuitl get user id from context")
 	}
 
 	var id int
@@ -87,7 +88,7 @@ func (t *Fine) Insert(ctx context.Context, m Fine) (int, error) {
 
 		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
 		if _, err := sess.SQL().Exec(query); err != nil {
-			return err
+			return newErrors.Wrap(err, "upper exec")
 		}
 
 		collection := sess.Collection(t.Table())
@@ -96,7 +97,7 @@ func (t *Fine) Insert(ctx context.Context, m Fine) (int, error) {
 		var err error
 
 		if res, err = collection.Insert(m); err != nil {
-			return err
+			return newErrors.Wrap(err, "upper insert")
 		}
 
 		id = getInsertId(res.ID())
@@ -105,7 +106,7 @@ func (t *Fine) Insert(ctx context.Context, m Fine) (int, error) {
 	})
 
 	if err != nil {
-		return 0, err
+		return 0, newErrors.Wrap(err, "upper tx")
 	}
 
 	return id, nil
@@ -124,7 +125,7 @@ func (t *Fine) GetAll(page *int, size *int, condition *up.AndExpr) ([]*Fine, *ui
 	}
 	total, err := res.Count()
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, newErrors.Wrap(err, "upper count")
 	}
 
 	if page != nil && size != nil {
@@ -133,7 +134,7 @@ func (t *Fine) GetAll(page *int, size *int, condition *up.AndExpr) ([]*Fine, *ui
 
 	err = res.OrderBy("created_at desc").All(&all)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, newErrors.Wrap(err, "upper all")
 	}
 
 	return all, &total, err
@@ -144,27 +145,28 @@ func (t *Fine) Update(ctx context.Context, m Fine) error {
 	m.UpdatedAt = time.Now()
 	userID, ok := contextutil.GetUserIDFromContext(ctx)
 	if !ok {
-		return errors.New("user ID not found in context")
+		err := newErrors.New("user ID not found in context")
+		return newErrors.Wrap(err, "contextuitl get user id from context")
 	}
 
 	err := Upper.Tx(func(sess up.Session) error {
 
 		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
 		if _, err := sess.SQL().Exec(query); err != nil {
-			return err
+			return newErrors.Wrap(err, "upper exec")
 		}
 
 		collection := sess.Collection(t.Table())
 		res := collection.Find(m.ID)
 		if err := res.Update(&m); err != nil {
-			return err
+			return newErrors.Wrap(err, "upper update")
 		}
 
 		return nil
 	})
 
 	if err != nil {
-		return err
+		return newErrors.Wrap(err, "upper tx")
 	}
 	return nil
 }
@@ -173,26 +175,27 @@ func (t *Fine) Update(ctx context.Context, m Fine) error {
 func (t *Fine) Delete(ctx context.Context, id int) error {
 	userID, ok := contextutil.GetUserIDFromContext(ctx)
 	if !ok {
-		return errors.New("user ID not found in context")
+		err := newErrors.New("user ID not found in context")
+		return newErrors.Wrap(err, "contextuitl get user id from context")
 	}
 
 	err := Upper.Tx(func(sess up.Session) error {
 		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
 		if _, err := sess.SQL().Exec(query); err != nil {
-			return err
+			return newErrors.Wrap(err, "upper exec")
 		}
 
 		collection := sess.Collection(t.Table())
 		res := collection.Find(id)
 		if err := res.Delete(); err != nil {
-			return err
+			return newErrors.Wrap(err, "upper delete")
 		}
 
 		return nil
 	})
 
 	if err != nil {
-		return err
+		return newErrors.Wrap(err, "upper tx")
 	}
 	return nil
 }

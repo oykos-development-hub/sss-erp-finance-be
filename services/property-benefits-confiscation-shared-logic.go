@@ -7,7 +7,7 @@ import (
 
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
-	"gitlab.sudovi.me/erp/finance-api/errors"
+	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 
 	"github.com/oykos-development-hub/celeritas"
 	"github.com/upper/db/v4"
@@ -31,13 +31,11 @@ func NewPropBenConfSharedLogicServiceImpl(app *celeritas.Celeritas, repoPropBenC
 func (h *PropBenConfSharedLogicServiceImpl) CalculatePropBenConfDetailsAndUpdateStatus(ctx context.Context, propbenconfId int) (*dto.PropBenConfDetailsDTO, data.PropBenConfStatus, error) {
 	propbenconf, err := h.repoPropBenConf.Get(propbenconfId)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, 0, errors.ErrNotFound
+		return nil, 0, newErrors.Wrap(err, "repo prop ben conf get")
 	}
 	payments, err := h.getPropBenConfPaymentsByPropBenConfID(propbenconf.ID)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, 0, errors.ErrNotFound
+		return nil, 0, newErrors.Wrap(err, "get prop ben conf payments by prop ben conf id")
 	}
 
 	details := &dto.PropBenConfDetailsDTO{}
@@ -85,7 +83,7 @@ func (h *PropBenConfSharedLogicServiceImpl) CalculatePropBenConfDetailsAndUpdate
 		propbenconf.Status = newStatus
 		err = h.repoPropBenConf.Update(ctx, *propbenconf)
 		if err != nil {
-			return nil, 0, errors.ErrInternalServer
+			return nil, 0, newErrors.Wrap(err, "repo prop ben conf update")
 		}
 	}
 
@@ -97,8 +95,7 @@ func (h *PropBenConfSharedLogicServiceImpl) getPropBenConfPaymentsByPropBenConfI
 
 	propbenconfPayments, _, err := h.repoPropBenConfPayment.GetAll(&cond)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo prop ben conf payments get all")
 	}
 
 	return propbenconfPayments, nil

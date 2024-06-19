@@ -6,7 +6,7 @@ import (
 
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
-	"gitlab.sudovi.me/erp/finance-api/errors"
+	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 
 	"github.com/oykos-development-hub/celeritas"
 	up "github.com/upper/db/v4"
@@ -29,12 +29,12 @@ func (h *TaxAuthorityCodebookServiceImpl) CreateTaxAuthorityCodebook(ctx context
 
 	id, err := h.repo.Insert(ctx, *data)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo tax authority codebook insert")
 	}
 
 	data, err = data.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo tax authority codebook get")
 	}
 
 	res := dto.ToTaxAuthorityCodebookResponseDTO(*data)
@@ -48,12 +48,12 @@ func (h *TaxAuthorityCodebookServiceImpl) UpdateTaxAuthorityCodebook(ctx context
 
 	err := h.repo.Update(ctx, *data)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo tax authority codebook update")
 	}
 
 	data, err = h.repo.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo tax authority codebook get")
 	}
 
 	response := dto.ToTaxAuthorityCodebookResponseDTO(*data)
@@ -64,8 +64,7 @@ func (h *TaxAuthorityCodebookServiceImpl) UpdateTaxAuthorityCodebook(ctx context
 func (h *TaxAuthorityCodebookServiceImpl) DeleteTaxAuthorityCodebook(ctx context.Context, id int) error {
 	err := h.repo.Delete(ctx, id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return errors.ErrInternalServer
+		return newErrors.Wrap(err, "repo tax authority codebook delete")
 	}
 
 	return nil
@@ -74,8 +73,7 @@ func (h *TaxAuthorityCodebookServiceImpl) DeleteTaxAuthorityCodebook(ctx context
 func (h *TaxAuthorityCodebookServiceImpl) DeactivateTaxAuthorityCodebook(ctx context.Context, id int, active bool) error {
 	err := h.repo.Deactivate(ctx, id, active)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return errors.ErrInternalServer
+		return newErrors.Wrap(err, "repo tax authority codebook deactivate")
 	}
 
 	return nil
@@ -84,9 +82,9 @@ func (h *TaxAuthorityCodebookServiceImpl) DeactivateTaxAuthorityCodebook(ctx con
 func (h *TaxAuthorityCodebookServiceImpl) GetTaxAuthorityCodebook(id int) (*dto.TaxAuthorityCodebookResponseDTO, error) {
 	data, err := h.repo.Get(id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrNotFound
+		return nil, newErrors.Wrap(err, "repo tax authority codebook get")
 	}
+
 	response := dto.ToTaxAuthorityCodebookResponseDTO(*data)
 
 	return &response, nil
@@ -121,8 +119,7 @@ func (h *TaxAuthorityCodebookServiceImpl) GetTaxAuthorityCodebookList(filter dto
 
 	data, total, err := h.repo.GetAll(filter.Page, filter.Size, conditionAndExp, orders)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, nil, errors.ErrInternalServer
+		return nil, nil, newErrors.Wrap(err, "repo tax authority codebook get all")
 	}
 	response := dto.ToTaxAuthorityCodebookListResponseDTO(data)
 

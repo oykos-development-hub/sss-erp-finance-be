@@ -3,7 +3,7 @@ package services
 import (
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
-	"gitlab.sudovi.me/erp/finance-api/errors"
+	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 
 	"github.com/oykos-development-hub/celeritas"
 	up "github.com/upper/db/v4"
@@ -26,12 +26,12 @@ func (h *FinancialBudgetLimitServiceImpl) CreateFinancialBudgetLimit(input dto.F
 
 	id, err := h.repo.Insert(*data)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo financial budget limit insert")
 	}
 
 	data, err = data.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo financial budget limit get")
 	}
 
 	res := dto.ToFinancialBudgetLimitResponseDTO(*data)
@@ -45,12 +45,12 @@ func (h *FinancialBudgetLimitServiceImpl) UpdateFinancialBudgetLimit(id int, inp
 
 	err := h.repo.Update(*data)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo financial budget limit update")
 	}
 
 	data, err = h.repo.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo financial budget limit get")
 	}
 
 	response := dto.ToFinancialBudgetLimitResponseDTO(*data)
@@ -61,8 +61,7 @@ func (h *FinancialBudgetLimitServiceImpl) UpdateFinancialBudgetLimit(id int, inp
 func (h *FinancialBudgetLimitServiceImpl) DeleteFinancialBudgetLimit(id int) error {
 	err := h.repo.Delete(id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return errors.ErrInternalServer
+		return newErrors.Wrap(err, "repo financial budget limit delete")
 	}
 
 	return nil
@@ -71,9 +70,9 @@ func (h *FinancialBudgetLimitServiceImpl) DeleteFinancialBudgetLimit(id int) err
 func (h *FinancialBudgetLimitServiceImpl) GetFinancialBudgetLimit(id int) (*dto.FinancialBudgetLimitResponseDTO, error) {
 	data, err := h.repo.Get(id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrNotFound
+		return nil, newErrors.Wrap(err, "repo financial budget limit get")
 	}
+
 	response := dto.ToFinancialBudgetLimitResponseDTO(*data)
 
 	return &response, nil
@@ -92,8 +91,7 @@ func (h *FinancialBudgetLimitServiceImpl) GetFinancialBudgetLimitList(filter dto
 
 	data, total, err := h.repo.GetAll(filter.Page, filter.Size, conditionAndExp, orders)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, nil, errors.ErrInternalServer
+		return nil, nil, newErrors.Wrap(err, "repo financial budget limit get all")
 	}
 	response := dto.ToFinancialBudgetLimitListResponseDTO(data)
 

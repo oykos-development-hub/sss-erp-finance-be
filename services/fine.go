@@ -6,7 +6,7 @@ import (
 
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
-	"gitlab.sudovi.me/erp/finance-api/errors"
+	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 
 	"github.com/oykos-development-hub/celeritas"
 	up "github.com/upper/db/v4"
@@ -34,12 +34,12 @@ func (h *FineServiceImpl) CreateFine(ctx context.Context, input dto.FineDTO) (*d
 
 	id, err := h.repo.Insert(ctx, *fine)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo fine insert")
 	}
 
 	fine, err = fine.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo fine get")
 	}
 
 	return h.createFineResponse(ctx, fine)
@@ -49,8 +49,7 @@ func (h *FineServiceImpl) CreateFine(ctx context.Context, input dto.FineDTO) (*d
 func (h *FineServiceImpl) GetFine(id int) (*dto.FineResponseDTO, error) {
 	fine, err := h.repo.Get(id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrNotFound
+		return nil, newErrors.Wrap(err, "repo fine get")
 	}
 
 	return h.createFineResponse(context.Background(), fine)
@@ -63,12 +62,12 @@ func (h *FineServiceImpl) UpdateFine(ctx context.Context, id int, input dto.Fine
 
 	err := h.repo.Update(ctx, *fine)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo fine update")
 	}
 
 	fine, err = h.repo.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo fine get")
 	}
 
 	return h.createFineResponse(ctx, fine)
@@ -78,8 +77,7 @@ func (h *FineServiceImpl) UpdateFine(ctx context.Context, id int, input dto.Fine
 func (h *FineServiceImpl) DeleteFine(ctx context.Context, id int) error {
 	err := h.repo.Delete(ctx, id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return errors.ErrInternalServer
+		return newErrors.Wrap(err, "repo fine delete")
 	}
 
 	return nil
@@ -116,8 +114,7 @@ func (h *FineServiceImpl) GetFineList(input dto.FineFilterDTO) ([]dto.FineRespon
 
 	fines, total, err := h.repo.GetAll(input.Page, input.Size, conditionAndExp)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, nil, err
+		return nil, nil, newErrors.Wrap(err, "repo fine get all")
 	}
 
 	var finesList []data.Fine
@@ -127,8 +124,7 @@ func (h *FineServiceImpl) GetFineList(input dto.FineFilterDTO) ([]dto.FineRespon
 
 	response, err := h.convertFinesToResponses(finesList)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, nil, err
+		return nil, nil, newErrors.Wrap(err, "convert fines to response")
 	}
 
 	return response, total, nil
@@ -140,7 +136,7 @@ func (h *FineServiceImpl) convertFinesToResponses(fines []data.Fine) ([]dto.Fine
 	for _, fee := range fines {
 		response, err := h.createFineResponse(context.Background(), &fee)
 		if err != nil {
-			return nil, err
+			return nil, newErrors.Wrap(err, "create fine response")
 		}
 		responses = append(responses, *response)
 	}
@@ -154,8 +150,7 @@ func (h *FineServiceImpl) createFineResponse(ctx context.Context, fine *data.Fin
 	var err error
 	response.FineFeeDetailsDTO, newStatus, err = h.fineSharedLogicService.CalculateFineDetailsAndUpdateStatus(ctx, fine.ID)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, err
+		return nil, newErrors.Wrap(err, "fine shared logic calculate fine details and update status")
 	}
 	response.Status = newStatus
 

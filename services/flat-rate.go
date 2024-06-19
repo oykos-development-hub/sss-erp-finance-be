@@ -6,7 +6,7 @@ import (
 
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
-	"gitlab.sudovi.me/erp/finance-api/errors"
+	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 
 	"github.com/oykos-development-hub/celeritas"
 	up "github.com/upper/db/v4"
@@ -34,12 +34,12 @@ func (h *FlatRateServiceImpl) CreateFlatRate(ctx context.Context, input dto.Flat
 
 	id, err := h.repo.Insert(ctx, *FlatRate)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo flat rate insert")
 	}
 
 	FlatRate, err = FlatRate.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo flat rate insert")
 	}
 
 	return h.createFlatRateResponse(ctx, FlatRate)
@@ -49,8 +49,7 @@ func (h *FlatRateServiceImpl) CreateFlatRate(ctx context.Context, input dto.Flat
 func (h *FlatRateServiceImpl) GetFlatRate(id int) (*dto.FlatRateResponseDTO, error) {
 	FlatRate, err := h.repo.Get(id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrNotFound
+		return nil, newErrors.Wrap(err, "repo flat rate get")
 	}
 
 	return h.createFlatRateResponse(context.Background(), FlatRate)
@@ -63,12 +62,12 @@ func (h *FlatRateServiceImpl) UpdateFlatRate(ctx context.Context, id int, input 
 
 	err := h.repo.Update(ctx, *FlatRate)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo flat rate update")
 	}
 
 	FlatRate, err = h.repo.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo flat rate get")
 	}
 
 	return h.createFlatRateResponse(ctx, FlatRate)
@@ -78,8 +77,7 @@ func (h *FlatRateServiceImpl) UpdateFlatRate(ctx context.Context, id int, input 
 func (h *FlatRateServiceImpl) DeleteFlatRate(ctx context.Context, id int) error {
 	err := h.repo.Delete(ctx, id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return errors.ErrInternalServer
+		return newErrors.Wrap(err, "repo flat rate delete")
 	}
 
 	return nil
@@ -116,8 +114,7 @@ func (h *FlatRateServiceImpl) GetFlatRateList(input dto.FlatRateFilterDTO) ([]dt
 
 	FlatRates, total, err := h.repo.GetAll(input.Page, input.Size, conditionAndExp)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, nil, err
+		return nil, nil, newErrors.Wrap(err, "repo flat rate get all")
 	}
 
 	var FlatRatesList []data.FlatRate
@@ -127,8 +124,7 @@ func (h *FlatRateServiceImpl) GetFlatRateList(input dto.FlatRateFilterDTO) ([]dt
 
 	response, err := h.convertFlatRatesToResponses(FlatRatesList)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, nil, err
+		return nil, nil, newErrors.Wrap(err, "convert flat rates to responses")
 	}
 
 	return response, total, nil
@@ -140,7 +136,7 @@ func (h *FlatRateServiceImpl) convertFlatRatesToResponses(FlatRates []data.FlatR
 	for _, fee := range FlatRates {
 		response, err := h.createFlatRateResponse(context.Background(), &fee)
 		if err != nil {
-			return nil, err
+			return nil, newErrors.Wrap(err, "create flat rate response")
 		}
 		responses = append(responses, *response)
 	}
@@ -154,8 +150,7 @@ func (h *FlatRateServiceImpl) createFlatRateResponse(ctx context.Context, FlatRa
 	var err error
 	response.FlatRateDetails, newStatus, err = h.FlatRateSharedLogicService.CalculateFlatRateDetailsAndUpdateStatus(ctx, FlatRate.ID)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, err
+		return nil, newErrors.Wrap(err, "flat rate shared logic service calcualte flat rate details and update status")
 	}
 	response.Status = newStatus
 

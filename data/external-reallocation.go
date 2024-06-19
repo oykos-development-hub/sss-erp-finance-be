@@ -7,7 +7,7 @@ import (
 
 	up "github.com/upper/db/v4"
 	"gitlab.sudovi.me/erp/finance-api/contextutil"
-	"gitlab.sudovi.me/erp/finance-api/pkg/errors"
+	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 )
 
 type ReallocationStatus string
@@ -58,7 +58,7 @@ func (t *ExternalReallocation) GetAll(page *int, size *int, condition *up.AndExp
 	}
 	total, err := res.Count()
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, newErrors.Wrap(err, "upper count")
 	}
 
 	if page != nil && size != nil {
@@ -67,7 +67,7 @@ func (t *ExternalReallocation) GetAll(page *int, size *int, condition *up.AndExp
 
 	err = res.OrderBy(orders...).All(&all)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, newErrors.Wrap(err, "upper all")
 	}
 
 	return all, &total, err
@@ -81,7 +81,7 @@ func (t *ExternalReallocation) Get(id int) (*ExternalReallocation, error) {
 	res := collection.Find(up.Cond{"id": id})
 	err := res.One(&one)
 	if err != nil {
-		return nil, err
+		return nil, newErrors.Wrap(err, "upper one")
 	}
 	return &one, nil
 }
@@ -91,18 +91,19 @@ func (t *ExternalReallocation) Update(ctx context.Context, tx up.Session, m Exte
 	m.UpdatedAt = time.Now()
 	userID, ok := contextutil.GetUserIDFromContext(ctx)
 	if !ok {
-		return errors.New("user ID not found in context")
+		err := newErrors.New("user ID not found in context")
+		return newErrors.Wrap(err, "contextuitl get user id from context")
 	}
 
 	query := fmt.Sprintf("SET myapp.user_id = %d", userID)
 	if _, err := tx.SQL().Exec(query); err != nil {
-		return err
+		return newErrors.Wrap(err, "upper exec")
 	}
 
 	collection := tx.Collection(t.Table())
 	res := collection.Find(m.ID)
 	if err := res.Update(&m); err != nil {
-		return err
+		return newErrors.Wrap(err, "upper update")
 	}
 
 	return nil
@@ -112,26 +113,27 @@ func (t *ExternalReallocation) Update(ctx context.Context, tx up.Session, m Exte
 func (t *ExternalReallocation) Delete(ctx context.Context, id int) error {
 	userID, ok := contextutil.GetUserIDFromContext(ctx)
 	if !ok {
-		return errors.New("user ID not found in context")
+		err := newErrors.New("user ID not found in context")
+		return newErrors.Wrap(err, "contextuitl get user id from context")
 	}
 
 	err := Upper.Tx(func(sess up.Session) error {
 		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
 		if _, err := sess.SQL().Exec(query); err != nil {
-			return err
+			return newErrors.Wrap(err, "upper exec")
 		}
 
 		collection := sess.Collection(t.Table())
 		res := collection.Find(id)
 		if err := res.Delete(); err != nil {
-			return err
+			return newErrors.Wrap(err, "upper delete")
 		}
 
 		return nil
 	})
 
 	if err != nil {
-		return err
+		return newErrors.Wrap(err, "upper tx")
 	}
 	return nil
 }
@@ -142,14 +144,15 @@ func (t *ExternalReallocation) Insert(ctx context.Context, tx up.Session, m Exte
 	m.UpdatedAt = time.Now()
 	userID, ok := contextutil.GetUserIDFromContext(ctx)
 	if !ok {
-		return 0, errors.New("user ID not found in context")
+		err := newErrors.New("user ID not found in context")
+		return 0, newErrors.Wrap(err, "contextuitl get user id from context")
 	}
 
 	var id int
 
 	query := fmt.Sprintf("SET myapp.user_id = %d", userID)
 	if _, err := tx.SQL().Exec(query); err != nil {
-		return 0, err
+		return 0, newErrors.Wrap(err, "upper exec")
 	}
 
 	collection := tx.Collection(t.Table())
@@ -158,7 +161,7 @@ func (t *ExternalReallocation) Insert(ctx context.Context, tx up.Session, m Exte
 	var err error
 
 	if res, err = collection.Insert(m); err != nil {
-		return 0, err
+		return 0, newErrors.Wrap(err, "upper insert")
 	}
 
 	id = getInsertId(res.ID())
@@ -170,13 +173,14 @@ func (t *ExternalReallocation) AcceptOUExternalReallocation(ctx context.Context,
 
 	userID, ok := contextutil.GetUserIDFromContext(ctx)
 	if !ok {
-		return errors.New("user ID not found in context")
+		err := newErrors.New("user ID not found in context")
+		return newErrors.Wrap(err, "contextuitl get user id from context")
 	}
 
 	// Set the user_id variable
 	query := fmt.Sprintf("SET myapp.user_id = %d", userID)
 	if _, err := tx.SQL().Exec(query); err != nil {
-		return err
+		return newErrors.Wrap(err, "upper exec")
 	}
 
 	query = `update external_reallocations
@@ -185,7 +189,11 @@ func (t *ExternalReallocation) AcceptOUExternalReallocation(ctx context.Context,
 
 	_, err := tx.SQL().Query(query, ReallocationStatusOUAccept, m.DateOfActionDestOrgUnit, m.AcceptedBy, m.DestinationOrgUnitFileID, m.ID)
 
-	return err
+	if err != nil {
+		return newErrors.Wrap(err, "upper exec")
+	}
+
+	return nil
 
 }
 
@@ -193,14 +201,15 @@ func (t *ExternalReallocation) RejectOUExternalReallocation(ctx context.Context,
 
 	userID, ok := contextutil.GetUserIDFromContext(ctx)
 	if !ok {
-		return errors.New("user ID not found in context")
+		err := newErrors.New("user ID not found in context")
+		return newErrors.Wrap(err, "contextuitl get user id from context")
 	}
 
 	err := Upper.Tx(func(sess up.Session) error {
 		// Set the user_id variable
 		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
 		if _, err := sess.SQL().Exec(query); err != nil {
-			return err
+			return newErrors.Wrap(err, "upper exec")
 		}
 
 		query = `update external_reallocations
@@ -208,7 +217,11 @@ func (t *ExternalReallocation) RejectOUExternalReallocation(ctx context.Context,
 
 		_, err := sess.SQL().Query(query, ReallocationStatusOUDecline, id)
 
-		return err
+		if err != nil {
+			return newErrors.Wrap(err, "upper exec")
+		}
+
+		return nil
 	})
 
 	return err
@@ -218,13 +231,14 @@ func (t *ExternalReallocation) AcceptSSSExternalReallocation(ctx context.Context
 
 	userID, ok := contextutil.GetUserIDFromContext(ctx)
 	if !ok {
-		return errors.New("user ID not found in context")
+		err := newErrors.New("user ID not found in context")
+		return newErrors.Wrap(err, "contextuitl get user id from context")
 	}
 
 	// Set the user_id variable
 	query := fmt.Sprintf("SET myapp.user_id = %d", userID)
 	if _, err := tx.SQL().Exec(query); err != nil {
-		return err
+		return newErrors.Wrap(err, "upper exec")
 	}
 
 	query = `update external_reallocations
@@ -232,18 +246,23 @@ func (t *ExternalReallocation) AcceptSSSExternalReallocation(ctx context.Context
 
 	_, err := tx.SQL().Query(query, ReallocationStatusSSSAccept, id)
 
-	return err
+	if err != nil {
+		return newErrors.Wrap(err, "upper exec")
+	}
+
+	return nil
 }
 
 func (t *ExternalReallocation) RejectSSSExternalReallocation(ctx context.Context, tx up.Session, id int) error {
 
 	userID, ok := contextutil.GetUserIDFromContext(ctx)
 	if !ok {
-		return errors.New("user ID not found in context")
+		err := newErrors.New("user ID not found in context")
+		return newErrors.Wrap(err, "contextuitl get user id from context")
 	}
 	query := fmt.Sprintf("SET myapp.user_id = %d", userID)
 	if _, err := tx.SQL().Exec(query); err != nil {
-		return err
+		return newErrors.Wrap(err, "upper exec")
 	}
 
 	query = `update external_reallocations
@@ -251,5 +270,9 @@ func (t *ExternalReallocation) RejectSSSExternalReallocation(ctx context.Context
 
 	_, err := tx.SQL().Query(query, ReallocationStatusSSSDecline, id)
 
-	return err
+	if err != nil {
+		return newErrors.Wrap(err, "upper exec")
+	}
+
+	return nil
 }

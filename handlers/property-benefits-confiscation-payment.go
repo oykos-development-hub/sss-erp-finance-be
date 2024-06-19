@@ -32,12 +32,14 @@ func (h *propbenconfPaymentHandlerImpl) CreatePropBenConfPayment(w http.Response
 	var input dto.PropBenConfPaymentDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
 	}
 
 	validator := h.App.Validator().ValidateStruct(&input)
 	if !validator.Valid() {
+		h.App.ErrorLog.Print(validator.Errors)
 		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
 		return
 	}
@@ -47,6 +49,7 @@ func (h *propbenconfPaymentHandlerImpl) CreatePropBenConfPayment(w http.Response
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
 	}
@@ -56,6 +59,7 @@ func (h *propbenconfPaymentHandlerImpl) CreatePropBenConfPayment(w http.Response
 
 	res, err := h.service.CreatePropBenConfPayment(ctx, input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -72,6 +76,7 @@ func (h *propbenconfPaymentHandlerImpl) DeletePropBenConfPayment(w http.Response
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
 	}
@@ -81,6 +86,7 @@ func (h *propbenconfPaymentHandlerImpl) DeletePropBenConfPayment(w http.Response
 
 	err = h.service.DeletePropBenConfPayment(ctx, id)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -92,6 +98,7 @@ func (h *propbenconfPaymentHandlerImpl) DeletePropBenConfPayment(w http.Response
 func (h *propbenconfPaymentHandlerImpl) UpdatePropBenConfPayment(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
 	}
@@ -99,12 +106,14 @@ func (h *propbenconfPaymentHandlerImpl) UpdatePropBenConfPayment(w http.Response
 	var input dto.PropBenConfPaymentDTO
 	err = h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
 	}
 
 	validator := h.App.Validator().ValidateStruct(&input)
 	if !validator.Valid() {
+		h.App.ErrorLog.Print(validator.Errors)
 		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
 		return
 	}
@@ -114,6 +123,7 @@ func (h *propbenconfPaymentHandlerImpl) UpdatePropBenConfPayment(w http.Response
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
 	}
@@ -123,6 +133,7 @@ func (h *propbenconfPaymentHandlerImpl) UpdatePropBenConfPayment(w http.Response
 
 	res, err := h.service.UpdatePropBenConfPayment(ctx, id, input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -136,6 +147,7 @@ func (h *propbenconfPaymentHandlerImpl) GetPropBenConfPaymentById(w http.Respons
 
 	res, err := h.service.GetPropBenConfPayment(id)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -151,12 +163,14 @@ func (h *propbenconfPaymentHandlerImpl) GetPropBenConfPaymentList(w http.Respons
 
 	validator := h.App.Validator().ValidateStruct(&filter)
 	if !validator.Valid() {
+		h.App.ErrorLog.Print(validator.Errors)
 		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
 		return
 	}
 
 	res, total, err := h.service.GetPropBenConfPaymentList(filter)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}

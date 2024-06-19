@@ -8,6 +8,7 @@ import (
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
 	"gitlab.sudovi.me/erp/finance-api/errors"
+	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 )
 
 type FeePaymentServiceImpl struct {
@@ -32,20 +33,19 @@ func (h *FeePaymentServiceImpl) CreateFeePayment(ctx context.Context, input dto.
 
 	id, err := h.repo.Insert(ctx, *feePayment)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo fee payment insert")
 	}
 
 	feePayment, err = feePayment.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo fee payment get")
 	}
 
 	res := dto.ToFeePaymentResponseDTO(*feePayment)
 
 	_, _, err = h.feeSharedLogicService.CalculateFeeDetailsAndUpdateStatus(ctx, feePayment.FeeID)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, err
+		return nil, newErrors.Wrap(err, "fee shared logic service calculate fee details and update status")
 	}
 
 	return &res, nil
@@ -55,20 +55,17 @@ func (h *FeePaymentServiceImpl) CreateFeePayment(ctx context.Context, input dto.
 func (h *FeePaymentServiceImpl) DeleteFeePayment(ctx context.Context, id int) error {
 	feePayment, err := h.repo.Get(id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return errors.ErrNotFound
+		return newErrors.Wrap(err, "repo fee payment get")
 	}
 
 	err = h.repo.Delete(ctx, id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return errors.ErrInternalServer
+		return newErrors.Wrap(err, "repo fee payment delete")
 	}
 
 	_, _, err = h.feeSharedLogicService.CalculateFeeDetailsAndUpdateStatus(ctx, feePayment.FeeID)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return errors.ErrInternalServer
+		return newErrors.Wrap(err, "fee shared logic service calculate fee details and update status")
 	}
 
 	return nil
@@ -81,20 +78,19 @@ func (h *FeePaymentServiceImpl) UpdateFeePayment(ctx context.Context, id int, in
 
 	err := h.repo.Update(ctx, *data)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo fee payment update")
 	}
 
 	data, err = h.repo.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo fee payment get")
 	}
 
 	response := dto.ToFeePaymentResponseDTO(*data)
 
 	_, _, err = h.feeSharedLogicService.CalculateFeeDetailsAndUpdateStatus(ctx, data.FeeID)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "fee shared logic service calculate fee details and update status")
 	}
 
 	return &response, nil
@@ -105,12 +101,11 @@ func (h *FeePaymentServiceImpl) GetFeePaymentList(input dto.FeePaymentFilterDTO)
 
 	feePayments, total, err := h.getFeePaymentsByFeeID(input.FeeID)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, nil, errors.ErrInternalServer
+		return nil, nil, newErrors.Wrap(err, "get fee payments by fee id")
 	}
 
 	if len(feePayments) == 0 {
-		return nil, nil, errors.ErrNotFound
+		return nil, nil, newErrors.Wrap(errors.ErrNotFound, "get fee payments by fee id")
 	}
 	response := dto.ToFeePaymentListResponseDTO(feePayments)
 
@@ -122,8 +117,7 @@ func (h *FeePaymentServiceImpl) getFeePaymentsByFeeID(feeID int) ([]*data.FeePay
 
 	feePayments, total, err := h.repo.GetAll(&cond)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, nil, errors.ErrInternalServer
+		return nil, nil, newErrors.Wrap(err, "repo fee payments get all")
 	}
 
 	return feePayments, total, nil
@@ -133,9 +127,9 @@ func (h *FeePaymentServiceImpl) getFeePaymentsByFeeID(feeID int) ([]*data.FeePay
 func (h *FeePaymentServiceImpl) GetFeePayment(id int) (*dto.FeePaymentResponseDTO, error) {
 	data, err := h.repo.Get(id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrNotFound
+		return nil, newErrors.Wrap(err, "repo fee payments get")
 	}
+
 	response := dto.ToFeePaymentResponseDTO(*data)
 
 	return &response, nil

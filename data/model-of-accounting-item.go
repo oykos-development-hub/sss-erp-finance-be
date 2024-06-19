@@ -4,6 +4,7 @@ import (
 	"time"
 
 	up "github.com/upper/db/v4"
+	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 )
 
 // ModelOfAccountingItem struct
@@ -35,7 +36,7 @@ func (t *ModelOfAccountingItem) GetAll(page *int, size *int, condition *up.AndEx
 	}
 	total, err := res.Count()
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, newErrors.Wrap(err, "upper count")
 	}
 
 	if page != nil && size != nil {
@@ -45,7 +46,7 @@ func (t *ModelOfAccountingItem) GetAll(page *int, size *int, condition *up.AndEx
 	orders = append(orders, "id asc")
 	err = res.OrderBy(orders...).All(&all)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, newErrors.Wrap(err, "upper all")
 	}
 
 	return all, &total, err
@@ -59,7 +60,7 @@ func (t *ModelOfAccountingItem) Get(id int) (*ModelOfAccountingItem, error) {
 	res := collection.Find(up.Cond{"id": id})
 	err := res.One(&one)
 	if err != nil {
-		return nil, err
+		return nil, newErrors.Wrap(err, "upper one")
 	}
 	return &one, nil
 }
@@ -73,13 +74,13 @@ func (t *ModelOfAccountingItem) Update(tx up.Session, m ModelOfAccountingItem) e
 	if m.DebitAccountID != 0 {
 		rows, err := Upper.SQL().Query(query1, m.DebitAccountID, m.UpdatedAt, m.ID)
 		if err != nil {
-			return err
+			return newErrors.Wrap(err, "upper exec")
 		}
 		defer rows.Close()
 	} else {
 		rows, err := Upper.SQL().Query(query2, m.CreditAccountID, m.UpdatedAt, m.ID)
 		if err != nil {
-			return err
+			return newErrors.Wrap(err, "upper exec")
 		}
 		defer rows.Close()
 	}
@@ -93,7 +94,7 @@ func (t *ModelOfAccountingItem) Delete(id int) error {
 	res := collection.Find(id)
 	err := res.Delete()
 	if err != nil {
-		return err
+		return newErrors.Wrap(err, "upper delete")
 	}
 	return nil
 }
@@ -105,7 +106,7 @@ func (t *ModelOfAccountingItem) Insert(tx up.Session, m ModelOfAccountingItem) (
 	collection := tx.Collection(t.Table())
 	res, err := collection.Insert(m)
 	if err != nil {
-		return 0, err
+		return 0, newErrors.Wrap(err, "upper insert")
 	}
 
 	id := getInsertId(res.ID())

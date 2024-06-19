@@ -6,6 +6,7 @@ import (
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
 	"gitlab.sudovi.me/erp/finance-api/errors"
+	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 
 	"github.com/oykos-development-hub/celeritas"
 	up "github.com/upper/db/v4"
@@ -35,7 +36,7 @@ func (h *ExternalReallocationServiceImpl) CreateExternalReallocation(ctx context
 		var err error
 		id, err = h.repo.Insert(ctx, tx, *dataToInsert)
 		if err != nil {
-			return errors.ErrInternalServer
+			return newErrors.Wrap(err, "repo external reallocation insert")
 		}
 
 		for _, item := range input.Items {
@@ -45,7 +46,7 @@ func (h *ExternalReallocationServiceImpl) CreateExternalReallocation(ctx context
 			_, err = h.itemsRepo.Insert(tx, *itemToInsert)
 
 			if err != nil {
-				return errors.ErrInternalServer
+				return newErrors.Wrap(err, "repo external reallocation item insert")
 			}
 		}
 
@@ -53,12 +54,12 @@ func (h *ExternalReallocationServiceImpl) CreateExternalReallocation(ctx context
 	})
 
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "upper tx")
 	}
 
 	dataToInsert, err = h.repo.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo external reallocation get")
 	}
 
 	res := dto.ToExternalReallocationResponseDTO(*dataToInsert)
@@ -70,18 +71,16 @@ func (h *ExternalReallocationServiceImpl) DeleteExternalReallocation(ctx context
 	reallocation, err := h.GetExternalReallocation(id)
 
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return errors.ErrInternalServer
+		return newErrors.Wrap(err, "repo external reallocation get")
 	}
 
 	if reallocation.Status == data.ReallocationStatusCreated {
 		err = h.repo.Delete(ctx, id)
 		if err != nil {
-			h.App.ErrorLog.Println(err)
-			return errors.ErrInternalServer
+			return newErrors.Wrap(err, "repo external reallocation delete")
 		}
 	} else {
-		return errors.ErrBadRequest
+		return newErrors.Wrap(errors.ErrBadRequest, "repo external reallocation delete")
 	}
 
 	return nil
@@ -90,9 +89,9 @@ func (h *ExternalReallocationServiceImpl) DeleteExternalReallocation(ctx context
 func (h *ExternalReallocationServiceImpl) GetExternalReallocation(id int) (*dto.ExternalReallocationResponseDTO, error) {
 	data, err := h.repo.Get(id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrNotFound
+		return nil, newErrors.Wrap(err, "repo external reallocation get")
 	}
+
 	response := dto.ToExternalReallocationResponseDTO(*data)
 
 	condition := up.And(
@@ -102,8 +101,7 @@ func (h *ExternalReallocationServiceImpl) GetExternalReallocation(id int) (*dto.
 	items, _, err := h.itemsRepo.GetAll(nil, nil, condition, nil)
 
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo external reallocation items get all")
 	}
 
 	responseItems := dto.ToExternalReallocationItemListResponseDTO(items)
@@ -146,8 +144,7 @@ func (h *ExternalReallocationServiceImpl) GetExternalReallocationList(filter dto
 
 	data, total, err := h.repo.GetAll(filter.Page, filter.Size, conditionAndExp, orders)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, nil, errors.ErrInternalServer
+		return nil, nil, newErrors.Wrap(err, "repo external reallocation get all")
 	}
 	response := dto.ToExternalReallocationListResponseDTO(data)
 
@@ -160,11 +157,11 @@ func (h *ExternalReallocationServiceImpl) AcceptOUExternalReallocation(ctx conte
 	reallocation, err := h.GetExternalReallocation(input.ID)
 
 	if err != nil {
-		return nil, err
+		return nil, newErrors.Wrap(err, "get external reallocation")
 	}
 
 	if reallocation.Status != data.ReallocationStatusCreated {
-		return nil, errors.ErrAlreadyDone
+		return nil, newErrors.Wrap(errors.ErrAlreadyDone, "get external reallocation")
 	}
 
 	id := input.ID
@@ -173,29 +170,29 @@ func (h *ExternalReallocationServiceImpl) AcceptOUExternalReallocation(ctx conte
 		dataToInsert.ID = id
 		err = h.repo.AcceptOUExternalReallocation(ctx, tx, *dataToInsert)
 		if err != nil {
-			return errors.ErrInternalServer
+			return newErrors.Wrap(err, "repo external reallocation accept ou")
 		}
 
 		for _, item := range input.Items {
 
-			if item.DestinationAccountID != 0 {
+			if item.SourceAccountID != 0 {
 				itemToInsert := item.ToExternalReallocationItem()
 				itemToInsert.ReallocationID = id
 
 				_, err = h.itemsRepo.Insert(tx, *itemToInsert)
 
 				if err != nil {
-					return errors.ErrInternalServer
+					return newErrors.Wrap(err, "repo external reallocation item insert")
 				}
 
 				currentBudget, err := h.currentBudgetRepo.GetBy(*up.And(
 					up.Cond{"budget_id": reallocation.BudgetID},
 					up.Cond{"unit_id": reallocation.DestinationOrganizationUnitID},
-					up.Cond{"account_id": itemToInsert.DestinationAccountID},
+					up.Cond{"account_id": itemToInsert.SourceAccountID},
 				))
 
 				if err != nil {
-					return errors.ErrInternalServer
+					return newErrors.Wrap(err, "repo current budget get by")
 				}
 
 				value := currentBudget.Actual.Sub(itemToInsert.Amount)
@@ -203,7 +200,7 @@ func (h *ExternalReallocationServiceImpl) AcceptOUExternalReallocation(ctx conte
 				err = h.currentBudgetRepo.UpdateActual(ctx, currentBudget.ID, value)
 
 				if err != nil {
-					return errors.ErrInternalServer
+					return newErrors.Wrap(err, "repo current budget update actual")
 				}
 			}
 		}
@@ -212,12 +209,12 @@ func (h *ExternalReallocationServiceImpl) AcceptOUExternalReallocation(ctx conte
 	})
 
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "upper tx")
 	}
 
 	dataToInsert, err = h.repo.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo external realocation get")
 	}
 
 	res := dto.ToExternalReallocationResponseDTO(*dataToInsert)
@@ -229,8 +226,7 @@ func (h *ExternalReallocationServiceImpl) RejectOUExternalReallocation(ctx conte
 
 	err := h.repo.RejectOUExternalReallocation(ctx, id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return errors.ErrInternalServer
+		return newErrors.Wrap(err, "repo external reallocation reject ou")
 	}
 
 	return nil
@@ -240,30 +236,30 @@ func (h *ExternalReallocationServiceImpl) AcceptSSSExternalReallocation(ctx cont
 	reallocation, err := h.GetExternalReallocation(id)
 
 	if err != nil {
-		return err
+		return newErrors.Wrap(err, "repo external reallocation get")
 	}
 
 	if reallocation.Status != data.ReallocationStatusOUAccept {
-		return errors.ErrAlreadyDone
+		return newErrors.Wrap(errors.ErrAlreadyDone, "repo external reallocation get")
 	}
 
 	err = data.Upper.Tx(func(tx up.Session) error {
 		err := h.repo.AcceptSSSExternalReallocation(ctx, tx, id)
 		if err != nil {
-			return errors.ErrInternalServer
+			return newErrors.Wrap(err, "repo external reallocation accept sss")
 		}
 
 		for _, item := range reallocation.Items {
 
-			if item.SourceAccountID != 0 {
+			if item.DestinationAccountID != 0 {
 				currentBudget, err := h.currentBudgetRepo.GetBy(*up.And(
 					up.Cond{"budget_id": reallocation.BudgetID},
 					up.Cond{"unit_id": reallocation.SourceOrganizationUnitID},
-					up.Cond{"account_id": item.SourceAccountID},
+					up.Cond{"account_id": item.DestinationAccountID},
 				))
 
 				if err != nil {
-					return errors.ErrInternalServer
+					return newErrors.Wrap(err, "repo current budget get by")
 				}
 
 				value := currentBudget.Actual.Add(item.Amount)
@@ -271,7 +267,7 @@ func (h *ExternalReallocationServiceImpl) AcceptSSSExternalReallocation(ctx cont
 				err = h.currentBudgetRepo.UpdateActual(ctx, currentBudget.ID, value)
 
 				if err != nil {
-					return errors.ErrInternalServer
+					return newErrors.Wrap(err, "repo current budget update actual")
 				}
 			}
 		}
@@ -280,7 +276,7 @@ func (h *ExternalReallocationServiceImpl) AcceptSSSExternalReallocation(ctx cont
 	})
 
 	if err != nil {
-		return errors.ErrInternalServer
+		return newErrors.Wrap(err, "upper tx")
 	}
 
 	return nil
@@ -290,30 +286,30 @@ func (h *ExternalReallocationServiceImpl) RejectSSSExternalReallocation(ctx cont
 	reallocation, err := h.GetExternalReallocation(id)
 
 	if err != nil {
-		return err
+		return newErrors.Wrap(err, "repo external reallocation get")
 	}
 
 	if reallocation.Status != data.ReallocationStatusOUAccept {
-		return errors.ErrAlreadyDone
+		return newErrors.Wrap(errors.ErrAlreadyDone, "repo external reallocation get")
 	}
 
 	err = data.Upper.Tx(func(tx up.Session) error {
 		err := h.repo.RejectSSSExternalReallocation(ctx, tx, id)
 		if err != nil {
-			return errors.ErrInternalServer
+			return newErrors.Wrap(err, "repo external reallocation reject sss")
 		}
 
 		for _, item := range reallocation.Items {
 
-			if item.DestinationAccountID != 0 {
+			if item.SourceAccountID != 0 {
 				currentBudget, err := h.currentBudgetRepo.GetBy(*up.And(
 					up.Cond{"budget_id": reallocation.BudgetID},
 					up.Cond{"unit_id": reallocation.DestinationOrganizationUnitID},
-					up.Cond{"account_id": item.DestinationAccountID},
+					up.Cond{"account_id": item.SourceAccountID},
 				))
 
 				if err != nil {
-					return errors.ErrInternalServer
+					return newErrors.Wrap(err, "repo current budget get by")
 				}
 
 				value := currentBudget.Actual.Add(item.Amount)
@@ -321,7 +317,7 @@ func (h *ExternalReallocationServiceImpl) RejectSSSExternalReallocation(ctx cont
 				err = h.currentBudgetRepo.UpdateActual(ctx, currentBudget.ID, value)
 
 				if err != nil {
-					return errors.ErrInternalServer
+					return newErrors.Wrap(err, "repo current budget update actual")
 				}
 			}
 		}
@@ -330,7 +326,7 @@ func (h *ExternalReallocationServiceImpl) RejectSSSExternalReallocation(ctx cont
 	})
 
 	if err != nil {
-		return errors.ErrInternalServer
+		return newErrors.Wrap(err, "upper tx")
 	}
 
 	return nil

@@ -8,7 +8,7 @@ import (
 	"github.com/shopspring/decimal"
 	up "github.com/upper/db/v4"
 	"gitlab.sudovi.me/erp/finance-api/contextutil"
-	"gitlab.sudovi.me/erp/finance-api/pkg/errors"
+	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 )
 
 // SpendingDynamic struct
@@ -54,12 +54,12 @@ func (t *SpendingDynamicEntry) FindLatestVersion() (int, error) {
 
 	row, err := Upper.SQL().QueryRow("SELECT MAX(version) AS version FROM spending_dynamic_entries")
 	if err != nil {
-		return 0, errors.Wrap(err, "upper sql")
+		return 0, newErrors.Wrap(err, "upper sql")
 	}
 
 	err = row.Scan(&version)
 	if err != nil {
-		return 0, errors.Wrap(err, "sql scan")
+		return 0, newErrors.Wrap(err, "sql scan")
 	}
 
 	return version, nil
@@ -111,14 +111,14 @@ func (t *SpendingDynamicEntry) FindAll(currentBudgetID, version, budgetID, unitI
 	} else {
 		latestVersion, err := t.FindLatestVersion()
 		if err != nil {
-			return nil, errors.Wrap(err, "find latest version")
+			return nil, newErrors.Wrap(err, "find latest version")
 		}
 		query = query.Where("sd.version = ?", latestVersion)
 	}
 
 	err := query.All(&all)
 	if err != nil {
-		return nil, errors.New("upper all")
+		return nil, newErrors.New("upper all")
 	}
 
 	return all, nil
@@ -139,7 +139,7 @@ func (t *SpendingDynamicEntry) FindHistoryChanges(budgetID, unitID int) ([]Spend
 
 	rows, err := Upper.SQL().Query(query, budgetID, unitID)
 	if err != nil {
-		return nil, errors.New("upper query")
+		return nil, newErrors.New("upper query")
 	}
 	defer rows.Close()
 
@@ -148,7 +148,7 @@ func (t *SpendingDynamicEntry) FindHistoryChanges(budgetID, unitID int) ([]Spend
 		var history SpendingDynamicHistory
 		err = rows.Scan(&history.CreatedAt, &history.Username, &history.Version)
 		if err != nil {
-			return nil, errors.New("sql scan")
+			return nil, newErrors.New("sql scan")
 		}
 
 		items = append(items, history)
@@ -204,7 +204,8 @@ func (t *SpendingDynamicEntry) Insert(ctx context.Context, m SpendingDynamicEntr
 
 	userID, ok := contextutil.GetUserIDFromContext(ctx)
 	if !ok {
-		return 0, errors.New("user id not found in context")
+		err := newErrors.New("user ID not found in context")
+		return 0, newErrors.Wrap(err, "contextuitl get user id from context")
 	}
 
 	var id int
@@ -213,7 +214,7 @@ func (t *SpendingDynamicEntry) Insert(ctx context.Context, m SpendingDynamicEntr
 
 		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
 		if _, err := sess.SQL().Exec(query); err != nil {
-			return errors.New("upper exec")
+			return newErrors.New("upper exec")
 		}
 
 		collection := sess.Collection(t.Table())
@@ -222,7 +223,7 @@ func (t *SpendingDynamicEntry) Insert(ctx context.Context, m SpendingDynamicEntr
 		var err error
 
 		if res, err = collection.Insert(m); err != nil {
-			return errors.New("upper insert")
+			return newErrors.New("upper insert")
 		}
 
 		id = getInsertId(res.ID())
@@ -231,7 +232,7 @@ func (t *SpendingDynamicEntry) Insert(ctx context.Context, m SpendingDynamicEntr
 	})
 
 	if err != nil {
-		return 0, errors.New("upper tx")
+		return 0, newErrors.New("upper tx")
 	}
 
 	return id, nil

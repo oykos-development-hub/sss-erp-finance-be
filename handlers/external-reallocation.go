@@ -32,12 +32,14 @@ func (h *externalreallocationHandlerImpl) CreateExternalReallocation(w http.Resp
 	var input dto.ExternalReallocationDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
 	}
 
 	validator := h.App.Validator().ValidateStruct(&input)
 	if !validator.Valid() {
+		h.App.ErrorLog.Print(validator.Errors)
 		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
 		return
 	}
@@ -47,6 +49,7 @@ func (h *externalreallocationHandlerImpl) CreateExternalReallocation(w http.Resp
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
 	}
@@ -56,6 +59,7 @@ func (h *externalreallocationHandlerImpl) CreateExternalReallocation(w http.Resp
 
 	res, err := h.service.CreateExternalReallocation(ctx, input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -71,6 +75,7 @@ func (h *externalreallocationHandlerImpl) DeleteExternalReallocation(w http.Resp
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
 	}
@@ -80,6 +85,7 @@ func (h *externalreallocationHandlerImpl) DeleteExternalReallocation(w http.Resp
 
 	err = h.service.DeleteExternalReallocation(ctx, id)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -92,6 +98,7 @@ func (h *externalreallocationHandlerImpl) GetExternalReallocationById(w http.Res
 
 	res, err := h.service.GetExternalReallocation(id)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -106,12 +113,14 @@ func (h *externalreallocationHandlerImpl) GetExternalReallocationList(w http.Res
 
 	validator := h.App.Validator().ValidateStruct(&filter)
 	if !validator.Valid() {
+		h.App.ErrorLog.Print(validator.Errors)
 		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
 		return
 	}
 
 	res, total, err := h.service.GetExternalReallocationList(filter)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -123,12 +132,14 @@ func (h *externalreallocationHandlerImpl) AcceptOUExternalReallocation(w http.Re
 	var input dto.ExternalReallocationDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
 	}
 
 	validator := h.App.Validator().ValidateStruct(&input)
 	if !validator.Valid() {
+		h.App.ErrorLog.Print(validator.Errors)
 		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
 		return
 	}
@@ -138,6 +149,7 @@ func (h *externalreallocationHandlerImpl) AcceptOUExternalReallocation(w http.Re
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
 	}
@@ -147,6 +159,7 @@ func (h *externalreallocationHandlerImpl) AcceptOUExternalReallocation(w http.Re
 
 	res, err := h.service.AcceptOUExternalReallocation(ctx, input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -162,6 +175,7 @@ func (h *externalreallocationHandlerImpl) RejectOUExternalReallocation(w http.Re
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
 	}
@@ -171,6 +185,7 @@ func (h *externalreallocationHandlerImpl) RejectOUExternalReallocation(w http.Re
 
 	err = h.service.RejectOUExternalReallocation(ctx, id)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -186,6 +201,7 @@ func (h *externalreallocationHandlerImpl) AcceptSSSExternalReallocation(w http.R
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
 	}
@@ -195,6 +211,7 @@ func (h *externalreallocationHandlerImpl) AcceptSSSExternalReallocation(w http.R
 
 	err = h.service.AcceptSSSExternalReallocation(ctx, id)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -210,6 +227,7 @@ func (h *externalreallocationHandlerImpl) RejectSSSExternalReallocation(w http.R
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
 	}
@@ -219,6 +237,7 @@ func (h *externalreallocationHandlerImpl) RejectSSSExternalReallocation(w http.R
 
 	err = h.service.RejectSSSExternalReallocation(ctx, id)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}

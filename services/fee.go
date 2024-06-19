@@ -6,7 +6,7 @@ import (
 
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
-	"gitlab.sudovi.me/erp/finance-api/errors"
+	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 
 	"github.com/oykos-development-hub/celeritas"
 	up "github.com/upper/db/v4"
@@ -34,12 +34,12 @@ func (h *FeeServiceImpl) CreateFee(ctx context.Context, input dto.FeeDTO) (*dto.
 
 	id, err := h.repo.Insert(ctx, *fee)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo fee insert")
 	}
 
 	fee, err = fee.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo fee delete")
 	}
 
 	return h.convertFeeToResponse(fee)
@@ -49,8 +49,7 @@ func (h *FeeServiceImpl) CreateFee(ctx context.Context, input dto.FeeDTO) (*dto.
 func (h *FeeServiceImpl) GetFee(id int) (*dto.FeeResponseDTO, error) {
 	fee, err := h.repo.Get(id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrNotFound
+		return nil, newErrors.Wrap(err, "repo fee get")
 	}
 
 	return h.convertFeeToResponse(fee)
@@ -63,12 +62,12 @@ func (h *FeeServiceImpl) UpdateFee(ctx context.Context, id int, input dto.FeeDTO
 
 	err := h.repo.Update(ctx, *fee)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo fee update")
 	}
 
 	fee, err = h.repo.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo fee get")
 	}
 
 	return h.convertFeeToResponse(fee)
@@ -78,8 +77,7 @@ func (h *FeeServiceImpl) UpdateFee(ctx context.Context, id int, input dto.FeeDTO
 func (h *FeeServiceImpl) DeleteFee(ctx context.Context, id int) error {
 	err := h.repo.Delete(ctx, id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return errors.ErrInternalServer
+		return newErrors.Wrap(err, "repo fee delete")
 	}
 
 	return nil
@@ -112,8 +110,7 @@ func (h *FeeServiceImpl) GetFeeList(input dto.FeeFilterDTO) ([]dto.FeeResponseDT
 
 	fees, total, err := h.repo.GetAll(input.Page, input.Size, conditionAndExp)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, nil, err
+		return nil, nil, newErrors.Wrap(err, "repo fee get all")
 	}
 
 	var feeList []data.Fee
@@ -123,8 +120,7 @@ func (h *FeeServiceImpl) GetFeeList(input dto.FeeFilterDTO) ([]dto.FeeResponseDT
 
 	response, err := h.convertFeesToResponses(feeList)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, nil, err
+		return nil, nil, newErrors.Wrap(err, "convert fee to response")
 	}
 
 	return response, total, nil
@@ -136,7 +132,7 @@ func (h *FeeServiceImpl) convertFeesToResponses(fees []data.Fee) ([]dto.FeeRespo
 	for _, fee := range fees {
 		response, err := h.convertFeeToResponse(&fee)
 		if err != nil {
-			return nil, err
+			return nil, newErrors.Wrap(err, "convert fees to response")
 		}
 		responses = append(responses, *response)
 	}
@@ -150,8 +146,7 @@ func (h *FeeServiceImpl) convertFeeToResponse(fee *data.Fee) (*dto.FeeResponseDT
 	var err error
 	response.FeeDetails, newStatus, err = h.feeSharedLogicService.CalculateFeeDetailsAndUpdateStatus(context.Background(), fee.ID)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, err
+		return nil, newErrors.Wrap(err, "repo fee shared logic calculatefee details and update status")
 	}
 	response.Status = newStatus
 	return &response, nil

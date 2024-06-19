@@ -36,6 +36,7 @@ func (h *invoiceHandlerImpl) CreateInvoice(w http.ResponseWriter, r *http.Reques
 
 	validator := h.App.Validator().ValidateStruct(&input)
 	if !validator.Valid() {
+		h.App.ErrorLog.Print(validator.Errors)
 		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
 		return
 	}
@@ -45,6 +46,7 @@ func (h *invoiceHandlerImpl) CreateInvoice(w http.ResponseWriter, r *http.Reques
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
 	}
@@ -54,6 +56,7 @@ func (h *invoiceHandlerImpl) CreateInvoice(w http.ResponseWriter, r *http.Reques
 
 	res, err := h.service.CreateInvoice(ctx, input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -69,6 +72,7 @@ func (h *invoiceHandlerImpl) UpdateInvoice(w http.ResponseWriter, r *http.Reques
 
 	validator := h.App.Validator().ValidateStruct(&input)
 	if !validator.Valid() {
+		h.App.ErrorLog.Print(validator.Errors)
 		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
 		return
 	}
@@ -78,6 +82,7 @@ func (h *invoiceHandlerImpl) UpdateInvoice(w http.ResponseWriter, r *http.Reques
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
 	}
@@ -87,6 +92,7 @@ func (h *invoiceHandlerImpl) UpdateInvoice(w http.ResponseWriter, r *http.Reques
 
 	res, err := h.service.UpdateInvoice(ctx, id, input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -102,6 +108,7 @@ func (h *invoiceHandlerImpl) DeleteInvoice(w http.ResponseWriter, r *http.Reques
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
 	}
@@ -111,6 +118,7 @@ func (h *invoiceHandlerImpl) DeleteInvoice(w http.ResponseWriter, r *http.Reques
 
 	err = h.service.DeleteInvoice(ctx, id)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -123,6 +131,7 @@ func (h *invoiceHandlerImpl) GetInvoiceById(w http.ResponseWriter, r *http.Reque
 
 	res, err := h.service.GetInvoice(id)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -137,12 +146,14 @@ func (h *invoiceHandlerImpl) GetInvoiceList(w http.ResponseWriter, r *http.Reque
 
 	validator := h.App.Validator().ValidateStruct(&input)
 	if !validator.Valid() {
+		h.App.ErrorLog.Print(validator.Errors)
 		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
 		return
 	}
 
 	res, total, err := h.service.GetInvoiceList(input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}

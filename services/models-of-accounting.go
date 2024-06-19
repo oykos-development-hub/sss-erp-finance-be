@@ -6,7 +6,7 @@ import (
 
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
-	"gitlab.sudovi.me/erp/finance-api/errors"
+	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 
 	"github.com/oykos-development-hub/celeritas"
 	up "github.com/upper/db/v4"
@@ -34,7 +34,7 @@ func (h *ModelsOfAccountingServiceImpl) CreateModelsOfAccounting(ctx context.Con
 		var err error
 		id, err = h.repo.Insert(ctx, tx, *dataToInsert)
 		if err != nil {
-			return errors.ErrInternalServer
+			return newErrors.Wrap(err, "repo models of accounting insert")
 		}
 
 		for _, item := range input.Items {
@@ -43,7 +43,7 @@ func (h *ModelsOfAccountingServiceImpl) CreateModelsOfAccounting(ctx context.Con
 			_, err = h.itemsRepo.Insert(tx, *itemToInsert)
 
 			if err != nil {
-				return err
+				return newErrors.Wrap(err, "repo model of accounting item insert")
 			}
 		}
 
@@ -51,12 +51,12 @@ func (h *ModelsOfAccountingServiceImpl) CreateModelsOfAccounting(ctx context.Con
 	})
 
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "upper tx")
 	}
 
 	dataToInsert, err = h.repo.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo models of accounting get")
 	}
 
 	res := dto.ToModelsOfAccountingResponseDTO(*dataToInsert)
@@ -73,19 +73,19 @@ func (h *ModelsOfAccountingServiceImpl) UpdateModelsOfAccounting(ctx context.Con
 			err := h.itemsRepo.Update(tx, *itemToInsert)
 
 			if err != nil {
-				return err
+				return newErrors.Wrap(err, "repo model of accounting update")
 			}
 		}
 
 		return nil
 	})
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "upper tx")
 	}
 
 	dataToInsert, err := h.repo.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo models of accounting get")
 	}
 
 	response := dto.ToModelsOfAccountingResponseDTO(*dataToInsert)
@@ -96,9 +96,9 @@ func (h *ModelsOfAccountingServiceImpl) UpdateModelsOfAccounting(ctx context.Con
 func (h *ModelsOfAccountingServiceImpl) GetModelsOfAccounting(id int) (*dto.ModelsOfAccountingResponseDTO, error) {
 	data, err := h.repo.Get(id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrNotFound
+		return nil, newErrors.Wrap(err, "repo models of accounting get")
 	}
+
 	response := dto.ToModelsOfAccountingResponseDTO(*data)
 
 	conditionAndExp := &up.AndExpr{}
@@ -106,8 +106,7 @@ func (h *ModelsOfAccountingServiceImpl) GetModelsOfAccounting(id int) (*dto.Mode
 
 	items, _, err := h.itemsRepo.GetAll(nil, nil, conditionAndExp, nil)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo model of accounting item get all")
 	}
 
 	for _, item := range items {
@@ -148,8 +147,7 @@ func (h *ModelsOfAccountingServiceImpl) GetModelsOfAccountingList(filter dto.Mod
 
 	data, total, err := h.repo.GetAll(filter.Page, filter.Size, conditionAndExp, orders)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, nil, errors.ErrInternalServer
+		return nil, nil, newErrors.Wrap(err, "repo models of accounting get all")
 	}
 	response := dto.ToModelsOfAccountingListResponseDTO(data)
 
@@ -159,8 +157,7 @@ func (h *ModelsOfAccountingServiceImpl) GetModelsOfAccountingList(filter dto.Mod
 
 		items, _, err := h.itemsRepo.GetAll(nil, nil, conditionAndExp, nil)
 		if err != nil {
-			h.App.ErrorLog.Println(err)
-			return nil, nil, errors.ErrInternalServer
+			return nil, nil, newErrors.Wrap(err, "repo models of accounting get all")
 		}
 
 		for _, item := range items {

@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"time"
 
+	errors "gitlab.sudovi.me/erp/finance-api/errors"
+
 	"github.com/shopspring/decimal"
 	up "github.com/upper/db/v4"
 	"gitlab.sudovi.me/erp/finance-api/contextutil"
-	"gitlab.sudovi.me/erp/finance-api/errors"
+	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 )
 
 // FilledFinancialBudget struct
@@ -43,7 +45,7 @@ func (t *FilledFinancialBudget) GetAll(page *int, size *int, condition *up.AndEx
 	}
 	total, err := res.Count()
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, newErrors.Wrap(err, "upper count")
 	}
 
 	if page != nil && size != nil {
@@ -52,7 +54,7 @@ func (t *FilledFinancialBudget) GetAll(page *int, size *int, condition *up.AndEx
 
 	err = res.OrderBy(orders...).All(&all)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, newErrors.Wrap(err, "upper all")
 	}
 
 	return all, &total, err
@@ -70,7 +72,7 @@ func (t *FilledFinancialBudget) GetSummaryFilledFinancialRequests(budgetID int, 
 
 	rows, err := Upper.SQL().Query(query, budgetID, requestType)
 	if err != nil {
-		return nil, err
+		return nil, newErrors.Wrap(err, "upper exec")
 	}
 
 	defer rows.Close()
@@ -86,7 +88,7 @@ func (t *FilledFinancialBudget) GetSummaryFilledFinancialRequests(budgetID int, 
 		)
 
 		if err != nil {
-			return nil, err
+			return nil, newErrors.Wrap(err, "upper scan")
 		}
 		res = append(res, item)
 	}
@@ -102,7 +104,7 @@ func (t *FilledFinancialBudget) Get(id int) (*FilledFinancialBudget, error) {
 	res := collection.Find(up.Cond{"id": id})
 	err := res.One(&one)
 	if err != nil {
-		return nil, err
+		return nil, newErrors.Wrap(err, "upper one")
 	}
 	return &one, nil
 }
@@ -112,27 +114,27 @@ func (t *FilledFinancialBudget) Update(ctx context.Context, m FilledFinancialBud
 	m.UpdatedAt = time.Now()
 	userID, ok := contextutil.GetUserIDFromContext(ctx)
 	if !ok {
-		return errors.ErrUnauthorized
+		return newErrors.Wrap(errors.ErrUnauthorized, "contextutil get user id from context")
 	}
 
 	err := Upper.Tx(func(sess up.Session) error {
 
 		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
 		if _, err := sess.SQL().Exec(query); err != nil {
-			return err
+			return newErrors.Wrap(err, "upper exec")
 		}
 
 		collection := sess.Collection(t.Table())
 		res := collection.Find(m.ID)
 		if err := res.Update(&m); err != nil {
-			return err
+			return newErrors.Wrap(err, "upper update")
 		}
 
 		return nil
 	})
 
 	if err != nil {
-		return err
+		return newErrors.Wrap(err, "upper tx")
 	}
 	return nil
 }
@@ -142,25 +144,25 @@ func (t *FilledFinancialBudget) UpdateActual(ctx context.Context, id int, actual
 
 	userID, ok := contextutil.GetUserIDFromContext(ctx)
 	if !ok {
-		return errors.ErrUnauthorized
+		return newErrors.Wrap(errors.ErrUnauthorized, "contextutil get user id from context")
 	}
 
 	err := Upper.Tx(func(sess up.Session) error {
 		// Set the user_id variable
 		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
 		if _, err := sess.SQL().Exec(query); err != nil {
-			return err
+			return newErrors.Wrap(err, "upper exec")
 		}
 
 		updateQuery := fmt.Sprintf("UPDATE %s SET actual = $1, updated_at = $2 WHERE id = $3", t.Table())
 
 		res, err := sess.SQL().Exec(updateQuery, actual, time.Now(), id)
 		if err != nil {
-			return err
+			return newErrors.Wrap(err, "upper exec")
 		}
 		rowsAffected, _ := res.RowsAffected()
 		if rowsAffected != 1 {
-			return errors.ErrNotFound
+			return newErrors.Wrap(errors.ErrNotFound, "upper exec")
 		}
 
 		return err
@@ -173,26 +175,26 @@ func (t *FilledFinancialBudget) UpdateActual(ctx context.Context, id int, actual
 func (t *FilledFinancialBudget) Delete(ctx context.Context, id int) error {
 	userID, ok := contextutil.GetUserIDFromContext(ctx)
 	if !ok {
-		return errors.ErrUnauthorized
+		return newErrors.Wrap(errors.ErrUnauthorized, "contextutil get user id from context")
 	}
 
 	err := Upper.Tx(func(sess up.Session) error {
 		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
 		if _, err := sess.SQL().Exec(query); err != nil {
-			return err
+			return newErrors.Wrap(err, "upper exec")
 		}
 
 		collection := sess.Collection(t.Table())
 		res := collection.Find(id)
 		if err := res.Delete(); err != nil {
-			return err
+			return newErrors.Wrap(err, "upper delete")
 		}
 
 		return nil
 	})
 
 	if err != nil {
-		return err
+		return newErrors.Wrap(err, "upper tx")
 	}
 	return nil
 }
@@ -203,7 +205,7 @@ func (t *FilledFinancialBudget) Insert(ctx context.Context, m FilledFinancialBud
 	m.UpdatedAt = time.Now()
 	userID, ok := contextutil.GetUserIDFromContext(ctx)
 	if !ok {
-		return 0, errors.ErrUnauthorized
+		return 0, newErrors.Wrap(errors.ErrUnauthorized, "contextutil get user id from context")
 	}
 
 	var id int
@@ -212,7 +214,7 @@ func (t *FilledFinancialBudget) Insert(ctx context.Context, m FilledFinancialBud
 
 		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
 		if _, err := sess.SQL().Exec(query); err != nil {
-			return err
+			return newErrors.Wrap(err, "upper exec")
 		}
 
 		collection := sess.Collection(t.Table())
@@ -221,7 +223,7 @@ func (t *FilledFinancialBudget) Insert(ctx context.Context, m FilledFinancialBud
 		var err error
 
 		if res, err = collection.Insert(m); err != nil {
-			return err
+			return newErrors.Wrap(err, "upper insert")
 		}
 
 		id = getInsertId(res.ID())
@@ -230,7 +232,7 @@ func (t *FilledFinancialBudget) Insert(ctx context.Context, m FilledFinancialBud
 	})
 
 	if err != nil {
-		return 0, err
+		return 0, newErrors.Wrap(err, "upper tx")
 	}
 
 	return id, nil
