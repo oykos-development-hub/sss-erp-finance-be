@@ -140,6 +140,14 @@ func (h *ExternalReallocationServiceImpl) GetExternalReallocationList(filter dto
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"status": *filter.Status})
 	}
 
+	if filter.OrganizationUnitID != nil && *filter.OrganizationUnitID != 0 {
+		search := up.Or(
+			up.Cond{"source_organization_unit_id": *filter.OrganizationUnitID},
+			up.Cond{"destination_organization_unit_id": *filter.OrganizationUnitID},
+		)
+		conditionAndExp = up.And(conditionAndExp, search)
+	}
+
 	orders = append(orders, "-created_at")
 
 	data, total, err := h.repo.GetAll(filter.Page, filter.Size, conditionAndExp, orders)

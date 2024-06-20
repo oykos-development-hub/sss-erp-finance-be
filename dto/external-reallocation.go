@@ -51,6 +51,7 @@ type ExternalReallocationFilterDTO struct {
 	Status                        *string `json:"status"`
 	SourceOrganizationUnitID      *int    `json:"source_organization_unit_id"`
 	DestinationOrganizationUnitID *int    `json:"destination_organization_unit_id"`
+	OrganizationUnitID            *int    `json:"organization_unit_id"`
 	RequestedBy                   *int    `json:"requested_by"`
 	BudgetID                      *int    `json:"budget_id"`
 }
