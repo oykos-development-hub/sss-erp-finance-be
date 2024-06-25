@@ -9,6 +9,7 @@ import (
 	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 
 	"github.com/oykos-development-hub/celeritas"
+	"github.com/shopspring/decimal"
 	up "github.com/upper/db/v4"
 )
 
@@ -210,7 +211,7 @@ func (h *ExternalReallocationServiceImpl) AcceptOUExternalReallocation(ctx conte
 
 				currentBudget, err := h.currentBudgetRepo.GetBy(*up.And(
 					up.Cond{"budget_id": reallocation.BudgetID},
-					up.Cond{"unit_id": reallocation.DestinationOrganizationUnitID},
+					up.Cond{"unit_id": reallocation.SourceOrganizationUnitID},
 					up.Cond{"account_id": itemToInsert.SourceAccountID},
 				))
 
@@ -219,6 +220,10 @@ func (h *ExternalReallocationServiceImpl) AcceptOUExternalReallocation(ctx conte
 				}
 
 				value := currentBudget.Actual.Sub(itemToInsert.Amount)
+
+				if value.Compare(decimal.NewFromInt(0)) < 0 {
+					return newErrors.Wrap(errors.ErrInsufficientFunds, "repo current budget update actual")
+				}
 
 				err = h.currentBudgetRepo.UpdateActual(ctx, currentBudget.ID, value)
 
@@ -277,7 +282,7 @@ func (h *ExternalReallocationServiceImpl) AcceptSSSExternalReallocation(ctx cont
 			if item.DestinationAccountID != 0 {
 				currentBudget, err := h.currentBudgetRepo.GetBy(*up.And(
 					up.Cond{"budget_id": reallocation.BudgetID},
-					up.Cond{"unit_id": reallocation.SourceOrganizationUnitID},
+					up.Cond{"unit_id": reallocation.DestinationOrganizationUnitID},
 					up.Cond{"account_id": item.DestinationAccountID},
 				))
 
@@ -327,7 +332,7 @@ func (h *ExternalReallocationServiceImpl) RejectSSSExternalReallocation(ctx cont
 			if item.SourceAccountID != 0 {
 				currentBudget, err := h.currentBudgetRepo.GetBy(*up.And(
 					up.Cond{"budget_id": reallocation.BudgetID},
-					up.Cond{"unit_id": reallocation.DestinationOrganizationUnitID},
+					up.Cond{"unit_id": reallocation.SourceOrganizationUnitID},
 					up.Cond{"account_id": item.SourceAccountID},
 				))
 

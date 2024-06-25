@@ -140,7 +140,6 @@ func (t *EnforcedPayment) ReturnEnforcedPayment(ctx context.Context, tx up.Sessi
 		return newErrors.Wrap(err, "upper exec")
 	}
 
-	m.UpdatedAt = time.Now()
 	m.Status = EnforcedPaymentStatusStatusReturn
 
 	query = `update enforced_payments set status = $2, return_date = $3, return_file_id = $4, return_amount = $5 where id = $1`
