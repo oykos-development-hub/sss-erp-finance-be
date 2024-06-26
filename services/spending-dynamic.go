@@ -33,7 +33,7 @@ func NewSpendingDynamicServiceImpl(
 }
 
 func (h *SpendingDynamicServiceImpl) CreateSpendingDynamic(ctx context.Context, budgetID, unitID int, inputDataDTO []dto.SpendingDynamicDTO) error {
-	latestVersion, err := h.repoEntries.FindLatestVersion()
+	latestVersion, err := h.repoEntries.FindLatestVersion(nil, &budgetID, &unitID)
 	if err != nil {
 		return newErrors.Wrap(err, "repo entries find latest version")
 	}

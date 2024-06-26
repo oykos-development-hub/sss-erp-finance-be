@@ -49,21 +49,35 @@ func (t *SpendingDynamicEntry) SumOfMonths() decimal.Decimal {
 	return decimal.Sum(t.January, t.February, t.March, t.April, t.May, t.June, t.July, t.August, t.September, t.October, t.November, t.December)
 }
 
-func (t *SpendingDynamicEntry) FindLatestVersion() (int, error) {
-	var version int
+type LatestVersionRes struct {
+	Version int `db:"version"`
+}
 
-	row, err := Upper.SQL().QueryRow("SELECT MAX(version) AS version FROM spending_dynamic_entries")
-	if err != nil {
-		return 0, newErrors.Wrap(err, "upper sql")
+func (t *SpendingDynamicEntry) FindLatestVersion(currentBudgetID, budgetID, unitID *int) (int, error) {
+	var latestRes LatestVersionRes
+
+	query := Upper.SQL().Select(
+		up.Raw("COALESCE(MAX(sd.version), 0) AS version"),
+	).
+		From("spending_dynamic_entries AS sd").
+		Join("current_budgets AS cb").On("cb.id = sd.current_budget_id")
+
+	if currentBudgetID != nil {
+		query = query.Where("sd.current_budget_id = ?", *currentBudgetID)
+	}
+	if budgetID != nil {
+		query = query.Where("cb.budget_id = ?", *budgetID)
+	}
+	if unitID != nil {
+		query = query.Where("cb.unit_id = ?", *unitID)
 	}
 
-	err = row.Scan(&version)
+	err := query.One(&latestRes)
 	if err != nil {
-		return 0, newErrors.Wrap(err, "sql scan")
+		return 0, newErrors.Wrap(err, "upper one")
 	}
 
-	return version, nil
-
+	return latestRes.Version, nil
 }
 
 // GetAll gets all records from the database, using upper
@@ -109,7 +123,7 @@ func (t *SpendingDynamicEntry) FindAll(currentBudgetID, version, budgetID, unitI
 	if version != nil {
 		query = query.Where("sd.version = ?", *version)
 	} else {
-		latestVersion, err := t.FindLatestVersion()
+		latestVersion, err := t.FindLatestVersion(currentBudgetID, budgetID, unitID)
 		if err != nil {
 			return nil, newErrors.Wrap(err, "find latest version")
 		}
