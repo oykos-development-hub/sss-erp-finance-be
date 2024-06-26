@@ -271,7 +271,7 @@ func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation
 			}
 			obligation.Type = TypeInvoice
 
-			if invoiceNumber != nil {
+			if invoiceNumber != nil && *invoiceNumber != "" && obligation.Title == "" {
 				obligation.Title = *invoiceNumber
 			}
 
