@@ -79,7 +79,7 @@ func routes(app *celeritas.Celeritas, middleware *middleware.Middleware, handler
 		rt.Get("/filled-financial-budgets/{id}", handlers.FilledFinancialBudgetHandler.GetFilledFinancialBudgetById)
 		rt.Get("/filled-financial-budgets", handlers.FilledFinancialBudgetHandler.GetFilledFinancialBudgetList)
 		rt.Put("/filled-financial-budgets/{id}", handlers.FilledFinancialBudgetHandler.UpdateFilledFinancialBudget)
-		rt.Patch("/filled-financial-budgets/{id}/actual", handlers.FilledFinancialBudgetHandler.UpdateActualFilledFinancialBudget)
+		rt.Patch("/filled-financial-budgets/{id}/actual/{request_id}", handlers.FilledFinancialBudgetHandler.UpdateActualFilledFinancialBudget)
 		rt.Delete("/filled-financial-budgets/{id}", handlers.FilledFinancialBudgetHandler.DeleteFilledFinancialBudget)
 		rt.Get("/budgets/{id}/filled-financial-summary/{req_type}", handlers.FilledFinancialBudgetHandler.GetSummaryFilledFinancialRequests)
 

@@ -99,7 +99,7 @@ type GoalIndicatorService interface {
 type FilledFinancialBudgetService interface {
 	CreateFilledFinancialBudget(ctx context.Context, input dto.FilledFinancialBudgetDTO) (*dto.FilledFinancialBudgetResponseDTO, error)
 	UpdateFilledFinancialBudget(ctx context.Context, id int, input dto.FilledFinancialBudgetDTO) (*dto.FilledFinancialBudgetResponseDTO, error)
-	UpdateActualFilledFinancialBudget(ctx context.Context, id int, amount decimal.Decimal) (*dto.FilledFinancialBudgetResponseDTO, error)
+	UpdateActualFilledFinancialBudget(ctx context.Context, id int, amount decimal.Decimal, requestID int) (*dto.FilledFinancialBudgetResponseDTO, error)
 	DeleteFilledFinancialBudget(ctx context.Context, id int) error
 	GetFilledFinancialBudget(id int) (*dto.FilledFinancialBudgetResponseDTO, error)
 	GetFilledFinancialBudgetList(filter dto.FilledFinancialBudgetFilterDTO) ([]dto.FilledFinancialBudgetResponseDTO, *uint64, error)

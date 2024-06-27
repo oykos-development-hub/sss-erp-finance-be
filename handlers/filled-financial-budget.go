@@ -111,6 +111,7 @@ func (h *filledfinancialbudgetHandlerImpl) UpdateFilledFinancialBudget(w http.Re
 
 func (h *filledfinancialbudgetHandlerImpl) UpdateActualFilledFinancialBudget(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.Atoi(chi.URLParam(r, "id"))
+	requestID, _ := strconv.Atoi(chi.URLParam(r, "request_id"))
 
 	var input dto.FilledActualFinancialBudgetDTO
 	err := h.App.ReadJSON(w, r, &input)
@@ -140,7 +141,7 @@ func (h *filledfinancialbudgetHandlerImpl) UpdateActualFilledFinancialBudget(w h
 	ctx := context.Background()
 	ctx = contextutil.SetUserIDInContext(ctx, userID)
 
-	res, err := h.service.UpdateActualFilledFinancialBudget(ctx, id, input.Actual)
+	res, err := h.service.UpdateActualFilledFinancialBudget(ctx, id, input.Actual, requestID)
 	if err != nil {
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)

@@ -70,8 +70,8 @@ func (h *FilledFinancialBudgetServiceImpl) UpdateFilledFinancialBudget(ctx conte
 	return &response, nil
 }
 
-func (h *FilledFinancialBudgetServiceImpl) UpdateActualFilledFinancialBudget(ctx context.Context, id int, actual decimal.Decimal) (*dto.FilledFinancialBudgetResponseDTO, error) {
-	err := h.repo.UpdateActual(ctx, id, actual)
+func (h *FilledFinancialBudgetServiceImpl) UpdateActualFilledFinancialBudget(ctx context.Context, id int, actual decimal.Decimal, requestID int) (*dto.FilledFinancialBudgetResponseDTO, error) {
+	/*err := h.repo.UpdateActual(ctx, id, actual)
 	if err != nil {
 		return nil, newErrors.Wrap(err, "repo filled financial budget update actual")
 	}
@@ -79,9 +79,9 @@ func (h *FilledFinancialBudgetServiceImpl) UpdateActualFilledFinancialBudget(ctx
 	item, err := h.repo.Get(id)
 	if err != nil {
 		return nil, newErrors.Wrap(err, "repo filled financial budget get")
-	}
+	}*/
 
-	budgetRequest, err := h.reqRepo.Get(item.BudgetRequestID)
+	budgetRequest, err := h.reqRepo.Get(requestID)
 	if err != nil {
 		return nil, newErrors.Wrap(err, "repo budget request get")
 	}
@@ -90,18 +90,18 @@ func (h *FilledFinancialBudgetServiceImpl) UpdateActualFilledFinancialBudget(ctx
 	_, err = h.currentBudgetRepo.Insert(ctx, data.CurrentBudget{
 		BudgetID:      budgetRequest.BudgetID,
 		UnitID:        budgetRequest.OrganizationUnitID,
-		AccountID:     item.AccountID,
-		InitialActual: item.Actual.Decimal,
-		Actual:        item.Actual.Decimal,
+		AccountID:     id,
+		InitialActual: actual,
+		Actual:        actual,
 		Balance:       decimal.Zero,
 	})
 	if err != nil {
 		return nil, newErrors.Wrap(err, "repo current budget insert")
 	}
 
-	response := dto.ToFilledFinancialBudgetResponseDTO(item)
+	//response := dto.ToFilledFinancialBudgetResponseDTO(item)
 
-	return &response, nil
+	return nil, nil
 }
 
 func (h *FilledFinancialBudgetServiceImpl) DeleteFilledFinancialBudget(ctx context.Context, id int) error {
