@@ -31,7 +31,24 @@ func NewSpendingReleaseServiceImpl(app *celeritas.Celeritas, repo data.SpendingR
 
 func (h *SpendingReleaseServiceImpl) CreateSpendingRelease(ctx context.Context, budgetID, unitID int, inputDTOList []dto.SpendingReleaseDTO) ([]dto.SpendingReleaseResponseDTO, error) {
 	res := make([]dto.SpendingReleaseResponseDTO, 0, len(inputDTOList))
-	currentMonth := time.Now().Month()
+	currentMonth := int(time.Now().Month())
+
+	currentYear := time.Now().Year()
+
+	existingSpendingRelease, err := h.GetSpendingReleaseList(data.SpendingReleaseFilterDTO{
+		BudgetID: &budgetID,
+		UnitID:   &unitID,
+		Month:    &currentMonth,
+		Year:     &currentYear,
+	})
+	if err != nil {
+		return nil, newErrors.Wrap(err, "repo get spending release list")
+	}
+
+	if len(existingSpendingRelease) != 0 {
+		return nil, newErrors.NewBadRequestError("release already exists")
+	}
+
 	for _, inputDTO := range inputDTOList {
 		currentBudget, err := h.repoCurrentBudget.GetBy(*up.And(
 			up.Cond{"budget_id": budgetID},
@@ -55,7 +72,7 @@ func (h *SpendingReleaseServiceImpl) CreateSpendingRelease(ctx context.Context, 
 		inputData := data.SpendingRelease{
 			CurrentBudgetID: currentBudget.ID,
 			Year:            budget.Year,
-			Month:           int(currentMonth),
+			Month:           currentMonth,
 			Value:           inputDTO.Value,
 			Username:        inputDTO.Username,
 		}
