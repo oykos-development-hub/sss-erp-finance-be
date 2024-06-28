@@ -84,22 +84,13 @@ func (h *NonFinancialBudgetGoalServiceImpl) GetNonFinancialBudgetGoalList(filter
 	conditionAndExp := &up.AndExpr{}
 	var orders []interface{}
 
-	// example of making conditions
-	// if filter.Year != nil {
-	// 	conditionAndExp = up.And(conditionAndExp, &up.Cond{"year": *filter.Year})
-	// }
-
-	if filter.SortByTitle != nil {
-		if *filter.SortByTitle == "asc" {
-			orders = append(orders, "-title")
-		} else {
-			orders = append(orders, "title")
-		}
+	if filter.NonFinancialBudgetID != nil {
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"non_financial_budget_id": *filter.NonFinancialBudgetID})
 	}
 
 	orders = append(orders, "-created_at")
 
-	data, total, err := h.repo.GetAll(filter.Page, filter.Size, conditionAndExp, orders)
+	data, total, err := h.repo.GetAll(nil, nil, conditionAndExp, orders)
 	if err != nil {
 		return nil, nil, newErrors.Wrap(err, "repo non financial budget goal get all")
 	}

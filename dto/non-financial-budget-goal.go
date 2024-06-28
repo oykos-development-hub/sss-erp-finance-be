@@ -22,9 +22,7 @@ type NonFinancialBudgetGoalResponseDTO struct {
 }
 
 type NonFinancialBudgetGoalFilterDTO struct {
-	Page        *int    `json:"page"`
-	Size        *int    `json:"size"`
-	SortByTitle *string `json:"sort_by_title"`
+	NonFinancialBudgetID *int `json:"non_financial_budget_id"`
 }
 
 func (dto NonFinancialBudgetGoalDTO) ToNonFinancialBudgetGoal() *data.NonFinancialBudgetGoal {
