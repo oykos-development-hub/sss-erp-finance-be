@@ -52,9 +52,9 @@ type GoalIndicatorResponseDTO struct {
 }
 
 type GoalIndicatorFilterDTO struct {
-	Page        *int    `json:"page"`
-	Size        *int    `json:"size"`
-	SortByTitle *string `json:"sort_by_title"`
+	Page   *int `json:"page"`
+	Size   *int `json:"size"`
+	GoalID *int `json:"goal_id"`
 }
 
 func (dto GoalIndicatorDTO) ToGoalIndicator() *data.GoalIndicator {

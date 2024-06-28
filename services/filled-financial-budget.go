@@ -17,6 +17,7 @@ type FilledFinancialBudgetServiceImpl struct {
 	repo              data.FilledFinancialBudget
 	reqRepo           data.BudgetRequest
 	currentBudgetRepo data.CurrentBudget
+	currentBudgetSVC  CurrentBudgetService
 }
 
 func NewFilledFinancialBudgetServiceImpl(
@@ -24,12 +25,14 @@ func NewFilledFinancialBudgetServiceImpl(
 	repo data.FilledFinancialBudget,
 	reqRepo data.BudgetRequest,
 	currentBudgetRepo data.CurrentBudget,
+	currentBudgetSVC CurrentBudgetService,
 ) FilledFinancialBudgetService {
 	return &FilledFinancialBudgetServiceImpl{
 		App:               app,
 		repo:              repo,
 		reqRepo:           reqRepo,
 		currentBudgetRepo: currentBudgetRepo,
+		currentBudgetSVC:  currentBudgetSVC,
 	}
 }
 
@@ -87,7 +90,7 @@ func (h *FilledFinancialBudgetServiceImpl) UpdateActualFilledFinancialBudget(ctx
 	}
 
 	// TODO: check if there is only one insert. If we allow official to update actual, then we need to update it here too.
-	_, err = h.currentBudgetRepo.Insert(ctx, data.CurrentBudget{
+	_, err = h.currentBudgetSVC.CreateCurrentBudget(ctx, dto.CurrentBudgetDTO{
 		BudgetID:      budgetRequest.BudgetID,
 		UnitID:        budgetRequest.OrganizationUnitID,
 		AccountID:     id,

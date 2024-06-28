@@ -84,17 +84,8 @@ func (h *GoalIndicatorServiceImpl) GetGoalIndicatorList(filter dto.GoalIndicator
 	conditionAndExp := &up.AndExpr{}
 	var orders []interface{}
 
-	// example of making conditions
-	// if filter.Year != nil {
-	// 	conditionAndExp = up.And(conditionAndExp, &up.Cond{"year": *filter.Year})
-	// }
-
-	if filter.SortByTitle != nil {
-		if *filter.SortByTitle == "asc" {
-			orders = append(orders, "-title")
-		} else {
-			orders = append(orders, "title")
-		}
+	if filter.GoalID != nil {
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"goal_id": *filter.GoalID})
 	}
 
 	orders = append(orders, "-created_at")

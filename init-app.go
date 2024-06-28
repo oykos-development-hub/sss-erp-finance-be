@@ -72,7 +72,7 @@ func initApplication() *celeritas.Celeritas {
 	GoalIndicatorService := services.NewGoalIndicatorServiceImpl(cel, models.GoalIndicator)
 	GoalIndicatorHandler := handlers.NewGoalIndicatorHandler(cel, GoalIndicatorService)
 
-	FilledFinancialBudgetService := services.NewFilledFinancialBudgetServiceImpl(cel, models.FilledFinancialBudget, models.BudgetRequest, models.CurrentBudget)
+	FilledFinancialBudgetService := services.NewFilledFinancialBudgetServiceImpl(cel, models.FilledFinancialBudget, models.BudgetRequest, models.CurrentBudget, CurrentBudgetService)
 	FilledFinancialBudgetHandler := handlers.NewFilledFinancialBudgetHandler(cel, FilledFinancialBudgetService)
 
 	BudgetRequestService := services.NewBudgetRequestServiceImpl(cel, models.BudgetRequest)
