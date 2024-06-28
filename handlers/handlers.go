@@ -432,6 +432,7 @@ type CurrentBudgetHandler interface {
 	CreateCurrentBudget(w http.ResponseWriter, r *http.Request)
 	GetCurrentBudgetById(w http.ResponseWriter, r *http.Request)
 	GetCurrentBudgetList(w http.ResponseWriter, r *http.Request)
+	GetCurrentBudgetUnitList(w http.ResponseWriter, r *http.Request)
 	GetAcctualCurrentBudget(w http.ResponseWriter, r *http.Request)
 }
 

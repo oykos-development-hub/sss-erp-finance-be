@@ -62,6 +62,26 @@ func (t *CurrentBudget) GetAll(page *int, size *int, condition *up.AndExpr, orde
 }
 
 // GetAll gets all records from the database, using upper
+func (t *CurrentBudget) GetCurrentBudgetUnits(year int) ([]int, error) {
+	query := Upper.SQL().Select(
+		"cb.unit_id as id",
+	).
+		From("current_budgets AS cb").
+		GroupBy("cb.unit_id").
+		Join("budgets b").On("b.year = cb.budget_id").
+		Where("b.year = ?", year)
+
+	var all []int
+
+	err := query.All(&all)
+	if err != nil {
+		return nil, newErrors.New("upper all")
+	}
+
+	return all, nil
+}
+
+// GetAll gets all records from the database, using upper
 func (t *CurrentBudget) GetBy(condition up.AndExpr) (*CurrentBudget, error) {
 	collection := Upper.Collection(t.Table())
 	var one CurrentBudget

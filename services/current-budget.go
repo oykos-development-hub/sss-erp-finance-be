@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"time"
 
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
@@ -122,6 +123,15 @@ func (h *CurrentBudgetServiceImpl) GetCurrentBudgetList(filter dto.CurrentBudget
 	response := dto.ToCurrentBudgetListResponseDTO(data)
 
 	return response, total, nil
+}
+
+func (h *CurrentBudgetServiceImpl) GetCurrentBudgetUnitList() ([]int, error) {
+	data, err := h.repo.GetCurrentBudgetUnits(int(time.Now().Year()))
+	if err != nil {
+		return nil, newErrors.Wrap(err, "repo get current budget units")
+	}
+
+	return data, nil
 }
 
 func (h *CurrentBudgetServiceImpl) GetAcctualCurrentBudget(organizationUnitID int) ([]dto.CurrentBudgetResponseDTO, error) {

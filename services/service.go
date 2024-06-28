@@ -409,6 +409,7 @@ type CurrentBudgetService interface {
 	UpdateBalance(ctx context.Context, tx up.Session, id int, balance decimal.Decimal) error
 	GetCurrentBudget(id int) (*dto.CurrentBudgetResponseDTO, error)
 	GetCurrentBudgetList(filter dto.CurrentBudgetFilterDTO) ([]dto.CurrentBudgetResponseDTO, *uint64, error)
+	GetCurrentBudgetUnitList() ([]int, error)
 	GetAcctualCurrentBudget(organizationUnitID int) ([]dto.CurrentBudgetResponseDTO, error)
 }
 
