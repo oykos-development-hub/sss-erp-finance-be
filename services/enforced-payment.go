@@ -135,7 +135,7 @@ func (h *EnforcedPaymentServiceImpl) CreateEnforcedPayment(ctx context.Context, 
 	})
 
 	if err != nil {
-		return nil, newErrors.Wrap(err, "upper tx")
+		return nil, newErrors.Wrap(errors.ErrInsufficientFunds, "upper tx")
 	}
 
 	dataToInsert, err = h.repo.Get(id)
