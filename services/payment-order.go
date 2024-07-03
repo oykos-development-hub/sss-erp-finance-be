@@ -386,13 +386,13 @@ func (h *PaymentOrderServiceImpl) GetAllObligations(filter dto.GetObligationsFil
 			}
 
 			for account, amount := range accountMap {
-				if amount > 0 {
-					invoiceItems = append(invoiceItems, dto.InvoiceItems{
-						AccountID:   account,
-						RemainPrice: amount,
-						TotalPrice:  totalAccountMap[account],
-					})
-				}
+				//if amount > 0 {
+				invoiceItems = append(invoiceItems, dto.InvoiceItems{
+					AccountID:   account,
+					RemainPrice: amount,
+					TotalPrice:  totalAccountMap[account],
+				})
+				//}
 			}
 		}
 
