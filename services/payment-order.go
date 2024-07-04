@@ -83,16 +83,9 @@ func (h *PaymentOrderServiceImpl) CreatePaymentOrder(ctx context.Context, input 
 			}
 		}
 
-		fmt.Println(id)
-		paymentOrder, err := h.GetPaymentOrder(id)
-
-		if err != nil {
-			return newErrors.Wrap(err, "repo payment order get")
-		}
-
-		for _, item := range paymentOrder.Items {
+		for _, item := range input.Items {
 			currentBudget, _, err := h.currentBudgetService.GetCurrentBudgetList(dto.CurrentBudgetFilterDTO{
-				UnitID:    &paymentOrder.OrganizationUnitID,
+				UnitID:    &input.OrganizationUnitID,
 				AccountID: &item.AccountID,
 			})
 
