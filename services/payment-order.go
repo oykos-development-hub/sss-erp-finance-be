@@ -83,6 +83,37 @@ func (h *PaymentOrderServiceImpl) CreatePaymentOrder(ctx context.Context, input 
 			}
 		}
 
+		paymentOrder, err := h.GetPaymentOrder(id)
+
+		if err != nil {
+			return newErrors.Wrap(err, "repo payment order get")
+		}
+
+		for _, item := range paymentOrder.Items {
+			currentBudget, _, err := h.currentBudgetService.GetCurrentBudgetList(dto.CurrentBudgetFilterDTO{
+				UnitID:    &paymentOrder.OrganizationUnitID,
+				AccountID: &item.AccountID,
+			})
+
+			if err != nil {
+				return newErrors.Wrap(err, "repo current budget get")
+			}
+
+			if len(currentBudget) > 0 {
+				currentAmount := currentBudget[0].Balance.Sub(decimal.NewFromFloat32(float32(item.Amount)))
+				if currentAmount.LessThan(decimal.NewFromInt(0)) {
+					return newErrors.Wrap(errors.ErrInsufficientFunds, "repo current budget update balance")
+				} else {
+					err = h.currentBudgetService.UpdateBalance(ctx, tx, currentBudget[0].ID, currentAmount)
+					if err != nil {
+						return newErrors.Wrap(err, "repo current budget update balance")
+					}
+				}
+			} else {
+				return newErrors.Wrap(errors.ErrInsufficientFunds, "repo current budget update balance")
+			}
+		}
+
 		return nil
 	})
 
@@ -131,6 +162,29 @@ func (h *PaymentOrderServiceImpl) DeletePaymentOrder(ctx context.Context, id int
 
 	if err != nil {
 		return newErrors.Wrap(err, "repo payment order get")
+	}
+
+	for _, item := range input.Items {
+		currentBudget, _, err := h.currentBudgetService.GetCurrentBudgetList(dto.CurrentBudgetFilterDTO{
+			UnitID:    &input.OrganizationUnitID,
+			AccountID: &item.AccountID,
+		})
+
+		if err != nil {
+			return newErrors.Wrap(err, "repo current budget get all")
+		}
+
+		if len(currentBudget) > 0 {
+			currentAmount := currentBudget[0].Balance.Add(decimal.NewFromFloat32(float32(item.Amount)))
+
+			err = h.currentBudgetService.UpdateBalance(ctx, data.Upper, currentBudget[0].ID, currentAmount)
+			if err != nil {
+				return newErrors.Wrap(err, "repo current budget update balance")
+			}
+
+		} else {
+			return newErrors.Wrap(errors.ErrNotFound, "repo current budget get all")
+		}
 	}
 
 	for _, item := range input.Items {
@@ -416,38 +470,7 @@ func (h *PaymentOrderServiceImpl) GetAllObligations(filter dto.GetObligationsFil
 func (h *PaymentOrderServiceImpl) PayPaymentOrder(ctx context.Context, id int, input dto.PaymentOrderDTO) error {
 	err := data.Upper.Tx(func(tx up.Session) error {
 
-		paymentOrder, err := h.GetPaymentOrder(id)
-
-		if err != nil {
-			return newErrors.Wrap(err, "repo payment order get")
-		}
-
-		for _, item := range paymentOrder.Items {
-			currentBudget, _, err := h.currentBudgetService.GetCurrentBudgetList(dto.CurrentBudgetFilterDTO{
-				UnitID:    &paymentOrder.OrganizationUnitID,
-				AccountID: &item.AccountID,
-			})
-
-			if err != nil {
-				return newErrors.Wrap(err, "repo current budget get")
-			}
-
-			if len(currentBudget) > 0 {
-				currentAmount := currentBudget[0].Balance.Sub(decimal.NewFromFloat32(float32(item.Amount)))
-				if currentAmount.LessThan(decimal.NewFromInt(0)) {
-					return newErrors.Wrap(errors.ErrInsufficientFunds, "repo current budget update balance")
-				} else {
-					err = h.currentBudgetService.UpdateBalance(ctx, tx, currentBudget[0].ID, currentAmount)
-					if err != nil {
-						return newErrors.Wrap(err, "repo current budget update balance")
-					}
-				}
-			} else {
-				return newErrors.Wrap(errors.ErrInsufficientFunds, "repo current budget update balance")
-			}
-		}
-
-		err = h.repo.PayPaymentOrder(ctx, tx, id, *input.SAPID, *input.DateOfSAP)
+		err := h.repo.PayPaymentOrder(ctx, tx, id, *input.SAPID, *input.DateOfSAP)
 		if err != nil {
 			return newErrors.Wrap(err, "repo payment order pay")
 		}

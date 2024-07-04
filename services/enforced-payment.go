@@ -68,69 +68,69 @@ func (h *EnforcedPaymentServiceImpl) CreateEnforcedPayment(ctx context.Context, 
 		if err != nil {
 			return newErrors.Wrap(err, "upper tx")
 		}
+		/*
+			for _, item := range input.Items {
+				currentBudget, _, err := h.currentBudget.GetCurrentBudgetList(dto.CurrentBudgetFilterDTO{
+					UnitID:    &input.OrganizationUnitID,
+					AccountID: &item.AccountID,
+				})
 
-		for _, item := range input.Items {
-			currentBudget, _, err := h.currentBudget.GetCurrentBudgetList(dto.CurrentBudgetFilterDTO{
-				UnitID:    &input.OrganizationUnitID,
-				AccountID: &item.AccountID,
-			})
-
-			if err != nil {
-				return newErrors.Wrap(err, "repo current budget get all")
-			}
-
-			if len(currentBudget) > 0 {
-				amount := 0.0
-
-				if len(input.Items) == 1 {
-					amount = input.Amount
-				} else {
-					amount, err = h.getInvoiceAmount(*item.InvoiceID)
-
-					if err != nil {
-						return newErrors.Wrap(err, "get invoice amount")
-					}
+				if err != nil {
+					return newErrors.Wrap(err, "repo current budget get all")
 				}
 
-				currentAmount := currentBudget[0].Balance.Sub(decimal.NewFromFloat32(float32(amount)))
-				if currentAmount.LessThan(decimal.NewFromInt(0)) {
-					return newErrors.Wrap(errors.ErrInsufficientFunds, "repo current budget update balance")
-				} else {
-					err = h.currentBudget.UpdateBalance(ctx, tx, currentBudget[0].ID, currentAmount)
-					if err != nil {
-						return newErrors.Wrap(err, "repo current budget update balance")
+				if len(currentBudget) > 0 {
+					amount := 0.0
+
+					if len(input.Items) == 1 {
+						amount = input.Amount
+					} else {
+						amount, err = h.getInvoiceAmount(*item.InvoiceID)
+
+						if err != nil {
+							return newErrors.Wrap(err, "get invoice amount")
+						}
 					}
-				}
-			} else {
-				return newErrors.Wrap(errors.ErrInsufficientFunds, "repo current budget update balance")
-			}
 
-			amount := input.AmountForAgent + input.AmountForBank + input.AmountForLawyer
-
-			currentBudget, _, err = h.currentBudget.GetCurrentBudgetList(dto.CurrentBudgetFilterDTO{
-				UnitID:    &input.OrganizationUnitID,
-				AccountID: &input.AccountIDForExpenses,
-			})
-
-			if err != nil {
-				return newErrors.Wrap(err, "repo current budget get")
-			}
-			if len(currentBudget) > 0 {
-				currentAmount := currentBudget[0].Balance.Sub(decimal.NewFromFloat32(float32(amount)))
-				if currentAmount.LessThan(decimal.NewFromInt(0)) {
-					return newErrors.Wrap(errors.ErrInsufficientFunds, "repo current budget update balance")
-				} else {
-					err = h.currentBudget.UpdateBalance(ctx, tx, currentBudget[0].ID, currentAmount)
-					if err != nil {
+					currentAmount := currentBudget[0].Balance.Sub(decimal.NewFromFloat32(float32(amount)))
+					if currentAmount.LessThan(decimal.NewFromInt(0)) {
 						return newErrors.Wrap(errors.ErrInsufficientFunds, "repo current budget update balance")
+					} else {
+						err = h.currentBudget.UpdateBalance(ctx, tx, currentBudget[0].ID, currentAmount)
+						if err != nil {
+							return newErrors.Wrap(err, "repo current budget update balance")
+						}
 					}
+				} else {
+					return newErrors.Wrap(errors.ErrInsufficientFunds, "repo current budget update balance")
 				}
-			} else {
-				return newErrors.Wrap(errors.ErrNotFound, "repo current budget get all")
+
+				amount := input.AmountForAgent + input.AmountForBank + input.AmountForLawyer
+
+				currentBudget, _, err = h.currentBudget.GetCurrentBudgetList(dto.CurrentBudgetFilterDTO{
+					UnitID:    &input.OrganizationUnitID,
+					AccountID: &input.AccountIDForExpenses,
+				})
+
+				if err != nil {
+					return newErrors.Wrap(err, "repo current budget get")
+				}
+				if len(currentBudget) > 0 {
+					currentAmount := currentBudget[0].Balance.Sub(decimal.NewFromFloat32(float32(amount)))
+					if currentAmount.LessThan(decimal.NewFromInt(0)) {
+						return newErrors.Wrap(errors.ErrInsufficientFunds, "repo current budget update balance")
+					} else {
+						err = h.currentBudget.UpdateBalance(ctx, tx, currentBudget[0].ID, currentAmount)
+						if err != nil {
+							return newErrors.Wrap(errors.ErrInsufficientFunds, "repo current budget update balance")
+						}
+					}
+				} else {
+					return newErrors.Wrap(errors.ErrNotFound, "repo current budget get all")
+				}
+
 			}
-
-		}
-
+		*/
 		return nil
 	})
 
