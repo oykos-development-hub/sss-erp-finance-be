@@ -83,6 +83,7 @@ func (h *PaymentOrderServiceImpl) CreatePaymentOrder(ctx context.Context, input 
 			}
 		}
 
+		fmt.Println(id)
 		paymentOrder, err := h.GetPaymentOrder(id)
 
 		if err != nil {
