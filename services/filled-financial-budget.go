@@ -96,6 +96,7 @@ func (h *FilledFinancialBudgetServiceImpl) UpdateActualFilledFinancialBudget(ctx
 		AccountID:     id,
 		InitialActual: actual,
 		Actual:        actual,
+		CurrentAmount: actual,
 		Balance:       decimal.Zero,
 	})
 	if err != nil {

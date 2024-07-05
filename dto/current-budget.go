@@ -12,6 +12,7 @@ type CurrentBudgetDTO struct {
 	UnitID        int             `json:"unit_id"`
 	AccountID     int             `json:"account_id"`
 	InitialActual decimal.Decimal `json:"initial_actual"`
+	CurrentAmount decimal.Decimal `json:"current_amount"`
 	Actual        decimal.Decimal `json:"actual"`
 	Balance       decimal.Decimal `json:"balance"`
 }
@@ -23,6 +24,7 @@ type CurrentBudgetResponseDTO struct {
 	AccountID     int             `json:"account_id"`
 	InitialActual decimal.Decimal `json:"initial_actual"`
 	Actual        decimal.Decimal `json:"actual"`
+	CurrentAmount decimal.Decimal `json:"current_amount"`
 	Balance       decimal.Decimal `json:"balance"`
 	CreatedAt     time.Time       `json:"created_at,omitempty"`
 }
@@ -41,6 +43,7 @@ func (dto CurrentBudgetDTO) ToCurrentBudget() *data.CurrentBudget {
 		UnitID:        dto.UnitID,
 		AccountID:     dto.AccountID,
 		InitialActual: dto.InitialActual,
+		CurrentAmount: dto.CurrentAmount,
 		Actual:        dto.Actual,
 		Balance:       dto.Balance,
 	}
@@ -53,6 +56,7 @@ func ToCurrentBudgetResponseDTO(data *data.CurrentBudget) CurrentBudgetResponseD
 		UnitID:        data.UnitID,
 		AccountID:     data.AccountID,
 		InitialActual: data.InitialActual,
+		CurrentAmount: data.CurrentAmount,
 		Actual:        data.Actual,
 		Balance:       data.Balance,
 		CreatedAt:     data.CreatedAt,

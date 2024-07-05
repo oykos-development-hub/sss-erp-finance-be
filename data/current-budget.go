@@ -20,6 +20,7 @@ type CurrentBudget struct {
 	AccountID     int             `db:"account_id"`
 	InitialActual decimal.Decimal `db:"initial_actual"`
 	Actual        decimal.Decimal `db:"actual"`
+	CurrentAmount decimal.Decimal `db:"current_amount"`
 	Balance       decimal.Decimal `db:"balance"`
 	CreatedAt     time.Time       `db:"created_at,omitempty"`
 }
@@ -190,6 +191,33 @@ func (t *CurrentBudget) UpdateBalance(currentBudgetID int, balance decimal.Decim
 	res, err := Upper.SQL().Exec(updateQuery, balance, currentBudgetID)
 	if err != nil {
 		return newErrors.Wrap(err, "upper exec")
+	}
+
+	rowsAffected, _ := res.RowsAffected()
+	if rowsAffected != 1 {
+		return newErrors.NewNotFoundError("upper no rows affected")
+	}
+
+	return nil
+}
+
+func (t *CurrentBudget) UpdateCurrentBudgetWithTx(ctx context.Context, tx up.Session, currentBudgetID int, currentAmount decimal.Decimal) error {
+	userID, ok := contextutil.GetUserIDFromContext(ctx)
+	if !ok {
+		err := newErrors.New("user ID not found in context")
+		return newErrors.Wrap(err, "contextuitl get user id from context")
+	}
+
+	query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+	if _, err := tx.SQL().Exec(query); err != nil {
+		return newErrors.Wrap(err, "upper exec")
+	}
+
+	updateQuery := fmt.Sprintf("UPDATE %s SET current_amount = $1 WHERE id = $2", t.Table())
+
+	res, err := tx.SQL().Exec(updateQuery, currentAmount, currentBudgetID)
+	if err != nil {
+		return newErrors.Wrap(err, "upper tx")
 	}
 
 	rowsAffected, _ := res.RowsAffected()
