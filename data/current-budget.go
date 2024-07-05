@@ -273,7 +273,7 @@ func (t *CurrentBudget) GetActualCurrentBudget(organizationUnitID int) ([]*Curre
    			  FROM current_budgets
 			  WHERE unit_id = $1
    			  ORDER BY id DESC)
-		SELECT budget_id, account_id, actual, balance, initial_actual
+		SELECT budget_id, account_id, actual, balance, initial_actual, current_amount
 		FROM sorted_data
 		WHERE budget_id = (SELECT budget_id FROM sorted_data LIMIT 1) and unit_id = $1;`
 
@@ -287,7 +287,7 @@ func (t *CurrentBudget) GetActualCurrentBudget(organizationUnitID int) ([]*Curre
 	for rows.Next() {
 		var item CurrentBudget
 
-		err = rows.Scan(&item.BudgetID, &item.AccountID, &item.Actual, &item.Balance, &item.InitialActual)
+		err = rows.Scan(&item.BudgetID, &item.AccountID, &item.Actual, &item.Balance, &item.InitialActual, &item.CurrentAmount)
 
 		if err != nil {
 			return nil, newErrors.New("sql scan")
