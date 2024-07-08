@@ -6,6 +6,7 @@ import (
 
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
+	"gitlab.sudovi.me/erp/finance-api/errors"
 	newErrors "gitlab.sudovi.me/erp/finance-api/pkg/errors"
 
 	"github.com/oykos-development-hub/celeritas"
@@ -122,21 +123,36 @@ func (h *SpendingReleaseServiceImpl) DeleteSpendingRelease(ctx context.Context, 
 		return newErrors.Wrap(err, "repo get all")
 	}
 
-	for _, release := range releases {
-		err = h.repo.Delete(ctx, release.ID)
-		if err != nil {
-			return newErrors.Wrap(err, "repo delete")
-		}
+	err = data.Upper.Tx(func(tx up.Session) error {
+		for _, release := range releases {
+			err = h.repo.Delete(ctx, release.ID)
+			if err != nil {
+				return newErrors.Wrap(err, "repo delete")
+			}
 
-		currentBudget, err := h.repoCurrentBudget.Get(release.CurrentBudgetID)
-		if err != nil {
-			return newErrors.Wrap(err, "repo current budget get")
-		}
+			currentBudget, err := h.repoCurrentBudget.Get(release.CurrentBudgetID)
+			if err != nil {
+				return newErrors.Wrap(err, "repo current budget get")
+			}
 
-		err = h.repoCurrentBudget.UpdateBalance(currentBudget.ID, currentBudget.Balance.Sub(release.Value))
-		if err != nil {
-			return newErrors.Wrap(err, "repo current budget update balance")
+			if currentBudget.Balance.Sub(release.Value).Cmp(decimal.NewFromInt(0)) < 0 {
+				return newErrors.Wrap(errors.ErrInsufficientFunds, "balance")
+			}
+
+			err = h.repoCurrentBudget.UpdateBalance(currentBudget.ID, currentBudget.Balance.Sub(release.Value))
+			if err != nil {
+				return newErrors.Wrap(err, "repo current budget update balance")
+			}
+
+			err = h.repoCurrentBudget.UpdateActual(ctx, currentBudget.ID, currentBudget.Actual.Add(release.Value))
+			if err != nil {
+				return newErrors.Wrap(err, "repo current budget update balance")
+			}
 		}
+		return nil
+	})
+	if err != nil {
+		return newErrors.Wrap(err, "upper tx")
 	}
 
 	return nil
