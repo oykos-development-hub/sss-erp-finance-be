@@ -407,7 +407,7 @@ func updateDynamicAdd(currentBudgetID int, amount decimal.Decimal, spendingDynam
 	for i := 0; i < len(spendingDynamic); i++ {
 		if spendingDynamic[i].CurrentBudgetID == currentBudgetID {
 			currentMonth := time.Now().Month()
-			monthIndex := monthMap[currentMonth]
+			monthIndex := monthMap[currentMonth] - 1
 
 			parts := decimal.NewFromInt(int64(12 - monthIndex))
 			amountPart := amount.Div(parts)
@@ -466,7 +466,7 @@ func updateDynamicSub(currentBudgetID int, amount decimal.Decimal, spendingDynam
 	for i := 0; i < len(spendingDynamic); i++ {
 		if spendingDynamic[i].CurrentBudgetID == currentBudgetID {
 			currentMonth := time.Now().Month()
-			monthIndex := monthMap[currentMonth]
+			monthIndex := monthMap[currentMonth] - 1
 
 			parts := decimal.NewFromInt(int64(12 - monthIndex))
 			amountPart := amount.Div(parts)

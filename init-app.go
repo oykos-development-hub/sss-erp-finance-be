@@ -189,7 +189,7 @@ func initApplication() *celeritas.Celeritas {
 	InternalReallocationItemService := services.NewInternalReallocationItemServiceImpl(cel, models.InternalReallocationItem)
 	InternalReallocationItemHandler := handlers.NewInternalReallocationItemHandler(cel, InternalReallocationItemService)
 
-	ExternalReallocationService := services.NewExternalReallocationServiceImpl(cel, models.ExternalReallocation, models.ExternalReallocationItem, models.CurrentBudget)
+	ExternalReallocationService := services.NewExternalReallocationServiceImpl(cel, models.ExternalReallocation, models.ExternalReallocationItem, models.CurrentBudget, models.SpendingDynamicEntry)
 	ExternalReallocationHandler := handlers.NewExternalReallocationHandler(cel, ExternalReallocationService)
 
 	ExternalReallocationItemService := services.NewExternalReallocationItemServiceImpl(cel, models.ExternalReallocationItem)

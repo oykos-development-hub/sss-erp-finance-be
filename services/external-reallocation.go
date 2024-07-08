@@ -14,18 +14,20 @@ import (
 )
 
 type ExternalReallocationServiceImpl struct {
-	App               *celeritas.Celeritas
-	repo              data.ExternalReallocation
-	itemsRepo         data.ExternalReallocationItem
-	currentBudgetRepo data.CurrentBudget
+	App                 *celeritas.Celeritas
+	repo                data.ExternalReallocation
+	itemsRepo           data.ExternalReallocationItem
+	currentBudgetRepo   data.CurrentBudget
+	spendingDynamicRepo data.SpendingDynamicEntry
 }
 
-func NewExternalReallocationServiceImpl(app *celeritas.Celeritas, repo data.ExternalReallocation, itemsRepo data.ExternalReallocationItem, currentBudgetRepo data.CurrentBudget) ExternalReallocationService {
+func NewExternalReallocationServiceImpl(app *celeritas.Celeritas, repo data.ExternalReallocation, itemsRepo data.ExternalReallocationItem, currentBudgetRepo data.CurrentBudget, spendingDynamicRepo data.SpendingDynamicEntry) ExternalReallocationService {
 	return &ExternalReallocationServiceImpl{
-		App:               app,
-		repo:              repo,
-		itemsRepo:         itemsRepo,
-		currentBudgetRepo: currentBudgetRepo,
+		App:                 app,
+		repo:                repo,
+		itemsRepo:           itemsRepo,
+		currentBudgetRepo:   currentBudgetRepo,
+		spendingDynamicRepo: spendingDynamicRepo,
 	}
 }
 
@@ -197,6 +199,12 @@ func (h *ExternalReallocationServiceImpl) AcceptOUExternalReallocation(ctx conte
 			return newErrors.Wrap(err, "repo external reallocation accept ou")
 		}
 
+		spendingDynamic, err := h.spendingDynamicRepo.FindAll(nil, nil, &input.BudgetID, &input.SourceOrganizationUnitID)
+
+		if err != nil {
+			return newErrors.Wrap(err, "repo spending dynamic get spending dynamic")
+		}
+
 		for _, item := range input.Items {
 
 			if item.SourceAccountID != 0 {
@@ -230,6 +238,33 @@ func (h *ExternalReallocationServiceImpl) AcceptOUExternalReallocation(ctx conte
 				if err != nil {
 					return newErrors.Wrap(err, "repo current budget update actual")
 				}
+
+				spendingDynamic = updateDynamicSub(currentBudget.ID, itemToInsert.Amount, spendingDynamic)
+
+			}
+		}
+
+		for _, item := range spendingDynamic {
+			_, err = h.spendingDynamicRepo.Insert(ctx, data.SpendingDynamicEntry{
+				CurrentBudgetID: item.CurrentBudgetID,
+				//Username:        item.Username,
+				January:   item.January,
+				February:  item.February,
+				March:     item.March,
+				April:     item.April,
+				May:       item.May,
+				June:      item.June,
+				July:      item.July,
+				August:    item.August,
+				September: item.September,
+				October:   item.October,
+				November:  item.November,
+				December:  item.December,
+				Version:   item.Version + 1,
+			})
+
+			if err != nil {
+				return newErrors.Wrap(err, "repo spending dynamic repo insert")
 			}
 		}
 
@@ -277,6 +312,12 @@ func (h *ExternalReallocationServiceImpl) AcceptSSSExternalReallocation(ctx cont
 			return newErrors.Wrap(err, "repo external reallocation accept sss")
 		}
 
+		spendingDynamic, err := h.spendingDynamicRepo.FindAll(nil, nil, &reallocation.BudgetID, &reallocation.DestinationOrganizationUnitID)
+
+		if err != nil {
+			return newErrors.Wrap(err, "repo spending dynamic get spending dynamic")
+		}
+
 		for _, item := range reallocation.Items {
 
 			if item.DestinationAccountID != 0 {
@@ -297,6 +338,32 @@ func (h *ExternalReallocationServiceImpl) AcceptSSSExternalReallocation(ctx cont
 				if err != nil {
 					return newErrors.Wrap(err, "repo current budget update actual")
 				}
+
+				spendingDynamic = updateDynamicAdd(currentBudget.ID, item.Amount, spendingDynamic)
+			}
+		}
+
+		for _, item := range spendingDynamic {
+			_, err = h.spendingDynamicRepo.Insert(ctx, data.SpendingDynamicEntry{
+				CurrentBudgetID: item.CurrentBudgetID,
+				//Username:        item.Username,
+				January:   item.January,
+				February:  item.February,
+				March:     item.March,
+				April:     item.April,
+				May:       item.May,
+				June:      item.June,
+				July:      item.July,
+				August:    item.August,
+				September: item.September,
+				October:   item.October,
+				November:  item.November,
+				December:  item.December,
+				Version:   item.Version + 1,
+			})
+
+			if err != nil {
+				return newErrors.Wrap(err, "repo spending dynamic repo insert")
 			}
 		}
 
@@ -327,6 +394,12 @@ func (h *ExternalReallocationServiceImpl) RejectSSSExternalReallocation(ctx cont
 			return newErrors.Wrap(err, "repo external reallocation reject sss")
 		}
 
+		spendingDynamic, err := h.spendingDynamicRepo.FindAll(nil, nil, &reallocation.BudgetID, &reallocation.SourceOrganizationUnitID)
+
+		if err != nil {
+			return newErrors.Wrap(err, "repo spending dynamic get spending dynamic")
+		}
+
 		for _, item := range reallocation.Items {
 
 			if item.SourceAccountID != 0 {
@@ -347,6 +420,32 @@ func (h *ExternalReallocationServiceImpl) RejectSSSExternalReallocation(ctx cont
 				if err != nil {
 					return newErrors.Wrap(err, "repo current budget update actual")
 				}
+
+				spendingDynamic = updateDynamicAdd(currentBudget.ID, item.Amount, spendingDynamic)
+			}
+		}
+
+		for _, item := range spendingDynamic {
+			_, err = h.spendingDynamicRepo.Insert(ctx, data.SpendingDynamicEntry{
+				CurrentBudgetID: item.CurrentBudgetID,
+				//Username:        item.Username,
+				January:   item.January,
+				February:  item.February,
+				March:     item.March,
+				April:     item.April,
+				May:       item.May,
+				June:      item.June,
+				July:      item.July,
+				August:    item.August,
+				September: item.September,
+				October:   item.October,
+				November:  item.November,
+				December:  item.December,
+				Version:   item.Version + 1,
+			})
+
+			if err != nil {
+				return newErrors.Wrap(err, "repo spending dynamic repo insert")
 			}
 		}
 
