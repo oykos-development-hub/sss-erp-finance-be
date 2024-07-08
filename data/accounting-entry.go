@@ -251,7 +251,7 @@ func (t *AccountingEntry) Insert(ctx context.Context, tx up.Session, m Accountin
 func (t *AccountingEntry) GetObligationsForAccounting(filter ObligationsFilter) ([]ObligationForAccounting, *uint64, error) {
 	var items []ObligationForAccounting
 
-	queryForInvoices := `select i.id, sum((a.net_price +a.net_price*a.vat_percentage/100)*a.amount) as sum, i.invoice_number, i.supplier_id, i.date_of_invoice
+	queryForInvoices := `select i.id, COALESCE(SUM((a.net_price + a.net_price * a.vat_percentage / 100) * a.amount), 0) AS sum, i.invoice_number, i.supplier_id, i.date_of_invoice
 						from invoices i
 						left join articles a on a.invoice_id = i.id
 						where 
@@ -263,7 +263,7 @@ func (t *AccountingEntry) GetObligationsForAccounting(filter ObligationsFilter) 
 						AND i.status <> $6
 						group by i.id;`
 
-	queryForAdditionalExpenses := `select i.id, sum(a.price), i.type, i.invoice_number, i.supplier_id, i.date_of_invoice
+	queryForAdditionalExpenses := `select i.id, COALESCE(sum(a.price),0) , i.type, i.invoice_number, i.supplier_id, i.date_of_invoice
 	                               from additional_expenses a
 	                               left join invoices i on a.invoice_id = i.id
 	                               where a.invoice_id = i.id and
@@ -274,7 +274,7 @@ func (t *AccountingEntry) GetObligationsForAccounting(filter ObligationsFilter) 
 								   AND (COALESCE($5::date, NULL) IS NULL OR i.date_of_invoice <= $5)
 	                               group by i.id, i.invoice_number order by i.id;`
 
-	queryForSalaryAdditionalExpenses := `select s.id, sum(a.amount), s.month, s.date_of_calculation
+	queryForSalaryAdditionalExpenses := `select s.id, COALESCE(sum(a.amount),0) , s.month, s.date_of_calculation
 	                                     from salary_additional_expenses a
 	                                     left join salaries s on s.id = a.salary_id
 	                                     where s.organization_unit_id = $1 and s.registred = false
