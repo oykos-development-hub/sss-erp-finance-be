@@ -99,6 +99,11 @@ func (h *SpendingReleaseServiceImpl) CreateSpendingRelease(ctx context.Context, 
 			return nil, newErrors.Wrap(err, "repo current budget update balance")
 		}
 
+		err = h.repoCurrentBudget.UpdateActual(ctx, currentBudget.ID, currentBudget.Actual.Sub(item.Value))
+		if err != nil {
+			return nil, newErrors.Wrap(err, "repo current budget update balance")
+		}
+
 		resItem := dto.ToSpendingReleaseResponseDTO(item)
 
 		res = append(res, resItem)
