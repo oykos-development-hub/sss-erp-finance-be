@@ -125,7 +125,6 @@ func (h *InternalReallocationServiceImpl) CreateInternalReallocation(ctx context
 
 		for _, item := range spendingDynamic {
 			_, err = h.spendingDynamicRepo.Insert(ctx, data.SpendingDynamicEntry{
-				ID:              item.ID,
 				CurrentBudgetID: item.CurrentBudgetID,
 				//Username:        item.Username,
 				January:   item.January,
@@ -271,7 +270,6 @@ func (h *InternalReallocationServiceImpl) DeleteInternalReallocation(ctx context
 
 	for _, item := range spendingDynamic {
 		_, err = h.spendingDynamicRepo.Insert(ctx, data.SpendingDynamicEntry{
-			ID:              item.ID,
 			CurrentBudgetID: item.CurrentBudgetID,
 			//Username:        item.Username,
 			January:   item.January,
