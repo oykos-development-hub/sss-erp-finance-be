@@ -228,6 +228,41 @@ func (t *CurrentBudget) UpdateCurrentBudgetWithTx(ctx context.Context, tx up.Ses
 	return nil
 }
 
+func (t *CurrentBudget) UpdateCurrentAmount(ctx context.Context, currentBudgetID int, actual decimal.Decimal) error {
+
+	userID, ok := contextutil.GetUserIDFromContext(ctx)
+	if !ok {
+		err := newErrors.New("user ID not found in context")
+		return newErrors.Wrap(err, "contextuitl get user id from context")
+	}
+
+	err := Upper.Tx(func(sess up.Session) error {
+		// Set the user_id variable
+		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+		if _, err := sess.SQL().Exec(query); err != nil {
+			return newErrors.Wrap(err, "upper exec")
+		}
+
+		updateQuery := fmt.Sprintf("UPDATE %s SET current_amount = $1 WHERE id = $2", t.Table())
+
+		res, err := sess.SQL().Exec(updateQuery, actual, currentBudgetID)
+		if err != nil {
+			return err
+		}
+		rowsAffected, _ := res.RowsAffected()
+		if rowsAffected != 1 {
+			return newErrors.NewNotFoundError("upper no rows affected")
+		}
+
+		return nil
+	})
+	if err != nil {
+		return newErrors.Wrap(err, "upper tx")
+	}
+
+	return nil
+}
+
 // Insert inserts a model into the database, using upper
 func (t *CurrentBudget) Insert(ctx context.Context, m CurrentBudget) (int, error) {
 	m.CreatedAt = time.Now()

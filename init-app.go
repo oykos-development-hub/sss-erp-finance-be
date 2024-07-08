@@ -183,7 +183,7 @@ func initApplication() *celeritas.Celeritas {
 	AccountingEntryItemService := services.NewAccountingEntryItemServiceImpl(cel, models.AccountingEntryItem)
 	AccountingEntryItemHandler := handlers.NewAccountingEntryItemHandler(cel, AccountingEntryItemService)
 
-	InternalReallocationService := services.NewInternalReallocationServiceImpl(cel, models.InternalReallocation, models.InternalReallocationItem, models.CurrentBudget)
+	InternalReallocationService := services.NewInternalReallocationServiceImpl(cel, models.InternalReallocation, models.InternalReallocationItem, models.CurrentBudget, models.SpendingDynamicEntry)
 	InternalReallocationHandler := handlers.NewInternalReallocationHandler(cel, InternalReallocationService)
 
 	InternalReallocationItemService := services.NewInternalReallocationItemServiceImpl(cel, models.InternalReallocationItem)
