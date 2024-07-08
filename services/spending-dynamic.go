@@ -151,6 +151,12 @@ func (h *SpendingDynamicServiceImpl) GetSpendingDynamic(currentBudgetID, budgetI
 		if err != nil {
 			return nil, newErrors.Wrap(err, "repo release get all")
 		}
+
+		currentAmount, err := h.GetCurrentAmount(entry.CurrentBudgetID, entry.UnitID, entry.AccountID)
+		if err != nil {
+			return nil, newErrors.Wrap(err, "get current amount")
+		}
+
 		entryRes := dto.SpendingDynamicWithEntryResponseDTO{
 			ID:              entry.ID,
 			CurrentBudgetID: entry.CurrentBudgetID,
@@ -158,6 +164,7 @@ func (h *SpendingDynamicServiceImpl) GetSpendingDynamic(currentBudgetID, budgetI
 			BudgetID:        entry.BudgetID,
 			UnitID:          entry.UnitID,
 			Actual:          entry.Actual,
+			CurrentAmount:   currentAmount,
 			Username:        entry.Username,
 			CreatedAt:       entry.CreatedAt,
 			January:         dto.MonthEntry{Value: entry.January},
@@ -221,4 +228,17 @@ func (h *SpendingDynamicServiceImpl) GetActual(budgetID, unitID, accountID int) 
 	}
 
 	return currentBudget.Actual, nil
+}
+
+func (h *SpendingDynamicServiceImpl) GetCurrentAmount(budgetID, unitID, accountID int) (decimal.Decimal, error) {
+	currentBudget, err := h.repoCurrentBudget.GetBy(*up.And(
+		up.Cond{"budget_id": budgetID},
+		up.Cond{"unit_id": unitID},
+		up.Cond{"account_id": accountID},
+	))
+	if err != nil {
+		return decimal.Zero, newErrors.Wrap(err, "repo current budget get by")
+	}
+
+	return currentBudget.CurrentAmount, nil
 }
