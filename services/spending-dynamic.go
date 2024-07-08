@@ -152,7 +152,7 @@ func (h *SpendingDynamicServiceImpl) GetSpendingDynamic(currentBudgetID, budgetI
 			return nil, newErrors.Wrap(err, "repo release get all")
 		}
 
-		currentAmount, err := h.GetCurrentAmount(entry.CurrentBudgetID, entry.UnitID, entry.AccountID)
+		currentAmount, err := h.GetCurrentAmount(*budgetID, *unitID, entry.AccountID)
 		if err != nil {
 			return nil, newErrors.Wrap(err, "get current amount")
 		}
