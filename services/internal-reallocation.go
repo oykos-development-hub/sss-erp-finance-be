@@ -87,7 +87,7 @@ func (h *InternalReallocationServiceImpl) CreateInternalReallocation(ctx context
 					return newErrors.Wrap(err, "repo current budget update current amount")
 				}
 
-				spendingDynamic = updateDynamicSub(itemToInsert.SourceAccountID, itemToInsert.Amount, spendingDynamic)
+				spendingDynamic = updateDynamicSub(currentBudget.ID, itemToInsert.Amount, spendingDynamic)
 
 			}
 			if item.DestinationAccountID != 0 {
@@ -118,7 +118,7 @@ func (h *InternalReallocationServiceImpl) CreateInternalReallocation(ctx context
 					return newErrors.Wrap(err, "repo current budget update current amount")
 				}
 
-				spendingDynamic = updateDynamicAdd(itemToInsert.DestinationAccountID, itemToInsert.Amount, spendingDynamic)
+				spendingDynamic = updateDynamicAdd(currentBudget.ID, itemToInsert.Amount, spendingDynamic)
 
 			}
 		}
@@ -233,7 +233,7 @@ func (h *InternalReallocationServiceImpl) DeleteInternalReallocation(ctx context
 				return newErrors.Wrap(err, "repo current budget update current amount")
 			}
 
-			spendingDynamic = updateDynamicAdd(item.SourceAccountID, item.Amount, spendingDynamic)
+			spendingDynamic = updateDynamicAdd(currentBudget.ID, item.Amount, spendingDynamic)
 
 		}
 		if item.DestinationAccountID != 0 {
@@ -264,7 +264,7 @@ func (h *InternalReallocationServiceImpl) DeleteInternalReallocation(ctx context
 				return newErrors.Wrap(err, "repo current budget update current amount")
 			}
 
-			spendingDynamic = updateDynamicSub(item.DestinationAccountID, item.Amount, spendingDynamic)
+			spendingDynamic = updateDynamicSub(currentBudget.ID, item.Amount, spendingDynamic)
 		}
 	}
 
@@ -387,7 +387,7 @@ func (h *InternalReallocationServiceImpl) GetInternalReallocationList(filter dto
 	return response, total, nil
 }
 
-func updateDynamicAdd(accountID int, amount decimal.Decimal, spendingDynamic []data.SpendingDynamicEntryWithCurrentBudget) []data.SpendingDynamicEntryWithCurrentBudget {
+func updateDynamicAdd(currentBudgetID int, amount decimal.Decimal, spendingDynamic []data.SpendingDynamicEntryWithCurrentBudget) []data.SpendingDynamicEntryWithCurrentBudget {
 
 	monthMap := map[time.Month]int{
 		time.January:   0,
@@ -405,7 +405,7 @@ func updateDynamicAdd(accountID int, amount decimal.Decimal, spendingDynamic []d
 	}
 
 	for i := 0; i < len(spendingDynamic); i++ {
-		if spendingDynamic[i].CurrentBudgetID == accountID {
+		if spendingDynamic[i].CurrentBudgetID == currentBudgetID {
 			currentMonth := time.Now().Month()
 			monthIndex := monthMap[currentMonth]
 
@@ -446,7 +446,7 @@ func updateDynamicAdd(accountID int, amount decimal.Decimal, spendingDynamic []d
 	return spendingDynamic
 }
 
-func updateDynamicSub(accountID int, amount decimal.Decimal, spendingDynamic []data.SpendingDynamicEntryWithCurrentBudget) []data.SpendingDynamicEntryWithCurrentBudget {
+func updateDynamicSub(currentBudgetID int, amount decimal.Decimal, spendingDynamic []data.SpendingDynamicEntryWithCurrentBudget) []data.SpendingDynamicEntryWithCurrentBudget {
 
 	monthMap := map[time.Month]int{
 		time.January:   0,
@@ -464,7 +464,7 @@ func updateDynamicSub(accountID int, amount decimal.Decimal, spendingDynamic []d
 	}
 
 	for i := 0; i < len(spendingDynamic); i++ {
-		if spendingDynamic[i].CurrentBudgetID == accountID {
+		if spendingDynamic[i].CurrentBudgetID == currentBudgetID {
 			currentMonth := time.Now().Month()
 			monthIndex := monthMap[currentMonth]
 
@@ -499,6 +499,7 @@ func updateDynamicSub(accountID int, amount decimal.Decimal, spendingDynamic []d
 					spendingDynamic[i].December = spendingDynamic[i].December.Sub(amountPart)
 				}
 			}
+			return spendingDynamic
 		}
 	}
 
