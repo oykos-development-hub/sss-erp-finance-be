@@ -199,7 +199,7 @@ func (h *ExternalReallocationServiceImpl) AcceptOUExternalReallocation(ctx conte
 			return newErrors.Wrap(err, "repo external reallocation accept ou")
 		}
 
-		spendingDynamic, err := h.spendingDynamicRepo.FindAll(nil, nil, &input.BudgetID, &input.SourceOrganizationUnitID)
+		spendingDynamic, err := h.spendingDynamicRepo.FindAll(nil, nil, &reallocation.BudgetID, &reallocation.SourceOrganizationUnitID)
 
 		if err != nil {
 			return newErrors.Wrap(err, "repo spending dynamic get spending dynamic")
@@ -237,6 +237,14 @@ func (h *ExternalReallocationServiceImpl) AcceptOUExternalReallocation(ctx conte
 
 				if err != nil {
 					return newErrors.Wrap(err, "repo current budget update actual")
+				}
+
+				currentAmountValue := currentBudget.CurrentAmount.Sub(itemToInsert.Amount)
+
+				err = h.currentBudgetRepo.UpdateCurrentAmount(ctx, currentBudget.ID, currentAmountValue)
+
+				if err != nil {
+					return newErrors.Wrap(err, "repo current budget update current amount")
 				}
 
 				spendingDynamic = updateDynamicSub(currentBudget.ID, itemToInsert.Amount, spendingDynamic)
@@ -339,6 +347,14 @@ func (h *ExternalReallocationServiceImpl) AcceptSSSExternalReallocation(ctx cont
 					return newErrors.Wrap(err, "repo current budget update actual")
 				}
 
+				currentAmountValue := currentBudget.CurrentAmount.Add(item.Amount)
+
+				err = h.currentBudgetRepo.UpdateCurrentAmount(ctx, currentBudget.ID, currentAmountValue)
+
+				if err != nil {
+					return newErrors.Wrap(err, "repo current budget update current amount")
+				}
+
 				spendingDynamic = updateDynamicAdd(currentBudget.ID, item.Amount, spendingDynamic)
 			}
 		}
@@ -419,6 +435,14 @@ func (h *ExternalReallocationServiceImpl) RejectSSSExternalReallocation(ctx cont
 
 				if err != nil {
 					return newErrors.Wrap(err, "repo current budget update actual")
+				}
+
+				currentAmountValue := currentBudget.CurrentAmount.Sub(item.Amount)
+
+				err = h.currentBudgetRepo.UpdateCurrentAmount(ctx, currentBudget.ID, currentAmountValue)
+
+				if err != nil {
+					return newErrors.Wrap(err, "repo current budget update current amount")
 				}
 
 				spendingDynamic = updateDynamicAdd(currentBudget.ID, item.Amount, spendingDynamic)
