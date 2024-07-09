@@ -54,7 +54,8 @@ type Handlers struct {
 	ExternalReallocationHandler     ExternalReallocationHandler
 	ExternalReallocationItemHandler ExternalReallocationItemHandler
 	LogHandler                      LogHandler
-}
+	SpendingReleaseRequestHandler SpendingReleaseRequestHandler
+	}
 
 type InvoiceHandler interface {
 	CreateInvoice(w http.ResponseWriter, r *http.Request)
@@ -483,4 +484,12 @@ type LogHandler interface {
 	DeleteLog(w http.ResponseWriter, r *http.Request)
 	GetLogById(w http.ResponseWriter, r *http.Request)
 	GetLogList(w http.ResponseWriter, r *http.Request)
+}
+
+type SpendingReleaseRequestHandler interface {
+	CreateSpendingReleaseRequest(w http.ResponseWriter, r *http.Request)
+	UpdateSpendingReleaseRequest(w http.ResponseWriter, r *http.Request)
+	DeleteSpendingReleaseRequest(w http.ResponseWriter, r *http.Request)
+	GetSpendingReleaseRequestById(w http.ResponseWriter, r *http.Request)
+	GetSpendingReleaseRequestList(w http.ResponseWriter, r *http.Request)
 }

@@ -198,6 +198,10 @@ func initApplication() *celeritas.Celeritas {
 	LogService := services.NewLogServiceImpl(cel, models.Log)
 	LogHandler := handlers.NewLogHandler(cel, LogService)
 
+		
+	SpendingReleaseRequestService := services.NewSpendingReleaseRequestServiceImpl(cel, models.SpendingReleaseRequest)
+	SpendingReleaseRequestHandler := handlers.NewSpendingReleaseRequestHandler(cel, SpendingReleaseRequestService)
+
 	myHandlers := &handlers.Handlers{
 		InvoiceHandler:                  InvoiceHandler,
 		ArticleHandler:                  ArticleHandler,
@@ -250,6 +254,7 @@ func initApplication() *celeritas.Celeritas {
 		ExternalReallocationHandler:     ExternalReallocationHandler,
 		ExternalReallocationItemHandler: ExternalReallocationItemHandler,
 		LogHandler:                      LogHandler,
+		SpendingReleaseRequestHandler: SpendingReleaseRequestHandler,
 	}
 
 	myMiddleware := &middleware.Middleware{

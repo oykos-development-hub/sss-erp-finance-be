@@ -464,3 +464,12 @@ type LogService interface {
 	GetLog(id int) (*dto.LogResponseDTO, error)
 	GetLogList(filter dto.LogFilterDTO) ([]dto.LogResponseDTO, *uint64, error)
 }
+
+type SpendingReleaseRequestService interface {
+	CreateSpendingReleaseRequest(input dto.SpendingReleaseRequestDTO) (*dto.SpendingReleaseRequestResponseDTO, error)
+	UpdateSpendingReleaseRequest(id int, input dto.SpendingReleaseRequestDTO) (*dto.SpendingReleaseRequestResponseDTO, error)
+	DeleteSpendingReleaseRequest(id int) error
+	GetSpendingReleaseRequest(id int) (*dto.SpendingReleaseRequestResponseDTO, error)
+	GetSpendingReleaseRequestList(filter dto.SpendingReleaseRequestFilterDTO) ([]dto.SpendingReleaseRequestResponseDTO, *uint64, error)
+	AcceptSSSRequest(ctx context.Context, id int, fileID int) error
+}
