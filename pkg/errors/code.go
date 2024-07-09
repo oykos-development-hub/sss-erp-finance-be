@@ -12,6 +12,8 @@ const (
 	NotEnoughFundsCode             = 202
 
 	ErrUnauthorized = 401
+
+	ErrInternalServerError = 500
 )
 
 func httpStatusCode(code int) int {

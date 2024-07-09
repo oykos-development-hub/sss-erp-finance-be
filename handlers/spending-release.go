@@ -105,7 +105,7 @@ func (h *spendingreleaseHandlerImpl) DeleteSpendingRelease(w http.ResponseWriter
 
 	err = h.service.DeleteSpendingRelease(ctx, &input)
 	if err != nil {
-		_ = h.App.WriteErrorResponse(w, errors.InternalCode, err)
+		_ = h.App.WriteErrorResponse(w, errors.ErrInternalServerError, err)
 		return
 	}
 
