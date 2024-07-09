@@ -335,12 +335,13 @@ func routes(app *celeritas.Celeritas, middleware *middleware.Middleware, handler
 		rt.Get("/logs", handlers.LogHandler.GetLogList)
 		rt.Put("/logs/{id}", handlers.LogHandler.UpdateLog)
 		rt.Delete("/logs/{id}", handlers.LogHandler.DeleteLog)
-	
+
 		rt.Post("/spending-release-requests", handlers.SpendingReleaseRequestHandler.CreateSpendingReleaseRequest)
-rt.Get("/spending-release-requests/{id}", handlers.SpendingReleaseRequestHandler.GetSpendingReleaseRequestById)
-rt.Get("/spending-release-requests", handlers.SpendingReleaseRequestHandler.GetSpendingReleaseRequestList)
-rt.Put("/spending-release-requests/{id}", handlers.SpendingReleaseRequestHandler.UpdateSpendingReleaseRequest)
-rt.Delete("/spending-release-requests/{id}", handlers.SpendingReleaseRequestHandler.DeleteSpendingReleaseRequest)
+		rt.Get("/spending-release-requests/{id}", handlers.SpendingReleaseRequestHandler.GetSpendingReleaseRequestById)
+		rt.Get("/spending-release-requests", handlers.SpendingReleaseRequestHandler.GetSpendingReleaseRequestList)
+		rt.Put("/spending-release-requests/{id}", handlers.SpendingReleaseRequestHandler.UpdateSpendingReleaseRequest)
+		rt.Put("/accept-spending-release-request/{id}", handlers.SpendingReleaseRequestHandler.AcceptSSSRequest)
+		rt.Delete("/spending-release-requests/{id}", handlers.SpendingReleaseRequestHandler.DeleteSpendingReleaseRequest)
 	})
 
 	return app.Routes
