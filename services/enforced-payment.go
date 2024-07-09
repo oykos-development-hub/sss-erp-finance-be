@@ -23,9 +23,11 @@ type EnforcedPaymentServiceImpl struct {
 	invoicesRepo           data.Invoice
 	invoiceArticlesRepo    data.Article
 	additionalExpensesRepo data.AdditionalExpense
+	paymentOrderRepo       data.PaymentOrder
+	paymentOrderItemRepo   data.PaymentOrderItem
 }
 
-func NewEnforcedPaymentServiceImpl(app *celeritas.Celeritas, repo data.EnforcedPayment, currentBudget CurrentBudgetService, itemsRepo data.EnforcedPaymentItem, invoicesRepo data.Invoice, invoiceArticlesRepo data.Article, additionalExpensesRepo data.AdditionalExpense) EnforcedPaymentService {
+func NewEnforcedPaymentServiceImpl(app *celeritas.Celeritas, repo data.EnforcedPayment, currentBudget CurrentBudgetService, itemsRepo data.EnforcedPaymentItem, invoicesRepo data.Invoice, invoiceArticlesRepo data.Article, additionalExpensesRepo data.AdditionalExpense, paymentOrderItemRepo data.PaymentOrderItem, paymentOrderRepo data.PaymentOrder) EnforcedPaymentService {
 	return &EnforcedPaymentServiceImpl{
 		App:                    app,
 		repo:                   repo,
@@ -34,6 +36,8 @@ func NewEnforcedPaymentServiceImpl(app *celeritas.Celeritas, repo data.EnforcedP
 		invoicesRepo:           invoicesRepo,
 		invoiceArticlesRepo:    invoiceArticlesRepo,
 		additionalExpensesRepo: additionalExpensesRepo,
+		paymentOrderItemRepo:   paymentOrderItemRepo,
+		paymentOrderRepo:       paymentOrderRepo,
 	}
 }
 
@@ -178,51 +182,62 @@ func (h *EnforcedPaymentServiceImpl) ReturnEnforcedPayment(ctx context.Context, 
 	dataToInsert.ID = id
 
 	err := data.Upper.Tx(func(tx up.Session) error {
-		err := h.repo.ReturnEnforcedPayment(ctx, tx, *dataToInsert)
-		if err != nil {
-			return newErrors.Wrap(err, "repo enforced payment return enforced payment")
-		}
-
 		paymentOrder, err := h.GetEnforcedPayment(id)
 
 		if err != nil {
 			return newErrors.Wrap(err, "get enforced payment")
 		}
 
+		var totalAmount float64
+
 		for _, item := range paymentOrder.Items {
-			currentBudget, _, err := h.currentBudget.GetCurrentBudgetList(dto.CurrentBudgetFilterDTO{
-				UnitID:    &paymentOrder.OrganizationUnitID,
-				AccountID: &item.AccountID,
-			})
+			conditionAndExp := &up.AndExpr{}
+			conditionAndExp = up.And(conditionAndExp, &up.Cond{"invoice_id": item.InvoiceID})
+
+			items, _, err := h.paymentOrderItemRepo.GetAll(nil, nil, conditionAndExp, nil)
 
 			if err != nil {
-				return newErrors.Wrap(err, "repo current budget get all")
+				return newErrors.Wrap(err, "repo payment order item get all")
 			}
 
-			if len(currentBudget) > 0 {
-				amount := 0.0
+			for _, paidItem := range items {
+				paidPaymentOrder, err := h.paymentOrderRepo.Get(paidItem.PaymentOrderID)
 
-				if len(paymentOrder.Items) == 1 {
-					amount = *input.ReturnAmount
-				} else {
-					amount, err = h.getInvoiceAmount(*item.InvoiceID)
+				if err != nil {
+					return newErrors.Wrap(err, "repo payment order get")
+				}
+
+				if paidPaymentOrder.Status == nil || *paidPaymentOrder.Status != "Storniran" {
+					currentBudget, _, err := h.currentBudget.GetCurrentBudgetList(dto.CurrentBudgetFilterDTO{
+						UnitID:    &paymentOrder.OrganizationUnitID,
+						AccountID: &paidItem.AccountID,
+					})
 
 					if err != nil {
-						return newErrors.Wrap(err, "get invoice amount")
+						return newErrors.Wrap(err, "repo current budget get all")
+					}
+
+					if len(currentBudget) > 0 {
+						totalAmount += paidItem.Amount
+						currentAmount := currentBudget[0].Balance.Add(decimal.NewFromFloat32(float32(paidItem.Amount)))
+
+						err = h.currentBudget.UpdateBalance(ctx, tx, currentBudget[0].ID, currentAmount)
+						if err != nil {
+							return newErrors.Wrap(err, "repo current budget update balance")
+
+						}
+					} else {
+						return newErrors.Wrap(errors.ErrNotFound, "repo current budget get all")
 					}
 				}
-
-				currentAmount := currentBudget[0].Balance.Add(decimal.NewFromFloat32(float32(amount)))
-
-				err = h.currentBudget.UpdateBalance(ctx, tx, currentBudget[0].ID, currentAmount)
-				if err != nil {
-					return newErrors.Wrap(err, "repo current budget update balance")
-
-				}
-			} else {
-				return newErrors.Wrap(errors.ErrNotFound, "repo current budget get all")
 			}
+		}
 
+		dataToInsert.ReturnAmount = &totalAmount
+
+		err = h.repo.ReturnEnforcedPayment(ctx, tx, *dataToInsert)
+		if err != nil {
+			return newErrors.Wrap(err, "repo enforced payment return enforced payment")
 		}
 
 		return nil
@@ -409,6 +424,7 @@ func updateInvoiceStatusForEnforcedPayment(ctx context.Context, id int, tx up.Se
 	return nil
 }
 
+/*
 func (h *EnforcedPaymentServiceImpl) getInvoiceAmount(id int) (float64, error) {
 	invoice, err := h.invoicesRepo.Get(id)
 
@@ -451,3 +467,4 @@ func (h *EnforcedPaymentServiceImpl) getInvoiceAmount(id int) (float64, error) {
 
 	return amount, nil
 }
+*/

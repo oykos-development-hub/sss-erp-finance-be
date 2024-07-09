@@ -165,7 +165,7 @@ func initApplication() *celeritas.Celeritas {
 	PaymentOrderService := services.NewPaymentOrderServiceImpl(cel, CurrentBudgetService, models.PaymentOrder, models.PaymentOrderItem, models.Invoice, models.Article, models.AdditionalExpense, models.SalaryAdditionalExpense, models.Salary)
 	PaymentOrderHandler := handlers.NewPaymentOrderHandler(cel, PaymentOrderService)
 
-	EnforcedPaymentService := services.NewEnforcedPaymentServiceImpl(cel, models.EnforcedPayment, CurrentBudgetService, models.EnforcedPaymentItem, models.Invoice, models.Article, models.AdditionalExpense)
+	EnforcedPaymentService := services.NewEnforcedPaymentServiceImpl(cel, models.EnforcedPayment, CurrentBudgetService, models.EnforcedPaymentItem, models.Invoice, models.Article, models.AdditionalExpense, models.PaymentOrderItem, models.PaymentOrder)
 	EnforcedPaymentHandler := handlers.NewEnforcedPaymentHandler(cel, EnforcedPaymentService)
 
 	EnforcedPaymentItemService := services.NewEnforcedPaymentItemServiceImpl(cel, models.EnforcedPaymentItem)
