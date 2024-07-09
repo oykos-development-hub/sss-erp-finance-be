@@ -99,6 +99,18 @@ func (t *PaymentOrder) Get(id int) (*PaymentOrder, error) {
 	return &one, nil
 }
 
+func (t *PaymentOrder) GetByIdOfStatement(id int) (*PaymentOrder, error) {
+	var one PaymentOrder
+	collection := Upper.Collection(t.Table())
+
+	res := collection.Find(up.Cond{"id_of_statement": id})
+	err := res.One(&one)
+	if err != nil {
+		return nil, newErrors.Wrap(err, "upper one")
+	}
+	return &one, nil
+}
+
 // Update updates a record in the database, using upper
 func (t *PaymentOrder) Update(ctx context.Context, tx up.Session, m PaymentOrder) error {
 	m.UpdatedAt = time.Now()

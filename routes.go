@@ -232,6 +232,7 @@ func routes(app *celeritas.Celeritas, middleware *middleware.Middleware, handler
 
 		rt.Post("/payment-orders", handlers.PaymentOrderHandler.CreatePaymentOrder)
 		rt.Get("/payment-orders/{id}", handlers.PaymentOrderHandler.GetPaymentOrderById)
+		rt.Get("/payment-orders-id-of-statement/{id}", handlers.PaymentOrderHandler.GetPaymentOrderByIdOfStatement)
 		rt.Get("/payment-orders", handlers.PaymentOrderHandler.GetPaymentOrderList)
 		rt.Get("/get-all-obligations", handlers.PaymentOrderHandler.GetAllObligations)
 		rt.Put("/payment-orders/{id}", handlers.PaymentOrderHandler.UpdatePaymentOrder)

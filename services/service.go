@@ -326,6 +326,7 @@ type PaymentOrderService interface {
 	UpdatePaymentOrder(ctx context.Context, id int, input dto.PaymentOrderDTO) (*dto.PaymentOrderResponseDTO, error)
 	DeletePaymentOrder(ctx context.Context, id int) error
 	GetPaymentOrder(id int) (*dto.PaymentOrderResponseDTO, error)
+	GetPaymentOrderByIdOfStatement(id int) (*dto.PaymentOrderResponseDTO, error)
 	GetPaymentOrderList(filter dto.PaymentOrderFilterDTO) ([]dto.PaymentOrderResponseDTO, *uint64, error)
 	GetAllObligations(filter dto.GetObligationsFilterDTO) ([]dto.ObligationResponse, *uint64, error)
 	PayPaymentOrder(ctx context.Context, id int, input dto.PaymentOrderDTO) error

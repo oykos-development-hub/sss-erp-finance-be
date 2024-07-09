@@ -300,6 +300,95 @@ func (h *PaymentOrderServiceImpl) GetPaymentOrder(id int) (*dto.PaymentOrderResp
 	return &response, nil
 }
 
+func (h *PaymentOrderServiceImpl) GetPaymentOrderByIdOfStatement(id int) (*dto.PaymentOrderResponseDTO, error) {
+	paymentData, err := h.repo.GetByIdOfStatement(id)
+	if err != nil {
+		return nil, newErrors.Wrap(err, "repo payment order get")
+	}
+
+	response := dto.ToPaymentOrderResponseDTO(*paymentData)
+
+	conditionAndExp := &up.AndExpr{}
+	conditionAndExp = up.And(conditionAndExp, &up.Cond{"payment_order_id": id})
+	items, _, err := h.itemsRepo.GetAll(nil, nil, conditionAndExp, nil)
+
+	if err != nil {
+		return nil, newErrors.Wrap(err, "repo payment order item get all")
+	}
+
+	for _, item := range items {
+		builtItem := dto.PaymentOrderItemResponseDTO{
+			ID:                        item.ID,
+			PaymentOrderID:            item.PaymentOrderID,
+			InvoiceID:                 item.InvoiceID,
+			AdditionalExpenseID:       item.AdditionalExpenseID,
+			SalaryAdditionalExpenseID: item.SalaryAdditionalExpenseID,
+			AccountID:                 item.AccountID,
+			Amount:                    item.Amount,
+			CreatedAt:                 item.CreatedAt,
+			UpdatedAt:                 item.UpdatedAt,
+		}
+
+		if item.InvoiceID != nil {
+			builtItem.Type = data.TypeInvoice
+
+			item, err := h.invoiceRepo.Get(*item.InvoiceID)
+
+			if err != nil {
+				return nil, newErrors.Wrap(err, "repo invoice get")
+			}
+
+			if item.InvoiceNumber != "" {
+				builtItem.Title = item.InvoiceNumber
+			} else {
+				builtItem.Title = item.ProFormaInvoiceNumber
+			}
+
+		} else if item.AdditionalExpenseID != nil {
+
+			additionalItem, err := h.additionalExpensesRepo.Get(*item.AdditionalExpenseID)
+
+			if err != nil {
+				return nil, newErrors.Wrap(err, "repo additional expense get")
+			}
+
+			item, err := h.invoiceRepo.Get(additionalItem.InvoiceID)
+			if err != nil {
+				return nil, newErrors.Wrap(err, "repo invoice get")
+			}
+
+			builtItem.Type = item.Type
+
+			builtItem.Title = item.InvoiceNumber
+
+		} else if item.SalaryAdditionalExpenseID != nil {
+			additionalItem, err := h.salaryAdditionalExpensesRepo.Get(*item.SalaryAdditionalExpenseID)
+
+			if err != nil {
+				return nil, newErrors.Wrap(err, "repo salary additional expense get")
+			}
+
+			item, err := h.salariesRepo.Get(additionalItem.SalaryID)
+
+			if err != nil {
+				return nil, newErrors.Wrap(err, "repo salary get")
+			}
+
+			builtItem.Type = data.TypeSalary
+			builtItem.Title = "Zarada " + item.Month + " " + string(additionalItem.Title)
+
+		}
+
+		if len(items) == 1 {
+			builtItem.Amount = response.Amount
+		}
+
+		response.Items = append(response.Items, builtItem)
+	}
+
+	return &response, nil
+}
+
 func (h *PaymentOrderServiceImpl) GetPaymentOrderList(filter dto.PaymentOrderFilterDTO) ([]dto.PaymentOrderResponseDTO, *uint64, error) {
 	conditionAndExp := &up.AndExpr{}
 	var orders []interface{}

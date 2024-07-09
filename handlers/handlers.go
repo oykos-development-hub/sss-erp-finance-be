@@ -354,6 +354,7 @@ type PaymentOrderHandler interface {
 	CancelPaymentOrder(w http.ResponseWriter, r *http.Request)
 	DeletePaymentOrder(w http.ResponseWriter, r *http.Request)
 	GetPaymentOrderById(w http.ResponseWriter, r *http.Request)
+	GetPaymentOrderByIdOfStatement(w http.ResponseWriter, r *http.Request)
 	GetPaymentOrderList(w http.ResponseWriter, r *http.Request)
 	GetAllObligations(w http.ResponseWriter, r *http.Request)
 }

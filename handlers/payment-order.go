@@ -147,6 +147,19 @@ func (h *paymentorderHandlerImpl) GetPaymentOrderById(w http.ResponseWriter, r *
 	_ = h.App.WriteDataResponse(w, http.StatusOK, "", res)
 }
 
+func (h *paymentorderHandlerImpl) GetPaymentOrderByIdOfStatement(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.Atoi(chi.URLParam(r, "id"))
+
+	res, err := h.service.GetPaymentOrderByIdOfStatement(id)
+	if err != nil {
+		h.App.ErrorLog.Print(err)
+		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
+		return
+	}
+
+	_ = h.App.WriteDataResponse(w, http.StatusOK, "", res)
+}
+
 func (h *paymentorderHandlerImpl) GetPaymentOrderList(w http.ResponseWriter, r *http.Request) {
 	var filter dto.PaymentOrderFilterDTO
 
