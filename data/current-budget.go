@@ -184,6 +184,33 @@ func (t *CurrentBudget) UpdateBalanceWithTx(ctx context.Context, tx up.Session, 
 	return nil
 }
 
+func (t *CurrentBudget) UpdateActualWithTx(ctx context.Context, tx up.Session, currentBudgetID int, value decimal.Decimal) error {
+	userID, ok := contextutil.GetUserIDFromContext(ctx)
+	if !ok {
+		err := newErrors.New("user ID not found in context")
+		return newErrors.Wrap(err, "contextuitl get user id from context")
+	}
+
+	query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+	if _, err := tx.SQL().Exec(query); err != nil {
+		return newErrors.Wrap(err, "upper exec")
+	}
+
+	updateQuery := fmt.Sprintf("UPDATE %s SET actual = $1 WHERE id = $2", t.Table())
+
+	res, err := tx.SQL().Exec(updateQuery, value, currentBudgetID)
+	if err != nil {
+		return newErrors.Wrap(err, "upper tx")
+	}
+
+	rowsAffected, _ := res.RowsAffected()
+	if rowsAffected != 1 {
+		return newErrors.NewNotFoundError("upper no rows affected")
+	}
+
+	return nil
+}
+
 // Update updates a record in the database, using upper
 func (t *CurrentBudget) UpdateBalance(currentBudgetID int, balance decimal.Decimal) error {
 	updateQuery := fmt.Sprintf("UPDATE %s SET balance = $1 WHERE id = $2", t.Table())

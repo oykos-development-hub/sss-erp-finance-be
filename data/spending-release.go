@@ -196,8 +196,8 @@ func (t *SpendingRelease) Update(ctx context.Context, m SpendingRelease) error {
 }
 
 // Delete deletes a record from the database by id, using upper
-func (t *SpendingRelease) Delete(ctx context.Context, id int) error {
-	collection := Upper.Collection(t.Table())
+func (t *SpendingRelease) Delete(ctx context.Context, tx up.Session, id int) error {
+	collection := tx.Collection(t.Table())
 	res := collection.Find(id)
 	err := res.Delete()
 	if err != nil {

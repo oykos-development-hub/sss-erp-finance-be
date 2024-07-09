@@ -125,7 +125,7 @@ func (h *SpendingReleaseServiceImpl) DeleteSpendingRelease(ctx context.Context, 
 
 	err = data.Upper.Tx(func(tx up.Session) error {
 		for _, release := range releases {
-			err = h.repo.Delete(ctx, release.ID)
+			err = h.repo.Delete(ctx, tx, release.ID)
 			if err != nil {
 				return newErrors.Wrap(err, "repo delete")
 			}
@@ -139,12 +139,12 @@ func (h *SpendingReleaseServiceImpl) DeleteSpendingRelease(ctx context.Context, 
 				return newErrors.Wrap(errors.ErrInsufficientFunds, "balance")
 			}
 
-			err = h.repoCurrentBudget.UpdateBalance(currentBudget.ID, currentBudget.Balance.Sub(release.Value))
+			err = h.repoCurrentBudget.UpdateBalanceWithTx(ctx, tx, currentBudget.ID, currentBudget.Balance.Sub(release.Value))
 			if err != nil {
 				return newErrors.Wrap(err, "repo current budget update balance")
 			}
 
-			err = h.repoCurrentBudget.UpdateActual(ctx, currentBudget.ID, currentBudget.Actual.Add(release.Value))
+			err = h.repoCurrentBudget.UpdateActualWithTx(ctx, tx, currentBudget.ID, currentBudget.Actual.Add(release.Value))
 			if err != nil {
 				return newErrors.Wrap(err, "repo current budget update balance")
 			}
