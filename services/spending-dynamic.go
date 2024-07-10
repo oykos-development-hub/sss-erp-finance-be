@@ -43,7 +43,7 @@ func (h *SpendingDynamicServiceImpl) CreateSpendingDynamic(ctx context.Context, 
 			up.Cond{"budget_id": budgetID},
 			up.Cond{"unit_id": unitID},
 			up.Cond{"account_id": inputDTO.AccountID},
-		))
+			up.Cond{"type": 1}))
 		if err != nil {
 			return newErrors.Wrap(err, "repo current budget get by")
 		}
@@ -152,7 +152,7 @@ func (h *SpendingDynamicServiceImpl) GetSpendingDynamic(currentBudgetID, budgetI
 			return nil, newErrors.Wrap(err, "repo release get all")
 		}
 
-		currentAmount, err := h.GetCurrentAmount(*budgetID, *unitID, entry.AccountID)
+		currentAmount, err := h.GetCurrentAmount(*budgetID, *unitID, entry.AccountID, 1)
 		if err != nil {
 			return nil, newErrors.Wrap(err, "get current amount")
 		}
@@ -217,11 +217,12 @@ func (h *SpendingDynamicServiceImpl) GetSpendingDynamic(currentBudgetID, budgetI
 	return entriesListRes, nil
 }
 
-func (h *SpendingDynamicServiceImpl) GetActual(budgetID, unitID, accountID int) (decimal.Decimal, error) {
+func (h *SpendingDynamicServiceImpl) GetActual(budgetID, unitID, accountID, Type int) (decimal.Decimal, error) {
 	currentBudget, err := h.repoCurrentBudget.GetBy(*up.And(
 		up.Cond{"budget_id": budgetID},
 		up.Cond{"unit_id": unitID},
 		up.Cond{"account_id": accountID},
+		up.Cond{"type": Type},
 	))
 	if err != nil {
 		return decimal.Zero, newErrors.Wrap(err, "repo current budget get by")
@@ -230,11 +231,12 @@ func (h *SpendingDynamicServiceImpl) GetActual(budgetID, unitID, accountID int) 
 	return currentBudget.Actual, nil
 }
 
-func (h *SpendingDynamicServiceImpl) GetCurrentAmount(budgetID, unitID, accountID int) (decimal.Decimal, error) {
+func (h *SpendingDynamicServiceImpl) GetCurrentAmount(budgetID, unitID, accountID, Type int) (decimal.Decimal, error) {
 	currentBudget, err := h.repoCurrentBudget.GetBy(*up.And(
 		up.Cond{"budget_id": budgetID},
 		up.Cond{"unit_id": unitID},
 		up.Cond{"account_id": accountID},
+		up.Cond{"type": Type},
 	))
 	if err != nil {
 		return decimal.Zero, newErrors.Wrap(err, "repo current budget get by")

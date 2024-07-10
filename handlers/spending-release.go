@@ -74,7 +74,7 @@ func (h *spendingreleaseHandlerImpl) CreateSpendingRelease(w http.ResponseWriter
 			return
 		}
 		h.App.ErrorLog.Print(err)
-		_ = h.App.WriteErrorResponse(w, errors.InternalCode, err)
+		_ = h.App.WriteErrorResponse(w, errors.ErrInternalServerError, err)
 		return
 	}
 

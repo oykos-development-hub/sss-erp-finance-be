@@ -121,7 +121,7 @@ func (h *spendingdynamicHandlerImpl) GetActual(w http.ResponseWriter, r *http.Re
 	unitID, _ := strconv.Atoi(chi.URLParam(r, "unit_id"))
 	accountID, _ := strconv.Atoi(chi.URLParam(r, "account_id"))
 
-	res, err := h.service.GetActual(budgetID, unitID, accountID)
+	res, err := h.service.GetActual(budgetID, unitID, accountID, 1)
 	if err != nil {
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)

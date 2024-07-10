@@ -55,6 +55,7 @@ func (h *SpendingReleaseServiceImpl) CreateSpendingRelease(ctx context.Context, 
 			up.Cond{"budget_id": budgetID},
 			up.Cond{"unit_id": unitID},
 			up.Cond{"account_id": inputDTO.AccountID},
+			up.Cond{"type": 1},
 		))
 		if err != nil {
 			return nil, newErrors.Wrap(err, "repo current budget get by")
