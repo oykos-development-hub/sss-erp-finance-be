@@ -73,7 +73,7 @@ func (h *FilledFinancialBudgetServiceImpl) UpdateFilledFinancialBudget(ctx conte
 	return &response, nil
 }
 
-func (h *FilledFinancialBudgetServiceImpl) UpdateActualFilledFinancialBudget(ctx context.Context, id int, actual decimal.Decimal, requestID int) (*dto.FilledFinancialBudgetResponseDTO, error) {
+func (h *FilledFinancialBudgetServiceImpl) UpdateActualFilledFinancialBudget(ctx context.Context, id int, actual decimal.Decimal, Type int, requestID int) (*dto.FilledFinancialBudgetResponseDTO, error) {
 	/*err := h.repo.UpdateActual(ctx, id, actual)
 	if err != nil {
 		return nil, newErrors.Wrap(err, "repo filled financial budget update actual")
@@ -89,6 +89,12 @@ func (h *FilledFinancialBudgetServiceImpl) UpdateActualFilledFinancialBudget(ctx
 		return nil, newErrors.Wrap(err, "repo budget request get")
 	}
 
+	balance := decimal.Zero
+
+	if Type == 2 {
+		balance = actual
+	}
+
 	// TODO: check if there is only one insert. If we allow official to update actual, then we need to update it here too.
 	_, err = h.currentBudgetSVC.CreateCurrentBudget(ctx, dto.CurrentBudgetDTO{
 		BudgetID:      budgetRequest.BudgetID,
@@ -97,7 +103,8 @@ func (h *FilledFinancialBudgetServiceImpl) UpdateActualFilledFinancialBudget(ctx
 		InitialActual: actual,
 		Actual:        actual,
 		CurrentAmount: actual,
-		Balance:       decimal.Zero,
+		Balance:       balance,
+		Type:          Type,
 	})
 	if err != nil {
 		return nil, newErrors.Wrap(err, "repo current budget insert")

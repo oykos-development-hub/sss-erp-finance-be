@@ -84,9 +84,16 @@ func (h *PaymentOrderServiceImpl) CreatePaymentOrder(ctx context.Context, input 
 		}
 
 		for _, item := range input.Items {
+			Type := 1
+
+			if input.SourceOfFunding == "Donacija" {
+				Type = 2
+			}
+
 			currentBudget, _, err := h.currentBudgetService.GetCurrentBudgetList(dto.CurrentBudgetFilterDTO{
 				UnitID:    &input.OrganizationUnitID,
 				AccountID: &item.AccountID,
+				Type:      &Type,
 			})
 
 			if err != nil {
@@ -159,9 +166,16 @@ func (h *PaymentOrderServiceImpl) DeletePaymentOrder(ctx context.Context, id int
 	}
 
 	for _, item := range input.Items {
+
+		Type := 1
+
+		if input.SourceOfFunding == "Donacija" {
+			Type = 2
+		}
 		currentBudget, _, err := h.currentBudgetService.GetCurrentBudgetList(dto.CurrentBudgetFilterDTO{
 			UnitID:    &input.OrganizationUnitID,
 			AccountID: &item.AccountID,
+			Type:      &Type,
 		})
 
 		if err != nil {
@@ -576,9 +590,15 @@ func (h *PaymentOrderServiceImpl) CancelPaymentOrder(ctx context.Context, id int
 		}
 
 		for _, item := range input.Items {
+			Type := 1
+
+			if input.SourceOfFunding == "Donacija" {
+				Type = 2
+			}
 			currentBudget, _, err := h.currentBudgetService.GetCurrentBudgetList(dto.CurrentBudgetFilterDTO{
 				UnitID:    &input.OrganizationUnitID,
 				AccountID: &item.AccountID,
+				Type:      &Type,
 			})
 
 			if err != nil {

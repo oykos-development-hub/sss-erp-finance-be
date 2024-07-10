@@ -141,7 +141,7 @@ func (h *filledfinancialbudgetHandlerImpl) UpdateActualFilledFinancialBudget(w h
 	ctx := context.Background()
 	ctx = contextutil.SetUserIDInContext(ctx, userID)
 
-	res, err := h.service.UpdateActualFilledFinancialBudget(ctx, id, input.Actual, requestID)
+	res, err := h.service.UpdateActualFilledFinancialBudget(ctx, id, input.Actual, input.Type, requestID)
 	if err != nil {
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)

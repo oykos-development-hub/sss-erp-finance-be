@@ -18,6 +18,7 @@ type FilledFinancialBudgetDTO struct {
 
 type FilledActualFinancialBudgetDTO struct {
 	Actual decimal.Decimal `json:"actual" validate:"required"`
+	Type   int             `json:"type"`
 }
 
 type FilledFinancialBudgetResponseDTO struct {

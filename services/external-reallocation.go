@@ -221,6 +221,7 @@ func (h *ExternalReallocationServiceImpl) AcceptOUExternalReallocation(ctx conte
 					up.Cond{"budget_id": reallocation.BudgetID},
 					up.Cond{"unit_id": reallocation.SourceOrganizationUnitID},
 					up.Cond{"account_id": itemToInsert.SourceAccountID},
+					up.Cond{"type": 1}, // preusmejrenja se rade samo kod tekuceg budzeta
 				))
 
 				if err != nil {
@@ -333,6 +334,7 @@ func (h *ExternalReallocationServiceImpl) AcceptSSSExternalReallocation(ctx cont
 					up.Cond{"budget_id": reallocation.BudgetID},
 					up.Cond{"unit_id": reallocation.DestinationOrganizationUnitID},
 					up.Cond{"account_id": item.DestinationAccountID},
+					up.Cond{"type": 1}, // preusmejrenja se rade samo kod tekuceg budzeta
 				))
 
 				if err != nil {
@@ -423,6 +425,7 @@ func (h *ExternalReallocationServiceImpl) RejectSSSExternalReallocation(ctx cont
 					up.Cond{"budget_id": reallocation.BudgetID},
 					up.Cond{"unit_id": reallocation.SourceOrganizationUnitID},
 					up.Cond{"account_id": item.SourceAccountID},
+					up.Cond{"type": 1}, // preusmejrenja se rade samo kod tekuceg budzeta
 				))
 
 				if err != nil {

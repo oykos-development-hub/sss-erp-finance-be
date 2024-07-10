@@ -15,6 +15,7 @@ type CurrentBudgetDTO struct {
 	CurrentAmount decimal.Decimal `json:"current_amount"`
 	Actual        decimal.Decimal `json:"actual"`
 	Balance       decimal.Decimal `json:"balance"`
+	Type          int             `json:"type"`
 }
 
 type CurrentBudgetResponseDTO struct {
@@ -26,6 +27,7 @@ type CurrentBudgetResponseDTO struct {
 	Actual        decimal.Decimal `json:"actual"`
 	CurrentAmount decimal.Decimal `json:"current_amount"`
 	Balance       decimal.Decimal `json:"balance"`
+	Type          int             `json:"type"`
 	CreatedAt     time.Time       `json:"created_at,omitempty"`
 }
 
@@ -34,6 +36,7 @@ type CurrentBudgetFilterDTO struct {
 	Size        *int    `json:"size"`
 	SortByTitle *string `json:"sort_by_title"`
 	UnitID      *int    `json:"unit_id"`
+	Type        *int    `json:"type"`
 	AccountID   *int    `json:"account_id"`
 }
 
@@ -46,6 +49,7 @@ func (dto CurrentBudgetDTO) ToCurrentBudget() *data.CurrentBudget {
 		CurrentAmount: dto.CurrentAmount,
 		Actual:        dto.Actual,
 		Balance:       dto.Balance,
+		Type:          dto.Type,
 	}
 }
 
@@ -59,6 +63,7 @@ func ToCurrentBudgetResponseDTO(data *data.CurrentBudget) CurrentBudgetResponseD
 		CurrentAmount: data.CurrentAmount,
 		Actual:        data.Actual,
 		Balance:       data.Balance,
+		Type:          data.Type,
 		CreatedAt:     data.CreatedAt,
 	}
 }

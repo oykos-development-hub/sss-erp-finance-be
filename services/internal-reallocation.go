@@ -65,6 +65,7 @@ func (h *InternalReallocationServiceImpl) CreateInternalReallocation(ctx context
 					up.Cond{"budget_id": dataToInsert.BudgetID},
 					up.Cond{"unit_id": dataToInsert.OrganizationUnitID},
 					up.Cond{"account_id": itemToInsert.SourceAccountID},
+					up.Cond{"type": 1}, // preusmejrenja se rade samo kod tekuceg budzeta
 				))
 
 				if err != nil {
@@ -96,6 +97,7 @@ func (h *InternalReallocationServiceImpl) CreateInternalReallocation(ctx context
 					up.Cond{"budget_id": dataToInsert.BudgetID},
 					up.Cond{"unit_id": dataToInsert.OrganizationUnitID},
 					up.Cond{"account_id": itemToInsert.DestinationAccountID},
+					up.Cond{"type": 1}, // preusmejrenja se rade samo kod tekuceg budzeta
 				))
 
 				if err != nil {
@@ -184,6 +186,7 @@ func (h *InternalReallocationServiceImpl) DeleteInternalReallocation(ctx context
 				up.Cond{"budget_id": reallocation.BudgetID},
 				up.Cond{"unit_id": reallocation.OrganizationUnitID},
 				up.Cond{"account_id": item.DestinationAccountID},
+				up.Cond{"type": 1}, // preusmejrenja se rade samo kod tekuceg budzeta
 			))
 
 			if err != nil {
@@ -211,6 +214,7 @@ func (h *InternalReallocationServiceImpl) DeleteInternalReallocation(ctx context
 				up.Cond{"budget_id": reallocation.BudgetID},
 				up.Cond{"unit_id": reallocation.OrganizationUnitID},
 				up.Cond{"account_id": item.SourceAccountID},
+				up.Cond{"type": 1}, // preusmejrenja se rade samo kod tekuceg budzeta
 			))
 
 			if err != nil {
@@ -242,6 +246,7 @@ func (h *InternalReallocationServiceImpl) DeleteInternalReallocation(ctx context
 				up.Cond{"budget_id": reallocation.BudgetID},
 				up.Cond{"unit_id": reallocation.OrganizationUnitID},
 				up.Cond{"account_id": item.DestinationAccountID},
+				up.Cond{"type": 1}, // preusmejrenja se rade samo kod tekuceg budzeta
 			))
 
 			if err != nil {

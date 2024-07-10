@@ -59,6 +59,7 @@ func (h *CurrentBudgetServiceImpl) UpdateActual(ctx context.Context, unitID, bud
 		up.Cond{"budget_id": budgetID},
 		up.Cond{"unit_id": unitID},
 		up.Cond{"account_id": accountID},
+		up.Cond{"type": 1}, //actual se moze azurirati samo kod tekuceg budzeta, ne i kod donacija
 	))
 	if err != nil {
 		return nil, newErrors.Wrap(err, "repo current budget get by")
@@ -104,6 +105,10 @@ func (h *CurrentBudgetServiceImpl) GetCurrentBudgetList(filter dto.CurrentBudget
 
 	if filter.UnitID != nil {
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"unit_id": *filter.UnitID})
+	}
+
+	if filter.Type != nil {
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"type": *filter.Type})
 	}
 
 	if filter.SortByTitle != nil {
