@@ -43,6 +43,7 @@ func (h *spendingreleaseHandlerImpl) CreateSpendingRelease(w http.ResponseWriter
 
 	validator := h.App.Validator().ValidateStruct(&input)
 	if !validator.Valid() {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponseWithData(w, errors.BadRequestCode, errors.NewBadRequestError("input validation"), validator.Errors)
 		return
 	}
@@ -52,6 +53,7 @@ func (h *spendingreleaseHandlerImpl) CreateSpendingRelease(w http.ResponseWriter
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.ErrUnauthorized, err)
 		return
 	}
@@ -62,13 +64,16 @@ func (h *spendingreleaseHandlerImpl) CreateSpendingRelease(w http.ResponseWriter
 	res, err := h.service.CreateSpendingRelease(ctx, budgetID, unitID, input)
 	if err != nil {
 		if errors.IsErr(err, errors.BadRequestCode) {
+			h.App.ErrorLog.Print(err)
 			_ = h.App.WriteErrorResponse(w, errors.BadRequestCode, err)
 			return
 		}
 		if errors.IsErr(err, errors.NotFoundCode) {
+			h.App.ErrorLog.Print(err)
 			_ = h.App.WriteErrorResponse(w, errors.NotFoundCode, err)
 			return
 		}
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.InternalCode, err)
 		return
 	}
