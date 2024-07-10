@@ -15,15 +15,17 @@ import (
 )
 
 type finePaymentHandlerImpl struct {
-	App     *celeritas.Celeritas
-	service services.FinePaymentService
+	App             *celeritas.Celeritas
+	service         services.FinePaymentService
+	errorLogService services.ErrorLogService
 }
 
 // NewFinePaymentHandler is a factory function that returns a new instance of FinePaymentHandler
-func NewFinePaymentHandler(app *celeritas.Celeritas, finePaymentService services.FinePaymentService) FinePaymentHandler {
+func NewFinePaymentHandler(app *celeritas.Celeritas, finePaymentService services.FinePaymentService, errorLogService services.ErrorLogService) FinePaymentHandler {
 	return &finePaymentHandlerImpl{
-		App:     app,
-		service: finePaymentService,
+		App:             app,
+		service:         finePaymentService,
+		errorLogService: errorLogService,
 	}
 }
 
@@ -32,6 +34,7 @@ func (h *finePaymentHandlerImpl) CreateFinePayment(w http.ResponseWriter, r *htt
 	var input dto.FinePaymentDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -49,6 +52,7 @@ func (h *finePaymentHandlerImpl) CreateFinePayment(w http.ResponseWriter, r *htt
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -59,6 +63,7 @@ func (h *finePaymentHandlerImpl) CreateFinePayment(w http.ResponseWriter, r *htt
 
 	res, err := h.service.CreateFinePayment(ctx, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -76,6 +81,7 @@ func (h *finePaymentHandlerImpl) DeleteFinePayment(w http.ResponseWriter, r *htt
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -86,6 +92,7 @@ func (h *finePaymentHandlerImpl) DeleteFinePayment(w http.ResponseWriter, r *htt
 
 	err = h.service.DeleteFinePayment(ctx, id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -98,6 +105,7 @@ func (h *finePaymentHandlerImpl) DeleteFinePayment(w http.ResponseWriter, r *htt
 func (h *finePaymentHandlerImpl) UpdateFinePayment(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -106,6 +114,7 @@ func (h *finePaymentHandlerImpl) UpdateFinePayment(w http.ResponseWriter, r *htt
 	var input dto.FinePaymentDTO
 	err = h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -123,6 +132,7 @@ func (h *finePaymentHandlerImpl) UpdateFinePayment(w http.ResponseWriter, r *htt
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -133,6 +143,7 @@ func (h *finePaymentHandlerImpl) UpdateFinePayment(w http.ResponseWriter, r *htt
 
 	res, err := h.service.UpdateFinePayment(ctx, id, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -147,6 +158,7 @@ func (h *finePaymentHandlerImpl) GetFinePaymentById(w http.ResponseWriter, r *ht
 
 	res, err := h.service.GetFinePayment(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -170,6 +182,7 @@ func (h *finePaymentHandlerImpl) GetFinePaymentList(w http.ResponseWriter, r *ht
 
 	res, total, err := h.service.GetFinePaymentList(filter)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return

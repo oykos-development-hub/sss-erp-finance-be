@@ -15,15 +15,17 @@ import (
 )
 
 type propbenconfPaymentHandlerImpl struct {
-	App     *celeritas.Celeritas
-	service services.PropBenConfPaymentService
+	App             *celeritas.Celeritas
+	service         services.PropBenConfPaymentService
+	errorLogService services.ErrorLogService
 }
 
 // NewPropBenConfPaymentHandler is a factory function that returns a new instance of PropBenConfPaymentHandler
-func NewPropBenConfPaymentHandler(app *celeritas.Celeritas, propbenconfPaymentService services.PropBenConfPaymentService) PropBenConfPaymentHandler {
+func NewPropBenConfPaymentHandler(app *celeritas.Celeritas, propbenconfPaymentService services.PropBenConfPaymentService, errorLogService services.ErrorLogService) PropBenConfPaymentHandler {
 	return &propbenconfPaymentHandlerImpl{
-		App:     app,
-		service: propbenconfPaymentService,
+		App:             app,
+		service:         propbenconfPaymentService,
+		errorLogService: errorLogService,
 	}
 }
 
@@ -32,6 +34,7 @@ func (h *propbenconfPaymentHandlerImpl) CreatePropBenConfPayment(w http.Response
 	var input dto.PropBenConfPaymentDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -49,6 +52,7 @@ func (h *propbenconfPaymentHandlerImpl) CreatePropBenConfPayment(w http.Response
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -59,6 +63,7 @@ func (h *propbenconfPaymentHandlerImpl) CreatePropBenConfPayment(w http.Response
 
 	res, err := h.service.CreatePropBenConfPayment(ctx, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -76,6 +81,7 @@ func (h *propbenconfPaymentHandlerImpl) DeletePropBenConfPayment(w http.Response
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -86,6 +92,7 @@ func (h *propbenconfPaymentHandlerImpl) DeletePropBenConfPayment(w http.Response
 
 	err = h.service.DeletePropBenConfPayment(ctx, id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -98,6 +105,7 @@ func (h *propbenconfPaymentHandlerImpl) DeletePropBenConfPayment(w http.Response
 func (h *propbenconfPaymentHandlerImpl) UpdatePropBenConfPayment(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -106,6 +114,7 @@ func (h *propbenconfPaymentHandlerImpl) UpdatePropBenConfPayment(w http.Response
 	var input dto.PropBenConfPaymentDTO
 	err = h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -123,6 +132,7 @@ func (h *propbenconfPaymentHandlerImpl) UpdatePropBenConfPayment(w http.Response
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -133,6 +143,7 @@ func (h *propbenconfPaymentHandlerImpl) UpdatePropBenConfPayment(w http.Response
 
 	res, err := h.service.UpdatePropBenConfPayment(ctx, id, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -147,6 +158,7 @@ func (h *propbenconfPaymentHandlerImpl) GetPropBenConfPaymentById(w http.Respons
 
 	res, err := h.service.GetPropBenConfPayment(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -170,6 +182,7 @@ func (h *propbenconfPaymentHandlerImpl) GetPropBenConfPaymentList(w http.Respons
 
 	res, total, err := h.service.GetPropBenConfPaymentList(filter)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return

@@ -16,15 +16,17 @@ import (
 
 // FixedDepositItemHandler is a concrete type that implements FixedDepositItemHandler
 type fixeddeposititemHandlerImpl struct {
-	App     *celeritas.Celeritas
-	service services.FixedDepositItemService
+	App             *celeritas.Celeritas
+	service         services.FixedDepositItemService
+	errorLogService services.ErrorLogService
 }
 
 // NewFixedDepositItemHandler initializes a new FixedDepositItemHandler with its dependencies
-func NewFixedDepositItemHandler(app *celeritas.Celeritas, fixeddeposititemService services.FixedDepositItemService) FixedDepositItemHandler {
+func NewFixedDepositItemHandler(app *celeritas.Celeritas, fixeddeposititemService services.FixedDepositItemService, errorLogService services.ErrorLogService) FixedDepositItemHandler {
 	return &fixeddeposititemHandlerImpl{
-		App:     app,
-		service: fixeddeposititemService,
+		App:             app,
+		service:         fixeddeposititemService,
+		errorLogService: errorLogService,
 	}
 }
 
@@ -32,6 +34,7 @@ func (h *fixeddeposititemHandlerImpl) CreateFixedDepositItem(w http.ResponseWrit
 	var input dto.FixedDepositItemDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -49,6 +52,7 @@ func (h *fixeddeposititemHandlerImpl) CreateFixedDepositItem(w http.ResponseWrit
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -59,6 +63,7 @@ func (h *fixeddeposititemHandlerImpl) CreateFixedDepositItem(w http.ResponseWrit
 
 	res, err := h.service.CreateFixedDepositItem(ctx, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -73,6 +78,7 @@ func (h *fixeddeposititemHandlerImpl) UpdateFixedDepositItem(w http.ResponseWrit
 	var input dto.FixedDepositItemDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -90,6 +96,7 @@ func (h *fixeddeposititemHandlerImpl) UpdateFixedDepositItem(w http.ResponseWrit
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -100,6 +107,7 @@ func (h *fixeddeposititemHandlerImpl) UpdateFixedDepositItem(w http.ResponseWrit
 
 	res, err := h.service.UpdateFixedDepositItem(ctx, id, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -116,6 +124,7 @@ func (h *fixeddeposititemHandlerImpl) DeleteFixedDepositItem(w http.ResponseWrit
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -126,6 +135,7 @@ func (h *fixeddeposititemHandlerImpl) DeleteFixedDepositItem(w http.ResponseWrit
 
 	err = h.service.DeleteFixedDepositItem(ctx, id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -139,6 +149,7 @@ func (h *fixeddeposititemHandlerImpl) GetFixedDepositItemById(w http.ResponseWri
 
 	res, err := h.service.GetFixedDepositItem(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -161,6 +172,7 @@ func (h *fixeddeposititemHandlerImpl) GetFixedDepositItemList(w http.ResponseWri
 
 	res, total, err := h.service.GetFixedDepositItemList(filter)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return

@@ -14,15 +14,17 @@ import (
 
 // AccountingEntryItemHandler is a concrete type that implements AccountingEntryItemHandler
 type accountingentryitemHandlerImpl struct {
-	App     *celeritas.Celeritas
-	service services.AccountingEntryItemService
+	App             *celeritas.Celeritas
+	service         services.AccountingEntryItemService
+	errorLogService services.ErrorLogService
 }
 
 // NewAccountingEntryItemHandler initializes a new AccountingEntryItemHandler with its dependencies
-func NewAccountingEntryItemHandler(app *celeritas.Celeritas, accountingentryitemService services.AccountingEntryItemService) AccountingEntryItemHandler {
+func NewAccountingEntryItemHandler(app *celeritas.Celeritas, accountingentryitemService services.AccountingEntryItemService, errorLogService services.ErrorLogService) AccountingEntryItemHandler {
 	return &accountingentryitemHandlerImpl{
-		App:     app,
-		service: accountingentryitemService,
+		App:             app,
+		service:         accountingentryitemService,
+		errorLogService: errorLogService,
 	}
 }
 
@@ -30,6 +32,7 @@ func (h *accountingentryitemHandlerImpl) CreateAccountingEntryItem(w http.Respon
 	var input dto.AccountingEntryItemDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -37,13 +40,13 @@ func (h *accountingentryitemHandlerImpl) CreateAccountingEntryItem(w http.Respon
 
 	validator := h.App.Validator().ValidateStruct(&input)
 	if !validator.Valid() {
-		h.App.ErrorLog.Print(validator.Errors)
 		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
 		return
 	}
 
 	res, err := h.service.CreateAccountingEntryItem(input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -58,6 +61,7 @@ func (h *accountingentryitemHandlerImpl) UpdateAccountingEntryItem(w http.Respon
 	var input dto.AccountingEntryItemDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -72,6 +76,7 @@ func (h *accountingentryitemHandlerImpl) UpdateAccountingEntryItem(w http.Respon
 
 	res, err := h.service.UpdateAccountingEntryItem(id, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -85,6 +90,7 @@ func (h *accountingentryitemHandlerImpl) DeleteAccountingEntryItem(w http.Respon
 
 	err := h.service.DeleteAccountingEntryItem(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -98,6 +104,7 @@ func (h *accountingentryitemHandlerImpl) GetAccountingEntryItemById(w http.Respo
 
 	res, err := h.service.GetAccountingEntryItem(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -120,6 +127,7 @@ func (h *accountingentryitemHandlerImpl) GetAccountingEntryItemList(w http.Respo
 
 	res, total, err := h.service.GetAccountingEntryItemList(filter)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return

@@ -14,15 +14,17 @@ import (
 
 // EnforcedPaymentItemHandler is a concrete type that implements EnforcedPaymentItemHandler
 type enforcedpaymentitemHandlerImpl struct {
-	App     *celeritas.Celeritas
-	service services.EnforcedPaymentItemService
+	App             *celeritas.Celeritas
+	service         services.EnforcedPaymentItemService
+	errorLogService services.ErrorLogService
 }
 
 // NewEnforcedPaymentItemHandler initializes a new EnforcedPaymentItemHandler with its dependencies
-func NewEnforcedPaymentItemHandler(app *celeritas.Celeritas, enforcedpaymentitemService services.EnforcedPaymentItemService) EnforcedPaymentItemHandler {
+func NewEnforcedPaymentItemHandler(app *celeritas.Celeritas, enforcedpaymentitemService services.EnforcedPaymentItemService, errorLogService services.ErrorLogService) EnforcedPaymentItemHandler {
 	return &enforcedpaymentitemHandlerImpl{
-		App:     app,
-		service: enforcedpaymentitemService,
+		App:             app,
+		service:         enforcedpaymentitemService,
+		errorLogService: errorLogService,
 	}
 }
 
@@ -30,6 +32,7 @@ func (h *enforcedpaymentitemHandlerImpl) CreateEnforcedPaymentItem(w http.Respon
 	var input dto.EnforcedPaymentItemDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -44,6 +47,7 @@ func (h *enforcedpaymentitemHandlerImpl) CreateEnforcedPaymentItem(w http.Respon
 
 	res, err := h.service.CreateEnforcedPaymentItem(input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -58,6 +62,7 @@ func (h *enforcedpaymentitemHandlerImpl) UpdateEnforcedPaymentItem(w http.Respon
 	var input dto.EnforcedPaymentItemDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -72,6 +77,7 @@ func (h *enforcedpaymentitemHandlerImpl) UpdateEnforcedPaymentItem(w http.Respon
 
 	res, err := h.service.UpdateEnforcedPaymentItem(id, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -85,6 +91,7 @@ func (h *enforcedpaymentitemHandlerImpl) DeleteEnforcedPaymentItem(w http.Respon
 
 	err := h.service.DeleteEnforcedPaymentItem(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -98,6 +105,7 @@ func (h *enforcedpaymentitemHandlerImpl) GetEnforcedPaymentItemById(w http.Respo
 
 	res, err := h.service.GetEnforcedPaymentItem(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -120,6 +128,7 @@ func (h *enforcedpaymentitemHandlerImpl) GetEnforcedPaymentItemList(w http.Respo
 
 	res, total, err := h.service.GetEnforcedPaymentItemList(filter)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return

@@ -14,15 +14,17 @@ import (
 
 // ExternalReallocationItemHandler is a concrete type that implements ExternalReallocationItemHandler
 type externalreallocationitemHandlerImpl struct {
-	App     *celeritas.Celeritas
-	service services.ExternalReallocationItemService
+	App             *celeritas.Celeritas
+	service         services.ExternalReallocationItemService
+	errorLogService services.ErrorLogService
 }
 
 // NewExternalReallocationItemHandler initializes a new ExternalReallocationItemHandler with its dependencies
-func NewExternalReallocationItemHandler(app *celeritas.Celeritas, externalreallocationitemService services.ExternalReallocationItemService) ExternalReallocationItemHandler {
+func NewExternalReallocationItemHandler(app *celeritas.Celeritas, externalreallocationitemService services.ExternalReallocationItemService, errorLogService services.ErrorLogService) ExternalReallocationItemHandler {
 	return &externalreallocationitemHandlerImpl{
-		App:     app,
-		service: externalreallocationitemService,
+		App:             app,
+		service:         externalreallocationitemService,
+		errorLogService: errorLogService,
 	}
 }
 
@@ -30,6 +32,7 @@ func (h *externalreallocationitemHandlerImpl) CreateExternalReallocationItem(w h
 	var input dto.ExternalReallocationItemDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -44,6 +47,7 @@ func (h *externalreallocationitemHandlerImpl) CreateExternalReallocationItem(w h
 
 	res, err := h.service.CreateExternalReallocationItem(input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -57,6 +61,7 @@ func (h *externalreallocationitemHandlerImpl) DeleteExternalReallocationItem(w h
 
 	err := h.service.DeleteExternalReallocationItem(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -70,6 +75,7 @@ func (h *externalreallocationitemHandlerImpl) GetExternalReallocationItemById(w 
 
 	res, err := h.service.GetExternalReallocationItem(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -92,6 +98,7 @@ func (h *externalreallocationitemHandlerImpl) GetExternalReallocationItemList(w 
 
 	res, total, err := h.service.GetExternalReallocationItemList(filter)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return

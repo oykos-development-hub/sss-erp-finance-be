@@ -15,15 +15,17 @@ import (
 )
 
 type fineHandlerImpl struct {
-	App     *celeritas.Celeritas
-	service services.FineService
+	App             *celeritas.Celeritas
+	service         services.FineService
+	errorLogService services.ErrorLogService
 }
 
 // NewFineHandler is a factory function that returns a new instance of FineHandler
-func NewFineHandler(app *celeritas.Celeritas, fineService services.FineService) FineHandler {
+func NewFineHandler(app *celeritas.Celeritas, fineService services.FineService, errorLogService services.ErrorLogService) FineHandler {
 	return &fineHandlerImpl{
-		App:     app,
-		service: fineService,
+		App:             app,
+		service:         fineService,
+		errorLogService: errorLogService,
 	}
 }
 
@@ -32,6 +34,7 @@ func (h *fineHandlerImpl) CreateFine(w http.ResponseWriter, r *http.Request) {
 	var input dto.FineDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -49,6 +52,7 @@ func (h *fineHandlerImpl) CreateFine(w http.ResponseWriter, r *http.Request) {
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -59,6 +63,7 @@ func (h *fineHandlerImpl) CreateFine(w http.ResponseWriter, r *http.Request) {
 
 	res, err := h.service.CreateFine(ctx, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -73,6 +78,7 @@ func (h *fineHandlerImpl) GetFineById(w http.ResponseWriter, r *http.Request) {
 
 	res, err := h.service.GetFine(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -88,6 +94,7 @@ func (h *fineHandlerImpl) UpdateFine(w http.ResponseWriter, r *http.Request) {
 	var input dto.FineDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -105,6 +112,7 @@ func (h *fineHandlerImpl) UpdateFine(w http.ResponseWriter, r *http.Request) {
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -115,6 +123,7 @@ func (h *fineHandlerImpl) UpdateFine(w http.ResponseWriter, r *http.Request) {
 
 	res, err := h.service.UpdateFine(ctx, id, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -132,6 +141,7 @@ func (h *fineHandlerImpl) DeleteFine(w http.ResponseWriter, r *http.Request) {
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -142,6 +152,7 @@ func (h *fineHandlerImpl) DeleteFine(w http.ResponseWriter, r *http.Request) {
 
 	err = h.service.DeleteFine(ctx, id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -165,6 +176,7 @@ func (h *fineHandlerImpl) GetFineList(w http.ResponseWriter, r *http.Request) {
 
 	res, total, err := h.service.GetFineList(filter)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return

@@ -14,15 +14,17 @@ import (
 
 // InternalReallocationItemHandler is a concrete type that implements InternalReallocationItemHandler
 type internalreallocationitemHandlerImpl struct {
-	App     *celeritas.Celeritas
-	service services.InternalReallocationItemService
+	App             *celeritas.Celeritas
+	service         services.InternalReallocationItemService
+	errorLogService services.ErrorLogService
 }
 
 // NewInternalReallocationItemHandler initializes a new InternalReallocationItemHandler with its dependencies
-func NewInternalReallocationItemHandler(app *celeritas.Celeritas, internalreallocationitemService services.InternalReallocationItemService) InternalReallocationItemHandler {
+func NewInternalReallocationItemHandler(app *celeritas.Celeritas, internalreallocationitemService services.InternalReallocationItemService, errorLogService services.ErrorLogService) InternalReallocationItemHandler {
 	return &internalreallocationitemHandlerImpl{
-		App:     app,
-		service: internalreallocationitemService,
+		App:             app,
+		service:         internalreallocationitemService,
+		errorLogService: errorLogService,
 	}
 }
 
@@ -30,6 +32,7 @@ func (h *internalreallocationitemHandlerImpl) CreateInternalReallocationItem(w h
 	var input dto.InternalReallocationItemDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -44,6 +47,7 @@ func (h *internalreallocationitemHandlerImpl) CreateInternalReallocationItem(w h
 
 	res, err := h.service.CreateInternalReallocationItem(input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -57,6 +61,7 @@ func (h *internalreallocationitemHandlerImpl) DeleteInternalReallocationItem(w h
 
 	err := h.service.DeleteInternalReallocationItem(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -70,6 +75,7 @@ func (h *internalreallocationitemHandlerImpl) GetInternalReallocationItemById(w 
 
 	res, err := h.service.GetInternalReallocationItem(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -92,6 +98,7 @@ func (h *internalreallocationitemHandlerImpl) GetInternalReallocationItemList(w 
 
 	res, total, err := h.service.GetInternalReallocationItemList(filter)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return

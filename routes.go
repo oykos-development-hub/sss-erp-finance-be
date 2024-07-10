@@ -342,6 +342,10 @@ func routes(app *celeritas.Celeritas, middleware *middleware.Middleware, handler
 		rt.Put("/spending-release-requests/{id}", handlers.SpendingReleaseRequestHandler.UpdateSpendingReleaseRequest)
 		rt.Put("/accept-spending-release-request/{id}", handlers.SpendingReleaseRequestHandler.AcceptSSSRequest)
 		rt.Delete("/spending-release-requests/{id}", handlers.SpendingReleaseRequestHandler.DeleteSpendingReleaseRequest)
+
+		rt.Get("/error-logs/{id}", handlers.ErrorLogHandler.GetErrorLogById)
+		rt.Get("/error-logs", handlers.ErrorLogHandler.GetErrorLogList)
+		rt.Delete("/error-logs/{id}", handlers.ErrorLogHandler.DeleteErrorLog)
 	})
 
 	return app.Routes

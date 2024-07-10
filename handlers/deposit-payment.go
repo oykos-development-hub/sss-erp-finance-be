@@ -16,15 +16,17 @@ import (
 
 // DepositPaymentHandler is a concrete type that implements DepositPaymentHandler
 type depositpaymentHandlerImpl struct {
-	App     *celeritas.Celeritas
-	service services.DepositPaymentService
+	App             *celeritas.Celeritas
+	service         services.DepositPaymentService
+	errorLogService services.ErrorLogService
 }
 
 // NewDepositPaymentHandler initializes a new DepositPaymentHandler with its dependencies
-func NewDepositPaymentHandler(app *celeritas.Celeritas, depositpaymentService services.DepositPaymentService) DepositPaymentHandler {
+func NewDepositPaymentHandler(app *celeritas.Celeritas, depositpaymentService services.DepositPaymentService, errorLogService services.ErrorLogService) DepositPaymentHandler {
 	return &depositpaymentHandlerImpl{
-		App:     app,
-		service: depositpaymentService,
+		App:             app,
+		service:         depositpaymentService,
+		errorLogService: errorLogService,
 	}
 }
 
@@ -32,6 +34,7 @@ func (h *depositpaymentHandlerImpl) CreateDepositPayment(w http.ResponseWriter, 
 	var input dto.DepositPaymentDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -49,6 +52,7 @@ func (h *depositpaymentHandlerImpl) CreateDepositPayment(w http.ResponseWriter, 
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -59,6 +63,7 @@ func (h *depositpaymentHandlerImpl) CreateDepositPayment(w http.ResponseWriter, 
 
 	res, err := h.service.CreateDepositPayment(ctx, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -73,6 +78,7 @@ func (h *depositpaymentHandlerImpl) UpdateDepositPayment(w http.ResponseWriter, 
 	var input dto.DepositPaymentDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -90,6 +96,7 @@ func (h *depositpaymentHandlerImpl) UpdateDepositPayment(w http.ResponseWriter, 
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -100,6 +107,7 @@ func (h *depositpaymentHandlerImpl) UpdateDepositPayment(w http.ResponseWriter, 
 
 	res, err := h.service.UpdateDepositPayment(ctx, id, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -116,6 +124,7 @@ func (h *depositpaymentHandlerImpl) DeleteDepositPayment(w http.ResponseWriter, 
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -126,6 +135,7 @@ func (h *depositpaymentHandlerImpl) DeleteDepositPayment(w http.ResponseWriter, 
 
 	err = h.service.DeleteDepositPayment(ctx, id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -139,6 +149,7 @@ func (h *depositpaymentHandlerImpl) GetDepositPaymentById(w http.ResponseWriter,
 
 	res, err := h.service.GetDepositPayment(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -161,6 +172,7 @@ func (h *depositpaymentHandlerImpl) GetDepositPaymentsByCaseNumber(w http.Respon
 
 	res, err := h.service.GetDepositPaymentByCaseNumber(filter.CaseNumber, filter.SourceBankAccount)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -183,6 +195,7 @@ func (h *depositpaymentHandlerImpl) GetCaseNumber(w http.ResponseWriter, r *http
 
 	res, err := h.service.GetCaseNumber(filter.OrganizationUnitID, filter.SourceBankAccount)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -205,6 +218,7 @@ func (h *depositpaymentHandlerImpl) GetDepositPaymentList(w http.ResponseWriter,
 
 	res, total, err := h.service.GetDepositPaymentList(filter)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -227,6 +241,7 @@ func (h *depositpaymentHandlerImpl) GetInitialState(w http.ResponseWriter, r *ht
 
 	res, err := h.service.GetInitialState(filter)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return

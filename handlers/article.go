@@ -14,15 +14,17 @@ import (
 
 // ArticleHandler is a concrete type that implements ArticleHandler
 type articleHandlerImpl struct {
-	App     *celeritas.Celeritas
-	service services.ArticleService
+	App             *celeritas.Celeritas
+	service         services.ArticleService
+	errorLogService services.ErrorLogService
 }
 
 // NewArticleHandler initializes a new ArticleHandler with its dependencies
-func NewArticleHandler(app *celeritas.Celeritas, articleService services.ArticleService) ArticleHandler {
+func NewArticleHandler(app *celeritas.Celeritas, articleService services.ArticleService, errorLogService services.ErrorLogService) ArticleHandler {
 	return &articleHandlerImpl{
-		App:     app,
-		service: articleService,
+		App:             app,
+		service:         articleService,
+		errorLogService: errorLogService,
 	}
 }
 
@@ -30,6 +32,7 @@ func (h *articleHandlerImpl) CreateArticle(w http.ResponseWriter, r *http.Reques
 	var input dto.ArticleDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -44,6 +47,7 @@ func (h *articleHandlerImpl) CreateArticle(w http.ResponseWriter, r *http.Reques
 
 	res, err := h.service.CreateArticle(input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -58,6 +62,7 @@ func (h *articleHandlerImpl) UpdateArticle(w http.ResponseWriter, r *http.Reques
 	var input dto.ArticleDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -72,6 +77,7 @@ func (h *articleHandlerImpl) UpdateArticle(w http.ResponseWriter, r *http.Reques
 
 	res, err := h.service.UpdateArticle(id, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -85,6 +91,7 @@ func (h *articleHandlerImpl) DeleteArticle(w http.ResponseWriter, r *http.Reques
 
 	err := h.service.DeleteArticle(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -98,6 +105,7 @@ func (h *articleHandlerImpl) GetArticleById(w http.ResponseWriter, r *http.Reque
 
 	res, err := h.service.GetArticle(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -120,6 +128,7 @@ func (h *articleHandlerImpl) GetArticleList(w http.ResponseWriter, r *http.Reque
 
 	res, total, err := h.service.GetArticleList(filter)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return

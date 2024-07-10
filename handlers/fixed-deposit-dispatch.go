@@ -16,15 +16,17 @@ import (
 
 // FixedDepositDispatchHandler is a concrete type that implements FixedDepositDispatchHandler
 type fixeddepositdispatchHandlerImpl struct {
-	App     *celeritas.Celeritas
-	service services.FixedDepositDispatchService
+	App             *celeritas.Celeritas
+	service         services.FixedDepositDispatchService
+	errorLogService services.ErrorLogService
 }
 
 // NewFixedDepositDispatchHandler initializes a new FixedDepositDispatchHandler with its dependencies
-func NewFixedDepositDispatchHandler(app *celeritas.Celeritas, fixeddepositdispatchService services.FixedDepositDispatchService) FixedDepositDispatchHandler {
+func NewFixedDepositDispatchHandler(app *celeritas.Celeritas, fixeddepositdispatchService services.FixedDepositDispatchService, errorLogService services.ErrorLogService) FixedDepositDispatchHandler {
 	return &fixeddepositdispatchHandlerImpl{
-		App:     app,
-		service: fixeddepositdispatchService,
+		App:             app,
+		service:         fixeddepositdispatchService,
+		errorLogService: errorLogService,
 	}
 }
 
@@ -32,6 +34,7 @@ func (h *fixeddepositdispatchHandlerImpl) CreateFixedDepositDispatch(w http.Resp
 	var input dto.FixedDepositDispatchDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -49,6 +52,7 @@ func (h *fixeddepositdispatchHandlerImpl) CreateFixedDepositDispatch(w http.Resp
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -59,6 +63,7 @@ func (h *fixeddepositdispatchHandlerImpl) CreateFixedDepositDispatch(w http.Resp
 
 	res, err := h.service.CreateFixedDepositDispatch(ctx, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -73,6 +78,7 @@ func (h *fixeddepositdispatchHandlerImpl) UpdateFixedDepositDispatch(w http.Resp
 	var input dto.FixedDepositDispatchDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -90,6 +96,7 @@ func (h *fixeddepositdispatchHandlerImpl) UpdateFixedDepositDispatch(w http.Resp
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -100,6 +107,7 @@ func (h *fixeddepositdispatchHandlerImpl) UpdateFixedDepositDispatch(w http.Resp
 
 	res, err := h.service.UpdateFixedDepositDispatch(ctx, id, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -116,6 +124,7 @@ func (h *fixeddepositdispatchHandlerImpl) DeleteFixedDepositDispatch(w http.Resp
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -126,6 +135,7 @@ func (h *fixeddepositdispatchHandlerImpl) DeleteFixedDepositDispatch(w http.Resp
 
 	err = h.service.DeleteFixedDepositDispatch(ctx, id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -139,6 +149,7 @@ func (h *fixeddepositdispatchHandlerImpl) GetFixedDepositDispatchById(w http.Res
 
 	res, err := h.service.GetFixedDepositDispatch(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -161,6 +172,7 @@ func (h *fixeddepositdispatchHandlerImpl) GetFixedDepositDispatchList(w http.Res
 
 	res, total, err := h.service.GetFixedDepositDispatchList(filter)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return

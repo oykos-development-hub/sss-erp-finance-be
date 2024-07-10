@@ -15,15 +15,17 @@ import (
 )
 
 type flatratePaymentHandlerImpl struct {
-	App     *celeritas.Celeritas
-	service services.FlatRatePaymentService
+	App             *celeritas.Celeritas
+	service         services.FlatRatePaymentService
+	errorLogService services.ErrorLogService
 }
 
 // NewFlatRatePaymentHandler is a factory function that returns a new instance of FlatRatePaymentHandler
-func NewFlatRatePaymentHandler(app *celeritas.Celeritas, flatratePaymentService services.FlatRatePaymentService) FlatRatePaymentHandler {
+func NewFlatRatePaymentHandler(app *celeritas.Celeritas, flatratePaymentService services.FlatRatePaymentService, errorLogService services.ErrorLogService) FlatRatePaymentHandler {
 	return &flatratePaymentHandlerImpl{
-		App:     app,
-		service: flatratePaymentService,
+		App:             app,
+		service:         flatratePaymentService,
+		errorLogService: errorLogService,
 	}
 }
 
@@ -32,6 +34,7 @@ func (h *flatratePaymentHandlerImpl) CreateFlatRatePayment(w http.ResponseWriter
 	var input dto.FlatRatePaymentDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -49,6 +52,7 @@ func (h *flatratePaymentHandlerImpl) CreateFlatRatePayment(w http.ResponseWriter
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -59,6 +63,7 @@ func (h *flatratePaymentHandlerImpl) CreateFlatRatePayment(w http.ResponseWriter
 
 	res, err := h.service.CreateFlatRatePayment(ctx, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -76,6 +81,7 @@ func (h *flatratePaymentHandlerImpl) DeleteFlatRatePayment(w http.ResponseWriter
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -86,6 +92,7 @@ func (h *flatratePaymentHandlerImpl) DeleteFlatRatePayment(w http.ResponseWriter
 
 	err = h.service.DeleteFlatRatePayment(ctx, id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -98,6 +105,7 @@ func (h *flatratePaymentHandlerImpl) DeleteFlatRatePayment(w http.ResponseWriter
 func (h *flatratePaymentHandlerImpl) UpdateFlatRatePayment(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -106,6 +114,7 @@ func (h *flatratePaymentHandlerImpl) UpdateFlatRatePayment(w http.ResponseWriter
 	var input dto.FlatRatePaymentDTO
 	err = h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -123,6 +132,7 @@ func (h *flatratePaymentHandlerImpl) UpdateFlatRatePayment(w http.ResponseWriter
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -133,6 +143,7 @@ func (h *flatratePaymentHandlerImpl) UpdateFlatRatePayment(w http.ResponseWriter
 
 	res, err := h.service.UpdateFlatRatePayment(ctx, id, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -147,6 +158,7 @@ func (h *flatratePaymentHandlerImpl) GetFlatRatePaymentById(w http.ResponseWrite
 
 	res, err := h.service.GetFlatRatePayment(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -170,6 +182,7 @@ func (h *flatratePaymentHandlerImpl) GetFlatRatePaymentList(w http.ResponseWrite
 
 	res, total, err := h.service.GetFlatRatePaymentList(filter)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return

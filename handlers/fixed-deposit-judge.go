@@ -14,15 +14,17 @@ import (
 
 // FixedDepositJudgeHandler is a concrete type that implements FixedDepositJudgeHandler
 type fixeddepositjudgeHandlerImpl struct {
-	App     *celeritas.Celeritas
-	service services.FixedDepositJudgeService
+	App             *celeritas.Celeritas
+	service         services.FixedDepositJudgeService
+	errorLogService services.ErrorLogService
 }
 
 // NewFixedDepositJudgeHandler initializes a new FixedDepositJudgeHandler with its dependencies
-func NewFixedDepositJudgeHandler(app *celeritas.Celeritas, fixeddepositjudgeService services.FixedDepositJudgeService) FixedDepositJudgeHandler {
+func NewFixedDepositJudgeHandler(app *celeritas.Celeritas, fixeddepositjudgeService services.FixedDepositJudgeService, errorLogService services.ErrorLogService) FixedDepositJudgeHandler {
 	return &fixeddepositjudgeHandlerImpl{
-		App:     app,
-		service: fixeddepositjudgeService,
+		App:             app,
+		service:         fixeddepositjudgeService,
+		errorLogService: errorLogService,
 	}
 }
 
@@ -30,6 +32,7 @@ func (h *fixeddepositjudgeHandlerImpl) CreateFixedDepositJudge(w http.ResponseWr
 	var input dto.FixedDepositJudgeDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -44,6 +47,7 @@ func (h *fixeddepositjudgeHandlerImpl) CreateFixedDepositJudge(w http.ResponseWr
 
 	res, err := h.service.CreateFixedDepositJudge(input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -58,6 +62,7 @@ func (h *fixeddepositjudgeHandlerImpl) UpdateFixedDepositJudge(w http.ResponseWr
 	var input dto.FixedDepositJudgeDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -72,6 +77,7 @@ func (h *fixeddepositjudgeHandlerImpl) UpdateFixedDepositJudge(w http.ResponseWr
 
 	res, err := h.service.UpdateFixedDepositJudge(id, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -85,6 +91,7 @@ func (h *fixeddepositjudgeHandlerImpl) DeleteFixedDepositJudge(w http.ResponseWr
 
 	err := h.service.DeleteFixedDepositJudge(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -98,6 +105,7 @@ func (h *fixeddepositjudgeHandlerImpl) GetFixedDepositJudgeById(w http.ResponseW
 
 	res, err := h.service.GetFixedDepositJudge(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -120,6 +128,7 @@ func (h *fixeddepositjudgeHandlerImpl) GetFixedDepositJudgeList(w http.ResponseW
 
 	res, total, err := h.service.GetFixedDepositJudgeList(filter)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return

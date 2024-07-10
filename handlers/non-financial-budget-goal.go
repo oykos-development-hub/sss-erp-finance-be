@@ -16,15 +16,17 @@ import (
 
 // NonFinancialBudgetGoalHandler is a concrete type that implements NonFinancialBudgetGoalHandler
 type nonfinancialbudgetgoalHandlerImpl struct {
-	App     *celeritas.Celeritas
-	service services.NonFinancialBudgetGoalService
+	App             *celeritas.Celeritas
+	service         services.NonFinancialBudgetGoalService
+	errorLogService services.ErrorLogService
 }
 
 // NewNonFinancialBudgetGoalHandler initializes a new NonFinancialBudgetGoalHandler with its dependencies
-func NewNonFinancialBudgetGoalHandler(app *celeritas.Celeritas, nonfinancialbudgetgoalService services.NonFinancialBudgetGoalService) NonFinancialBudgetGoalHandler {
+func NewNonFinancialBudgetGoalHandler(app *celeritas.Celeritas, nonfinancialbudgetgoalService services.NonFinancialBudgetGoalService, errorLogService services.ErrorLogService) NonFinancialBudgetGoalHandler {
 	return &nonfinancialbudgetgoalHandlerImpl{
-		App:     app,
-		service: nonfinancialbudgetgoalService,
+		App:             app,
+		service:         nonfinancialbudgetgoalService,
+		errorLogService: errorLogService,
 	}
 }
 
@@ -32,6 +34,7 @@ func (h *nonfinancialbudgetgoalHandlerImpl) CreateNonFinancialBudgetGoal(w http.
 	var input dto.NonFinancialBudgetGoalDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -49,6 +52,7 @@ func (h *nonfinancialbudgetgoalHandlerImpl) CreateNonFinancialBudgetGoal(w http.
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -59,6 +63,7 @@ func (h *nonfinancialbudgetgoalHandlerImpl) CreateNonFinancialBudgetGoal(w http.
 
 	res, err := h.service.CreateNonFinancialBudgetGoal(ctx, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -73,6 +78,7 @@ func (h *nonfinancialbudgetgoalHandlerImpl) UpdateNonFinancialBudgetGoal(w http.
 	var input dto.NonFinancialBudgetGoalDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -90,6 +96,7 @@ func (h *nonfinancialbudgetgoalHandlerImpl) UpdateNonFinancialBudgetGoal(w http.
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -100,6 +107,7 @@ func (h *nonfinancialbudgetgoalHandlerImpl) UpdateNonFinancialBudgetGoal(w http.
 
 	res, err := h.service.UpdateNonFinancialBudgetGoal(ctx, id, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -116,6 +124,7 @@ func (h *nonfinancialbudgetgoalHandlerImpl) DeleteNonFinancialBudgetGoal(w http.
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -126,6 +135,7 @@ func (h *nonfinancialbudgetgoalHandlerImpl) DeleteNonFinancialBudgetGoal(w http.
 
 	err = h.service.DeleteNonFinancialBudgetGoal(ctx, id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -139,6 +149,7 @@ func (h *nonfinancialbudgetgoalHandlerImpl) GetNonFinancialBudgetGoalById(w http
 
 	res, err := h.service.GetNonFinancialBudgetGoal(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -161,6 +172,7 @@ func (h *nonfinancialbudgetgoalHandlerImpl) GetNonFinancialBudgetGoalList(w http
 
 	res, total, err := h.service.GetNonFinancialBudgetGoalList(filter)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return

@@ -16,15 +16,17 @@ import (
 
 // CurrentBudgetHandler is a concrete type that implements CurrentBudgetHandler
 type currentbudgetHandlerImpl struct {
-	App     *celeritas.Celeritas
-	service services.CurrentBudgetService
+	App             *celeritas.Celeritas
+	service         services.CurrentBudgetService
+	errorLogService services.ErrorLogService
 }
 
 // NewCurrentBudgetHandler initializes a new CurrentBudgetHandler with its dependencies
-func NewCurrentBudgetHandler(app *celeritas.Celeritas, currentbudgetService services.CurrentBudgetService) CurrentBudgetHandler {
+func NewCurrentBudgetHandler(app *celeritas.Celeritas, currentbudgetService services.CurrentBudgetService, errorLogService services.ErrorLogService) CurrentBudgetHandler {
 	return &currentbudgetHandlerImpl{
-		App:     app,
-		service: currentbudgetService,
+		App:             app,
+		service:         currentbudgetService,
+		errorLogService: errorLogService,
 	}
 }
 
@@ -32,6 +34,7 @@ func (h *currentbudgetHandlerImpl) CreateCurrentBudget(w http.ResponseWriter, r 
 	var input dto.CurrentBudgetDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -49,6 +52,7 @@ func (h *currentbudgetHandlerImpl) CreateCurrentBudget(w http.ResponseWriter, r 
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -59,6 +63,7 @@ func (h *currentbudgetHandlerImpl) CreateCurrentBudget(w http.ResponseWriter, r 
 
 	res, err := h.service.CreateCurrentBudget(ctx, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -72,6 +77,7 @@ func (h *currentbudgetHandlerImpl) GetCurrentBudgetById(w http.ResponseWriter, r
 
 	res, err := h.service.GetCurrentBudget(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -94,6 +100,7 @@ func (h *currentbudgetHandlerImpl) GetCurrentBudgetList(w http.ResponseWriter, r
 
 	res, total, err := h.service.GetCurrentBudgetList(filter)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -105,6 +112,7 @@ func (h *currentbudgetHandlerImpl) GetCurrentBudgetList(w http.ResponseWriter, r
 func (h *currentbudgetHandlerImpl) GetCurrentBudgetUnitList(w http.ResponseWriter, r *http.Request) {
 	res, err := h.service.GetCurrentBudgetUnitList()
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -118,6 +126,7 @@ func (h *currentbudgetHandlerImpl) GetAcctualCurrentBudget(w http.ResponseWriter
 
 	res, err := h.service.GetAcctualCurrentBudget(organizationUnitID)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return

@@ -14,15 +14,17 @@ import (
 
 // AdditionalExpenseHandler is a concrete type that implements AdditionalExpenseHandler
 type additionalexpenseHandlerImpl struct {
-	App     *celeritas.Celeritas
-	service services.AdditionalExpenseService
+	App             *celeritas.Celeritas
+	service         services.AdditionalExpenseService
+	errorLogService services.ErrorLogService
 }
 
 // NewAdditionalExpenseHandler initializes a new AdditionalExpenseHandler with its dependencies
-func NewAdditionalExpenseHandler(app *celeritas.Celeritas, additionalexpenseService services.AdditionalExpenseService) AdditionalExpenseHandler {
+func NewAdditionalExpenseHandler(app *celeritas.Celeritas, additionalexpenseService services.AdditionalExpenseService, errorLogService services.ErrorLogService) AdditionalExpenseHandler {
 	return &additionalexpenseHandlerImpl{
-		App:     app,
-		service: additionalexpenseService,
+		App:             app,
+		service:         additionalexpenseService,
+		errorLogService: errorLogService,
 	}
 }
 
@@ -31,6 +33,7 @@ func (h *additionalexpenseHandlerImpl) DeleteAdditionalExpense(w http.ResponseWr
 
 	err := h.service.DeleteAdditionalExpense(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -44,6 +47,7 @@ func (h *additionalexpenseHandlerImpl) GetAdditionalExpenseById(w http.ResponseW
 
 	res, err := h.service.GetAdditionalExpense(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -66,6 +70,7 @@ func (h *additionalexpenseHandlerImpl) GetAdditionalExpenseList(w http.ResponseW
 
 	res, total, err := h.service.GetAdditionalExpenseList(filter)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return

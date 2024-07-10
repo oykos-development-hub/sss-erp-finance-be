@@ -55,6 +55,7 @@ type Handlers struct {
 	ExternalReallocationItemHandler ExternalReallocationItemHandler
 	LogHandler                      LogHandler
 	SpendingReleaseRequestHandler   SpendingReleaseRequestHandler
+	ErrorLogHandler                 ErrorLogHandler
 }
 
 type InvoiceHandler interface {
@@ -493,4 +494,11 @@ type SpendingReleaseRequestHandler interface {
 	GetSpendingReleaseRequestById(w http.ResponseWriter, r *http.Request)
 	GetSpendingReleaseRequestList(w http.ResponseWriter, r *http.Request)
 	AcceptSSSRequest(w http.ResponseWriter, r *http.Request)
+}
+
+type ErrorLogHandler interface {
+	UpdateErrorLog(w http.ResponseWriter, r *http.Request)
+	DeleteErrorLog(w http.ResponseWriter, r *http.Request)
+	GetErrorLogById(w http.ResponseWriter, r *http.Request)
+	GetErrorLogList(w http.ResponseWriter, r *http.Request)
 }

@@ -16,15 +16,17 @@ import (
 
 // PaymentOrderHandler is a concrete type that implements PaymentOrderHandler
 type paymentorderHandlerImpl struct {
-	App     *celeritas.Celeritas
-	service services.PaymentOrderService
+	App             *celeritas.Celeritas
+	service         services.PaymentOrderService
+	errorLogService services.ErrorLogService
 }
 
 // NewPaymentOrderHandler initializes a new PaymentOrderHandler with its dependencies
-func NewPaymentOrderHandler(app *celeritas.Celeritas, paymentorderService services.PaymentOrderService) PaymentOrderHandler {
+func NewPaymentOrderHandler(app *celeritas.Celeritas, paymentorderService services.PaymentOrderService, errorLogService services.ErrorLogService) PaymentOrderHandler {
 	return &paymentorderHandlerImpl{
-		App:     app,
-		service: paymentorderService,
+		App:             app,
+		service:         paymentorderService,
+		errorLogService: errorLogService,
 	}
 }
 
@@ -32,6 +34,7 @@ func (h *paymentorderHandlerImpl) CreatePaymentOrder(w http.ResponseWriter, r *h
 	var input dto.PaymentOrderDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -49,6 +52,7 @@ func (h *paymentorderHandlerImpl) CreatePaymentOrder(w http.ResponseWriter, r *h
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -59,6 +63,7 @@ func (h *paymentorderHandlerImpl) CreatePaymentOrder(w http.ResponseWriter, r *h
 
 	res, err := h.service.CreatePaymentOrder(ctx, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -73,6 +78,7 @@ func (h *paymentorderHandlerImpl) UpdatePaymentOrder(w http.ResponseWriter, r *h
 	var input dto.PaymentOrderDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -90,6 +96,7 @@ func (h *paymentorderHandlerImpl) UpdatePaymentOrder(w http.ResponseWriter, r *h
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -100,6 +107,7 @@ func (h *paymentorderHandlerImpl) UpdatePaymentOrder(w http.ResponseWriter, r *h
 
 	res, err := h.service.UpdatePaymentOrder(ctx, id, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -116,6 +124,7 @@ func (h *paymentorderHandlerImpl) DeletePaymentOrder(w http.ResponseWriter, r *h
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -126,6 +135,7 @@ func (h *paymentorderHandlerImpl) DeletePaymentOrder(w http.ResponseWriter, r *h
 
 	err = h.service.DeletePaymentOrder(ctx, id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -139,6 +149,7 @@ func (h *paymentorderHandlerImpl) GetPaymentOrderById(w http.ResponseWriter, r *
 
 	res, err := h.service.GetPaymentOrder(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -152,6 +163,7 @@ func (h *paymentorderHandlerImpl) GetPaymentOrderByIdOfStatement(w http.Response
 
 	res, err := h.service.GetPaymentOrderByIdOfStatement(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -174,6 +186,7 @@ func (h *paymentorderHandlerImpl) GetPaymentOrderList(w http.ResponseWriter, r *
 
 	res, total, err := h.service.GetPaymentOrderList(filter)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -196,6 +209,7 @@ func (h *paymentorderHandlerImpl) GetAllObligations(w http.ResponseWriter, r *ht
 
 	res, total, err := h.service.GetAllObligations(filter)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -210,6 +224,7 @@ func (h *paymentorderHandlerImpl) PayPaymentOrder(w http.ResponseWriter, r *http
 	var input dto.PaymentOrderDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -227,6 +242,7 @@ func (h *paymentorderHandlerImpl) PayPaymentOrder(w http.ResponseWriter, r *http
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -237,6 +253,7 @@ func (h *paymentorderHandlerImpl) PayPaymentOrder(w http.ResponseWriter, r *http
 
 	err = h.service.PayPaymentOrder(ctx, id, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -253,6 +270,7 @@ func (h *paymentorderHandlerImpl) CancelPaymentOrder(w http.ResponseWriter, r *h
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -263,6 +281,7 @@ func (h *paymentorderHandlerImpl) CancelPaymentOrder(w http.ResponseWriter, r *h
 
 	err = h.service.CancelPaymentOrder(ctx, id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return

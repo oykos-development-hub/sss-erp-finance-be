@@ -16,15 +16,17 @@ import (
 
 // FinancialBudgetHandler is a concrete type that implements FinancialBudgetHandler
 type financialbudgetHandlerImpl struct {
-	App     *celeritas.Celeritas
-	service services.FinancialBudgetService
+	App             *celeritas.Celeritas
+	service         services.FinancialBudgetService
+	errorLogService services.ErrorLogService
 }
 
 // NewFinancialBudgetHandler initializes a new FinancialBudgetHandler with its dependencies
-func NewFinancialBudgetHandler(app *celeritas.Celeritas, financialbudgetService services.FinancialBudgetService) FinancialBudgetHandler {
+func NewFinancialBudgetHandler(app *celeritas.Celeritas, financialbudgetService services.FinancialBudgetService, errorLogService services.ErrorLogService) FinancialBudgetHandler {
 	return &financialbudgetHandlerImpl{
-		App:     app,
-		service: financialbudgetService,
+		App:             app,
+		service:         financialbudgetService,
+		errorLogService: errorLogService,
 	}
 }
 
@@ -32,6 +34,7 @@ func (h *financialbudgetHandlerImpl) CreateFinancialBudget(w http.ResponseWriter
 	var input dto.FinancialBudgetDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -49,6 +52,7 @@ func (h *financialbudgetHandlerImpl) CreateFinancialBudget(w http.ResponseWriter
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -59,6 +63,7 @@ func (h *financialbudgetHandlerImpl) CreateFinancialBudget(w http.ResponseWriter
 
 	res, err := h.service.CreateFinancialBudget(ctx, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -73,6 +78,7 @@ func (h *financialbudgetHandlerImpl) UpdateFinancialBudget(w http.ResponseWriter
 	var input dto.FinancialBudgetDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -90,6 +96,7 @@ func (h *financialbudgetHandlerImpl) UpdateFinancialBudget(w http.ResponseWriter
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -100,6 +107,7 @@ func (h *financialbudgetHandlerImpl) UpdateFinancialBudget(w http.ResponseWriter
 
 	res, err := h.service.UpdateFinancialBudget(ctx, id, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -116,6 +124,7 @@ func (h *financialbudgetHandlerImpl) DeleteFinancialBudget(w http.ResponseWriter
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -126,6 +135,7 @@ func (h *financialbudgetHandlerImpl) DeleteFinancialBudget(w http.ResponseWriter
 
 	err = h.service.DeleteFinancialBudget(ctx, id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -139,6 +149,7 @@ func (h *financialbudgetHandlerImpl) GetFinancialBudgetById(w http.ResponseWrite
 
 	res, err := h.service.GetFinancialBudget(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -152,6 +163,7 @@ func (h *financialbudgetHandlerImpl) GetFinancialBudgetByBudgetID(w http.Respons
 
 	res, err := h.service.GetFinancialBudgetByBudgetID(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -163,6 +175,7 @@ func (h *financialbudgetHandlerImpl) GetFinancialBudgetByBudgetID(w http.Respons
 func (h *financialbudgetHandlerImpl) GetFinancialBudgetList(w http.ResponseWriter, r *http.Request) {
 	res, err := h.service.GetFinancialBudgetList()
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return

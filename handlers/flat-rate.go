@@ -15,15 +15,17 @@ import (
 )
 
 type flatrateHandlerImpl struct {
-	App     *celeritas.Celeritas
-	service services.FlatRateService
+	App             *celeritas.Celeritas
+	service         services.FlatRateService
+	errorLogService services.ErrorLogService
 }
 
 // NewFlatRateHandler is a factory function that returns a new instance of FlatRateHandler
-func NewFlatRateHandler(app *celeritas.Celeritas, flatrateService services.FlatRateService) FlatRateHandler {
+func NewFlatRateHandler(app *celeritas.Celeritas, flatrateService services.FlatRateService, errorLogService services.ErrorLogService) FlatRateHandler {
 	return &flatrateHandlerImpl{
-		App:     app,
-		service: flatrateService,
+		App:             app,
+		service:         flatrateService,
+		errorLogService: errorLogService,
 	}
 }
 
@@ -32,6 +34,7 @@ func (h *flatrateHandlerImpl) CreateFlatRate(w http.ResponseWriter, r *http.Requ
 	var input dto.FlatRateDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -49,6 +52,7 @@ func (h *flatrateHandlerImpl) CreateFlatRate(w http.ResponseWriter, r *http.Requ
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -59,6 +63,7 @@ func (h *flatrateHandlerImpl) CreateFlatRate(w http.ResponseWriter, r *http.Requ
 
 	res, err := h.service.CreateFlatRate(ctx, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -73,6 +78,7 @@ func (h *flatrateHandlerImpl) GetFlatRateById(w http.ResponseWriter, r *http.Req
 
 	res, err := h.service.GetFlatRate(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -88,6 +94,7 @@ func (h *flatrateHandlerImpl) UpdateFlatRate(w http.ResponseWriter, r *http.Requ
 	var input dto.FlatRateDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -105,6 +112,7 @@ func (h *flatrateHandlerImpl) UpdateFlatRate(w http.ResponseWriter, r *http.Requ
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -115,6 +123,7 @@ func (h *flatrateHandlerImpl) UpdateFlatRate(w http.ResponseWriter, r *http.Requ
 
 	res, err := h.service.UpdateFlatRate(ctx, id, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -132,6 +141,7 @@ func (h *flatrateHandlerImpl) DeleteFlatRate(w http.ResponseWriter, r *http.Requ
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -142,6 +152,7 @@ func (h *flatrateHandlerImpl) DeleteFlatRate(w http.ResponseWriter, r *http.Requ
 
 	err = h.service.DeleteFlatRate(ctx, id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -165,6 +176,7 @@ func (h *flatrateHandlerImpl) GetFlatRateList(w http.ResponseWriter, r *http.Req
 
 	res, total, err := h.service.GetFlatRateList(filter)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return

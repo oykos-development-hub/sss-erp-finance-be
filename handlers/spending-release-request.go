@@ -14,15 +14,17 @@ import (
 
 // SpendingReleaseRequestHandler is a concrete type that implements SpendingReleaseRequestHandler
 type spendingreleaserequestHandlerImpl struct {
-	App     *celeritas.Celeritas
-	service services.SpendingReleaseRequestService
+	App             *celeritas.Celeritas
+	service         services.SpendingReleaseRequestService
+	errorLogService services.ErrorLogService
 }
 
 // NewSpendingReleaseRequestHandler initializes a new SpendingReleaseRequestHandler with its dependencies
-func NewSpendingReleaseRequestHandler(app *celeritas.Celeritas, spendingreleaserequestService services.SpendingReleaseRequestService) SpendingReleaseRequestHandler {
+func NewSpendingReleaseRequestHandler(app *celeritas.Celeritas, spendingreleaserequestService services.SpendingReleaseRequestService, errorLogService services.ErrorLogService) SpendingReleaseRequestHandler {
 	return &spendingreleaserequestHandlerImpl{
-		App:     app,
-		service: spendingreleaserequestService,
+		App:             app,
+		service:         spendingreleaserequestService,
+		errorLogService: errorLogService,
 	}
 }
 

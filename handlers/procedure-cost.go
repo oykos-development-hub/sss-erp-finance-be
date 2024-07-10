@@ -15,15 +15,17 @@ import (
 )
 
 type procedurecostHandlerImpl struct {
-	App     *celeritas.Celeritas
-	service services.ProcedureCostService
+	App             *celeritas.Celeritas
+	service         services.ProcedureCostService
+	errorLogService services.ErrorLogService
 }
 
 // NewProcedureCostHandler is a factory function that returns a new instance of ProcedureCostHandler
-func NewProcedureCostHandler(app *celeritas.Celeritas, procedurecostService services.ProcedureCostService) ProcedureCostHandler {
+func NewProcedureCostHandler(app *celeritas.Celeritas, procedurecostService services.ProcedureCostService, errorLogService services.ErrorLogService) ProcedureCostHandler {
 	return &procedurecostHandlerImpl{
-		App:     app,
-		service: procedurecostService,
+		App:             app,
+		service:         procedurecostService,
+		errorLogService: errorLogService,
 	}
 }
 
@@ -32,6 +34,7 @@ func (h *procedurecostHandlerImpl) CreateProcedureCost(w http.ResponseWriter, r 
 	var input dto.ProcedureCostDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -49,6 +52,7 @@ func (h *procedurecostHandlerImpl) CreateProcedureCost(w http.ResponseWriter, r 
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -59,6 +63,7 @@ func (h *procedurecostHandlerImpl) CreateProcedureCost(w http.ResponseWriter, r 
 
 	res, err := h.service.CreateProcedureCost(ctx, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -73,6 +78,7 @@ func (h *procedurecostHandlerImpl) GetProcedureCostById(w http.ResponseWriter, r
 
 	res, err := h.service.GetProcedureCost(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -88,6 +94,7 @@ func (h *procedurecostHandlerImpl) UpdateProcedureCost(w http.ResponseWriter, r 
 	var input dto.ProcedureCostDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -105,6 +112,7 @@ func (h *procedurecostHandlerImpl) UpdateProcedureCost(w http.ResponseWriter, r 
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -115,6 +123,7 @@ func (h *procedurecostHandlerImpl) UpdateProcedureCost(w http.ResponseWriter, r 
 
 	res, err := h.service.UpdateProcedureCost(ctx, id, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -132,6 +141,7 @@ func (h *procedurecostHandlerImpl) DeleteProcedureCost(w http.ResponseWriter, r 
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -142,6 +152,7 @@ func (h *procedurecostHandlerImpl) DeleteProcedureCost(w http.ResponseWriter, r 
 
 	err = h.service.DeleteProcedureCost(ctx, id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -165,6 +176,7 @@ func (h *procedurecostHandlerImpl) GetProcedureCostList(w http.ResponseWriter, r
 
 	res, total, err := h.service.GetProcedureCostList(filter)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return

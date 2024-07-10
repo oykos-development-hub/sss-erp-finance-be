@@ -16,15 +16,17 @@ import (
 
 // GoalIndicatorHandler is a concrete type that implements GoalIndicatorHandler
 type goalindicatorHandlerImpl struct {
-	App     *celeritas.Celeritas
-	service services.GoalIndicatorService
+	App             *celeritas.Celeritas
+	service         services.GoalIndicatorService
+	errorLogService services.ErrorLogService
 }
 
 // NewGoalIndicatorHandler initializes a new GoalIndicatorHandler with its dependencies
-func NewGoalIndicatorHandler(app *celeritas.Celeritas, goalindicatorService services.GoalIndicatorService) GoalIndicatorHandler {
+func NewGoalIndicatorHandler(app *celeritas.Celeritas, goalindicatorService services.GoalIndicatorService, errorLogService services.ErrorLogService) GoalIndicatorHandler {
 	return &goalindicatorHandlerImpl{
-		App:     app,
-		service: goalindicatorService,
+		App:             app,
+		service:         goalindicatorService,
+		errorLogService: errorLogService,
 	}
 }
 
@@ -32,6 +34,7 @@ func (h *goalindicatorHandlerImpl) CreateGoalIndicator(w http.ResponseWriter, r 
 	var input dto.GoalIndicatorDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -49,6 +52,7 @@ func (h *goalindicatorHandlerImpl) CreateGoalIndicator(w http.ResponseWriter, r 
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -59,6 +63,7 @@ func (h *goalindicatorHandlerImpl) CreateGoalIndicator(w http.ResponseWriter, r 
 
 	res, err := h.service.CreateGoalIndicator(ctx, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -73,6 +78,7 @@ func (h *goalindicatorHandlerImpl) UpdateGoalIndicator(w http.ResponseWriter, r 
 	var input dto.GoalIndicatorDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -90,6 +96,7 @@ func (h *goalindicatorHandlerImpl) UpdateGoalIndicator(w http.ResponseWriter, r 
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -100,6 +107,7 @@ func (h *goalindicatorHandlerImpl) UpdateGoalIndicator(w http.ResponseWriter, r 
 
 	res, err := h.service.UpdateGoalIndicator(ctx, id, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -116,6 +124,7 @@ func (h *goalindicatorHandlerImpl) DeleteGoalIndicator(w http.ResponseWriter, r 
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -126,6 +135,7 @@ func (h *goalindicatorHandlerImpl) DeleteGoalIndicator(w http.ResponseWriter, r 
 
 	err = h.service.DeleteGoalIndicator(ctx, id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -139,6 +149,7 @@ func (h *goalindicatorHandlerImpl) GetGoalIndicatorById(w http.ResponseWriter, r
 
 	res, err := h.service.GetGoalIndicator(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -161,6 +172,7 @@ func (h *goalindicatorHandlerImpl) GetGoalIndicatorList(w http.ResponseWriter, r
 
 	res, total, err := h.service.GetGoalIndicatorList(filter)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return

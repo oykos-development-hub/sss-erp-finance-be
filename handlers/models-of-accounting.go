@@ -16,15 +16,17 @@ import (
 
 // ModelsOfAccountingHandler is a concrete type that implements ModelsOfAccountingHandler
 type modelsofaccountingHandlerImpl struct {
-	App     *celeritas.Celeritas
-	service services.ModelsOfAccountingService
+	App             *celeritas.Celeritas
+	service         services.ModelsOfAccountingService
+	errorLogService services.ErrorLogService
 }
 
 // NewModelsOfAccountingHandler initializes a new ModelsOfAccountingHandler with its dependencies
-func NewModelsOfAccountingHandler(app *celeritas.Celeritas, modelsofaccountingService services.ModelsOfAccountingService) ModelsOfAccountingHandler {
+func NewModelsOfAccountingHandler(app *celeritas.Celeritas, modelsofaccountingService services.ModelsOfAccountingService, errorLogService services.ErrorLogService) ModelsOfAccountingHandler {
 	return &modelsofaccountingHandlerImpl{
-		App:     app,
-		service: modelsofaccountingService,
+		App:             app,
+		service:         modelsofaccountingService,
+		errorLogService: errorLogService,
 	}
 }
 
@@ -32,6 +34,7 @@ func (h *modelsofaccountingHandlerImpl) CreateModelsOfAccounting(w http.Response
 	var input dto.ModelsOfAccountingDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -49,6 +52,7 @@ func (h *modelsofaccountingHandlerImpl) CreateModelsOfAccounting(w http.Response
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -59,6 +63,7 @@ func (h *modelsofaccountingHandlerImpl) CreateModelsOfAccounting(w http.Response
 
 	res, err := h.service.CreateModelsOfAccounting(ctx, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -72,6 +77,7 @@ func (h *modelsofaccountingHandlerImpl) GetModelsOfAccountingById(w http.Respons
 
 	res, err := h.service.GetModelsOfAccounting(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -94,6 +100,7 @@ func (h *modelsofaccountingHandlerImpl) GetModelsOfAccountingList(w http.Respons
 
 	res, total, err := h.service.GetModelsOfAccountingList(filter)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -108,6 +115,7 @@ func (h *modelsofaccountingHandlerImpl) UpdateModelsOfAccounting(w http.Response
 	var input dto.ModelsOfAccountingDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -125,6 +133,7 @@ func (h *modelsofaccountingHandlerImpl) UpdateModelsOfAccounting(w http.Response
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -135,6 +144,7 @@ func (h *modelsofaccountingHandlerImpl) UpdateModelsOfAccounting(w http.Response
 
 	res, err := h.service.UpdateModelsOfAccounting(ctx, id, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return

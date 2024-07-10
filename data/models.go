@@ -73,6 +73,7 @@ type Models struct {
 		ExternalReallocationItem ExternalReallocationItem
 		Log Log
 		SpendingReleaseRequest SpendingReleaseRequest
+		ErrorLog ErrorLog
 	}
 
 func New(databasePool *sql.DB) Models {
@@ -135,6 +136,7 @@ func New(databasePool *sql.DB) Models {
 		ExternalReallocationItem: ExternalReallocationItem{},
 		Log: Log{},
 		SpendingReleaseRequest: SpendingReleaseRequest{},
+		ErrorLog: ErrorLog{},
 	}
 }
 

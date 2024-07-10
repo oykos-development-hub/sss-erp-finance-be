@@ -16,15 +16,17 @@ import (
 
 // EnforcedPaymentHandler is a concrete type that implements EnforcedPaymentHandler
 type enforcedpaymentHandlerImpl struct {
-	App     *celeritas.Celeritas
-	service services.EnforcedPaymentService
+	App             *celeritas.Celeritas
+	service         services.EnforcedPaymentService
+	errorLogService services.ErrorLogService
 }
 
 // NewEnforcedPaymentHandler initializes a new EnforcedPaymentHandler with its dependencies
-func NewEnforcedPaymentHandler(app *celeritas.Celeritas, enforcedpaymentService services.EnforcedPaymentService) EnforcedPaymentHandler {
+func NewEnforcedPaymentHandler(app *celeritas.Celeritas, enforcedpaymentService services.EnforcedPaymentService, errorLogService services.ErrorLogService) EnforcedPaymentHandler {
 	return &enforcedpaymentHandlerImpl{
-		App:     app,
-		service: enforcedpaymentService,
+		App:             app,
+		service:         enforcedpaymentService,
+		errorLogService: errorLogService,
 	}
 }
 
@@ -32,6 +34,7 @@ func (h *enforcedpaymentHandlerImpl) CreateEnforcedPayment(w http.ResponseWriter
 	var input dto.EnforcedPaymentDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -49,6 +52,7 @@ func (h *enforcedpaymentHandlerImpl) CreateEnforcedPayment(w http.ResponseWriter
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -59,6 +63,7 @@ func (h *enforcedpaymentHandlerImpl) CreateEnforcedPayment(w http.ResponseWriter
 
 	res, err := h.service.CreateEnforcedPayment(ctx, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -73,6 +78,7 @@ func (h *enforcedpaymentHandlerImpl) UpdateEnforcedPayment(w http.ResponseWriter
 	var input dto.EnforcedPaymentDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -90,6 +96,7 @@ func (h *enforcedpaymentHandlerImpl) UpdateEnforcedPayment(w http.ResponseWriter
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -100,6 +107,7 @@ func (h *enforcedpaymentHandlerImpl) UpdateEnforcedPayment(w http.ResponseWriter
 
 	res, err := h.service.UpdateEnforcedPayment(ctx, id, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -114,6 +122,7 @@ func (h *enforcedpaymentHandlerImpl) ReturnEnforcedPayment(w http.ResponseWriter
 	var input dto.EnforcedPaymentDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -131,6 +140,7 @@ func (h *enforcedpaymentHandlerImpl) ReturnEnforcedPayment(w http.ResponseWriter
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -141,6 +151,7 @@ func (h *enforcedpaymentHandlerImpl) ReturnEnforcedPayment(w http.ResponseWriter
 
 	err = h.service.ReturnEnforcedPayment(ctx, id, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -157,6 +168,7 @@ func (h *enforcedpaymentHandlerImpl) DeleteEnforcedPayment(w http.ResponseWriter
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -167,6 +179,7 @@ func (h *enforcedpaymentHandlerImpl) DeleteEnforcedPayment(w http.ResponseWriter
 
 	err = h.service.DeleteEnforcedPayment(ctx, id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -180,6 +193,7 @@ func (h *enforcedpaymentHandlerImpl) GetEnforcedPaymentById(w http.ResponseWrite
 
 	res, err := h.service.GetEnforcedPayment(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -202,6 +216,7 @@ func (h *enforcedpaymentHandlerImpl) GetEnforcedPaymentList(w http.ResponseWrite
 
 	res, total, err := h.service.GetEnforcedPaymentList(filter)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return

@@ -16,15 +16,17 @@ import (
 
 // FixedDepositWillHandler is a concrete type that implements FixedDepositWillHandler
 type fixeddepositwillHandlerImpl struct {
-	App     *celeritas.Celeritas
-	service services.FixedDepositWillService
+	App             *celeritas.Celeritas
+	service         services.FixedDepositWillService
+	errorLogService services.ErrorLogService
 }
 
 // NewFixedDepositWillHandler initializes a new FixedDepositWillHandler with its dependencies
-func NewFixedDepositWillHandler(app *celeritas.Celeritas, fixeddepositwillService services.FixedDepositWillService) FixedDepositWillHandler {
+func NewFixedDepositWillHandler(app *celeritas.Celeritas, fixeddepositwillService services.FixedDepositWillService, errorLogService services.ErrorLogService) FixedDepositWillHandler {
 	return &fixeddepositwillHandlerImpl{
-		App:     app,
-		service: fixeddepositwillService,
+		App:             app,
+		service:         fixeddepositwillService,
+		errorLogService: errorLogService,
 	}
 }
 
@@ -32,6 +34,7 @@ func (h *fixeddepositwillHandlerImpl) CreateFixedDepositWill(w http.ResponseWrit
 	var input dto.FixedDepositWillDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -49,6 +52,7 @@ func (h *fixeddepositwillHandlerImpl) CreateFixedDepositWill(w http.ResponseWrit
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -59,6 +63,7 @@ func (h *fixeddepositwillHandlerImpl) CreateFixedDepositWill(w http.ResponseWrit
 
 	res, err := h.service.CreateFixedDepositWill(ctx, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -73,6 +78,7 @@ func (h *fixeddepositwillHandlerImpl) UpdateFixedDepositWill(w http.ResponseWrit
 	var input dto.FixedDepositWillDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -90,6 +96,7 @@ func (h *fixeddepositwillHandlerImpl) UpdateFixedDepositWill(w http.ResponseWrit
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -100,6 +107,7 @@ func (h *fixeddepositwillHandlerImpl) UpdateFixedDepositWill(w http.ResponseWrit
 
 	res, err := h.service.UpdateFixedDepositWill(ctx, id, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -116,6 +124,7 @@ func (h *fixeddepositwillHandlerImpl) DeleteFixedDepositWill(w http.ResponseWrit
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -126,6 +135,7 @@ func (h *fixeddepositwillHandlerImpl) DeleteFixedDepositWill(w http.ResponseWrit
 
 	err = h.service.DeleteFixedDepositWill(ctx, id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -139,6 +149,7 @@ func (h *fixeddepositwillHandlerImpl) GetFixedDepositWillById(w http.ResponseWri
 
 	res, err := h.service.GetFixedDepositWill(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -161,6 +172,7 @@ func (h *fixeddepositwillHandlerImpl) GetFixedDepositWillList(w http.ResponseWri
 
 	res, total, err := h.service.GetFixedDepositWillList(filter)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return

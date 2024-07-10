@@ -14,15 +14,17 @@ import (
 
 // LogHandler is a concrete type that implements LogHandler
 type logHandlerImpl struct {
-	App     *celeritas.Celeritas
-	service services.LogService
+	App             *celeritas.Celeritas
+	service         services.LogService
+	errorLogService services.ErrorLogService
 }
 
 // NewLogHandler initializes a new LogHandler with its dependencies
-func NewLogHandler(app *celeritas.Celeritas, logService services.LogService) LogHandler {
+func NewLogHandler(app *celeritas.Celeritas, logService services.LogService, errorLogService services.ErrorLogService) LogHandler {
 	return &logHandlerImpl{
-		App:     app,
-		service: logService,
+		App:             app,
+		service:         logService,
+		errorLogService: errorLogService,
 	}
 }
 
@@ -30,6 +32,7 @@ func (h *logHandlerImpl) CreateLog(w http.ResponseWriter, r *http.Request) {
 	var input dto.LogDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -44,6 +47,7 @@ func (h *logHandlerImpl) CreateLog(w http.ResponseWriter, r *http.Request) {
 
 	res, err := h.service.CreateLog(input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -58,6 +62,7 @@ func (h *logHandlerImpl) UpdateLog(w http.ResponseWriter, r *http.Request) {
 	var input dto.LogDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -72,6 +77,7 @@ func (h *logHandlerImpl) UpdateLog(w http.ResponseWriter, r *http.Request) {
 
 	res, err := h.service.UpdateLog(id, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -85,6 +91,7 @@ func (h *logHandlerImpl) DeleteLog(w http.ResponseWriter, r *http.Request) {
 
 	err := h.service.DeleteLog(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -98,6 +105,7 @@ func (h *logHandlerImpl) GetLogById(w http.ResponseWriter, r *http.Request) {
 
 	res, err := h.service.GetLog(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -120,6 +128,7 @@ func (h *logHandlerImpl) GetLogList(w http.ResponseWriter, r *http.Request) {
 
 	res, total, err := h.service.GetLogList(filter)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return

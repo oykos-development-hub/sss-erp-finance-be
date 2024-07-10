@@ -14,15 +14,17 @@ import (
 
 // ModelOfAccountingItemHandler is a concrete type that implements ModelOfAccountingItemHandler
 type modelofaccountingitemHandlerImpl struct {
-	App     *celeritas.Celeritas
-	service services.ModelOfAccountingItemService
+	App             *celeritas.Celeritas
+	service         services.ModelOfAccountingItemService
+	errorLogService services.ErrorLogService
 }
 
 // NewModelOfAccountingItemHandler initializes a new ModelOfAccountingItemHandler with its dependencies
-func NewModelOfAccountingItemHandler(app *celeritas.Celeritas, modelofaccountingitemService services.ModelOfAccountingItemService) ModelOfAccountingItemHandler {
+func NewModelOfAccountingItemHandler(app *celeritas.Celeritas, modelofaccountingitemService services.ModelOfAccountingItemService, errorLogService services.ErrorLogService) ModelOfAccountingItemHandler {
 	return &modelofaccountingitemHandlerImpl{
-		App:     app,
-		service: modelofaccountingitemService,
+		App:             app,
+		service:         modelofaccountingitemService,
+		errorLogService: errorLogService,
 	}
 }
 
@@ -30,6 +32,7 @@ func (h *modelofaccountingitemHandlerImpl) CreateModelOfAccountingItem(w http.Re
 	var input dto.ModelOfAccountingItemDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -44,6 +47,7 @@ func (h *modelofaccountingitemHandlerImpl) CreateModelOfAccountingItem(w http.Re
 
 	res, err := h.service.CreateModelOfAccountingItem(input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -58,6 +62,7 @@ func (h *modelofaccountingitemHandlerImpl) UpdateModelOfAccountingItem(w http.Re
 	var input dto.ModelOfAccountingItemDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -72,6 +77,7 @@ func (h *modelofaccountingitemHandlerImpl) UpdateModelOfAccountingItem(w http.Re
 
 	res, err := h.service.UpdateModelOfAccountingItem(id, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -85,6 +91,7 @@ func (h *modelofaccountingitemHandlerImpl) GetModelOfAccountingItemById(w http.R
 
 	res, err := h.service.GetModelOfAccountingItem(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -107,6 +114,7 @@ func (h *modelofaccountingitemHandlerImpl) GetModelOfAccountingItemList(w http.R
 
 	res, total, err := h.service.GetModelOfAccountingItemList(filter)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return

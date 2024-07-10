@@ -16,15 +16,17 @@ import (
 
 // InternalReallocationHandler is a concrete type that implements InternalReallocationHandler
 type internalreallocationHandlerImpl struct {
-	App     *celeritas.Celeritas
-	service services.InternalReallocationService
+	App             *celeritas.Celeritas
+	service         services.InternalReallocationService
+	errorLogService services.ErrorLogService
 }
 
 // NewInternalReallocationHandler initializes a new InternalReallocationHandler with its dependencies
-func NewInternalReallocationHandler(app *celeritas.Celeritas, internalreallocationService services.InternalReallocationService) InternalReallocationHandler {
+func NewInternalReallocationHandler(app *celeritas.Celeritas, internalreallocationService services.InternalReallocationService, errorLogService services.ErrorLogService) InternalReallocationHandler {
 	return &internalreallocationHandlerImpl{
-		App:     app,
-		service: internalreallocationService,
+		App:             app,
+		service:         internalreallocationService,
+		errorLogService: errorLogService,
 	}
 }
 
@@ -32,6 +34,7 @@ func (h *internalreallocationHandlerImpl) CreateInternalReallocation(w http.Resp
 	var input dto.InternalReallocationDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -49,6 +52,7 @@ func (h *internalreallocationHandlerImpl) CreateInternalReallocation(w http.Resp
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -59,6 +63,7 @@ func (h *internalreallocationHandlerImpl) CreateInternalReallocation(w http.Resp
 
 	res, err := h.service.CreateInternalReallocation(ctx, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -74,6 +79,7 @@ func (h *internalreallocationHandlerImpl) DeleteInternalReallocation(w http.Resp
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -84,6 +90,7 @@ func (h *internalreallocationHandlerImpl) DeleteInternalReallocation(w http.Resp
 
 	err = h.service.DeleteInternalReallocation(ctx, id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -97,6 +104,7 @@ func (h *internalreallocationHandlerImpl) GetInternalReallocationById(w http.Res
 
 	res, err := h.service.GetInternalReallocation(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -119,6 +127,7 @@ func (h *internalreallocationHandlerImpl) GetInternalReallocationList(w http.Res
 
 	res, total, err := h.service.GetInternalReallocationList(filter)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return

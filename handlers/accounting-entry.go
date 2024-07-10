@@ -17,15 +17,17 @@ import (
 
 // AccountingEntryHandler is a concrete type that implements AccountingEntryHandler
 type accountingentryHandlerImpl struct {
-	App     *celeritas.Celeritas
-	service services.AccountingEntryService
+	App             *celeritas.Celeritas
+	service         services.AccountingEntryService
+	errorLogService services.ErrorLogService
 }
 
 // NewAccountingEntryHandler initializes a new AccountingEntryHandler with its dependencies
-func NewAccountingEntryHandler(app *celeritas.Celeritas, accountingentryService services.AccountingEntryService) AccountingEntryHandler {
+func NewAccountingEntryHandler(app *celeritas.Celeritas, accountingentryService services.AccountingEntryService, errorLogService services.ErrorLogService) AccountingEntryHandler {
 	return &accountingentryHandlerImpl{
-		App:     app,
-		service: accountingentryService,
+		App:             app,
+		service:         accountingentryService,
+		errorLogService: errorLogService,
 	}
 }
 
@@ -33,6 +35,7 @@ func (h *accountingentryHandlerImpl) CreateAccountingEntry(w http.ResponseWriter
 	var input dto.AccountingEntryDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -50,6 +53,7 @@ func (h *accountingentryHandlerImpl) CreateAccountingEntry(w http.ResponseWriter
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -60,6 +64,7 @@ func (h *accountingentryHandlerImpl) CreateAccountingEntry(w http.ResponseWriter
 
 	res, err := h.service.CreateAccountingEntry(ctx, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -74,6 +79,7 @@ func (h *accountingentryHandlerImpl) UpdateAccountingEntry(w http.ResponseWriter
 	var input dto.AccountingEntryDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -91,6 +97,7 @@ func (h *accountingentryHandlerImpl) UpdateAccountingEntry(w http.ResponseWriter
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -101,6 +108,7 @@ func (h *accountingentryHandlerImpl) UpdateAccountingEntry(w http.ResponseWriter
 
 	res, err := h.service.UpdateAccountingEntry(ctx, id, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -117,6 +125,7 @@ func (h *accountingentryHandlerImpl) DeleteAccountingEntry(w http.ResponseWriter
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -127,6 +136,7 @@ func (h *accountingentryHandlerImpl) DeleteAccountingEntry(w http.ResponseWriter
 
 	err = h.service.DeleteAccountingEntry(ctx, id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -140,6 +150,7 @@ func (h *accountingentryHandlerImpl) GetAccountingEntryById(w http.ResponseWrite
 
 	res, err := h.service.GetAccountingEntry(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -162,6 +173,7 @@ func (h *accountingentryHandlerImpl) GetAccountingEntryList(w http.ResponseWrite
 
 	res, total, err := h.service.GetAccountingEntryList(filter)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -184,6 +196,7 @@ func (h *accountingentryHandlerImpl) GetAnalyticalCard(w http.ResponseWriter, r 
 
 	res, err := h.service.GetAnalyticalCard(filter)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -206,6 +219,7 @@ func (h *accountingentryHandlerImpl) GetObligationsForAccounting(w http.Response
 
 	res, total, err := h.service.GetObligationsForAccounting(filter)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -228,6 +242,7 @@ func (h *accountingentryHandlerImpl) GetPaymentOrdersForAccounting(w http.Respon
 
 	res, total, err := h.service.GetPaymentOrdersForAccounting(filter)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -250,6 +265,7 @@ func (h *accountingentryHandlerImpl) GetEnforcedPaymentsForAccounting(w http.Res
 
 	res, total, err := h.service.GetEnforcedPaymentsForAccounting(filter)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -272,6 +288,7 @@ func (h *accountingentryHandlerImpl) GetReturnedEnforcedPaymentsForAccounting(w 
 
 	res, total, err := h.service.GetReturnedEnforcedPaymentsForAccounting(filter)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -294,6 +311,7 @@ func (h *accountingentryHandlerImpl) BuildAccountingOrderForObligations(w http.R
 
 	res, err := h.service.BuildAccountingOrderForObligations(data)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return

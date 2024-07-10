@@ -14,15 +14,17 @@ import (
 
 // FinancialBudgetLimitHandler is a concrete type that implements FinancialBudgetLimitHandler
 type financialbudgetlimitHandlerImpl struct {
-	App     *celeritas.Celeritas
-	service services.FinancialBudgetLimitService
+	App             *celeritas.Celeritas
+	service         services.FinancialBudgetLimitService
+	errorLogService services.ErrorLogService
 }
 
 // NewFinancialBudgetLimitHandler initializes a new FinancialBudgetLimitHandler with its dependencies
-func NewFinancialBudgetLimitHandler(app *celeritas.Celeritas, financialbudgetlimitService services.FinancialBudgetLimitService) FinancialBudgetLimitHandler {
+func NewFinancialBudgetLimitHandler(app *celeritas.Celeritas, financialbudgetlimitService services.FinancialBudgetLimitService, errorLogService services.ErrorLogService) FinancialBudgetLimitHandler {
 	return &financialbudgetlimitHandlerImpl{
-		App:     app,
-		service: financialbudgetlimitService,
+		App:             app,
+		service:         financialbudgetlimitService,
+		errorLogService: errorLogService,
 	}
 }
 
@@ -30,6 +32,7 @@ func (h *financialbudgetlimitHandlerImpl) CreateFinancialBudgetLimit(w http.Resp
 	var input dto.FinancialBudgetLimitDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -44,6 +47,7 @@ func (h *financialbudgetlimitHandlerImpl) CreateFinancialBudgetLimit(w http.Resp
 
 	res, err := h.service.CreateFinancialBudgetLimit(input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -58,6 +62,7 @@ func (h *financialbudgetlimitHandlerImpl) UpdateFinancialBudgetLimit(w http.Resp
 	var input dto.FinancialBudgetLimitDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -72,6 +77,7 @@ func (h *financialbudgetlimitHandlerImpl) UpdateFinancialBudgetLimit(w http.Resp
 
 	res, err := h.service.UpdateFinancialBudgetLimit(id, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -85,6 +91,7 @@ func (h *financialbudgetlimitHandlerImpl) DeleteFinancialBudgetLimit(w http.Resp
 
 	err := h.service.DeleteFinancialBudgetLimit(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -98,6 +105,7 @@ func (h *financialbudgetlimitHandlerImpl) GetFinancialBudgetLimitById(w http.Res
 
 	res, err := h.service.GetFinancialBudgetLimit(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -120,6 +128,7 @@ func (h *financialbudgetlimitHandlerImpl) GetFinancialBudgetLimitList(w http.Res
 
 	res, total, err := h.service.GetFinancialBudgetLimitList(filter)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return

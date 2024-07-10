@@ -16,15 +16,17 @@ import (
 
 // SalaryHandler is a concrete type that implements SalaryHandler
 type salaryHandlerImpl struct {
-	App     *celeritas.Celeritas
-	service services.SalaryService
+	App             *celeritas.Celeritas
+	service         services.SalaryService
+	errorLogService services.ErrorLogService
 }
 
 // NewSalaryHandler initializes a new SalaryHandler with its dependencies
-func NewSalaryHandler(app *celeritas.Celeritas, salaryService services.SalaryService) SalaryHandler {
+func NewSalaryHandler(app *celeritas.Celeritas, salaryService services.SalaryService, errorLogService services.ErrorLogService) SalaryHandler {
 	return &salaryHandlerImpl{
-		App:     app,
-		service: salaryService,
+		App:             app,
+		service:         salaryService,
+		errorLogService: errorLogService,
 	}
 }
 
@@ -32,6 +34,7 @@ func (h *salaryHandlerImpl) CreateSalary(w http.ResponseWriter, r *http.Request)
 	var input dto.SalaryDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -49,6 +52,7 @@ func (h *salaryHandlerImpl) CreateSalary(w http.ResponseWriter, r *http.Request)
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -59,6 +63,7 @@ func (h *salaryHandlerImpl) CreateSalary(w http.ResponseWriter, r *http.Request)
 
 	res, err := h.service.CreateSalary(ctx, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -73,6 +78,7 @@ func (h *salaryHandlerImpl) UpdateSalary(w http.ResponseWriter, r *http.Request)
 	var input dto.SalaryDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -90,6 +96,7 @@ func (h *salaryHandlerImpl) UpdateSalary(w http.ResponseWriter, r *http.Request)
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -100,6 +107,7 @@ func (h *salaryHandlerImpl) UpdateSalary(w http.ResponseWriter, r *http.Request)
 
 	res, err := h.service.UpdateSalary(ctx, id, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -116,6 +124,7 @@ func (h *salaryHandlerImpl) DeleteSalary(w http.ResponseWriter, r *http.Request)
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -126,6 +135,7 @@ func (h *salaryHandlerImpl) DeleteSalary(w http.ResponseWriter, r *http.Request)
 
 	err = h.service.DeleteSalary(ctx, id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -139,6 +149,7 @@ func (h *salaryHandlerImpl) GetSalaryById(w http.ResponseWriter, r *http.Request
 
 	res, err := h.service.GetSalary(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -161,6 +172,7 @@ func (h *salaryHandlerImpl) GetSalaryList(w http.ResponseWriter, r *http.Request
 
 	res, total, err := h.service.GetSalaryList(filter)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return

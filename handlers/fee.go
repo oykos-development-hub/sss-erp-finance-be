@@ -15,15 +15,17 @@ import (
 )
 
 type feeHandlerImpl struct {
-	App     *celeritas.Celeritas
-	service services.FeeService
+	App             *celeritas.Celeritas
+	service         services.FeeService
+	errorLogService services.ErrorLogService
 }
 
 // NewFeeHandler is a factory function that returns a new instance of FeeHandler
-func NewFeeHandler(app *celeritas.Celeritas, feeService services.FeeService) FeeHandler {
+func NewFeeHandler(app *celeritas.Celeritas, feeService services.FeeService, errorLogService services.ErrorLogService) FeeHandler {
 	return &feeHandlerImpl{
-		App:     app,
-		service: feeService,
+		App:             app,
+		service:         feeService,
+		errorLogService: errorLogService,
 	}
 }
 
@@ -32,6 +34,7 @@ func (h *feeHandlerImpl) CreateFee(w http.ResponseWriter, r *http.Request) {
 	var input dto.FeeDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -49,6 +52,7 @@ func (h *feeHandlerImpl) CreateFee(w http.ResponseWriter, r *http.Request) {
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -59,6 +63,7 @@ func (h *feeHandlerImpl) CreateFee(w http.ResponseWriter, r *http.Request) {
 
 	res, err := h.service.CreateFee(ctx, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -73,6 +78,7 @@ func (h *feeHandlerImpl) GetFeeById(w http.ResponseWriter, r *http.Request) {
 
 	res, err := h.service.GetFee(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -88,6 +94,7 @@ func (h *feeHandlerImpl) UpdateFee(w http.ResponseWriter, r *http.Request) {
 	var input dto.FeeDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -105,6 +112,7 @@ func (h *feeHandlerImpl) UpdateFee(w http.ResponseWriter, r *http.Request) {
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -115,6 +123,7 @@ func (h *feeHandlerImpl) UpdateFee(w http.ResponseWriter, r *http.Request) {
 
 	res, err := h.service.UpdateFee(ctx, id, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -132,6 +141,7 @@ func (h *feeHandlerImpl) DeleteFee(w http.ResponseWriter, r *http.Request) {
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -142,6 +152,7 @@ func (h *feeHandlerImpl) DeleteFee(w http.ResponseWriter, r *http.Request) {
 
 	err = h.service.DeleteFee(ctx, id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -165,6 +176,7 @@ func (h *feeHandlerImpl) GetFeeList(w http.ResponseWriter, r *http.Request) {
 
 	res, total, err := h.service.GetFeeList(filter)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return

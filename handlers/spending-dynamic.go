@@ -16,15 +16,17 @@ import (
 
 // SpendingDynamicHandler is a concrete type that implements SpendingDynamicHandler
 type spendingdynamicHandlerImpl struct {
-	App     *celeritas.Celeritas
-	service services.SpendingDynamicService
+	App             *celeritas.Celeritas
+	service         services.SpendingDynamicService
+	errorLogService services.ErrorLogService
 }
 
 // NewSpendingDynamicHandler initializes a new SpendingDynamicHandler with its dependencies
-func NewSpendingDynamicHandler(app *celeritas.Celeritas, spendingdynamicService services.SpendingDynamicService) SpendingDynamicHandler {
+func NewSpendingDynamicHandler(app *celeritas.Celeritas, spendingdynamicService services.SpendingDynamicService, errorLogService services.ErrorLogService) SpendingDynamicHandler {
 	return &spendingdynamicHandlerImpl{
-		App:     app,
-		service: spendingdynamicService,
+		App:             app,
+		service:         spendingdynamicService,
+		errorLogService: errorLogService,
 	}
 }
 
@@ -35,6 +37,7 @@ func (h *spendingdynamicHandlerImpl) CreateSpendingDynamic(w http.ResponseWriter
 	var input []dto.SpendingDynamicDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -52,6 +55,7 @@ func (h *spendingdynamicHandlerImpl) CreateSpendingDynamic(w http.ResponseWriter
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -62,6 +66,7 @@ func (h *spendingdynamicHandlerImpl) CreateSpendingDynamic(w http.ResponseWriter
 
 	err = h.service.CreateSpendingDynamic(ctx, budgetID, unitID, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -69,6 +74,7 @@ func (h *spendingdynamicHandlerImpl) CreateSpendingDynamic(w http.ResponseWriter
 
 	res, err := h.service.GetSpendingDynamic(nil, &budgetID, &unitID, nil)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -83,6 +89,7 @@ func (h *spendingdynamicHandlerImpl) GetBudgetSpendingDynamicHistory(w http.Resp
 
 	res, err := h.service.GetSpendingDynamicHistory(budgetID, unitID)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -108,6 +115,7 @@ func (h *spendingdynamicHandlerImpl) GetBudgetSpendingDynamic(w http.ResponseWri
 
 	res, err := h.service.GetSpendingDynamic(nil, &budgetID, &unitID, filter.Version)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -123,6 +131,7 @@ func (h *spendingdynamicHandlerImpl) GetActual(w http.ResponseWriter, r *http.Re
 
 	res, err := h.service.GetActual(budgetID, unitID, accountID, 1)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return

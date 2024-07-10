@@ -14,15 +14,17 @@ import (
 
 // DepositAdditionalExpenseHandler is a concrete type that implements DepositAdditionalExpenseHandler
 type depositadditionalexpenseHandlerImpl struct {
-	App     *celeritas.Celeritas
-	service services.DepositAdditionalExpenseService
+	App             *celeritas.Celeritas
+	service         services.DepositAdditionalExpenseService
+	errorLogService services.ErrorLogService
 }
 
 // NewDepositAdditionalExpenseHandler initializes a new DepositAdditionalExpenseHandler with its dependencies
-func NewDepositAdditionalExpenseHandler(app *celeritas.Celeritas, depositadditionalexpenseService services.DepositAdditionalExpenseService) DepositAdditionalExpenseHandler {
+func NewDepositAdditionalExpenseHandler(app *celeritas.Celeritas, depositadditionalexpenseService services.DepositAdditionalExpenseService, errorLogService services.ErrorLogService) DepositAdditionalExpenseHandler {
 	return &depositadditionalexpenseHandlerImpl{
-		App:     app,
-		service: depositadditionalexpenseService,
+		App:             app,
+		service:         depositadditionalexpenseService,
+		errorLogService: errorLogService,
 	}
 }
 
@@ -30,6 +32,7 @@ func (h *depositadditionalexpenseHandlerImpl) CreateDepositAdditionalExpense(w h
 	var input dto.DepositAdditionalExpenseDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -44,6 +47,7 @@ func (h *depositadditionalexpenseHandlerImpl) CreateDepositAdditionalExpense(w h
 
 	res, err := h.service.CreateDepositAdditionalExpense(input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -58,6 +62,7 @@ func (h *depositadditionalexpenseHandlerImpl) UpdateDepositAdditionalExpense(w h
 	var input dto.DepositAdditionalExpenseDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -72,6 +77,7 @@ func (h *depositadditionalexpenseHandlerImpl) UpdateDepositAdditionalExpense(w h
 
 	res, err := h.service.UpdateDepositAdditionalExpense(id, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -85,6 +91,7 @@ func (h *depositadditionalexpenseHandlerImpl) DeleteDepositAdditionalExpense(w h
 
 	err := h.service.DeleteDepositAdditionalExpense(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -98,6 +105,7 @@ func (h *depositadditionalexpenseHandlerImpl) GetDepositAdditionalExpenseById(w 
 
 	res, err := h.service.GetDepositAdditionalExpense(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -120,6 +128,7 @@ func (h *depositadditionalexpenseHandlerImpl) GetDepositAdditionalExpenseList(w 
 
 	res, total, err := h.service.GetDepositAdditionalExpenseList(filter)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return

@@ -14,15 +14,17 @@ import (
 
 // PaymentOrderItemHandler is a concrete type that implements PaymentOrderItemHandler
 type paymentorderitemHandlerImpl struct {
-	App     *celeritas.Celeritas
-	service services.PaymentOrderItemService
+	App             *celeritas.Celeritas
+	service         services.PaymentOrderItemService
+	errorLogService services.ErrorLogService
 }
 
 // NewPaymentOrderItemHandler initializes a new PaymentOrderItemHandler with its dependencies
-func NewPaymentOrderItemHandler(app *celeritas.Celeritas, paymentorderitemService services.PaymentOrderItemService) PaymentOrderItemHandler {
+func NewPaymentOrderItemHandler(app *celeritas.Celeritas, paymentorderitemService services.PaymentOrderItemService, errorLogService services.ErrorLogService) PaymentOrderItemHandler {
 	return &paymentorderitemHandlerImpl{
-		App:     app,
-		service: paymentorderitemService,
+		App:             app,
+		service:         paymentorderitemService,
+		errorLogService: errorLogService,
 	}
 }
 
@@ -30,6 +32,7 @@ func (h *paymentorderitemHandlerImpl) CreatePaymentOrderItem(w http.ResponseWrit
 	var input dto.PaymentOrderItemDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -44,6 +47,7 @@ func (h *paymentorderitemHandlerImpl) CreatePaymentOrderItem(w http.ResponseWrit
 
 	res, err := h.service.CreatePaymentOrderItem(input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -58,6 +62,7 @@ func (h *paymentorderitemHandlerImpl) UpdatePaymentOrderItem(w http.ResponseWrit
 	var input dto.PaymentOrderItemDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -72,6 +77,7 @@ func (h *paymentorderitemHandlerImpl) UpdatePaymentOrderItem(w http.ResponseWrit
 
 	res, err := h.service.UpdatePaymentOrderItem(id, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -85,6 +91,7 @@ func (h *paymentorderitemHandlerImpl) DeletePaymentOrderItem(w http.ResponseWrit
 
 	err := h.service.DeletePaymentOrderItem(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -98,6 +105,7 @@ func (h *paymentorderitemHandlerImpl) GetPaymentOrderItemById(w http.ResponseWri
 
 	res, err := h.service.GetPaymentOrderItem(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -120,6 +128,7 @@ func (h *paymentorderitemHandlerImpl) GetPaymentOrderItemList(w http.ResponseWri
 
 	res, total, err := h.service.GetPaymentOrderItemList(filter)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return

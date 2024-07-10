@@ -16,15 +16,17 @@ import (
 
 // ActivityHandler is a concrete type that implements ActivityHandler
 type activityHandlerImpl struct {
-	App     *celeritas.Celeritas
-	service services.ActivityService
+	App             *celeritas.Celeritas
+	service         services.ActivityService
+	errorLogService services.ErrorLogService
 }
 
 // NewActivityHandler initializes a new ActivityHandler with its dependencies
-func NewActivityHandler(app *celeritas.Celeritas, activityService services.ActivityService) ActivityHandler {
+func NewActivityHandler(app *celeritas.Celeritas, activityService services.ActivityService, errorLogService services.ErrorLogService) ActivityHandler {
 	return &activityHandlerImpl{
-		App:     app,
-		service: activityService,
+		App:             app,
+		service:         activityService,
+		errorLogService: errorLogService,
 	}
 }
 
@@ -32,6 +34,7 @@ func (h *activityHandlerImpl) CreateActivity(w http.ResponseWriter, r *http.Requ
 	var input dto.ActivityDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -49,6 +52,7 @@ func (h *activityHandlerImpl) CreateActivity(w http.ResponseWriter, r *http.Requ
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -59,6 +63,7 @@ func (h *activityHandlerImpl) CreateActivity(w http.ResponseWriter, r *http.Requ
 
 	res, err := h.service.CreateActivity(ctx, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -73,6 +78,7 @@ func (h *activityHandlerImpl) UpdateActivity(w http.ResponseWriter, r *http.Requ
 	var input dto.ActivityDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -90,6 +96,7 @@ func (h *activityHandlerImpl) UpdateActivity(w http.ResponseWriter, r *http.Requ
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -100,6 +107,7 @@ func (h *activityHandlerImpl) UpdateActivity(w http.ResponseWriter, r *http.Requ
 
 	res, err := h.service.UpdateActivity(ctx, id, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -116,6 +124,7 @@ func (h *activityHandlerImpl) DeleteActivity(w http.ResponseWriter, r *http.Requ
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -126,6 +135,7 @@ func (h *activityHandlerImpl) DeleteActivity(w http.ResponseWriter, r *http.Requ
 
 	err = h.service.DeleteActivity(ctx, id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -139,6 +149,7 @@ func (h *activityHandlerImpl) GetActivityById(w http.ResponseWriter, r *http.Req
 
 	res, err := h.service.GetActivity(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -161,6 +172,7 @@ func (h *activityHandlerImpl) GetActivityList(w http.ResponseWriter, r *http.Req
 
 	res, total, err := h.service.GetActivityList(filter)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return

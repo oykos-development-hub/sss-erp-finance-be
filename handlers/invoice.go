@@ -16,17 +16,19 @@ import (
 
 // InvoiceHandler is a concrete type that implements InvoiceHandler
 type invoiceHandlerImpl struct {
-	App      *celeritas.Celeritas
-	service  services.InvoiceService
-	articles services.ArticleService
+	App             *celeritas.Celeritas
+	service         services.InvoiceService
+	articles        services.ArticleService
+	errorLogService services.ErrorLogService
 }
 
 // NewInvoiceHandler initializes a new InvoiceHandler with its dependencies
-func NewInvoiceHandler(app *celeritas.Celeritas, invoiceService services.InvoiceService, articleService services.ArticleService) InvoiceHandler {
+func NewInvoiceHandler(app *celeritas.Celeritas, invoiceService services.InvoiceService, articleService services.ArticleService, errorLogService services.ErrorLogService) InvoiceHandler {
 	return &invoiceHandlerImpl{
-		App:      app,
-		service:  invoiceService,
-		articles: articleService,
+		App:             app,
+		service:         invoiceService,
+		articles:        articleService,
+		errorLogService: errorLogService,
 	}
 }
 
@@ -46,6 +48,7 @@ func (h *invoiceHandlerImpl) CreateInvoice(w http.ResponseWriter, r *http.Reques
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -56,6 +59,7 @@ func (h *invoiceHandlerImpl) CreateInvoice(w http.ResponseWriter, r *http.Reques
 
 	res, err := h.service.CreateInvoice(ctx, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -82,6 +86,7 @@ func (h *invoiceHandlerImpl) UpdateInvoice(w http.ResponseWriter, r *http.Reques
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -92,6 +97,7 @@ func (h *invoiceHandlerImpl) UpdateInvoice(w http.ResponseWriter, r *http.Reques
 
 	res, err := h.service.UpdateInvoice(ctx, id, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -108,6 +114,7 @@ func (h *invoiceHandlerImpl) DeleteInvoice(w http.ResponseWriter, r *http.Reques
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -118,6 +125,7 @@ func (h *invoiceHandlerImpl) DeleteInvoice(w http.ResponseWriter, r *http.Reques
 
 	err = h.service.DeleteInvoice(ctx, id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -131,6 +139,7 @@ func (h *invoiceHandlerImpl) GetInvoiceById(w http.ResponseWriter, r *http.Reque
 
 	res, err := h.service.GetInvoice(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -153,6 +162,7 @@ func (h *invoiceHandlerImpl) GetInvoiceList(w http.ResponseWriter, r *http.Reque
 
 	res, total, err := h.service.GetInvoiceList(input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return

@@ -15,15 +15,17 @@ import (
 )
 
 type procedurecostPaymentHandlerImpl struct {
-	App     *celeritas.Celeritas
-	service services.ProcedureCostPaymentService
+	App             *celeritas.Celeritas
+	service         services.ProcedureCostPaymentService
+	errorLogService services.ErrorLogService
 }
 
 // NewProcedureCostPaymentHandler is a factory function that returns a new instance of ProcedureCostPaymentHandler
-func NewProcedureCostPaymentHandler(app *celeritas.Celeritas, procedurecostPaymentService services.ProcedureCostPaymentService) ProcedureCostPaymentHandler {
+func NewProcedureCostPaymentHandler(app *celeritas.Celeritas, procedurecostPaymentService services.ProcedureCostPaymentService, errorLogService services.ErrorLogService) ProcedureCostPaymentHandler {
 	return &procedurecostPaymentHandlerImpl{
-		App:     app,
-		service: procedurecostPaymentService,
+		App:             app,
+		service:         procedurecostPaymentService,
+		errorLogService: errorLogService,
 	}
 }
 
@@ -32,6 +34,7 @@ func (h *procedurecostPaymentHandlerImpl) CreateProcedureCostPayment(w http.Resp
 	var input dto.ProcedureCostPaymentDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -49,6 +52,7 @@ func (h *procedurecostPaymentHandlerImpl) CreateProcedureCostPayment(w http.Resp
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -59,6 +63,7 @@ func (h *procedurecostPaymentHandlerImpl) CreateProcedureCostPayment(w http.Resp
 
 	res, err := h.service.CreateProcedureCostPayment(ctx, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -76,6 +81,7 @@ func (h *procedurecostPaymentHandlerImpl) DeleteProcedureCostPayment(w http.Resp
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -86,6 +92,7 @@ func (h *procedurecostPaymentHandlerImpl) DeleteProcedureCostPayment(w http.Resp
 
 	err = h.service.DeleteProcedureCostPayment(ctx, id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -98,6 +105,7 @@ func (h *procedurecostPaymentHandlerImpl) DeleteProcedureCostPayment(w http.Resp
 func (h *procedurecostPaymentHandlerImpl) UpdateProcedureCostPayment(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -106,6 +114,7 @@ func (h *procedurecostPaymentHandlerImpl) UpdateProcedureCostPayment(w http.Resp
 	var input dto.ProcedureCostPaymentDTO
 	err = h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -123,6 +132,7 @@ func (h *procedurecostPaymentHandlerImpl) UpdateProcedureCostPayment(w http.Resp
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
@@ -133,6 +143,7 @@ func (h *procedurecostPaymentHandlerImpl) UpdateProcedureCostPayment(w http.Resp
 
 	res, err := h.service.UpdateProcedureCostPayment(ctx, id, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -147,6 +158,7 @@ func (h *procedurecostPaymentHandlerImpl) GetProcedureCostPaymentById(w http.Res
 
 	res, err := h.service.GetProcedureCostPayment(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -170,6 +182,7 @@ func (h *procedurecostPaymentHandlerImpl) GetProcedureCostPaymentList(w http.Res
 
 	res, total, err := h.service.GetProcedureCostPaymentList(filter)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return

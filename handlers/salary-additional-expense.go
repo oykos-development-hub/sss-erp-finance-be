@@ -14,15 +14,17 @@ import (
 
 // SalaryAdditionalExpenseHandler is a concrete type that implements SalaryAdditionalExpenseHandler
 type salaryadditionalexpenseHandlerImpl struct {
-	App     *celeritas.Celeritas
-	service services.SalaryAdditionalExpenseService
+	App             *celeritas.Celeritas
+	service         services.SalaryAdditionalExpenseService
+	errorLogService services.ErrorLogService
 }
 
 // NewSalaryAdditionalExpenseHandler initializes a new SalaryAdditionalExpenseHandler with its dependencies
-func NewSalaryAdditionalExpenseHandler(app *celeritas.Celeritas, salaryadditionalexpenseService services.SalaryAdditionalExpenseService) SalaryAdditionalExpenseHandler {
+func NewSalaryAdditionalExpenseHandler(app *celeritas.Celeritas, salaryadditionalexpenseService services.SalaryAdditionalExpenseService, errorLogService services.ErrorLogService) SalaryAdditionalExpenseHandler {
 	return &salaryadditionalexpenseHandlerImpl{
-		App:     app,
-		service: salaryadditionalexpenseService,
+		App:             app,
+		service:         salaryadditionalexpenseService,
+		errorLogService: errorLogService,
 	}
 }
 
@@ -30,6 +32,7 @@ func (h *salaryadditionalexpenseHandlerImpl) CreateSalaryAdditionalExpense(w htt
 	var input dto.SalaryAdditionalExpenseDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -44,6 +47,7 @@ func (h *salaryadditionalexpenseHandlerImpl) CreateSalaryAdditionalExpense(w htt
 
 	res, err := h.service.CreateSalaryAdditionalExpense(input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -58,6 +62,7 @@ func (h *salaryadditionalexpenseHandlerImpl) UpdateSalaryAdditionalExpense(w htt
 	var input dto.SalaryAdditionalExpenseDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -72,6 +77,7 @@ func (h *salaryadditionalexpenseHandlerImpl) UpdateSalaryAdditionalExpense(w htt
 
 	res, err := h.service.UpdateSalaryAdditionalExpense(id, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -85,6 +91,7 @@ func (h *salaryadditionalexpenseHandlerImpl) DeleteSalaryAdditionalExpense(w htt
 
 	err := h.service.DeleteSalaryAdditionalExpense(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -98,6 +105,7 @@ func (h *salaryadditionalexpenseHandlerImpl) GetSalaryAdditionalExpenseById(w ht
 
 	res, err := h.service.GetSalaryAdditionalExpense(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -120,6 +128,7 @@ func (h *salaryadditionalexpenseHandlerImpl) GetSalaryAdditionalExpenseList(w ht
 
 	res, total, err := h.service.GetSalaryAdditionalExpenseList(filter)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return

@@ -473,3 +473,11 @@ type SpendingReleaseRequestService interface {
 	GetSpendingReleaseRequestList(filter dto.SpendingReleaseRequestFilterDTO) ([]dto.SpendingReleaseRequestResponseDTO, *uint64, error)
 	AcceptSSSRequest(ctx context.Context, id int, fileID int) error
 }
+
+type ErrorLogService interface {
+	CreateErrorLog(err error)
+	UpdateErrorLog(id int, input dto.ErrorLogDTO) (*dto.ErrorLogResponseDTO, error)
+	DeleteErrorLog(id int) error
+	GetErrorLog(id int) (*dto.ErrorLogResponseDTO, error)
+	GetErrorLogList(filter dto.ErrorLogFilterDTO) ([]dto.ErrorLogResponseDTO, *uint64, error)
+}

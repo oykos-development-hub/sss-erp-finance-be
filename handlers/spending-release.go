@@ -17,15 +17,17 @@ import (
 
 // SpendingReleaseHandler is a concrete type that implements SpendingReleaseHandler
 type spendingreleaseHandlerImpl struct {
-	App     *celeritas.Celeritas
-	service services.SpendingReleaseService
+	App             *celeritas.Celeritas
+	service         services.SpendingReleaseService
+	errorLogService services.ErrorLogService
 }
 
 // NewSpendingReleaseHandler initializes a new SpendingReleaseHandler with its dependencies
-func NewSpendingReleaseHandler(app *celeritas.Celeritas, spendingreleaseService services.SpendingReleaseService) SpendingReleaseHandler {
+func NewSpendingReleaseHandler(app *celeritas.Celeritas, spendingreleaseService services.SpendingReleaseService, errorLogService services.ErrorLogService) SpendingReleaseHandler {
 	return &spendingreleaseHandlerImpl{
-		App:     app,
-		service: spendingreleaseService,
+		App:             app,
+		service:         spendingreleaseService,
+		errorLogService: errorLogService,
 	}
 }
 
@@ -36,6 +38,7 @@ func (h *spendingreleaseHandlerImpl) CreateSpendingRelease(w http.ResponseWriter
 	var input []dto.SpendingReleaseDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
@@ -43,6 +46,7 @@ func (h *spendingreleaseHandlerImpl) CreateSpendingRelease(w http.ResponseWriter
 
 	validator := h.App.Validator().ValidateStruct(&input)
 	if !validator.Valid() {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponseWithData(w, errors.BadRequestCode, errors.NewBadRequestError("input validation"), validator.Errors)
 		return
@@ -53,6 +57,7 @@ func (h *spendingreleaseHandlerImpl) CreateSpendingRelease(w http.ResponseWriter
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.ErrUnauthorized, err)
 		return
@@ -64,15 +69,18 @@ func (h *spendingreleaseHandlerImpl) CreateSpendingRelease(w http.ResponseWriter
 	res, err := h.service.CreateSpendingRelease(ctx, budgetID, unitID, input)
 	if err != nil {
 		if errors.IsErr(err, errors.BadRequestCode) {
+			h.errorLogService.CreateErrorLog(err)
 			h.App.ErrorLog.Print(err)
 			_ = h.App.WriteErrorResponse(w, errors.BadRequestCode, err)
 			return
 		}
 		if errors.IsErr(err, errors.NotFoundCode) {
+			h.errorLogService.CreateErrorLog(err)
 			h.App.ErrorLog.Print(err)
 			_ = h.App.WriteErrorResponse(w, errors.NotFoundCode, err)
 			return
 		}
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.ErrInternalServerError, err)
 		return
@@ -85,6 +93,7 @@ func (h *spendingreleaseHandlerImpl) DeleteSpendingRelease(w http.ResponseWriter
 	var input dto.DeleteSpendingReleaseInput
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
