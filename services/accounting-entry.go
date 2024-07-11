@@ -376,10 +376,54 @@ func (h *AccountingEntryServiceImpl) GetAccountingEntryList(filter dto.Accountin
 
 	orders = append(orders, "-created_at")
 
-	data, total, err := h.repo.GetAll(filter.Page, filter.Size, conditionAndExp, orders)
-	if err != nil {
-		return nil, nil, newErrors.Wrap(err, "repo accounting entry get all")
+	var data []*data.AccountingEntry
+	var total *uint64
+	var err error
+
+	//ako ti bude trebala paginacija za report napravi novi endpoint koji stavlja ovo u ono order case
+	if filter.SortForReport != nil && *filter.SortForReport {
+		var reportOrders []interface{}
+		reportOrders = append(reportOrders, "created_at")
+		conditionAndExpInvoice := up.And(conditionAndExp, &up.Cond{"type": "obligations"})
+		invoiceData, _, err := h.repo.GetAll(nil, nil, conditionAndExpInvoice, reportOrders)
+
+		if err != nil {
+			return nil, nil, newErrors.Wrap(err, "repo accounting entry get all")
+		}
+
+		conditionAndExpPaymentOrders := up.And(conditionAndExp, &up.Cond{"type": "payment_orders"})
+		paymentOrderData, _, err := h.repo.GetAll(nil, nil, conditionAndExpPaymentOrders, reportOrders)
+
+		if err != nil {
+			return nil, nil, newErrors.Wrap(err, "repo accounting entry get all")
+		}
+
+		conditionAndExpEnforcedPayment := up.And(conditionAndExp, &up.Cond{"type": "enforced_payments"})
+		enforcedPaymentData, _, err := h.repo.GetAll(nil, nil, conditionAndExpEnforcedPayment, reportOrders)
+
+		if err != nil {
+			return nil, nil, newErrors.Wrap(err, "repo accounting entry get all")
+		}
+
+		conditionAndExpReturnEnforcedPayment := up.And(conditionAndExp, &up.Cond{"type": "return_enforced_payment"})
+		returnEnforcedPaymentData, _, err := h.repo.GetAll(nil, nil, conditionAndExpReturnEnforcedPayment, reportOrders)
+
+		if err != nil {
+			return nil, nil, newErrors.Wrap(err, "repo accounting entry get all")
+		}
+
+		data = append(data, invoiceData...)
+		data = append(data, paymentOrderData...)
+		data = append(data, enforcedPaymentData...)
+		data = append(data, returnEnforcedPaymentData...)
+
+	} else {
+		data, total, err = h.repo.GetAll(filter.Page, filter.Size, conditionAndExp, orders)
+		if err != nil {
+			return nil, nil, newErrors.Wrap(err, "repo accounting entry get all")
+		}
 	}
+
 	response := dto.ToAccountingEntryListResponseDTO(data)
 
 	for i := 0; i < len(response); i++ {

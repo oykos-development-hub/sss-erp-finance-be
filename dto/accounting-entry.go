@@ -37,6 +37,7 @@ type AccountingEntryFilterDTO struct {
 	Type               *data.TypesOfObligation `json:"type"`
 	DateOfStart        *time.Time              `json:"date_of_start"`
 	DateOfEnd          *time.Time              `json:"date_of_end"`
+	SortForReport      *bool                   `json:"sort_for_report"`
 }
 
 type ObligationForAccounting struct {
