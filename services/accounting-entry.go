@@ -382,31 +382,29 @@ func (h *AccountingEntryServiceImpl) GetAccountingEntryList(filter dto.Accountin
 
 	//ako ti bude trebala paginacija za report napravi novi endpoint koji stavlja ovo u ono order case
 	if filter.SortForReport != nil && *filter.SortForReport {
-		var reportOrders []interface{}
-		reportOrders = append(reportOrders, "created_at")
 		conditionAndExpInvoice := up.And(conditionAndExp, &up.Cond{"type": "obligations"})
-		invoiceData, totalInvoice, err := h.repo.GetAll(nil, nil, conditionAndExpInvoice, reportOrders)
+		invoiceData, totalInvoice, err := h.repo.GetAll(nil, nil, conditionAndExpInvoice, orders)
 
 		if err != nil {
 			return nil, nil, newErrors.Wrap(err, "repo accounting entry get all")
 		}
 
 		conditionAndExpPaymentOrders := up.And(conditionAndExp, &up.Cond{"type": "payment_orders"})
-		paymentOrderData, totalPaymentOrder, err := h.repo.GetAll(nil, nil, conditionAndExpPaymentOrders, reportOrders)
+		paymentOrderData, totalPaymentOrder, err := h.repo.GetAll(nil, nil, conditionAndExpPaymentOrders, orders)
 
 		if err != nil {
 			return nil, nil, newErrors.Wrap(err, "repo accounting entry get all")
 		}
 
 		conditionAndExpEnforcedPayment := up.And(conditionAndExp, &up.Cond{"type": "enforced_payments"})
-		enforcedPaymentData, totalEnforcedPayment, err := h.repo.GetAll(nil, nil, conditionAndExpEnforcedPayment, reportOrders)
+		enforcedPaymentData, totalEnforcedPayment, err := h.repo.GetAll(nil, nil, conditionAndExpEnforcedPayment, orders)
 
 		if err != nil {
 			return nil, nil, newErrors.Wrap(err, "repo accounting entry get all")
 		}
 
 		conditionAndExpReturnEnforcedPayment := up.And(conditionAndExp, &up.Cond{"type": "return_enforced_payment"})
-		returnEnforcedPaymentData, totalReturnEnforced, err := h.repo.GetAll(nil, nil, conditionAndExpReturnEnforcedPayment, reportOrders)
+		returnEnforcedPaymentData, totalReturnEnforced, err := h.repo.GetAll(nil, nil, conditionAndExpReturnEnforcedPayment, orders)
 
 		if err != nil {
 			return nil, nil, newErrors.Wrap(err, "repo accounting entry get all")
