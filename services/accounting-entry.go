@@ -385,28 +385,28 @@ func (h *AccountingEntryServiceImpl) GetAccountingEntryList(filter dto.Accountin
 		var reportOrders []interface{}
 		reportOrders = append(reportOrders, "created_at")
 		conditionAndExpInvoice := up.And(conditionAndExp, &up.Cond{"type": "obligations"})
-		invoiceData, _, err := h.repo.GetAll(nil, nil, conditionAndExpInvoice, reportOrders)
+		invoiceData, totalInvoice, err := h.repo.GetAll(nil, nil, conditionAndExpInvoice, reportOrders)
 
 		if err != nil {
 			return nil, nil, newErrors.Wrap(err, "repo accounting entry get all")
 		}
 
 		conditionAndExpPaymentOrders := up.And(conditionAndExp, &up.Cond{"type": "payment_orders"})
-		paymentOrderData, _, err := h.repo.GetAll(nil, nil, conditionAndExpPaymentOrders, reportOrders)
+		paymentOrderData, totalPaymentOrder, err := h.repo.GetAll(nil, nil, conditionAndExpPaymentOrders, reportOrders)
 
 		if err != nil {
 			return nil, nil, newErrors.Wrap(err, "repo accounting entry get all")
 		}
 
 		conditionAndExpEnforcedPayment := up.And(conditionAndExp, &up.Cond{"type": "enforced_payments"})
-		enforcedPaymentData, _, err := h.repo.GetAll(nil, nil, conditionAndExpEnforcedPayment, reportOrders)
+		enforcedPaymentData, totalEnforcedPayment, err := h.repo.GetAll(nil, nil, conditionAndExpEnforcedPayment, reportOrders)
 
 		if err != nil {
 			return nil, nil, newErrors.Wrap(err, "repo accounting entry get all")
 		}
 
 		conditionAndExpReturnEnforcedPayment := up.And(conditionAndExp, &up.Cond{"type": "return_enforced_payment"})
-		returnEnforcedPaymentData, _, err := h.repo.GetAll(nil, nil, conditionAndExpReturnEnforcedPayment, reportOrders)
+		returnEnforcedPaymentData, totalReturnEnforced, err := h.repo.GetAll(nil, nil, conditionAndExpReturnEnforcedPayment, reportOrders)
 
 		if err != nil {
 			return nil, nil, newErrors.Wrap(err, "repo accounting entry get all")
@@ -416,7 +416,8 @@ func (h *AccountingEntryServiceImpl) GetAccountingEntryList(filter dto.Accountin
 		data = append(data, paymentOrderData...)
 		data = append(data, enforcedPaymentData...)
 		data = append(data, returnEnforcedPaymentData...)
-
+		totalInt := *totalInvoice + *totalPaymentOrder + *totalReturnEnforced + *totalEnforcedPayment
+		total = &totalInt
 	} else {
 		data, total, err = h.repo.GetAll(filter.Page, filter.Size, conditionAndExp, orders)
 		if err != nil {
