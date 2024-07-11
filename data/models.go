@@ -67,14 +67,14 @@ type Models struct {
 	SpendingDynamicEntry     SpendingDynamicEntry
 	CurrentBudget            CurrentBudget
 	SpendingRelease          SpendingRelease
-	InternalReallocation InternalReallocation
-		InternalReallocationItem InternalReallocationItem
-		ExternalReallocation ExternalReallocation
-		ExternalReallocationItem ExternalReallocationItem
-		Log Log
-		SpendingReleaseRequest SpendingReleaseRequest
-		ErrorLog ErrorLog
-	}
+	InternalReallocation     InternalReallocation
+	InternalReallocationItem InternalReallocationItem
+	ExternalReallocation     ExternalReallocation
+	ExternalReallocationItem ExternalReallocationItem
+	Log                      Log
+	SpendingReleaseRequest   SpendingReleaseRequest
+	ErrorLog                 ErrorLog
+}
 
 func New(databasePool *sql.DB) Models {
 	//db = databasePool
@@ -130,13 +130,13 @@ func New(databasePool *sql.DB) Models {
 		SpendingDynamicEntry:     SpendingDynamicEntry{},
 		CurrentBudget:            CurrentBudget{},
 		SpendingRelease:          SpendingRelease{},
-		InternalReallocation: InternalReallocation{},
+		InternalReallocation:     InternalReallocation{},
 		InternalReallocationItem: InternalReallocationItem{},
-		ExternalReallocation: ExternalReallocation{},
+		ExternalReallocation:     ExternalReallocation{},
 		ExternalReallocationItem: ExternalReallocationItem{},
-		Log: Log{},
-		SpendingReleaseRequest: SpendingReleaseRequest{},
-		ErrorLog: ErrorLog{},
+		Log:                      Log{},
+		SpendingReleaseRequest:   SpendingReleaseRequest{},
+		ErrorLog:                 ErrorLog{},
 	}
 }
 

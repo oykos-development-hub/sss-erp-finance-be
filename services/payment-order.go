@@ -54,9 +54,11 @@ func (h *PaymentOrderServiceImpl) CreatePaymentOrder(ctx context.Context, input 
 			return newErrors.Wrap(err, "repo payment order insert")
 		}
 
+		var amount float64
 		for _, item := range input.Items {
 			itemToInsert := item.ToPaymentOrderItem()
 			itemToInsert.PaymentOrderID = id
+			amount += item.Amount
 			_, err = h.itemsRepo.Insert(tx, *itemToInsert)
 			if err != nil {
 				return newErrors.Wrap(err, "repo payment order item insert")
@@ -80,6 +82,15 @@ func (h *PaymentOrderServiceImpl) CreatePaymentOrder(ctx context.Context, input 
 				if err != nil {
 					return newErrors.Wrap(err, "update salary status")
 				}
+			}
+		}
+
+		if dataToInsert.Amount == 0 {
+			dataToInsert.Amount = amount
+			err = h.repo.Update(ctx, tx, *dataToInsert)
+
+			if err != nil {
+				return newErrors.Wrap(err, "update payment order")
 			}
 		}
 
