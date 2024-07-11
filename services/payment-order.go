@@ -87,6 +87,7 @@ func (h *PaymentOrderServiceImpl) CreatePaymentOrder(ctx context.Context, input 
 
 		if dataToInsert.Amount == 0 {
 			dataToInsert.Amount = amount
+			dataToInsert.ID = id
 			err = h.repo.Update(ctx, tx, *dataToInsert)
 
 			if err != nil {
