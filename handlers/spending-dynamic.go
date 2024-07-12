@@ -31,8 +31,14 @@ func NewSpendingDynamicHandler(app *celeritas.Celeritas, spendingdynamicService 
 }
 
 func (h *spendingdynamicHandlerImpl) CreateSpendingDynamic(w http.ResponseWriter, r *http.Request) {
-	budgetID, _ := strconv.Atoi(chi.URLParam(r, "budget_id"))
-	unitID, _ := strconv.Atoi(chi.URLParam(r, "unit_id"))
+	budgetID, budgetErr := strconv.Atoi(chi.URLParam(r, "budget_id"))
+	unitID, unitErr := strconv.Atoi(chi.URLParam(r, "unit_id"))
+
+	if budgetErr != nil || unitErr != nil {
+		h.App.ErrorLog.Print(errors.ErrInvalidInput)
+		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, errors.ErrInvalidInput)
+		return
+	}
 
 	var input []dto.SpendingDynamicDTO
 	err := h.App.ReadJSON(w, r, &input)
