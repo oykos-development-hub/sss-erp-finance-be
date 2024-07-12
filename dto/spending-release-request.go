@@ -31,6 +31,8 @@ type SpendingReleaseRequestFilterDTO struct {
 	Size               *int    `json:"size"`
 	OrganizationUnitID *int    `json:"organization_unit_id"`
 	Status             *string `json:"status"`
+	Month              *int    `json:"month"`
+	Year               *int    `json:"year"`
 }
 
 func (dto SpendingReleaseRequestDTO) ToSpendingReleaseRequest() *data.SpendingReleaseRequest {

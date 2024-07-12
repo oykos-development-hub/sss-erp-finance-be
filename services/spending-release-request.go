@@ -111,6 +111,14 @@ func (h *SpendingReleaseRequestServiceImpl) GetSpendingReleaseRequestList(filter
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"status": *filter.Status})
 	}
 
+	if filter.Month != nil {
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"month": *filter.Month})
+	}
+
+	if filter.Year != nil {
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"year": *filter.Year})
+	}
+
 	orders = append(orders, "-created_at")
 
 	data, total, err := h.repo.GetAll(filter.Page, filter.Size, conditionAndExp, orders)
