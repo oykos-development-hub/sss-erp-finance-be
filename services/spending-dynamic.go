@@ -50,7 +50,7 @@ func (h *SpendingDynamicServiceImpl) CreateSpendingDynamic(ctx context.Context, 
 
 		entriesInputData := inputDTO.ToSpendingDynamicEntry()
 
-		oldDynamic, err := h.GetSpendingDynamic(&currentBudget.ID, &budgetID, &unitID, nil)
+		/*oldDynamic, err := h.GetSpendingDynamic(&currentBudget.ID, &budgetID, &unitID, nil)
 		if err != nil {
 			return newErrors.Wrap(err, "get spending dynamic")
 		}
@@ -62,7 +62,7 @@ func (h *SpendingDynamicServiceImpl) CreateSpendingDynamic(ctx context.Context, 
 			if !entriesInputData.SumOfMonths().Equal(currentBudget.CurrentAmount) {
 				return newErrors.NewBadRequestError("sum must match actual of current budget")
 			}
-		}
+		}*/
 
 		entriesInputData.CurrentBudgetID = currentBudget.ID
 		entriesInputData.Version = latestVersion + 1
