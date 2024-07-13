@@ -17,7 +17,7 @@ BEGIN
         SELECT current_setting('myapp.user_id')::INTEGER INTO user_id;
     EXCEPTION
         WHEN others THEN
-            user_id := NULL;  
+            user_id := 0;  
     END;
 
     IF TG_OP = 'INSERT' THEN
