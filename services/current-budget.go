@@ -46,9 +46,11 @@ func (h *CurrentBudgetServiceImpl) CreateCurrentBudget(ctx context.Context, inpu
 
 	res := dto.ToCurrentBudgetResponseDTO(data)
 
-	err = h.spendingService.CreateInititalSpendingDynamicFromCurrentBudget(ctx, data)
-	if err != nil {
-		return nil, newErrors.Wrap(err, "svc spending create initial spending dynamic from current budget")
+	if data.Type == 1 {
+		err = h.spendingService.CreateInititalSpendingDynamicFromCurrentBudget(ctx, data)
+		if err != nil {
+			return nil, newErrors.Wrap(err, "svc spending create initial spending dynamic from current budget")
+		}
 	}
 
 	return &res, nil
