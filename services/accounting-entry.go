@@ -412,10 +412,10 @@ func (h *AccountingEntryServiceImpl) GetAccountingEntryList(filter dto.Accountin
 			return nil, nil, newErrors.Wrap(err, "repo accounting entry get all")
 		}
 
-		data = append(data, invoiceData...)
-		data = append(data, paymentOrderData...)
-		data = append(data, enforcedPaymentData...)
 		data = append(data, returnEnforcedPaymentData...)
+		data = append(data, enforcedPaymentData...)
+		data = append(data, paymentOrderData...)
+		data = append(data, invoiceData...)
 		totalInt := *totalInvoice + *totalPaymentOrder + *totalReturnEnforced + *totalEnforcedPayment
 		total = &totalInt
 	} else {
