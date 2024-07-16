@@ -258,6 +258,7 @@ func (h *InvoiceServiceImpl) GetInvoiceList(input dto.InvoicesFilter) ([]dto.Inv
 		likeCondition := fmt.Sprintf("%%%s%%", *input.Search)
 		search := up.Or(
 			up.Cond{"invoice_number ILIKE": likeCondition},
+			up.Cond{"pro_forma_invoice_number ILIKE": likeCondition},
 		)
 		conditionAndExp = up.And(conditionAndExp, search)
 	}
