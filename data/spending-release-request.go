@@ -13,6 +13,7 @@ type SpendingReleaseStatus string
 var (
 	SprendingReleaseStatusCreated SpendingReleaseStatus = "Kreiran"
 	SpendingReleaseStatusAccept   SpendingReleaseStatus = "Prihvaćen"
+	SpendingReleaseStatusFilled   SpendingReleaseStatus = "Popunjen"
 )
 
 // SpendingReleaseRequest struct

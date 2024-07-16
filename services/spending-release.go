@@ -15,18 +15,20 @@ import (
 )
 
 type SpendingReleaseServiceImpl struct {
-	App               *celeritas.Celeritas
-	repo              data.SpendingRelease
-	repoBudget        data.Budget
-	repoCurrentBudget data.CurrentBudget
+	App                  *celeritas.Celeritas
+	repo                 data.SpendingRelease
+	repoBudget           data.Budget
+	repoCurrentBudget    data.CurrentBudget
+	repoSpendingRequests data.SpendingReleaseRequest
 }
 
-func NewSpendingReleaseServiceImpl(app *celeritas.Celeritas, repo data.SpendingRelease, repoCurrentBudget data.CurrentBudget, repoBudget data.Budget) SpendingReleaseService {
+func NewSpendingReleaseServiceImpl(app *celeritas.Celeritas, repo data.SpendingRelease, repoCurrentBudget data.CurrentBudget, repoBudget data.Budget, repoSpendingRequests data.SpendingReleaseRequest) SpendingReleaseService {
 	return &SpendingReleaseServiceImpl{
-		App:               app,
-		repo:              repo,
-		repoBudget:        repoBudget,
-		repoCurrentBudget: repoCurrentBudget,
+		App:                  app,
+		repo:                 repo,
+		repoBudget:           repoBudget,
+		repoCurrentBudget:    repoCurrentBudget,
+		repoSpendingRequests: repoSpendingRequests,
 	}
 }
 
@@ -84,6 +86,29 @@ func (h *SpendingReleaseServiceImpl) CreateSpendingRelease(ctx context.Context, 
 
 		if currentBudget.Vault().Sub(inputData.Value).LessThan(decimal.Zero) {
 			return nil, newErrors.NewWithCode(newErrors.NotEnoughFundsCode, "not enough funds")
+		}
+		conditionAndExp := &up.AndExpr{}
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"organization_unit_id": unitID})
+
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"month": currentMonth})
+
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"year": currentYear})
+
+		spendingReleaseRequest, _, err := h.repoSpendingRequests.GetAll(nil, nil, conditionAndExp, nil)
+		if err != nil {
+			return nil, newErrors.Wrap(err, "repo spending requests get all")
+		}
+
+		if len(spendingReleaseRequest) != 1 {
+			return nil, newErrors.Wrap(errors.ErrInvalidInput, "repo spending requests get all")
+		}
+
+		spendingReleaseRequest[0].Status = data.SpendingReleaseStatusFilled
+
+		err = h.repoSpendingRequests.Update(data.Upper, *spendingReleaseRequest[0])
+
+		if err != nil {
+			return nil, newErrors.Wrap(err, "repo spending requests update")
 		}
 
 		id, err := h.repo.Insert(ctx, inputData)

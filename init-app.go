@@ -48,7 +48,7 @@ func initApplication() *celeritas.Celeritas {
 	SpendingDynamicService := services.NewSpendingDynamicServiceImpl(cel, models.SpendingDynamicEntry, models.CurrentBudget)
 	SpendingDynamicHandler := handlers.NewSpendingDynamicHandler(cel, SpendingDynamicService, ErrorLogService)
 
-	SpendingReleaseService := services.NewSpendingReleaseServiceImpl(cel, models.SpendingRelease, models.CurrentBudget, models.Budget)
+	SpendingReleaseService := services.NewSpendingReleaseServiceImpl(cel, models.SpendingRelease, models.CurrentBudget, models.Budget, models.SpendingReleaseRequest)
 	SpendingReleaseHandler := handlers.NewSpendingReleaseHandler(cel, SpendingReleaseService, ErrorLogService)
 
 	CurrentBudgetService := services.NewCurrentBudgetServiceImpl(cel, models.CurrentBudget, SpendingDynamicService)
