@@ -211,7 +211,7 @@ func (t *PaymentOrder) Insert(ctx context.Context, tx up.Session, m PaymentOrder
 func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation, *uint64, error) {
 	var items []Obligation
 
-	queryForInvoices := `select i.id, sum((a.net_price +a.net_price*a.vat_percentage/100)*a.amount) as sum, 
+	queryForInvoices := `select i.id, COALESCE(SUM((a.net_price + a.net_price * a.vat_percentage / 100) * a.amount), 0) as sum, 
 						i.invoice_number, i.pro_forma_invoice_number, i.status, i.created_at
 						from invoices i
 						left join articles a on a.invoice_id = i.id
@@ -219,7 +219,7 @@ func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation
 						i.organization_unit_id = $2 and i.type = $4 and i.status <> $3 and i.status <> $5
 						group by i.id;`
 
-	queryForPaidInvoices := `select sum(p.amount) from payment_order_items pi 
+	queryForPaidInvoices := `select COALESCE(sum(p.amount),0) as sum from payment_order_items pi 
 							left join payment_orders p on p.id = pi.payment_order_id
 							where pi.invoice_id = $1 and (p.status is null or p.status <> 'Storniran')`
 
@@ -230,7 +230,7 @@ func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation
 	                               i.organization_unit_id = $2 and a.status <> $3
 	                               group by a.id, a.title, i.type, i.invoice_number order by a.id;`
 
-	queryForPaidAdditionalExpenses := `select sum(p.amount) from payment_order_items pi 
+	queryForPaidAdditionalExpenses := `select COALESCE(sum(p.amount) as sum) from payment_order_items pi 
 								   left join payment_orders p on p.id = pi.payment_order_id
 								   where pi.additional_expense_id = $1`
 
@@ -241,7 +241,7 @@ func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation
 	                                     s.organization_unit_id = $2 and a.status <> $3
 	                                     group by a.id, a.title, s.month order by a.id;`
 
-	queryForPaidSalaryAdditionalExpenses := `select sum(p.amount) from payment_order_items pi 
+	queryForPaidSalaryAdditionalExpenses := `select COALESCE(sum(p.amount),0) as sum from payment_order_items pi 
 										 left join payment_orders p on p.id = pi.payment_order_id
 										 where pi.salary_additional_expense_id = $1`
 
