@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"time"
 
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
@@ -180,6 +181,9 @@ func (h *SpendingDynamicServiceImpl) GetSpendingDynamic(currentBudgetID, budgetI
 			November:        dto.MonthEntry{Value: entry.November},
 			December:        dto.MonthEntry{Value: entry.December},
 		}
+
+		IsCurrentMonthEditable := true
+
 		for _, release := range releases {
 			switch release.Month {
 			case 1:
@@ -207,9 +211,17 @@ func (h *SpendingDynamicServiceImpl) GetSpendingDynamic(currentBudgetID, budgetI
 			case 12:
 				entryRes.December.Savings = entryRes.December.Value.Sub(release.Value)
 			}
+
+			currentMonth := int(time.Now().Month())
+
+			if currentMonth == release.Month {
+				IsCurrentMonthEditable = false
+			}
+
 		}
 
 		entryRes.TotalSavings = entryRes.GetTotalSavings()
+		entryRes.IsCurrentMonthEditable = IsCurrentMonthEditable
 
 		entriesListRes = append(entriesListRes, entryRes)
 	}
