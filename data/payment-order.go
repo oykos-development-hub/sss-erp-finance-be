@@ -51,6 +51,7 @@ type Obligation struct {
 	RemainPrice               float64           `json:"remain_price"`
 	Status                    string            `json:"status"`
 	CreatedAt                 time.Time         `json:"created_at"`
+	AccountID                 int               `json:"account_id"`
 }
 
 // Table returns the table name
@@ -223,7 +224,7 @@ func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation
 							left join payment_orders p on p.id = pi.payment_order_id
 							where pi.invoice_id = $1 and (p.status is null or p.status <> 'Storniran')`
 
-	queryForAdditionalExpenses := `select a.id, a.price, a.title, i.type, i.invoice_number, a.status, a.created_at
+	queryForAdditionalExpenses := `select a.id, a.price, a.title, i.type, i.invoice_number, a.status, a.created_at, a.account_id
 	                               from additional_expenses a
 	                               left join invoices i on a.invoice_id = i.id
 	                               where a.invoice_id = i.id and a.subject_id = $1 and
@@ -234,7 +235,7 @@ func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation
 								   left join payment_orders p on p.id = pi.payment_order_id
 								   where pi.additional_expense_id = $1`
 
-	queryForSalaryAdditionalExpenses := `select a.id, a.amount, a.title, a.status, a.created_at, s.month
+	queryForSalaryAdditionalExpenses := `select a.id, a.amount, a.title, a.status, a.created_at, s.month, a.account_id
 	                                     from salary_additional_expenses a
 	                                     left join salaries s on s.id = a.salary_id
 	                                     where  a.subject_id = $1 and
@@ -302,7 +303,7 @@ func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation
 			var obligation Obligation
 			var paid *float64
 			var title string
-			err = rows.Scan(&obligation.AdditionalExpenseID, &obligation.TotalPrice, &obligation.Title, &obligation.Type, &title, &obligation.Status, &obligation.CreatedAt)
+			err = rows.Scan(&obligation.AdditionalExpenseID, &obligation.TotalPrice, &obligation.Title, &obligation.Type, &title, &obligation.Status, &obligation.CreatedAt, &obligation.AccountID)
 
 			if err != nil {
 				return nil, nil, newErrors.Wrap(err, "upper scan")
@@ -345,7 +346,7 @@ func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation
 			var obligation Obligation
 			var paid *float64
 			var title string
-			err = rows.Scan(&obligation.SalaryAdditionalExpenseID, &obligation.TotalPrice, &title, &obligation.Status, &obligation.CreatedAt, &obligation.Title)
+			err = rows.Scan(&obligation.SalaryAdditionalExpenseID, &obligation.TotalPrice, &title, &obligation.Status, &obligation.CreatedAt, &obligation.Title, &obligation.AccountID)
 
 			if err != nil {
 				return nil, nil, newErrors.Wrap(err, "upper scan")
