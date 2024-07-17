@@ -55,6 +55,7 @@ type ObligationResponse struct {
 	RemainPrice               float64                `json:"remain_price"`
 	InvoiceItems              []InvoiceItems         `json:"invoice_items"`
 	CreatedAt                 time.Time              `json:"created_at"`
+	AccountID                 int                    `json:"account_id"`
 }
 
 type InvoiceItems struct {

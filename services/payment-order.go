@@ -567,6 +567,7 @@ func (h *PaymentOrderServiceImpl) GetAllObligations(filter dto.GetObligationsFil
 			RemainPrice:               item.RemainPrice,
 			InvoiceItems:              invoiceItems,
 			CreatedAt:                 item.CreatedAt,
+			AccountID:                 item.AccountID,
 		})
 	}
 
