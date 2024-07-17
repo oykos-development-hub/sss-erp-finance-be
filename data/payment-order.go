@@ -230,7 +230,7 @@ func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation
 	                               i.organization_unit_id = $2 and a.status <> $3
 	                               group by a.id, a.title, i.type, i.invoice_number order by a.id;`
 
-	queryForPaidAdditionalExpenses := `select COALESCE(sum(p.amount) as sum) from payment_order_items pi 
+	queryForPaidAdditionalExpenses := `select COALESCE(sum(p.amount),0) as sum from payment_order_items pi 
 								   left join payment_orders p on p.id = pi.payment_order_id
 								   where pi.additional_expense_id = $1`
 
