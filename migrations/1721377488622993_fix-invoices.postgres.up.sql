@@ -1,0 +1,1 @@
+alter table invoices add column date_of_end timestamp default;
