@@ -1,0 +1,1 @@
+alter table invoices add column tax_authority_codebook_id integer;
