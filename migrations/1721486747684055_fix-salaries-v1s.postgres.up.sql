@@ -1,0 +1,1 @@
+alter table salaries add column number_of_employees integer;
