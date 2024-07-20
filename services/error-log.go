@@ -104,14 +104,6 @@ func (h *ErrorLogServiceImpl) GetErrorLogList(filter dto.ErrorLogFilterDTO) ([]d
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"created_at < ": *filter.DateOfEnd})
 	}
 
-	/*if filter.SortByTitle != nil {
-		if *filter.SortByTitle == "asc" {
-			orders = append(orders, "-title")
-		} else {
-			orders = append(orders, "title")
-		}
-	}*/
-
 	orders = append(orders, "-created_at")
 
 	data, total, err := h.repo.GetAll(filter.Page, filter.Size, conditionAndExp, orders)
