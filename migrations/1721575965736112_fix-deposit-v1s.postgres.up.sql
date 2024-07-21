@@ -1,0 +1,1 @@
+alter table deposit_payments add column current_bank_account text;

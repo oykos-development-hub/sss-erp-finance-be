@@ -1,0 +1,1 @@
+alter table payment_orders add column status text;

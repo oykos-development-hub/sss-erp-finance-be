@@ -1,0 +1,43 @@
+services:
+  api:
+    image: ${IMAGE_URL}:${IMAGE_TAG}
+    restart: always
+    volumes:
+      - ../.env:/.env:ro
+    environment:
+      DATABASE_HOST: postgres
+    depends_on:
+      - migration
+    networks:
+      default:
+      bff:
+        aliases:
+        - "${COMPOSE_PROJECT_NAME}-api"
+  postgres:
+    image: 'postgres:13.4'
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: finance
+    volumes:
+      - postgres:/data/postgres
+    healthcheck:
+      test: "pg_isready --username=postgres && psql --username=postgres --list"
+      interval: 3s
+      timeout: 5s
+      retries: 20
+  migration:
+    image: migrate/migrate
+    command: ["-path", "../migrations", "-database", "postgres://postgres:password@postgres:5432/finance?sslmode=disable", "up"]
+    depends_on:
+      postgres: 
+        condition: service_healthy
+    volumes:
+      - ../migrations:/migrations
+volumes:
+  postgres:
+networks:
+  bff:
+    driver: bridge
+    external: true
