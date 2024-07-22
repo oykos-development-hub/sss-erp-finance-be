@@ -104,8 +104,8 @@ func (h *LogServiceImpl) GetLogList(filter dto.LogFilterDTO) ([]dto.LogResponseD
 		likeCondition := fmt.Sprintf("%%%s%%", *filter.Search)
 		conditionAndExp = up.And(
 			up.Or(
-				up.Cond{"old_state::text ILIKE": likeCondition},
-				up.Cond{"new_state::text ILIKE": likeCondition},
+				up.Cond{"old_state ::text ILIKE": likeCondition},
+				up.Cond{"new_state ::text ILIKE": likeCondition},
 			),
 		)
 	}

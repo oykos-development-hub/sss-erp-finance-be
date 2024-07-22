@@ -463,28 +463,56 @@ func (t *AccountingEntry) GetAnalyticalCard(filter AnalyticalCardFilter) (*Analy
 	var sumCreditAmount float64
 
 	queryForInitialState := `SELECT SUM(a.credit_amount) - SUM(a.debit_amount) AS saldo 
-    						 FROM accounting_entry_items a
-    						 LEFT JOIN accounting_entries ae ON ae.id = a.entry_id
-    						 WHERE a.supplier_id = $1 AND ae.organization_unit_id = $2 
-    						 AND ((cast($3 AS timestamp) IS NOT NULL AND a.date <  cast($3 AS timestamp)) OR 
-    						      (cast($4 AS timestamp) IS NOT NULL AND ae.date_of_booking < cast($4 AS timestamp)))
-							 AND (array_length($5::int[], 1) IS NULL OR a.account_id = ANY($5::int[]));`
+							 FROM accounting_entry_items a
+							 LEFT JOIN accounting_entries ae ON ae.id = a.entry_id
+							 WHERE a.supplier_id = $1 
+							   AND ae.organization_unit_id = $2 
+							   AND ((cast($3 AS timestamp) IS NOT NULL AND cast(a.date AS timestamp) < cast($3 AS timestamp)) 
+							        OR (cast($4 AS timestamp) IS NOT NULL AND cast(ae.date_of_booking AS timestamp) < cast($4 AS timestamp)))
+							   AND (array_length($5::int[], 1) IS NULL OR a.account_id = ANY($5::int[]));`
 
-	queryForItems := `select a.date, a.title, ae.date_of_booking, a.debit_amount, a.credit_amount, 
-						COALESCE(i.invoice_number, s.month, p.sap_id, e.sap_id, ep.sap_id) as document_number, a.type, ae.id_of_entry
-						from accounting_entry_items a
-						left join accounting_entries ae on ae.id = a.entry_id
-						left join invoices i on i.id = a.invoice_id
-						left join salaries s on s.id = a.salary_id
-						left join payment_orders p on p.id = a.payment_order_id
-						left join enforced_payments e on e.id = a.enforced_payment_id
-						left join enforced_payments ep on ep.id = a.return_enforced_payment_id
-						where a.supplier_id = $1 and ae.organization_unit_id = $2 and
-						((cast($3 AS timestamp) is not null and a.date >= cast($3 AS timestamp) and cast($4 AS timestamp) is not null and a.date <= cast($4 AS timestamp)) or
-						(cast($5 AS timestamp) is not null and ae.date_of_booking >= cast($5 AS timestamp) and cast($6 AS timestamp) is not null and ae.date_of_booking <= cast($6 AS timestamp)))
-						AND (array_length($7::int[], 1) IS NULL OR a.account_id = ANY($7::int[]));;`
+	queryForItems := `SELECT a.date, a.title, ae.date_of_booking, a.debit_amount, a.credit_amount, 
+                      COALESCE(i.invoice_number, s.month, p.sap_id, e.sap_id, ep.sap_id) AS document_number, a.type, ae.id_of_entry
+					  FROM accounting_entry_items a
+					  LEFT JOIN accounting_entries ae ON ae.id = a.entry_id
+					  LEFT JOIN invoices i ON i.id = a.invoice_id
+					  LEFT JOIN salaries s ON s.id = a.salary_id
+					  LEFT JOIN payment_orders p ON p.id = a.payment_order_id
+					  LEFT JOIN enforced_payments e ON e.id = a.enforced_payment_id
+					  LEFT JOIN enforced_payments ep ON ep.id = a.return_enforced_payment_id
+					  WHERE a.supplier_id = $1 
+					    AND ae.organization_unit_id = $2 
+					    AND ((cast($3 AS timestamp) IS NOT NULL AND cast(a.date AS timestamp) >= cast($3 AS timestamp) AND cast($4 AS timestamp) IS NOT NULL AND cast(a.date AS timestamp) <= cast($4 AS timestamp)) 
+					         OR (cast($5 AS timestamp) IS NOT NULL AND cast(ae.date_of_booking AS timestamp) >= cast($5 AS timestamp) AND cast($6 AS timestamp) IS NOT NULL AND cast(ae.date_of_booking AS timestamp) <= cast($6 AS timestamp)))
+					    AND (array_length($7::int[], 1) IS NULL OR a.account_id = ANY($7::int[]));`
 
-	rows, err := Upper.SQL().Query(queryForInitialState, filter.SupplierID, filter.OrganizationUnitID, filter.DateOfStart, filter.DateOfStartBooking, filter.AccountID)
+	var dateOfStartStr, dateOfStartBookingStr string
+	if filter.DateOfStart != nil {
+		dateOfStartStr = filter.DateOfStart.Format("2006-01-02T15:04:05Z")
+	} else {
+		dateOfStartStr = "0001-01-01T00:00:00Z"
+	}
+
+	if filter.DateOfStartBooking != nil {
+		dateOfStartBookingStr = filter.DateOfStartBooking.Format("2006-01-02T15:04:05Z")
+	} else {
+		dateOfStartBookingStr = "0001-01-01T00:00:00Z"
+	}
+
+	var dateOfEndStr, dateOfEndBookingStr string
+	if filter.DateOfEnd != nil {
+		dateOfEndStr = filter.DateOfEnd.Format("2006-01-02T15:04:05Z")
+	} else {
+		dateOfEndStr = "0001-01-01T00:00:00Z"
+	}
+
+	if filter.DateOfEndBooking != nil {
+		dateOfEndBookingStr = filter.DateOfEndBooking.Format("2006-01-02T15:04:05Z")
+	} else {
+		dateOfEndBookingStr = "0001-01-01T00:00:00Z"
+	}
+
+	rows, err := Upper.SQL().Query(queryForInitialState, filter.SupplierID, filter.OrganizationUnitID, dateOfStartStr, dateOfStartBookingStr, filter.AccountID)
 	if err != nil {
 		return nil, newErrors.Wrap(err, "upper exec")
 	}
@@ -507,12 +535,6 @@ func (t *AccountingEntry) GetAnalyticalCard(filter AnalyticalCardFilter) (*Analy
 		}
 		var dateOfInitialState time.Time
 
-		if filter.DateOfStart != nil {
-			dateOfInitialState = *filter.DateOfStart
-		} else if filter.DateOfStartBooking != nil {
-			dateOfInitialState = *filter.DateOfStartBooking
-		}
-
 		item.Items = append(item.Items, AnalyticalCardItems{
 			ID:            id,
 			Title:         InitialStateTitle,
@@ -524,7 +546,7 @@ func (t *AccountingEntry) GetAnalyticalCard(filter AnalyticalCardFilter) (*Analy
 		id++
 	}
 
-	rows, err = Upper.SQL().Query(queryForItems, filter.SupplierID, filter.OrganizationUnitID, filter.DateOfStart, filter.DateOfEnd, filter.DateOfStartBooking, filter.DateOfEndBooking, filter.AccountID)
+	rows, err = Upper.SQL().Query(queryForItems, filter.SupplierID, filter.OrganizationUnitID, dateOfStartStr, dateOfEndStr, dateOfStartBookingStr, dateOfEndBookingStr, filter.AccountID)
 	if err != nil {
 		return nil, newErrors.Wrap(err, "upper exec")
 	}

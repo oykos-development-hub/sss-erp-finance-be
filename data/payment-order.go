@@ -222,7 +222,7 @@ func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation
 
 	queryForPaidInvoices := `select COALESCE(sum(p.amount),0) as sum from payment_order_items pi 
 							left join payment_orders p on p.id = pi.payment_order_id
-							where pi.invoice_id = $1 and (p.status is null or p.status <> 'Storniran')`
+							where pi.invoice_id = $1 and (p.status is null or p.status <> 'Storniran');`
 
 	queryForAdditionalExpenses := `select a.id, a.price, a.title, i.type, i.invoice_number, a.status, a.created_at, a.account_id
 	                               from additional_expenses a
@@ -244,7 +244,7 @@ func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation
 
 	queryForPaidSalaryAdditionalExpenses := `select COALESCE(sum(p.amount),0) as sum from payment_order_items pi 
 										 left join payment_orders p on p.id = pi.payment_order_id
-										 where pi.salary_additional_expense_id = $1  and (p.status is null or p.status <> 'Storniran').;`
+										 where pi.salary_additional_expense_id = $1  and (p.status is null or p.status <> 'Storniran');`
 
 	if filter.Type == nil || *filter.Type == TypeInvoice {
 		rows, err := Upper.SQL().Query(queryForInvoices, filter.SupplierID, filter.OrganizationUnitID, InvoiceStatusFull, TypeInvoice, InvoiceStatusIncomplete)

@@ -1,0 +1,1 @@
+alter table deposit_additional_expenses add column source_bank_account text;
