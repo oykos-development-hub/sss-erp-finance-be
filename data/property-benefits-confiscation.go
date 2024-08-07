@@ -143,17 +143,19 @@ func (t *PropBenConf) GetAll(page *int, size *int, condition *up.AndExpr) ([]*Pr
 // Update updates a record in the database, using upper
 func (t *PropBenConf) Update(ctx context.Context, m PropBenConf) error {
 	m.UpdatedAt = time.Now()
-	userID, ok := contextutil.GetUserIDFromContext(ctx)
-	if !ok {
+	userID, _ := contextutil.GetUserIDFromContext(ctx)
+	/*if !ok {
 		err := newErrors.New("user ID not found in context")
 		return newErrors.Wrap(err, "contextuitl get user id from context")
-	}
+	}*/
 
 	err := Upper.Tx(func(sess up.Session) error {
 
-		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
-		if _, err := sess.SQL().Exec(query); err != nil {
-			return newErrors.Wrap(err, "upper exec")
+		if userID != 0 {
+			query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+			if _, err := sess.SQL().Exec(query); err != nil {
+				return newErrors.Wrap(err, "upper exec")
+			}
 		}
 
 		collection := sess.Collection(t.Table())
