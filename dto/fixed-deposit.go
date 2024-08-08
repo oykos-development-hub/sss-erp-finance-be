@@ -75,20 +75,21 @@ func (dto FixedDepositDTO) ToFixedDeposit() *data.FixedDeposit {
 
 func ToFixedDepositResponseDTO(data data.FixedDeposit) FixedDepositResponseDTO {
 	item := FixedDepositResponseDTO{
-		ID:                 data.ID,
-		OrganizationUnitID: data.OrganizationUnitID,
-		Subject:            data.Subject,
-		JudgeID:            data.JudgeID,
-		CaseNumber:         data.CaseNumber,
-		DateOfRecipiet:     data.DateOfRecipiet,
-		DateOfCase:         data.DateOfCase,
-		DateOfFinality:     data.DateOfFinality,
-		DateOfEnd:          data.DateOfEnd,
-		AccountID:          data.AccountID,
-		FileID:             data.FileID,
-		Type:               data.Type,
-		CreatedAt:          data.CreatedAt,
-		UpdatedAt:          data.UpdatedAt,
+		ID:                   data.ID,
+		OrganizationUnitID:   data.OrganizationUnitID,
+		Subject:              data.Subject,
+		JudgeID:              data.JudgeID,
+		CaseNumber:           data.CaseNumber,
+		DateOfRecipiet:       data.DateOfRecipiet,
+		DateOfCase:           data.DateOfCase,
+		DateOfFinality:       data.DateOfFinality,
+		DateOfEnforceability: data.DateOfEnforceability,
+		DateOfEnd:            data.DateOfEnd,
+		AccountID:            data.AccountID,
+		FileID:               data.FileID,
+		Type:                 data.Type,
+		CreatedAt:            data.CreatedAt,
+		UpdatedAt:            data.UpdatedAt,
 	}
 
 	if data.DateOfEnd == nil {
