@@ -37,7 +37,7 @@ type FlatRatePayment struct {
 	ReceiptNumber          string                `db:"receipt_number"`
 	PaymentReferenceNumber string                `db:"payment_reference_number"`
 	DebitReferenceNumber   string                `db:"debit_reference_number"`
-	Status                 FlatRatePaymentStatus `db:"status"`
+	Status                 FlatRatePaymentStatus `db:"status,omitempty"`
 	CreatedAt              time.Time             `db:"created_at,omitempty"`
 	UpdatedAt              time.Time             `db:"updated_at"`
 }

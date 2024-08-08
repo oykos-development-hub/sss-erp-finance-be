@@ -37,7 +37,7 @@ type ProcedureCostPayment struct {
 	ReceiptNumber          string                     `db:"receipt_number"`
 	PaymentReferenceNumber string                     `db:"payment_reference_number"`
 	DebitReferenceNumber   string                     `db:"debit_reference_number"`
-	Status                 ProcedureCostPaymentStatus `db:"status"`
+	Status                 ProcedureCostPaymentStatus `db:"status,omitempty"`
 	CreatedAt              time.Time                  `db:"created_at,omitempty"`
 	UpdatedAt              time.Time                  `db:"updated_at"`
 }
