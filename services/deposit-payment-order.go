@@ -428,6 +428,16 @@ func (h *DepositPaymentOrderServiceImpl) GetDepositPaymentOrderList(filter dto.D
 		}
 
 		response[i].AdditionalExpensesForPaying = additionalExpenses
+
+		var amount float64
+		for _, item := range response[i].AdditionalExpenses {
+			amount += float64(item.Price)
+		}
+		for _, item := range response[i].AdditionalExpensesForPaying {
+			amount += float64(item.Price)
+		}
+
+		response[i].NetAmount = amount
 	}
 
 	return response, total, nil
