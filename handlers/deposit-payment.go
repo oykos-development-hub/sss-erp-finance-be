@@ -242,7 +242,7 @@ func (h *depositpaymentHandlerImpl) GetInitialState(w http.ResponseWriter, r *ht
 
 	date := filter.Date
 
-	specificTime := time.Date(date.Year(), date.Month(), date.Day(), 23, 59, 0, 0, date.Location())
+	specificTime := time.Date(date.Year(), date.Month(), date.Day(), 0, 0, 0, 0, date.Location())
 
 	filter.Date = specificTime
 
