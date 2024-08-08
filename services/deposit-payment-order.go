@@ -431,7 +431,9 @@ func (h *DepositPaymentOrderServiceImpl) GetDepositPaymentOrderList(filter dto.D
 
 		var amount float64
 		for _, item := range response[i].AdditionalExpenses {
-			amount += float64(item.Price)
+			if item.Title == "Neto" {
+				amount += float64(item.Price)
+			}
 		}
 		for _, item := range response[i].AdditionalExpensesForPaying {
 			amount += float64(item.Price)
