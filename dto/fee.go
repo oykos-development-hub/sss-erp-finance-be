@@ -22,6 +22,7 @@ type FeeDTO struct {
 	PaymentDeadlineDate    time.Time        `json:"payment_deadline_date"`
 	Description            string           `json:"description"`
 	Status                 *data.FeeStatus  `json:"status"`
+	OrganizationUnitID     int              `json:"organization_unit_id"`
 	CourtAccountID         *int             `json:"court_account"`
 	File                   pq.Int64Array    `json:"file"`
 }
@@ -42,6 +43,7 @@ type FeeResponseDTO struct {
 	PaymentDeadlineDate    time.Time        `json:"payment_deadline_date"`
 	Description            string           `json:"description"`
 	Status                 data.FeeStatus   `json:"status"`
+	OrganizationUnitID     int              `json:"organization_unit_id"`
 	CourtAccountID         *int             `json:"court_account"`
 	FeeDetails             *FeeDetailsDTO   `json:"fee_details"`
 	File                   []int            `json:"file"`
@@ -60,6 +62,7 @@ type FeeFilterDTO struct {
 	FilterByFeeSubcategoryID *int    `json:"fee_subcategory_id"`
 	FilterByFeeTypeID        *int    `json:"fee_type_id"`
 	Search                   *string `json:"search"`
+	OrganizationUnitID       *int    `json:"organization_unit_id"`
 }
 
 // ToFee converts FeeDTO to Fee
@@ -78,6 +81,7 @@ func (dto FeeDTO) ToFee() *data.Fee {
 		PaymentDeadlineDate:    dto.PaymentDeadlineDate,
 		Description:            dto.Description,
 		Status:                 *dto.Status,
+		OrganizationUnitID:     dto.OrganizationUnitID,
 		CourtAccountID:         dto.CourtAccountID,
 		File:                   dto.File,
 	}
@@ -98,6 +102,7 @@ func ToFeeResponseDTO(data data.Fee) FeeResponseDTO {
 		Subject:                data.Subject,
 		JMBG:                   data.JMBG,
 		Amount:                 data.Amount,
+		OrganizationUnitID:     data.OrganizationUnitID,
 		PaymentReferenceNumber: data.PaymentReferenceNumber,
 		DebitReferenceNumber:   data.DebitReferenceNumber,
 		ExecutionDate:          data.ExecutionDate,

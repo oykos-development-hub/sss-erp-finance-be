@@ -19,6 +19,7 @@ type FlatRateDTO struct {
 	DebitReferenceNumber   string               `json:"debit_reference_number"`
 	AccountID              int                  `json:"account_id"`
 	ExecutionDate          time.Time            `json:"execution_date"`
+	OrganizationUnitID     int                  `json:"organization_unit_id"`
 	PaymentDeadlineDate    time.Time            `json:"payment_deadline_date"`
 	Description            string               `json:"description"`
 	Status                 *data.FlatRateStatus `json:"status"`
@@ -36,6 +37,7 @@ type FlatRateResponseDTO struct {
 	JMBG                   string              `json:"jmbg"`
 	Residence              string              `json:"residence"`
 	Amount                 float64             `json:"amount"`
+	OrganizationUnitID     int                 `json:"organization_unit_id"`
 	PaymentReferenceNumber string              `json:"payment_reference_number"`
 	DebitReferenceNumber   string              `json:"debit_reference_number"`
 	AccountID              int                 `json:"account_id"`
@@ -63,11 +65,12 @@ type FlatRateDetailsDTO struct {
 }
 
 type FlatRateFilterDTO struct {
-	Page           *int    `json:"page"`
-	Size           *int    `json:"size"`
-	Subject        *string `json:"subject"`
-	FilterByTypeID *int    `json:"flat_rate_type_id"`
-	Search         *string `json:"search"`
+	Page               *int    `json:"page"`
+	Size               *int    `json:"size"`
+	Subject            *string `json:"subject"`
+	FilterByTypeID     *int    `json:"flat_rate_type_id"`
+	Search             *string `json:"search"`
+	OrganizationUnitID *int    `json:"organization_unit_id"`
 }
 
 // ToFlatRate converts FlatRateDTO to FlatRate
@@ -87,6 +90,7 @@ func (dto FlatRateDTO) ToFlatRate() *data.FlatRate {
 		PaymentDeadlineDate:    dto.PaymentDeadlineDate,
 		Description:            dto.Description,
 		Status:                 *dto.Status,
+		OrganizationUnitID:     dto.OrganizationUnitID,
 		CourtCosts:             dto.CourtCosts,
 		CourtAccountID:         dto.CourtAccountID,
 		File:                   dto.File,
@@ -108,6 +112,7 @@ func ToFlatRateResponseDTO(data data.FlatRate) FlatRateResponseDTO {
 		JMBG:                   data.JMBG,
 		Residence:              data.Residence,
 		Amount:                 data.Amount,
+		OrganizationUnitID:     data.OrganizationUnitID,
 		PaymentReferenceNumber: data.PaymentReferenceNumber,
 		DebitReferenceNumber:   data.DebitReferenceNumber,
 		AccountID:              data.AccountID,

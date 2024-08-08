@@ -99,6 +99,10 @@ func (h *PropBenConfServiceImpl) GetPropBenConfList(input dto.PropBenConfFilterD
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"property_benefits_confiscation_type": *input.FilterByPropBenConfTypeID})
 	}
 
+	if input.OrganizationUnitID != nil {
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"organization_unit_id": *input.OrganizationUnitID})
+	}
+
 	// combine search by subject, jmbg and description with filter by decision number
 	if input.Search != nil && *input.Search != "" {
 		likeCondition := fmt.Sprintf("%%%s%%", *input.Search)

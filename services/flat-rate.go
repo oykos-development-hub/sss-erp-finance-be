@@ -99,6 +99,10 @@ func (h *FlatRateServiceImpl) GetFlatRateList(input dto.FlatRateFilterDTO) ([]dt
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"flat_rate_type": *input.FilterByTypeID})
 	}
 
+	if input.OrganizationUnitID != nil {
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"organization_unit_id": *input.OrganizationUnitID})
+	}
+
 	// combine search by subject, jmbg and description with filter by decision number
 	if input.Search != nil && *input.Search != "" {
 		likeCondition := fmt.Sprintf("%%%s%%", *input.Search)

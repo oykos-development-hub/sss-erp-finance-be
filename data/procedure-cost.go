@@ -47,6 +47,7 @@ type ProcedureCost struct {
 	PaymentDeadlineDate    time.Time           `db:"payment_deadline_date"`
 	Description            string              `db:"description"`
 	Status                 ProcedureCostStatus `db:"status"`
+	OrganizationUnitID     int                 `db:"organization_unit_id"`
 	CourtCosts             *float64            `db:"court_costs"`
 	CourtAccountID         *int                `db:"court_account_id"`
 	File                   pq.Int64Array       `db:"file"`

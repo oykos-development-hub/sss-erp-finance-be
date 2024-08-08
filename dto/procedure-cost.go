@@ -21,6 +21,7 @@ type ProcedureCostDTO struct {
 	ExecutionDate          time.Time                 `json:"execution_date"`
 	PaymentDeadlineDate    time.Time                 `json:"payment_deadline_date"`
 	Description            string                    `json:"description"`
+	OrganizationUnitID     int                       `json:"organization_unit_id"`
 	Status                 *data.ProcedureCostStatus `json:"status"`
 	CourtCosts             *float64                  `json:"court_costs"`
 	CourtAccountID         *int                      `json:"court_account_id"`
@@ -36,6 +37,7 @@ type ProcedureCostResponseDTO struct {
 	JMBG                   string                   `json:"jmbg"`
 	Residence              string                   `json:"residence"`
 	Amount                 float64                  `json:"amount"`
+	OrganizationUnitID     int                      `json:"organization_unit_id"`
 	PaymentReferenceNumber string                   `json:"payment_reference_number"`
 	DebitReferenceNumber   string                   `json:"debit_reference_number"`
 	AccountID              int                      `json:"account_id"`
@@ -68,6 +70,7 @@ type ProcedureCostFilterDTO struct {
 	Subject                     *string `json:"subject"`
 	FilterByProcedureCostTypeID *int    `json:"procedure_cost_type_id"`
 	Search                      *string `json:"search"`
+	OrganizationUnitID          *int    `json:"organization_unit_id"`
 }
 
 // ToProcedureCost converts ProcedureCostDTO to ProcedureCost
@@ -80,6 +83,7 @@ func (dto ProcedureCostDTO) ToProcedureCost() *data.ProcedureCost {
 		JMBG:                   dto.JMBG,
 		Residence:              dto.Residence,
 		Amount:                 dto.Amount,
+		OrganizationUnitID:     dto.OrganizationUnitID,
 		PaymentReferenceNumber: dto.PaymentReferenceNumber,
 		DebitReferenceNumber:   dto.DebitReferenceNumber,
 		AccountID:              dto.AccountID,
@@ -108,6 +112,7 @@ func ToProcedureCostResponseDTO(data data.ProcedureCost) ProcedureCostResponseDT
 		JMBG:                   data.JMBG,
 		Residence:              data.Residence,
 		Amount:                 data.Amount,
+		OrganizationUnitID:     data.OrganizationUnitID,
 		PaymentReferenceNumber: data.PaymentReferenceNumber,
 		DebitReferenceNumber:   data.DebitReferenceNumber,
 		AccountID:              data.AccountID,

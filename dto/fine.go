@@ -18,6 +18,7 @@ type FineDTO struct {
 	PaymentReferenceNumber string           `json:"payment_reference_number"`
 	DebitReferenceNumber   string           `json:"debit_reference_number"`
 	AccountID              int              `json:"account_id"`
+	OrganizationUnitID     int              `json:"organization_unit_id"`
 	ExecutionDate          time.Time        `json:"execution_date"`
 	PaymentDeadlineDate    time.Time        `json:"payment_deadline_date"`
 	Description            string           `json:"description"`
@@ -36,6 +37,7 @@ type FineResponseDTO struct {
 	JMBG                   string             `json:"jmbg"`
 	Residence              string             `json:"residence"`
 	Amount                 float64            `json:"amount"`
+	OrganizationUnitID     int                `json:"organization_unit_id"`
 	PaymentReferenceNumber string             `json:"payment_reference_number"`
 	DebitReferenceNumber   string             `json:"debit_reference_number"`
 	AccountID              int                `json:"account_id"`
@@ -63,11 +65,12 @@ type FineFeeDetailsDTO struct {
 }
 
 type FineFilterDTO struct {
-	Page              *int    `json:"page"`
-	Size              *int    `json:"size"`
-	Subject           *string `json:"subject"`
-	FilterByActTypeID *int    `json:"act_type_id"`
-	Search            *string `json:"search"`
+	Page               *int    `json:"page"`
+	Size               *int    `json:"size"`
+	Subject            *string `json:"subject"`
+	FilterByActTypeID  *int    `json:"act_type_id"`
+	Search             *string `json:"search"`
+	OrganizationUnitID *int    `json:"organization_unit_id"`
 }
 
 // ToFine converts FineDTO to Fine
@@ -80,6 +83,7 @@ func (dto FineDTO) ToFine() *data.Fine {
 		JMBG:                   dto.JMBG,
 		Residence:              dto.Residence,
 		Amount:                 dto.Amount,
+		OrganizationUnitID:     dto.OrganizationUnitID,
 		PaymentReferenceNumber: dto.PaymentReferenceNumber,
 		DebitReferenceNumber:   dto.DebitReferenceNumber,
 		AccountID:              dto.AccountID,
@@ -111,6 +115,7 @@ func ToFineResponseDTO(data data.Fine) FineResponseDTO {
 		PaymentReferenceNumber: data.PaymentReferenceNumber,
 		DebitReferenceNumber:   data.DebitReferenceNumber,
 		AccountID:              data.AccountID,
+		OrganizationUnitID:     data.OrganizationUnitID,
 		ExecutionDate:          data.ExecutionDate,
 		PaymentDeadlineDate:    data.PaymentDeadlineDate,
 		Description:            data.Description,
