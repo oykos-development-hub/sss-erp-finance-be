@@ -365,12 +365,12 @@ func getAmountByBankAccount(bankAccount string, date time.Time) (*DepositPayment
 }
 
 func getAmountOnTransitionalBankAccount(orgUnit int, date time.Time) (*DepositPayment, error) {
-	formattedDate := date.Format("2006-01-02 15:04:05")
+	formattedDate := date.Format("2006-01-02T15:04:05Z")
 
 	query1 := `select sum(amount) from deposit_payments
 	where organization_unit_id = $1 and
 	date_of_bank_statement <= $2 and (main_bank_account = false 
-	or (main_bank_account = true and  date_of_transfer_main_account > $2::timestamp));`
+	or (main_bank_account = true and  date_of_transfer_main_account >= $2::timestamp));`
 
 	rows1, err := Upper.SQL().Query(query1, orgUnit, formattedDate)
 	if err != nil {
