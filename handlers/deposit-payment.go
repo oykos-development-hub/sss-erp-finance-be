@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"strconv"
+	"time"
 
 	"gitlab.sudovi.me/erp/finance-api/contextutil"
 	"gitlab.sudovi.me/erp/finance-api/dto"
@@ -238,6 +239,12 @@ func (h *depositpaymentHandlerImpl) GetInitialState(w http.ResponseWriter, r *ht
 		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
 		return
 	}
+
+	date := filter.Date
+
+	specificTime := time.Date(date.Year(), date.Month(), date.Day(), 23, 59, 0, 0, date.Location())
+
+	filter.Date = specificTime
 
 	res, err := h.service.GetInitialState(filter)
 	if err != nil {

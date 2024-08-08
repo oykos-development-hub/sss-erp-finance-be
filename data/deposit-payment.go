@@ -290,6 +290,7 @@ func (t *DepositPayment) GetInitialState(filter DepositInitialStateFilter) ([]*D
 }
 
 func getAmountByBankAccount(bankAccount string, date time.Time) (*DepositPayment, error) {
+
 	formattedDate := date.Format("2006-01-02 15:04:05")
 	query1 := `select sum(amount) from deposit_payments 
 		where current_bank_account = $1 and date_of_transfer_main_account <= $2::timestamp;`
