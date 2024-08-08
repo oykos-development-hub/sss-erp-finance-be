@@ -57,8 +57,10 @@ func (h *PropBenConfSharedLogicServiceImpl) CalculatePropBenConfDetailsAndUpdate
 		details.CourtCostsLeftToPayAmount = *propbenconf.CourtCosts - details.CourtCostsPaid
 	}
 
-	details.AmountGracePeriodDueDate = propbenconf.DecisionDate.AddDate(0, 0, data.PropBenConfGracePeriod)
-	details.AmountGracePeriod = math.Ceil(float64(propbenconf.Amount) * 2 / 3)
+	//details.AmountGracePeriodDueDate = propbenconf.DecisionDate.AddDate(0, 0, data.PropBenConfGracePeriod)
+	//details.AmountGracePeriod = math.Ceil(float64(propbenconf.Amount) * 2 / 3)
+
+	details.AmountGracePeriod = propbenconf.Amount
 
 	if time.Until(details.AmountGracePeriodDueDate) > 0 {
 		details.AmountGracePeriodAvailable = true
