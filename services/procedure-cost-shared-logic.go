@@ -56,8 +56,9 @@ func (h *ProcedureCostSharedLogicServiceImpl) CalculateProcedureCostDetailsAndUp
 		details.CourtCostsLeftToPayAmount = *procedurecost.CourtCosts - details.CourtCostsPaid
 	}
 
-	details.AmountGracePeriodDueDate = procedurecost.DecisionDate.AddDate(0, 0, data.ProcedureCostGracePeriod)
-	details.AmountGracePeriod = math.Ceil(float64(procedurecost.Amount) * 2 / 3)
+	//details.AmountGracePeriodDueDate = procedurecost.DecisionDate.AddDate(0, 0, data.ProcedureCostGracePeriod)
+	//details.AmountGracePeriod = math.Ceil(float64(procedurecost.Amount) * 2 / 3)
+	details.AmountGracePeriod = procedurecost.Amount
 
 	if time.Until(details.AmountGracePeriodDueDate) > 0 {
 		details.AmountGracePeriodAvailable = true

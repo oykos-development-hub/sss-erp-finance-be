@@ -57,8 +57,9 @@ func (h *FlatRateSharedLogicServiceImpl) CalculateFlatRateDetailsAndUpdateStatus
 		details.CourtCostsLeftToPayAmount = *flatrate.CourtCosts - details.CourtCostsPaid
 	}
 
-	details.AmountGracePeriodDueDate = flatrate.DecisionDate.AddDate(0, 0, data.FlatRateGracePeriod)
-	details.AmountGracePeriod = math.Ceil(float64(flatrate.Amount) * 2 / 3)
+	//details.AmountGracePeriodDueDate = flatrate.DecisionDate.AddDate(0, 0, data.FlatRateGracePeriod)
+	//details.AmountGracePeriod = math.Ceil(float64(flatrate.Amount) * 2 / 3)
+	details.AmountGracePeriod = flatrate.Amount
 
 	if time.Until(details.AmountGracePeriodDueDate) > 0 {
 		details.AmountGracePeriodAvailable = true
