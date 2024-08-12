@@ -93,7 +93,7 @@ func (h *FineSharedLogicServiceImpl) CalculateFineDetailsAndUpdateStatus(ctx con
 		}
 	}
 
-	details.FeeAmountGracePeriodDueDate = fine.DecisionDate.Add(-24 * time.Hour)
+	details.FeeAmountGracePeriodDueDate = details.FeeAmountGracePeriodDueDate.Add(-24 * time.Hour)
 
 	return details, newStatus, nil
 }
