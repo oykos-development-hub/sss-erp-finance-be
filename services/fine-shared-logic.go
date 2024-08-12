@@ -73,6 +73,7 @@ func (h *FineSharedLogicServiceImpl) CalculateFineDetailsAndUpdateStatus(ctx con
 		details.FeeAmountGracePeriodAvailable = true
 		details.FeeLeftToPayAmount = details.FeeAmountGracePeriod - details.FeeAllPaymentAmount
 	} else if fine.Status == data.PaidFineStatus && paidDuringGracePeriod+tolerance > details.FeeAmountGracePeriod {
+		details.FeeAmountGracePeriodAvailable = true
 		details.FeeLeftToPayAmount = details.FeeAmountGracePeriod - details.FeeAllPaymentAmount
 	}
 
