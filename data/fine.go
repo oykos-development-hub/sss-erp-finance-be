@@ -27,7 +27,7 @@ const (
 )
 
 const (
-	FineGracePeriod = 7
+	FineGracePeriod = 8
 )
 
 // Fine struct
