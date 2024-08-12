@@ -42,6 +42,9 @@ func (h *FineSharedLogicServiceImpl) CalculateFineDetailsAndUpdateStatus(ctx con
 
 	var paidDuringGracePeriod float64
 
+	details.FeeAmountGracePeriodDueDate = fine.DecisionDate.AddDate(0, 0, data.FineGracePeriod)
+	details.FeeAmountGracePeriod = math.Ceil(float64(fine.Amount) * 2 / 3)
+
 	// count all payments and court costs payments
 	for _, payment := range payments {
 		if data.FinePaymentStatus(payment.Status) == data.PaidFinePeymentStatus {
@@ -62,9 +65,6 @@ func (h *FineSharedLogicServiceImpl) CalculateFineDetailsAndUpdateStatus(ctx con
 	if fine.CourtCosts != nil {
 		details.FeeCourtCostsLeftToPayAmount = *fine.CourtCosts - details.FeeCourtCostsPaid
 	}
-
-	details.FeeAmountGracePeriodDueDate = fine.DecisionDate.AddDate(0, 0, data.FineGracePeriod)
-	details.FeeAmountGracePeriod = math.Ceil(float64(fine.Amount) * 2 / 3)
 
 	var newStatus data.FineStatus
 	const tolerance = 0.00001
