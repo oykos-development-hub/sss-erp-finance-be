@@ -84,6 +84,7 @@ func (dto FeeDTO) ToFee() *data.Fee {
 		OrganizationUnitID:     dto.OrganizationUnitID,
 		CourtAccountID:         dto.CourtAccountID,
 		File:                   dto.File,
+		Residence:              dto.Residence,
 	}
 }
 
@@ -111,6 +112,7 @@ func ToFeeResponseDTO(data data.Fee) FeeResponseDTO {
 		Status:                 data.Status,
 		CourtAccountID:         data.CourtAccountID,
 		File:                   filesArray,
+		Residence:              data.Residence,
 		CreatedAt:              data.CreatedAt,
 		UpdatedAt:              data.UpdatedAt,
 	}

@@ -1,0 +1,1 @@
+alter table fees add column residence text;

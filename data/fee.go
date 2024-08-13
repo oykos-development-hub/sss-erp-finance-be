@@ -50,6 +50,7 @@ type Fee struct {
 	Status                 FeeStatus     `db:"status"`
 	CourtAccountID         *int          `db:"court_account_id"`
 	File                   pq.Int64Array `db:"file"`
+	Residence              string        `db:"residence"`
 	OrganizationUnitID     int           `db:"organization_unit_id"`
 	CreatedAt              time.Time     `db:"created_at,omitempty"`
 	UpdatedAt              time.Time     `db:"updated_at"`
