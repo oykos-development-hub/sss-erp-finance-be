@@ -28,6 +28,7 @@ type SpendingDynamicEntry struct {
 	October         decimal.Decimal `db:"october"`
 	November        decimal.Decimal `db:"november"`
 	December        decimal.Decimal `db:"december"`
+	TotalAmount     decimal.Decimal `db:"total_amount"`
 	Version         int             `db:"version"`
 	CreatedAt       time.Time       `db:"created_at,omitempty"`
 }

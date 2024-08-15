@@ -8,20 +8,21 @@ import (
 )
 
 type SpendingDynamicDTO struct {
-	AccountID int             `json:"account_id" validate:"required"`
-	Username  string          `json:"username" validate:"required"`
-	January   decimal.Decimal `json:"january" validate:"required"`
-	February  decimal.Decimal `json:"february" validate:"required"`
-	March     decimal.Decimal `json:"march" validate:"required"`
-	April     decimal.Decimal `json:"april" validate:"required"`
-	May       decimal.Decimal `json:"may" validate:"required"`
-	June      decimal.Decimal `json:"june" validate:"required"`
-	July      decimal.Decimal `json:"july" validate:"required"`
-	August    decimal.Decimal `json:"august" validate:"required"`
-	September decimal.Decimal `json:"september" validate:"required"`
-	October   decimal.Decimal `json:"october" validate:"required"`
-	November  decimal.Decimal `json:"november" validate:"required"`
-	December  decimal.Decimal `json:"december" validate:"required"`
+	AccountID   int             `json:"account_id" validate:"required"`
+	Username    string          `json:"username" validate:"required"`
+	January     decimal.Decimal `json:"january" validate:"required"`
+	February    decimal.Decimal `json:"february" validate:"required"`
+	March       decimal.Decimal `json:"march" validate:"required"`
+	April       decimal.Decimal `json:"april" validate:"required"`
+	May         decimal.Decimal `json:"may" validate:"required"`
+	June        decimal.Decimal `json:"june" validate:"required"`
+	July        decimal.Decimal `json:"july" validate:"required"`
+	August      decimal.Decimal `json:"august" validate:"required"`
+	September   decimal.Decimal `json:"september" validate:"required"`
+	October     decimal.Decimal `json:"october" validate:"required"`
+	November    decimal.Decimal `json:"november" validate:"required"`
+	December    decimal.Decimal `json:"december" validate:"required"`
+	TotalAmount decimal.Decimal `json:"total_amount"`
 }
 
 type SpendingDynamicHistoryResponseDTO struct {
@@ -59,6 +60,7 @@ type SpendingDynamicWithEntryResponseDTO struct {
 	November               MonthEntry      `json:"november"`
 	December               MonthEntry      `json:"december"`
 	CreatedAt              time.Time       `json:"created_at"`
+	TotalAmount            decimal.Decimal `json:"total_amount"`
 	IsCurrentMonthEditable bool            `json:"is_current_month_editable"`
 }
 
@@ -86,18 +88,19 @@ type MonthEntry struct {
 
 func (dto SpendingDynamicDTO) ToSpendingDynamicEntry() *data.SpendingDynamicEntry {
 	return &data.SpendingDynamicEntry{
-		Username:  dto.Username,
-		January:   dto.January,
-		February:  dto.February,
-		March:     dto.March,
-		April:     dto.April,
-		May:       dto.May,
-		June:      dto.June,
-		July:      dto.July,
-		August:    dto.August,
-		September: dto.September,
-		October:   dto.October,
-		November:  dto.November,
-		December:  dto.December,
+		Username:    dto.Username,
+		January:     dto.January,
+		February:    dto.February,
+		March:       dto.March,
+		April:       dto.April,
+		May:         dto.May,
+		June:        dto.June,
+		July:        dto.July,
+		August:      dto.August,
+		September:   dto.September,
+		October:     dto.October,
+		November:    dto.November,
+		December:    dto.December,
+		TotalAmount: dto.TotalAmount,
 	}
 }
