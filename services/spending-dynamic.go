@@ -215,9 +215,9 @@ func (h *SpendingDynamicServiceImpl) GetSpendingDynamic(currentBudgetID, budgetI
 					entryRes.July.Savings = entryRes.July.Value.Sub(release.Value)
 				}
 			case 8:
-				if release.CreatedAt.Before(entryRes.CreatedAt) {
-					entryRes.August.Savings = entryRes.August.Value.Sub(release.Value)
-				}
+				//if release.CreatedAt.Before(entryRes.CreatedAt) {
+				entryRes.August.Savings = entryRes.August.Value.Sub(release.Value)
+				//}
 			case 9:
 				if release.CreatedAt.Before(entryRes.CreatedAt) {
 					entryRes.September.Savings = entryRes.September.Value.Sub(release.Value)
