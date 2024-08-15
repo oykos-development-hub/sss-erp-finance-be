@@ -2,8 +2,10 @@ package services
 
 import (
 	"context"
+	"fmt"
 	"time"
 
+	"gitlab.sudovi.me/erp/finance-api/contextutil"
 	"gitlab.sudovi.me/erp/finance-api/data"
 	"gitlab.sudovi.me/erp/finance-api/dto"
 	"gitlab.sudovi.me/erp/finance-api/errors"
@@ -214,4 +216,68 @@ func (h *SpendingReleaseServiceImpl) GetSpendingReleaseOverview(filter dto.Spend
 	response := dto.ToSpendingReleaseOverviewDTO(data)
 
 	return response, nil
+}
+
+func (h *SpendingReleaseServiceImpl) StartMonthlyTaskForSpendingReleases() {
+	go h.monthlyScheduler()
+}
+
+func (h *SpendingReleaseServiceImpl) monthlyScheduler() {
+	for {
+		now := time.Now()
+		year, month, _ := now.Date()
+		location := now.Location()
+		//var nextMonth time.Time
+
+		/*if month == 12 {
+			nextMonth = time.Date(year, month+2, 1, 0, 0, 0, 0, location)
+		} else {
+			nextMonth = time.Date(year, month+1, 1, 0, 0, 0, 0, location)
+		}*/
+
+		nextMonth := time.Date(year, month, 15, 16, 50, 0, 0, location)
+
+		waitDuration := time.Until(nextMonth)
+		fmt.Printf("Sleeping until %v for release trigger\n", nextMonth)
+
+		time.Sleep(waitDuration)
+
+		h.executeMonthlyTask()
+	}
+}
+
+func (h *SpendingReleaseServiceImpl) executeMonthlyTask() {
+
+	conditionAndExp := &up.AndExpr{}
+
+	now := time.Now()
+	year, monthTime, _ := now.Date()
+	formattedString := fmt.Sprintf("%d-01-01T00:00:00Z", year)
+
+	conditionAndExp = up.And(conditionAndExp, &up.Cond{"created_at >= ": formattedString})
+
+	currentBudget, _, _ := h.repoCurrentBudget.GetAll(nil, nil, conditionAndExp, nil)
+
+	month := int(monthTime) - 1
+
+	for _, item := range currentBudget {
+		spendingReleaseItem, _ := h.repo.GetAll(data.SpendingReleaseFilterDTO{
+			CurrentBudgetID: &item.ID,
+			Year:            &year,
+			Month:           &month,
+		})
+
+		ctx := context.Background()
+		ctx = contextutil.SetUserIDInContext(ctx, 0)
+
+		if spendingReleaseItem == nil && len(spendingReleaseItem) == 0 {
+			_, _ = h.repo.Insert(ctx, data.SpendingRelease{
+				CurrentBudgetID: item.ID,
+				Year:            year,
+				Month:           month,
+				Value:           decimal.NewFromInt(0),
+			})
+		}
+	}
+
 }

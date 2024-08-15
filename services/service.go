@@ -420,6 +420,7 @@ type SpendingReleaseService interface {
 	GetSpendingRelease(id int) (*dto.SpendingReleaseResponseDTO, error)
 	GetSpendingReleaseList(filter data.SpendingReleaseFilterDTO) ([]dto.SpendingReleaseResponseDTO, error)
 	GetSpendingReleaseOverview(filter dto.SpendingReleaseOverviewFilterDTO) ([]dto.SpendingReleaseOverview, error)
+	StartMonthlyTaskForSpendingReleases()
 }
 
 type InternalReallocationService interface {

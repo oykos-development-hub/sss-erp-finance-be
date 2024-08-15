@@ -266,5 +266,7 @@ func initApplication() *celeritas.Celeritas {
 
 	cel.Routes = routes(cel, myMiddleware, myHandlers)
 
+	SpendingReleaseService.StartMonthlyTaskForSpendingReleases()
+
 	return cel
 }
