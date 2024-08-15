@@ -236,11 +236,13 @@ func (h *SpendingReleaseServiceImpl) monthlyScheduler() {
 		} else {
 			nextMonth = time.Date(year, month+1, 1, 0, 0, 0, 0, location)
 		}*/
+
 		if !flag {
-			nextMonth = time.Date(year, month, 15, 15, 0, 0, 0, location)
+			nextMonth = time.Date(year, month, 15, 15, 30, 0, 0, location)
 		} else {
-			nextMonth = time.Date(year, month, 15, 16, 0, 0, 0, location)
+			nextMonth = time.Date(year, month, 15, 18, 0, 0, 0, location)
 		}
+
 		waitDuration := time.Until(nextMonth)
 		fmt.Printf("Sleeping until %v for release trigger\n", nextMonth)
 
@@ -251,7 +253,7 @@ func (h *SpendingReleaseServiceImpl) monthlyScheduler() {
 }
 
 func (h *SpendingReleaseServiceImpl) executeMonthlyTask() {
-	fmt.Printf("Task for releases started")
+	fmt.Printf("Task for releases started\n")
 	flag = true
 
 	conditionAndExp := &up.AndExpr{}
@@ -276,7 +278,7 @@ func (h *SpendingReleaseServiceImpl) executeMonthlyTask() {
 		ctx := context.Background()
 		ctx = contextutil.SetUserIDInContext(ctx, 0)
 
-		if spendingReleaseItem == nil && len(spendingReleaseItem) == 0 {
+		if len(spendingReleaseItem) == 0 {
 			_, _ = h.repo.Insert(ctx, data.SpendingRelease{
 				CurrentBudgetID: item.ID,
 				Year:            year,
@@ -286,6 +288,6 @@ func (h *SpendingReleaseServiceImpl) executeMonthlyTask() {
 		}
 	}
 
-	fmt.Printf("Task for releases ended")
+	fmt.Printf("Task for releases ended\n")
 
 }
