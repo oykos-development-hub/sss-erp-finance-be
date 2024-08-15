@@ -153,11 +153,6 @@ func (h *SpendingDynamicServiceImpl) GetSpendingDynamic(currentBudgetID, budgetI
 			return nil, newErrors.Wrap(err, "repo release get all")
 		}
 
-		/*currentAmount, err := h.GetCurrentAmount(*budgetID, *unitID, entry.AccountID, 1)
-		if err != nil {
-			return nil, newErrors.Wrap(err, "get current amount")
-		}*/
-
 		entryRes := dto.SpendingDynamicWithEntryResponseDTO{
 			ID:              entry.ID,
 			CurrentBudgetID: entry.CurrentBudgetID,
@@ -165,21 +160,20 @@ func (h *SpendingDynamicServiceImpl) GetSpendingDynamic(currentBudgetID, budgetI
 			BudgetID:        entry.BudgetID,
 			UnitID:          entry.UnitID,
 			Actual:          entry.TotalAmount,
-			//CurrentAmount:   entry.TotalAmount,
-			Username:  entry.Username,
-			CreatedAt: entry.CreatedAt,
-			January:   dto.MonthEntry{Value: entry.January},
-			February:  dto.MonthEntry{Value: entry.February},
-			March:     dto.MonthEntry{Value: entry.March},
-			April:     dto.MonthEntry{Value: entry.April},
-			May:       dto.MonthEntry{Value: entry.May},
-			June:      dto.MonthEntry{Value: entry.June},
-			July:      dto.MonthEntry{Value: entry.July},
-			August:    dto.MonthEntry{Value: entry.August},
-			September: dto.MonthEntry{Value: entry.September},
-			October:   dto.MonthEntry{Value: entry.October},
-			November:  dto.MonthEntry{Value: entry.November},
-			December:  dto.MonthEntry{Value: entry.December},
+			Username:        entry.Username,
+			CreatedAt:       entry.CreatedAt,
+			January:         dto.MonthEntry{Value: entry.January},
+			February:        dto.MonthEntry{Value: entry.February},
+			March:           dto.MonthEntry{Value: entry.March},
+			April:           dto.MonthEntry{Value: entry.April},
+			May:             dto.MonthEntry{Value: entry.May},
+			June:            dto.MonthEntry{Value: entry.June},
+			July:            dto.MonthEntry{Value: entry.July},
+			August:          dto.MonthEntry{Value: entry.August},
+			September:       dto.MonthEntry{Value: entry.September},
+			October:         dto.MonthEntry{Value: entry.October},
+			November:        dto.MonthEntry{Value: entry.November},
+			December:        dto.MonthEntry{Value: entry.December},
 		}
 
 		IsCurrentMonthEditable := true
@@ -187,53 +181,29 @@ func (h *SpendingDynamicServiceImpl) GetSpendingDynamic(currentBudgetID, budgetI
 		for _, release := range releases {
 			switch release.Month {
 			case 1:
-				if release.CreatedAt.Before(entryRes.CreatedAt) {
-					entryRes.January.Savings = entryRes.January.Value.Sub(release.Value)
-				}
+				entryRes.January.Savings = entryRes.January.Value.Sub(release.Value)
 			case 2:
-				if release.CreatedAt.Before(entryRes.CreatedAt) {
-					entryRes.February.Savings = entryRes.February.Value.Sub(release.Value)
-				}
+				entryRes.February.Savings = entryRes.February.Value.Sub(release.Value)
 			case 3:
-				if release.CreatedAt.Before(entryRes.CreatedAt) {
-					entryRes.March.Savings = entryRes.March.Value.Sub(release.Value)
-				}
+				entryRes.March.Savings = entryRes.March.Value.Sub(release.Value)
 			case 4:
-				if release.CreatedAt.Before(entryRes.CreatedAt) {
-					entryRes.April.Savings = entryRes.April.Value.Sub(release.Value)
-				}
+				entryRes.April.Savings = entryRes.April.Value.Sub(release.Value)
 			case 5:
-				if release.CreatedAt.Before(entryRes.CreatedAt) {
-					entryRes.May.Savings = entryRes.May.Value.Sub(release.Value)
-				}
+				entryRes.May.Savings = entryRes.May.Value.Sub(release.Value)
 			case 6:
-				if release.CreatedAt.Before(entryRes.CreatedAt) {
-					entryRes.June.Savings = entryRes.June.Value.Sub(release.Value)
-				}
+				entryRes.June.Savings = entryRes.June.Value.Sub(release.Value)
 			case 7:
-				if release.CreatedAt.Before(entryRes.CreatedAt) {
-					entryRes.July.Savings = entryRes.July.Value.Sub(release.Value)
-				}
+				entryRes.July.Savings = entryRes.July.Value.Sub(release.Value)
 			case 8:
-				//if release.CreatedAt.Before(entryRes.CreatedAt) {
 				entryRes.August.Savings = entryRes.August.Value.Sub(release.Value)
-				//}
 			case 9:
-				if release.CreatedAt.Before(entryRes.CreatedAt) {
-					entryRes.September.Savings = entryRes.September.Value.Sub(release.Value)
-				}
+				entryRes.September.Savings = entryRes.September.Value.Sub(release.Value)
 			case 10:
-				if release.CreatedAt.Before(entryRes.CreatedAt) {
-					entryRes.October.Savings = entryRes.October.Value.Sub(release.Value)
-				}
+				entryRes.October.Savings = entryRes.October.Value.Sub(release.Value)
 			case 11:
-				if release.CreatedAt.Before(entryRes.CreatedAt) {
-					entryRes.November.Savings = entryRes.November.Value.Sub(release.Value)
-				}
+				entryRes.November.Savings = entryRes.November.Value.Sub(release.Value)
 			case 12:
-				if release.CreatedAt.Before(entryRes.CreatedAt) {
-					entryRes.December.Savings = entryRes.December.Value.Sub(release.Value)
-				}
+				entryRes.December.Savings = entryRes.December.Value.Sub(release.Value)
 			}
 
 			currentMonth := int(time.Now().Month())
