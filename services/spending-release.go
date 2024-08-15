@@ -235,7 +235,7 @@ func (h *SpendingReleaseServiceImpl) monthlyScheduler() {
 			nextMonth = time.Date(year, month+1, 1, 0, 0, 0, 0, location)
 		}*/
 
-		nextMonth := time.Date(year, month, 15, 16, 50, 0, 0, location)
+		nextMonth := time.Date(year, month, 15, 15, 0, 0, 0, location)
 
 		waitDuration := time.Until(nextMonth)
 		fmt.Printf("Sleeping until %v for release trigger\n", nextMonth)
@@ -247,6 +247,7 @@ func (h *SpendingReleaseServiceImpl) monthlyScheduler() {
 }
 
 func (h *SpendingReleaseServiceImpl) executeMonthlyTask() {
+	fmt.Printf("Task for releases started")
 
 	conditionAndExp := &up.AndExpr{}
 
@@ -279,5 +280,7 @@ func (h *SpendingReleaseServiceImpl) executeMonthlyTask() {
 			})
 		}
 	}
+
+	fmt.Printf("Task for releases ended")
 
 }
