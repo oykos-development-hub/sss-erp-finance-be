@@ -222,21 +222,25 @@ func (h *SpendingReleaseServiceImpl) StartMonthlyTaskForSpendingReleases() {
 	go h.monthlyScheduler()
 }
 
+var flag bool
+
 func (h *SpendingReleaseServiceImpl) monthlyScheduler() {
 	for {
 		now := time.Now()
 		year, month, _ := now.Date()
 		location := now.Location()
-		//var nextMonth time.Time
+		var nextMonth time.Time
 
 		/*if month == 12 {
 			nextMonth = time.Date(year, month+2, 1, 0, 0, 0, 0, location)
 		} else {
 			nextMonth = time.Date(year, month+1, 1, 0, 0, 0, 0, location)
 		}*/
-
-		nextMonth := time.Date(year, month, 15, 15, 0, 0, 0, location)
-
+		if !flag {
+			nextMonth = time.Date(year, month, 15, 15, 0, 0, 0, location)
+		} else {
+			nextMonth = time.Date(year, month, 15, 16, 0, 0, 0, location)
+		}
 		waitDuration := time.Until(nextMonth)
 		fmt.Printf("Sleeping until %v for release trigger\n", nextMonth)
 
@@ -248,6 +252,7 @@ func (h *SpendingReleaseServiceImpl) monthlyScheduler() {
 
 func (h *SpendingReleaseServiceImpl) executeMonthlyTask() {
 	fmt.Printf("Task for releases started")
+	flag = true
 
 	conditionAndExp := &up.AndExpr{}
 
