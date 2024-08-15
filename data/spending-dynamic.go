@@ -99,6 +99,7 @@ func (t *SpendingDynamicEntry) FindAll(currentBudgetID, version, budgetID, unitI
 		"sd.october",
 		"sd.november",
 		"sd.december",
+		"sd.total_amount",
 		"sd.version",
 		"sd.created_at",
 		"cb.budget_id",
