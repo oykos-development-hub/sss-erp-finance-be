@@ -352,7 +352,7 @@ func (t *PaymentOrder) GetAllObligations(filter ObligationsFilter) ([]Obligation
 				return nil, nil, newErrors.Wrap(err, "upper scan")
 			}
 
-			rows1, err := Upper.SQL().Query(queryForPaidSalaryAdditionalExpenses, obligation.AdditionalExpenseID)
+			rows1, err := Upper.SQL().Query(queryForPaidSalaryAdditionalExpenses, obligation.SalaryAdditionalExpenseID)
 
 			if err != nil {
 				return nil, nil, newErrors.Wrap(err, "upper exec")
