@@ -158,5 +158,15 @@ func (h *FixedDepositWillServiceImpl) GetFixedDepositWillList(filter dto.FixedDe
 	}
 	response := dto.ToFixedDepositWillListResponseDTO(data)
 
+	for i := 0; i < len(response); i++ {
+		dispatches, _, err := h.dispatches.GetFixedDepositWillDispatchList(dto.FixedDepositWillDispatchFilterDTO{WillID: &response[i].ID})
+
+		if err != nil {
+			return nil, nil, newErrors.Wrap(err, "repo fixed deposit will dispatches get all")
+		}
+
+		response[i].Dispatches = dispatches
+	}
+
 	return response, total, nil
 }
