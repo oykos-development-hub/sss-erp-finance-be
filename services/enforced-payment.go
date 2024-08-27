@@ -224,7 +224,13 @@ func (h *EnforcedPaymentServiceImpl) ReturnEnforcedPayment(ctx context.Context, 
 					if len(currentBudget) > 0 {
 						totalAmount += paidItem.Amount
 
-						currentAmount := currentBudget[0].Balance.Add(decimal.NewFromFloat(float64(paidItem.Amount)))
+						float64Value, _ := currentBudget[0].Balance.Float64()
+
+						float64Value += paidItem.Amount
+
+						//currentAmount := currentBudget[0].Balance.Add(decimal.NewFromFloat(float64(paidItem.Amount)))
+
+						currentAmount := decimal.NewFromFloat(float64Value)
 
 						err = h.currentBudget.UpdateBalance(ctx, tx, currentBudget[0].ID, currentAmount)
 						if err != nil {
