@@ -440,7 +440,7 @@ func (h *ExternalReallocationServiceImpl) RejectSSSExternalReallocation(ctx cont
 					return newErrors.Wrap(err, "repo current budget update actual")
 				}
 
-				currentAmountValue := currentBudget.CurrentAmount.Sub(item.Amount)
+				currentAmountValue := currentBudget.CurrentAmount.Add(item.Amount)
 
 				err = h.currentBudgetRepo.UpdateCurrentAmount(ctx, currentBudget.ID, currentAmountValue)
 
