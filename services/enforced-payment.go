@@ -188,6 +188,55 @@ func (h *EnforcedPaymentServiceImpl) ReturnEnforcedPayment(ctx context.Context, 
 					}
 				}
 			}
+
+			conditionAndExp = &up.AndExpr{}
+			conditionAndExp = up.And(conditionAndExp, &up.Cond{"invoice_id": item.InvoiceID})
+
+			items, _, err := h.paymentOrderItemRepo.GetAll(nil, nil, conditionAndExp, nil)
+
+			if err != nil {
+				return newErrors.Wrap(err, "repo payment order item get all")
+			}
+
+			for _, paidItem := range items {
+				paidPaymentOrder, err := h.paymentOrderRepo.Get(paidItem.PaymentOrderID)
+
+				if err != nil {
+					return newErrors.Wrap(err, "repo payment order get")
+				}
+
+				if paidPaymentOrder.Status == nil || *paidPaymentOrder.Status != "Storniran" {
+					Type := 1
+					if paidPaymentOrder.SourceOfFunding == "Donacija" {
+						Type = 2
+					}
+
+					currentBudget, _, err := h.currentBudget.GetCurrentBudgetList(dto.CurrentBudgetFilterDTO{
+						UnitID:    &paymentOrder.OrganizationUnitID,
+						AccountID: &paidItem.AccountID,
+						Type:      &Type,
+					})
+
+					if err != nil {
+						return newErrors.Wrap(err, "repo current budget get all")
+					}
+
+					if len(currentBudget) > 0 {
+						totalAmount += paidItem.Amount
+
+						currentAmount := currentBudget[0].Balance.Add(decimal.NewFromFloat(float64(paidItem.Amount)))
+
+						err = h.currentBudget.UpdateBalance(ctx, tx, currentBudget[0].ID, currentAmount)
+						if err != nil {
+							return newErrors.Wrap(err, "repo current budget update balance")
+
+						}
+					} else {
+						return newErrors.Wrap(errors.ErrNotFound, "repo current budget get all")
+					}
+				}
+			}
+
 		}
 
 		dataToInsert.ReturnAmount = &totalAmount
