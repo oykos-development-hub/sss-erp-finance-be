@@ -116,6 +116,7 @@ func (h *SalaryServiceImpl) UpdateSalary(ctx context.Context, id int, input dto.
 					if item.ID == itemID {
 						additionalExpenseData := item.ToSalaryAdditionalExpense()
 						additionalExpenseData.ID = id
+						additionalExpenseData.SalaryID = id
 						if additionalExpenseData.Amount > 0 {
 							err := h.salaryAdditionalExpenseRepo.Update(tx, *additionalExpenseData)
 							if err != nil {
