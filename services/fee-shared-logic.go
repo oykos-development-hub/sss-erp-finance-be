@@ -43,7 +43,10 @@ func (h *FeeSharedLogicServiceImpl) CalculateFeeDetailsAndUpdateStatus(ctx conte
 	var paidDuringGracePeriod float64
 
 	details.FeeAmountGracePeriodDueDate = fee.DecisionDate.AddDate(0, 0, data.FineGracePeriod)
-	details.FeeAmountGracePeriod = math.Ceil(float64(fee.Amount) * 2 / 3)
+	rawValue := float64(fee.Amount) * 2 / 3
+	roundedValue := math.Round(rawValue*100) / 100
+
+	details.FeeAmountGracePeriod = roundedValue
 
 	// count all payments and court costs payments
 	for _, payment := range payments {
