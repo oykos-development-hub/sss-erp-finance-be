@@ -111,6 +111,7 @@ func (h *PaymentOrderServiceImpl) CreatePaymentOrder(ctx context.Context, input 
 
 			if len(currentBudget) > 0 {
 				fmt.Println(item.Amount)
+				fmt.Println(currentBudget[0].Balance)
 				currentAmount := currentBudget[0].Balance.Sub(decimal.NewFromFloat32(float32(item.Amount)))
 				fmt.Println(currentAmount)
 
