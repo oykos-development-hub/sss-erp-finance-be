@@ -111,17 +111,19 @@ func (h *PaymentOrderServiceImpl) CreatePaymentOrder(ctx context.Context, input 
 
 			if len(currentBudget) > 0 {
 				fmt.Println(item.Amount)
-				fmt.Println(currentBudget[0].Balance)
-				fmt.Println("---------------")
 				currentAmount := currentBudget[0].Balance.Sub(decimal.NewFromFloat32(float32(item.Amount)))
+				fmt.Println(currentAmount)
+
 				if currentAmount.LessThan(decimal.NewFromInt(0)) {
 					return newErrors.Wrap(errors.ErrInsufficientFunds, "repo current budget update balance")
 				} else {
+					fmt.Println("azuriro")
 					err = h.currentBudgetService.UpdateBalance(ctx, tx, currentBudget[0].ID, currentAmount)
 					if err != nil {
 						return newErrors.Wrap(err, "repo current budget update balance")
 					}
 				}
+				fmt.Println("------------")
 			} else {
 				return newErrors.Wrap(errors.ErrInsufficientFunds, "repo current budget update balance")
 			}
